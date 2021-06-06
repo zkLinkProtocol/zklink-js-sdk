@@ -12,7 +12,8 @@ import {
     ForcedExit,
     ChangePubKey,
     Withdraw,
-    CloseAccount
+    CloseAccount,
+    CreatePool, AddLiquidity, RemoveLiquidity, Swap
 } from './types';
 
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
@@ -553,6 +554,9 @@ export function serializeNonce(nonce: number): Uint8Array {
     }
     return numberToBytesBE(nonce, 4);
 }
+export function serializeChainId(chainId: number): Uint8Array {
+    return numberToBytesBE(chainId, 1);
+}
 
 export function serializeTimestamp(time: number): Uint8Array {
     if (time < 0) {
@@ -597,7 +601,83 @@ export function serializeTransfer(transfer: Transfer): Uint8Array {
     const nonce = serializeNonce(transfer.nonce);
     const validFrom = serializeTimestamp(transfer.validFrom);
     const validUntil = serializeTimestamp(transfer.validUntil);
+    console.log('serializeTransfer transfer ', transfer);
     return ethers.utils.concat([type, accountId, from, to, token, amount, fee, nonce, validFrom, validUntil]);
+}
+
+export function serializeSwap(transfer: Swap): Uint8Array {
+    const type = new Uint8Array([12]); // tx type
+    const fromChain = serializeChainId(transfer.fromChain);
+    const toChain = serializeChainId(transfer.toChain);
+    const accountId = serializeAccountId(transfer.accountId);
+    const account = serializeAddress(transfer.account);
+    const pairAddress = serializeAddress(transfer.pairAddress);
+    const pairAccountId = serializeAccountId(transfer.pairAccountId);
+    const tokenIn = serializeTokenId(transfer.tokenIn);
+    const tokenOut = serializeTokenId(transfer.tokenOut);
+    const tokenLp = serializeTokenId(transfer.tokenLp);
+    const amountIn = serializeAmountPacked(transfer.amountIn);
+    const amountOut = serializeAmountPacked(transfer.amountOut);
+    const amountOutMin = serializeAmountPacked(transfer.amountOutMin);
+    const fee0 = serializeFeePacked(transfer.fee0);
+    const fee1 = serializeFeePacked(transfer.fee1);
+    const nonce = serializeNonce(transfer.nonce);
+    const validFrom = serializeTimestamp(transfer.validFrom);
+    const validUntil = serializeTimestamp(transfer.validUntil);
+    return ethers.utils.concat([type, fromChain, toChain, accountId, account, pairAddress, tokenIn, tokenOut, amountIn, amountOutMin, fee0, fee1, nonce, validFrom, validUntil]);
+}
+
+export function serializeCreatePool(transfer: CreatePool): Uint8Array {
+    const type = new Uint8Array([5]); // tx type
+    const accountId = serializeAccountId(transfer.accountId);
+    const account = serializeAddress(transfer.account);
+    const token0 = serializeTokenId(transfer.token0);
+    const token1 = serializeTokenId(transfer.token1);
+    const chainId0 = serializeChainId(transfer.chainId0);
+    const chainId1 = serializeChainId(transfer.chainId1);
+    const nonce = serializeNonce(transfer.nonce);
+    const validFrom = serializeTimestamp(transfer.validFrom);
+    const validUntil = serializeTimestamp(transfer.validUntil);
+    return ethers.utils.concat([type, chainId0, chainId1, account, accountId, token0, token1, nonce, validFrom, validUntil]);
+}
+export function serializeAddLiquidity(transfer: AddLiquidity): Uint8Array {
+    const type = new Uint8Array([10]); // tx type
+    const accountId = serializeAccountId(transfer.accountId);
+    const account = serializeAddress(transfer.account);
+    const pairAccount = serializeAddress(transfer.pairAccount);
+    const token0 = serializeTokenId(transfer.token0);
+    const token1 = serializeTokenId(transfer.token1);
+    const fromChainId = serializeChainId(transfer.fromChainId);
+    const toChainId = serializeChainId(transfer.toChainId);
+    const amount0 = serializeAmountPacked(transfer.amount0);
+    const amount1 = serializeAmountPacked(transfer.amount1);
+    const amount0Min = serializeAmountPacked(transfer.amount0Min);
+    const amount1Min = serializeAmountPacked(transfer.amount1Min);
+    const nonce = serializeNonce(transfer.nonce);
+    const validFrom = serializeTimestamp(transfer.validFrom);
+    const validUntil = serializeTimestamp(transfer.validUntil);
+    console.log('serializeAddLiquidity transfer ', transfer);
+    return ethers.utils.concat([type, fromChainId, toChainId, accountId, account, token0, token1, pairAccount, amount0, amount1, amount0Min, amount1Min, nonce, validFrom, validUntil]);
+}
+export function serializeRemoveLiquidity(transfer: RemoveLiquidity): Uint8Array {
+    const type = new Uint8Array([11]); // tx type
+    const accountId = serializeAccountId(transfer.accountId);
+    const pairAddress = serializeAddress(transfer.pairAddress);
+    const from = serializeAddress(transfer.from);
+    const chainId0 = serializeChainId(transfer.chainId0);
+    const chainId1 = serializeChainId(transfer.chainId1);
+    const minAmount1 = serializeAmountPacked(transfer.minAmount1);
+    const minAmount2 = serializeAmountPacked(transfer.minAmount2);
+    const lpQuantity = serializeAmountPacked(transfer.lpQuantity);
+    const tokenIn = serializeTokenId(transfer.tokenIn);
+    const tokenOut = serializeTokenId(transfer.tokenOut);
+    const tokenLp = serializeTokenId(transfer.tokenLp);
+    const fee1 = serializeAmountPacked(transfer.fee1);
+    const fee2 = serializeAmountPacked(transfer.fee2);
+    const nonce = serializeNonce(transfer.nonce);
+    const validFrom = serializeTimestamp(transfer.validFrom);
+    const validUntil = serializeTimestamp(transfer.validUntil);
+    return ethers.utils.concat([type, chainId0, chainId1, accountId, tokenIn, tokenLp, tokenOut, fee1, fee2, from, lpQuantity, minAmount1, minAmount2, pairAddress, nonce, validFrom, validUntil]);
 }
 
 export function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array {

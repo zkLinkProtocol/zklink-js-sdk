@@ -88,6 +88,84 @@ export interface Transfer {
     validUntil: number;
 }
 
+export interface CreatePool {
+    type: 'CreatePool';
+    chainId0: number;
+	chainId1: number;
+    account: Address;
+    accountId: number;
+    nonce: number;
+    token0: number,
+    token1: number,
+    signature?: Signature;
+    validFrom: number;
+    validUntil: number;
+}
+
+export interface AddLiquidity {
+    type: 'AddLiq';
+    fromChainId: number;
+    toChainId: number;
+    account: Address;
+    accountId: number;
+    amount0: BigNumberish,
+    amount1: BigNumberish,
+    amount0Min: BigNumberish,
+    amount1Min: BigNumberish,
+    // fee1: BigNumberish,
+    // fee2: BigNumberish,
+    nonce: number;
+    token0: number,
+    token1: number,
+    pairAccount: Address,
+    signature?: Signature;
+    validFrom: number;
+    validUntil: number;
+}
+
+export interface RemoveLiquidity {
+    type: 'RemoveLiquidity';
+    chainId0: number;
+	chainId1: number;
+    accountId: number;
+    tokenIn: number,
+    tokenLp: number,
+    tokenOut: number,
+    fee1: BigNumberish,
+    fee2: BigNumberish,
+    from: Address;
+    lpQuantity: string;
+    minAmount1: BigNumberish,
+    minAmount2: BigNumberish,
+    nonce: number;
+    pairAddress: Address,
+    signature?: Signature;
+    validFrom: number;
+    validUntil: number;
+}
+
+export interface Swap {
+    type: 'Swap';
+    fromChain: number;
+	toChain: number;
+    account: Address;
+    accountId: number;
+    amountIn: BigNumberish,
+    amountOut: BigNumberish,
+    amountOutMin: BigNumberish,
+    fee0: BigNumberish,
+    fee1: BigNumberish,
+    nonce: number;
+    pairAccountId: number,
+    pairAddress: Address,
+    tokenIn: number,
+    tokenLp: number,
+    tokenOut: number,
+    signature?: Signature;
+    validFrom: number;
+    validUntil: number;
+}
+
 export interface Withdraw {
     type: 'Withdraw';
     accountId: number;
@@ -156,7 +234,7 @@ export interface CloseAccount {
 }
 
 export interface SignedTransaction {
-    tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit;
+    tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit | CreatePool | AddLiquidity | RemoveLiquidity | Swap;
     ethereumSignature?: TxEthSignature;
 }
 

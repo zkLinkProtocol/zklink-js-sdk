@@ -150,6 +150,12 @@ export class Provider {
         return await this.transport.request('account_info', [address]);
     }
 
+    async getAddressByPair(token0: TokenLike, token1: TokenLike): Promise<AccountState> {
+        const tokenId0 = this.tokenSet.resolveTokenId(token0)
+        const tokenId1 = this.tokenSet.resolveTokenId(token1)
+        return await this.transport.request('address_by_pair', [tokenId0, tokenId1]);
+    }
+
     // get transaction status by its hash (e.g. 0xdead..beef)
     async getTxReceipt(txHash: string): Promise<TransactionReceipt> {
         return await this.transport.request('tx_info', [txHash]);

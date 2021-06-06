@@ -1,5 +1,5 @@
 import * as ethers from 'ethers';
-import { TxEthSignature, EthSignerType, PubKeyHash } from './types';
+import { TxEthSignature, EthSignerType, PubKeyHash, Address } from './types';
 import { getSignedBytesFromMessage, signMessagePersonalAPI, getChangePubkeyMessage } from './utils';
 
 /**
@@ -51,6 +51,219 @@ export class EthMessageSigner {
         const message = this.getTransferEthSignMessage(transfer);
         return await this.getEthMessageSignature(message);
     }
+
+
+    getSwapEthMessagePart(tx: {
+        stringAmountIn: string,
+        stringAmountOut: string,
+        stringFee0: string,
+        stringFee1: string,
+        stringTokenIn: string,
+        stringTokenOut: string,
+        tokenLp: string,
+        pairAddress: string,
+    }): string {
+
+        let message = '';
+        message += `Swap ${tx.stringAmountIn} to: ${tx.stringAmountOut}`;
+        message += '\n';
+        message += `Amount: ${tx.stringAmountIn} to: ${tx.stringAmountOut}`;
+        message += '\n';
+        message += `Fee: ${tx.stringFee0} ${tx.stringFee1}`;
+        message += '\n';
+        return message;
+    }
+    getSwapEthSignMessage(transfer: {
+        stringAmountIn: string,
+        stringAmountOut: string,
+        stringAmountOutMin: string,
+        stringFee0: string,
+        stringFee1: string,
+        stringTokenIn: string,
+        stringTokenOut: string,
+        tokenLp: string,
+        pairAddress: string,
+        nonce: number;
+        accountId: number;
+    }): string {
+        let humanReadableTxInfo = this.getSwapEthMessagePart(transfer);
+        if (humanReadableTxInfo.length != 0) {
+            humanReadableTxInfo += '\n';
+        }
+        humanReadableTxInfo += `Nonce: ${transfer.nonce}`;
+
+        return humanReadableTxInfo;
+    }
+
+
+    async ethSignSwap(transfer: {
+        stringAmountIn: string,
+        stringAmountOut: string,
+        stringAmountOutMin: string,
+        stringFee0: string,
+        stringFee1: string,
+        stringTokenIn: string,
+        stringTokenOut: string,
+        tokenLp: string,
+        pairAddress: string,
+        nonce: number;
+        accountId: number;
+    }): Promise<TxEthSignature> {
+        const message = this.getSwapEthSignMessage(transfer);
+        return await this.getEthMessageSignature(message);
+    }
+
+
+    getRemoveLiquidityEthMessagePart(tx: {
+        stringAmount0: string,
+        stringAmount1: string,
+        lpQuantity: string,
+        pairAddress: Address,
+        fee1: string,
+        fee2: string,
+        nonce: number;
+        accountId: number;
+    }): string {
+        let message = '';
+        if (tx.pairAddress != null) {
+            message += `Add Liquidity`;
+        }
+        message += '\n';
+        message += `Pair Address: ${tx.pairAddress}`
+        message += '\n';
+        message += `LP: ${tx.lpQuantity}`;
+        message += '\n';
+        message += `Amount: ${tx.stringAmount0} - ${tx.stringAmount1}`
+        message += '\n';
+        message += `Fee: ${tx.fee1} - ${tx.fee2}`
+        return message;
+    }
+
+    getRemoveLiquidityEthSignMessage(transfer: {
+        stringAmount0: string,
+        stringAmount1: string,
+        lpQuantity: string,
+        pairAddress: Address,
+        fee1: string,
+        fee2: string,
+        nonce: number;
+        accountId: number;
+    }): string {
+        let humanReadableTxInfo = this.getRemoveLiquidityEthMessagePart(transfer);
+        if (humanReadableTxInfo.length != 0) {
+            humanReadableTxInfo += '\n';
+        }
+        humanReadableTxInfo += `Nonce: ${transfer.nonce}`;
+
+        return humanReadableTxInfo;
+    }
+
+    async ethSignRemoveLiquidity(transfer: {
+        stringAmount0: string,
+        stringAmount1: string,
+        stringTokenIn: string,
+        stringTokenOut: string,
+        stringTokenLp: string,
+        lpQuantity: string,
+        pairAddress: Address,
+        fee1: string,
+        fee2: string,
+        nonce: number;
+        accountId: number;
+    }): Promise<TxEthSignature> {
+        const message = this.getRemoveLiquidityEthSignMessage(transfer);
+        return await this.getEthMessageSignature(message);
+    }
+
+    async ethSignAddLiquidity(transfer: {
+        stringAmount0: string,
+        stringAmount1: string,
+        stringAmount0Min: string,
+        stringAmount1Min: string,
+        stringToken0: string,
+        stringToken1: string,
+        account: string;
+        nonce: number;
+        accountId: number;
+        pairAccount: Address;
+    }): Promise<TxEthSignature> {
+        const message = this.getAddLiquidityEthSignMessage(transfer);
+        return await this.getEthMessageSignature(message);
+    }
+
+    getAddLiquidityEthSignMessage(transfer: {
+        stringAmount0: string,
+        stringAmount1: string,
+        stringToken0: string,
+        stringToken1: string,
+        account: string;
+        nonce: number;
+        accountId: number;
+    }): string {
+        let humanReadableTxInfo = this.getAddLiquidityEthMessagePart(transfer);
+        if (humanReadableTxInfo.length != 0) {
+            humanReadableTxInfo += '\n';
+        }
+        humanReadableTxInfo += `Nonce: ${transfer.nonce}`;
+
+        return humanReadableTxInfo;
+    }
+    getAddLiquidityEthMessagePart(tx: {
+        stringAmount0: string,
+        stringAmount1: string,
+        stringToken0: string,
+        stringToken1: string,
+        account: string;
+        nonce: number;
+        accountId: number;
+    }): string {
+        let message = '';
+        if (tx.account != null) {
+            message += `Add Liquidity`;
+        }
+        message += '\n';
+        message += `Token: ${tx.stringToken0} - ${tx.stringToken1}`;
+        message += '\n';
+        message += `Amount: ${tx.stringAmount0} - ${tx.stringAmount1}`
+        return message;
+    }
+
+
+    getCreatePoolEthMessagePart(tx: {
+        token0: string;
+        token1: string;
+    }): string {
+        let message = '';
+        message += `Token: ${tx.token0} - ${tx.token1}`;
+        return message;
+    }
+    
+    getCreatePoolEthSignMessage(transfer: {
+        token0: string;
+        token1: string;
+        nonce: number;
+        accountId: number;
+    }): string {
+        let humanReadableTxInfo = this.getCreatePoolEthMessagePart(transfer);
+        if (humanReadableTxInfo.length != 0) {
+            humanReadableTxInfo += '\n';
+        }
+        humanReadableTxInfo += `Nonce: ${transfer.nonce}`;
+
+        return humanReadableTxInfo;
+    }
+
+    async ethSignCreatePool(transfer: {
+        token0: string;
+        token1: string;
+        nonce: number;
+        accountId: number;
+    }): Promise<TxEthSignature> {
+        const message = this.getCreatePoolEthSignMessage(transfer);
+        return await this.getEthMessageSignature(message);
+    }
+    
+
 
     async ethSignForcedExit(forcedExit: {
         stringToken: string;

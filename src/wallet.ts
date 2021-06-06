@@ -23,7 +23,11 @@ import {
     ChangePubKeyOnchain,
     ChangePubKeyECDSA,
     ChangePubKeyCREATE2,
-    Create2Data
+    Create2Data,
+    CreatePool,
+    RemoveLiquidity,
+    AddLiquidity,
+    Swap
 } from './types';
 import {
     ERC20_APPROVE_TRESHOLD,
@@ -377,6 +381,482 @@ export class Wallet {
             transfer.fee = fullFee.totalFee;
         }
         const signedTransferTransaction = await this.signSyncTransfer(transfer as any);
+        return submitSignedTransaction(signedTransferTransaction, this.provider);
+    }
+
+    async getSwap(transfer: {
+        fromChain: number,
+        toChain: number,
+        tokenIn: TokenLike;
+        tokenOut: TokenLike;
+        tokenLp: TokenLike;
+        amountIn: BigNumberish;
+        amountOut: BigNumberish;
+        amountOutMin: BigNumberish;
+        pairAccountId: number,
+        pairAddress: Address,
+        fee0?: BigNumberish;
+        fee1?: BigNumberish;
+        nonce: number;
+        validFrom: number;
+        validUntil: number;
+    }): Promise<Swap> {
+        if (!this.signer) {
+            throw new Error('ZKSync signer is required for sending zksync transactions.');
+        }
+
+        await this.setRequiredAccountIdFromServer('Transfer funds');
+
+        const tokenIdIn = this.provider.tokenSet.resolveTokenId(transfer.tokenIn);
+        const tokenIdOut = this.provider.tokenSet.resolveTokenId(transfer.tokenOut);
+        const tokenIdLp = this.provider.tokenSet.resolveTokenId(transfer.tokenLp);
+
+        const transactionData = {
+            fromChain: transfer.fromChain,
+            toChain: transfer.toChain,
+            accountId: this.accountId,
+            account: this.address(),
+            tokenIdIn,
+            tokenIdOut,
+            tokenIdLp,
+            amountIn: transfer.amountIn,
+            amountOut: transfer.amountOut,
+            amountOutMin: transfer.amountOutMin,
+            fee0: transfer.fee0,
+            fee1: transfer.fee1,
+            pairAccountId: transfer.pairAccountId,
+            pairAddress: transfer.pairAddress,
+            nonce: transfer.nonce,
+            validFrom: transfer.validFrom,
+            validUntil: transfer.validUntil
+        };
+
+        return this.signer.signSyncSwap(transactionData);
+    }
+
+    async signSyncSwap(transfer: {
+        fromChain: number,
+        toChain: number,
+        tokenIn: TokenLike;
+        tokenOut: TokenLike;
+        tokenLp: TokenLike;
+        amountIn: BigNumberish;
+        amountOut: BigNumberish;
+        amountOutMin: BigNumberish;
+        pairAccountId: number,
+        pairAddress: Address,
+        fee0?: BigNumberish;
+        fee1?: BigNumberish;
+        nonce: number;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<SignedTransaction> {
+        transfer.validFrom = transfer.validFrom || 0;
+        transfer.validUntil = transfer.validUntil || MAX_TIMESTAMP;
+        const signedTransferTransaction = await this.getSwap(transfer as any);
+
+        const stringAmountIn = BigNumber.from(transfer.amountIn).isZero()
+            ? null
+            : this.provider.tokenSet.formatToken(transfer.tokenIn, transfer.amountIn);
+        const stringAmountOut = BigNumber.from(transfer.amountOut).isZero()
+            ? null
+            : this.provider.tokenSet.formatToken(transfer.tokenOut, transfer.amountOut);
+        const stringAmountOutMin = BigNumber.from(transfer.amountOutMin).isZero()
+            ? null
+            : this.provider.tokenSet.formatToken(transfer.tokenOut, transfer.amountOutMin);
+        const stringFee0 = BigNumber.from(transfer.fee0).isZero()
+            ? null
+            : this.provider.tokenSet.formatToken(transfer.tokenIn, transfer.fee0);
+        const stringFee1 = BigNumber.from(transfer.fee1).isZero()
+            ? null
+            : this.provider.tokenSet.formatToken(transfer.tokenOut, transfer.fee1);
+        const stringTokenIn = this.provider.tokenSet.resolveTokenSymbol(transfer.tokenIn);
+        const stringTokenOut = this.provider.tokenSet.resolveTokenSymbol(transfer.tokenOut);
+        const ethereumSignature =
+            this.ethSigner instanceof Create2WalletSigner
+                ? null
+                : await this.ethMessageSigner.ethSignSwap({
+                      stringAmountIn,
+                      stringAmountOut,
+                      stringAmountOutMin,
+                      stringFee0,
+                      stringFee1,
+                      stringTokenIn,
+                      stringTokenOut,
+                      tokenLp: transfer.tokenLp,
+                      pairAddress: transfer.pairAddress,
+                      nonce: transfer.nonce,
+                      accountId: this.accountId
+                  });
+        return {
+            tx: signedTransferTransaction,
+            ethereumSignature
+        };
+    }
+
+
+    async syncSwap(transfer: {
+        fromChain: number,
+        toChain: number,
+        tokenIn: TokenLike;
+        tokenOut: TokenLike;
+        tokenLp: TokenLike;
+        amountIn: BigNumberish;
+        amountOut: BigNumberish;
+        amountOutMin: BigNumberish;
+        pairAccountId: number,
+        pairAddress: Address,
+        fee0?: BigNumberish;
+        fee1?: BigNumberish;
+        nonce?: Nonce;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<Transaction> {
+        transfer.nonce = transfer.nonce != null ? await this.getNonce(transfer.nonce) : await this.getNonce();
+
+        // if (transfer.fee == null) {
+        //     const fullFee = await this.provider.getTransactionFee('Transfer', transfer.to, transfer.token);
+        //     transfer.fee = fullFee.totalFee;
+        // }
+        const signedTransferTransaction = await this.signSyncSwap(transfer as any);
+        return submitSignedTransaction(signedTransferTransaction, this.provider);
+    }
+
+
+    async getRemoveLiquidity(transfer: {
+        chainId0: number;
+        chainId1: number;
+        tokenIn: TokenLike,
+        tokenOut: TokenLike,
+        tokenLp: TokenLike,
+        minAmount1: BigNumberish,
+        minAmount2: BigNumberish,
+        fee1: BigNumberish,
+        fee2: BigNumberish,
+        pairAddress: Address,
+        lpQuantity: string;
+        nonce?: number;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<RemoveLiquidity> {
+        if (!this.signer) {
+            throw new Error('ZKSync signer is required for sending zksync transactions.');
+        }
+
+        await this.setRequiredAccountIdFromServer('Transfer funds');
+
+        const tokenIdIn = this.provider.tokenSet.resolveTokenId(transfer.tokenIn);
+        const tokenIdOut = this.provider.tokenSet.resolveTokenId(transfer.tokenOut);
+        const tokenIdLp = this.provider.tokenSet.resolveTokenId(transfer.tokenLp);
+        // const tokenId0 = this.provider.tokenSet.resolveTokenId(transfer.token0);
+        // const tokenId1 = this.provider.tokenSet.resolveTokenId(transfer.token1);
+
+        const transactionData = {
+            accountId: this.accountId,
+            pairAddress: transfer.pairAddress,
+            chainId0: transfer.chainId0,
+            chainId1: transfer.chainId1,
+            lpQuantity: transfer.lpQuantity,
+            from: this.address(),
+            tokenIdIn,
+            tokenIdOut,
+            tokenIdLp,
+            fee1: transfer.fee1,
+            fee2: transfer.fee2,
+            minAmount1: transfer.minAmount1,
+            minAmount2: transfer.minAmount2,
+            nonce: transfer.nonce,
+            validFrom: transfer.validFrom,
+            validUntil: transfer.validUntil
+        };
+
+        return this.signer.signSyncRemoveLiquidity(transactionData);
+    }
+    async signSyncRemoveLiquidity(transfer: {
+        chainId0: number;
+        chainId1: number;
+        tokenIn: TokenLike,
+        tokenOut: TokenLike,
+        tokenLp: TokenLike,
+        minAmount1: BigNumberish,
+        minAmount2: BigNumberish,
+        fee1: string,
+        fee2: string,
+        pairAddress: Address,
+        lpQuantity: string;
+        nonce?: number;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<SignedTransaction> {
+        transfer.validFrom = transfer.validFrom || 0;
+        transfer.validUntil = transfer.validUntil || MAX_TIMESTAMP;
+        const signedTransferTransaction = await this.getRemoveLiquidity(transfer as any);
+
+        const stringAmount0 = BigNumber.from(transfer.minAmount1).isZero()
+          ? null
+          : this.provider.tokenSet.formatToken(transfer.tokenIn, transfer.minAmount1);
+        const stringAmount1 = BigNumber.from(transfer.minAmount2).isZero()
+          ? null
+          : this.provider.tokenSet.formatToken(transfer.tokenOut, transfer.minAmount2);
+
+        const stringTokenIn = this.provider.tokenSet.resolveTokenSymbol(transfer.tokenIn);
+        const stringTokenOut = this.provider.tokenSet.resolveTokenSymbol(transfer.tokenOut);
+        const stringTokenLp = this.provider.tokenSet.resolveTokenSymbol(transfer.tokenLp);
+        const ethereumSignature =
+          this.ethSigner instanceof Create2WalletSigner
+            ? null
+            : await this.ethMessageSigner.ethSignRemoveLiquidity({
+                stringAmount0,
+                stringAmount1,
+                stringTokenIn,
+                stringTokenOut,
+                stringTokenLp,
+                // stringToken0,
+                // stringToken1,
+                lpQuantity: transfer.lpQuantity,
+                pairAddress: transfer.pairAddress,
+                fee1: transfer.fee1,
+                fee2: transfer.fee2,
+                nonce: transfer.nonce,
+                accountId: this.accountId
+            });
+        return {
+            tx: signedTransferTransaction,
+            ethereumSignature
+        };
+    }
+    async syncRemoveLiquidity(transfer: {
+        chainId0: number;
+        chainId1: number;
+        token0: TokenLike,
+        token1: TokenLike,
+        minAmount1: BigNumberish,
+        minAmount2: BigNumberish,
+        fee1: BigNumberish,
+        fee2: BigNumberish,
+        pairAddress: Address,
+        lpQuantity: string;
+        nonce?: Nonce;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<Transaction> {
+        transfer.nonce = transfer.nonce != null ? await this.getNonce(transfer.nonce) : await this.getNonce();
+
+        if (transfer.fee1 == null) {
+            // const fullFee = await this.provider.getTransactionFee('Transfer', transfer.pairAddress, transfer.token);
+            // transfer.fee1 = fullFee.totalFee;
+        }
+        if (transfer.fee2 == null) {
+            // const fullFee = await this.provider.getTransactionFee('Transfer', transfer.pairAddress, transfer.token);
+            // transfer.fee1 = fullFee.totalFee;
+        }
+        const signedTransferTransaction = await this.signSyncAddLiquidity(transfer as any);
+        return submitSignedTransaction(signedTransferTransaction, this.provider);
+    }
+    async getAddLiquidity(transfer: {
+        fromChainId: number;
+        toChainId: number;
+        token0: TokenLike;
+        token1: TokenLike;
+        amount0: BigNumberish;
+        amount1: BigNumberish;
+        amount0Min: BigNumberish;
+        amount1Min: BigNumberish;
+        pairAccount: Address;
+        // fee1: BigNumberish;
+        // fee2: BigNumberish;
+        nonce?: number;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<AddLiquidity> {
+        if (!this.signer) {
+            throw new Error('ZKSync signer is required for sending zksync transactions.');
+        }
+
+        await this.setRequiredAccountIdFromServer('Transfer funds');
+
+        const tokenId0 = this.provider.tokenSet.resolveTokenId(transfer.token0);
+        const tokenId1 = this.provider.tokenSet.resolveTokenId(transfer.token1);
+
+        const transactionData = {
+            accountId: this.accountId,
+            account: this.address(),
+            fromChainId: transfer.fromChainId,
+            toChainId: transfer.toChainId,
+            // fee1: transfer.fee1,
+            // fee2: transfer.fee2,
+            tokenId0,
+            tokenId1,
+            amount0: transfer.amount0,
+            amount1: transfer.amount1,
+            amount0Min: transfer.amount0Min,
+            amount1Min: transfer.amount1Min,
+            pairAccount: transfer.pairAccount,
+            nonce: transfer.nonce,
+            validFrom: transfer.validFrom,
+            validUntil: transfer.validUntil
+        };
+        console.log(transactionData);
+        return this.signer.signSyncAddLiquidity(transactionData);
+    }
+    async signSyncAddLiquidity(transfer: {
+        chainId0: number;
+        chainId1: number;
+        account: Address;
+        token0: TokenLike;
+        token1: TokenLike;
+        amount0: BigNumberish;
+        amount1: BigNumberish;
+        amount0Min: BigNumberish;
+        amount1Min: BigNumberish;
+        pairAccount: Address;
+        nonce?: number;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<SignedTransaction> {
+        transfer.validFrom = transfer.validFrom || 0;
+        transfer.validUntil = transfer.validUntil || MAX_TIMESTAMP;
+        const signedTransferTransaction = await this.getAddLiquidity(transfer as any);
+
+        const stringAmount0 = BigNumber.from(transfer.amount0).isZero()
+          ? null
+          : this.provider.tokenSet.formatToken(transfer.token0, transfer.amount0);
+
+        const stringAmount0Min = BigNumber.from(transfer.amount0Min).isZero()
+        ? null
+        : this.provider.tokenSet.formatToken(transfer.token0, transfer.amount0Min);
+        const stringAmount1 = BigNumber.from(transfer.amount1).isZero()
+          ? null
+          : this.provider.tokenSet.formatToken(transfer.token1, transfer.amount1);
+        const stringAmount1Min = BigNumber.from(transfer.amount1Min).isZero()
+          ? null
+          : this.provider.tokenSet.formatToken(transfer.token1, transfer.amount1Min);
+
+        const stringToken0 = this.provider.tokenSet.resolveTokenSymbol(transfer.token0);
+        const stringToken1 = this.provider.tokenSet.resolveTokenSymbol(transfer.token1);
+        const ethereumSignature =
+          this.ethSigner instanceof Create2WalletSigner
+            ? null
+            : await this.ethMessageSigner.ethSignAddLiquidity({
+                stringAmount0,
+                stringAmount1,
+                stringAmount0Min,
+                stringAmount1Min,
+                stringToken0,
+                stringToken1,
+                account: transfer.account,
+                nonce: transfer.nonce,
+                accountId: this.accountId,
+                pairAccount: transfer.pairAccount,
+            });
+        return {
+            tx: signedTransferTransaction,
+            ethereumSignature
+        };
+    }
+    async syncAddLiquidity(transfer: {
+        fromChainId: number;
+        toChainId: number;
+        token0: TokenLike;
+        token1: TokenLike;
+        amount0: BigNumberish;
+        amount1: BigNumberish;
+        amount0Min: BigNumberish;
+        amount1Min: BigNumberish;
+        pairAccount: Address;
+        nonce?: Nonce;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<Transaction> {
+        transfer.nonce = transfer.nonce != null ? await this.getNonce(transfer.nonce) : await this.getNonce();
+
+        // if (transfer.fee == null) {
+        //     const fullFee = await this.provider.getTransactionFee('Transfer', transfer.to, transfer.token);
+        //     transfer.fee = fullFee.totalFee;
+        // }
+        const signedTransferTransaction = await this.signSyncAddLiquidity(transfer as any);
+        return submitSignedTransaction(signedTransferTransaction, this.provider);
+    }
+
+    
+    async getCreatePool(transfer: {
+      chainId0: number;
+      chainId1: number;
+      token0: TokenLike;
+      token1: TokenLike;
+      nonce?: number;
+      validFrom?: number;
+      validUntil?: number;
+    }): Promise<CreatePool> {
+      if (!this.signer) {
+          throw new Error('ZKSync signer is required for sending zksync transactions.');
+      }
+
+      await this.setRequiredAccountIdFromServer('Transfer funds');
+
+      const tokenId0 = this.provider.tokenSet.resolveTokenId(transfer.token0);
+      const tokenId1 = this.provider.tokenSet.resolveTokenId(transfer.token1);
+
+      const transactionData = {
+          accountId: this.accountId,
+          account: this.address(),
+          chainId0: transfer.chainId0,
+          chainId1: transfer.chainId1,
+          tokenId0,
+          tokenId1,
+          nonce: transfer.nonce,
+          validFrom: transfer.validFrom,
+          validUntil: transfer.validUntil
+      };
+
+      return this.signer.signSyncCreatePool(transactionData);
+    }
+    async signSyncCreatePool(transfer: {
+      chainId0: number;
+      chainId1: number;
+      token0: TokenLike;
+      token1: TokenLike;
+      nonce?: number;
+      validFrom?: number;
+      validUntil?: number;
+    }): Promise<SignedTransaction> {
+      transfer.validFrom = transfer.validFrom || 0;
+      transfer.validUntil = transfer.validUntil || MAX_TIMESTAMP;
+      const signedTransferTransaction = await this.getCreatePool(transfer as any);
+
+      const stringToken0 = this.provider.tokenSet.resolveTokenSymbol(transfer.token0);
+      const stringToken1 = this.provider.tokenSet.resolveTokenSymbol(transfer.token1);
+      const ethereumSignature =
+          this.ethSigner instanceof Create2WalletSigner
+              ? null
+              : await this.ethMessageSigner.ethSignCreatePool({
+                    token0: stringToken0,
+                    token1: stringToken1,
+                    nonce: transfer.nonce,
+                    accountId: this.accountId
+                });
+      return {
+          tx: signedTransferTransaction,
+          ethereumSignature
+      };
+    }
+
+    async syncCreatePool(transfer: {
+        chainId0: number;
+        chainId1: number;
+        token0: TokenLike;
+        token1: TokenLike;
+        nonce?: Nonce;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<Transaction> {
+        transfer.nonce = transfer.nonce != null ? await this.getNonce(transfer.nonce) : await this.getNonce();
+
+        // if (transfer.fee == null) {
+        //     const fullFee = await this.provider.getTransactionFee('Transfer', transfer.to, transfer.token);
+        //     transfer.fee = fullFee.totalFee;
+        // }
+        const signedTransferTransaction = await this.signSyncCreatePool(transfer as any);
         return submitSignedTransaction(signedTransferTransaction, this.provider);
     }
 
@@ -760,6 +1240,10 @@ export class Wallet {
 
     async getAccountState(): Promise<AccountState> {
         return this.provider.getState(this.address());
+    }
+
+    async getAddressByPair(token0: TokenLike, token1: TokenLike): Promise<AccountState> {
+        return this.provider.getAddressByPair(token0, token1);
     }
 
     async getBalance(token: TokenLike, type: 'committed' | 'verified' = 'committed'): Promise<BigNumber> {

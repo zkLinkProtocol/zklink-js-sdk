@@ -1,5 +1,5 @@
 {
-    "name": "zksync",
+    "name": "zksync-js-sdk",
     "version": "0.10.9",
     "license": "MIT",
     "main": "build/index.js",
