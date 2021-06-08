@@ -9,7 +9,16 @@ This document is a description of the JS library that can be used to interact wi
 
 Full reference on how to use the library can be found [here](https://zksync.io/api/sdk/js/).
 
-## Changelog
+## Development
 
-The changelog of the zksync.js is avaliable
-[here](https://github.com/matter-labs/zksync/blob/master/changelog/js-sdk.md).
+### Project setup
+
+```
+npm install
+```
+
+### Compiles and minifies for production
+
+```
+npm run build
+```
