@@ -389,11 +389,9 @@ export class Wallet {
         toChain: number,
         tokenIn: TokenLike;
         tokenOut: TokenLike;
-        tokenLp: TokenLike;
         amountIn: BigNumberish;
         amountOut: BigNumberish;
         amountOutMin: BigNumberish;
-        pairAccountId: number,
         pairAddress: Address,
         fee0?: BigNumberish;
         fee1?: BigNumberish;
@@ -409,7 +407,6 @@ export class Wallet {
 
         const tokenIdIn = this.provider.tokenSet.resolveTokenId(transfer.tokenIn);
         const tokenIdOut = this.provider.tokenSet.resolveTokenId(transfer.tokenOut);
-        const tokenIdLp = this.provider.tokenSet.resolveTokenId(transfer.tokenLp);
 
         const transactionData = {
             fromChain: transfer.fromChain,
@@ -418,13 +415,11 @@ export class Wallet {
             account: this.address(),
             tokenIdIn,
             tokenIdOut,
-            tokenIdLp,
             amountIn: transfer.amountIn,
             amountOut: transfer.amountOut,
             amountOutMin: transfer.amountOutMin,
             fee0: transfer.fee0,
             fee1: transfer.fee1,
-            pairAccountId: transfer.pairAccountId,
             pairAddress: transfer.pairAddress,
             nonce: transfer.nonce,
             validFrom: transfer.validFrom,
@@ -439,11 +434,9 @@ export class Wallet {
         toChain: number,
         tokenIn: TokenLike;
         tokenOut: TokenLike;
-        tokenLp: TokenLike;
         amountIn: BigNumberish;
         amountOut: BigNumberish;
         amountOutMin: BigNumberish;
-        pairAccountId: number,
         pairAddress: Address,
         fee0?: BigNumberish;
         fee1?: BigNumberish;
@@ -483,7 +476,6 @@ export class Wallet {
                       stringFee1,
                       stringTokenIn,
                       stringTokenOut,
-                      tokenLp: transfer.tokenLp,
                       pairAddress: transfer.pairAddress,
                       nonce: transfer.nonce,
                       accountId: this.accountId
@@ -500,11 +492,9 @@ export class Wallet {
         toChain: number,
         tokenIn: TokenLike;
         tokenOut: TokenLike;
-        tokenLp: TokenLike;
         amountIn: BigNumberish;
         amountOut: BigNumberish;
         amountOutMin: BigNumberish;
-        pairAccountId: number,
         pairAddress: Address,
         fee0?: BigNumberish;
         fee1?: BigNumberish;

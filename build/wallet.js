@@ -256,7 +256,6 @@ class Wallet {
             yield this.setRequiredAccountIdFromServer('Transfer funds');
             const tokenIdIn = this.provider.tokenSet.resolveTokenId(transfer.tokenIn);
             const tokenIdOut = this.provider.tokenSet.resolveTokenId(transfer.tokenOut);
-            const tokenIdLp = this.provider.tokenSet.resolveTokenId(transfer.tokenLp);
             const transactionData = {
                 fromChain: transfer.fromChain,
                 toChain: transfer.toChain,
@@ -264,13 +263,11 @@ class Wallet {
                 account: this.address(),
                 tokenIdIn,
                 tokenIdOut,
-                tokenIdLp,
                 amountIn: transfer.amountIn,
                 amountOut: transfer.amountOut,
                 amountOutMin: transfer.amountOutMin,
                 fee0: transfer.fee0,
                 fee1: transfer.fee1,
-                pairAccountId: transfer.pairAccountId,
                 pairAddress: transfer.pairAddress,
                 nonce: transfer.nonce,
                 validFrom: transfer.validFrom,
@@ -311,7 +308,6 @@ class Wallet {
                     stringFee1,
                     stringTokenIn,
                     stringTokenOut,
-                    tokenLp: transfer.tokenLp,
                     pairAddress: transfer.pairAddress,
                     nonce: transfer.nonce,
                     accountId: this.accountId

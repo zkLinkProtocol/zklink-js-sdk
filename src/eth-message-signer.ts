@@ -60,7 +60,6 @@ export class EthMessageSigner {
         stringFee1: string,
         stringTokenIn: string,
         stringTokenOut: string,
-        tokenLp: string,
         pairAddress: string,
     }): string {
 
@@ -81,7 +80,6 @@ export class EthMessageSigner {
         stringFee1: string,
         stringTokenIn: string,
         stringTokenOut: string,
-        tokenLp: string,
         pairAddress: string,
         nonce: number;
         accountId: number;
@@ -104,7 +102,6 @@ export class EthMessageSigner {
         stringFee1: string,
         stringTokenIn: string,
         stringTokenOut: string,
-        tokenLp: string,
         pairAddress: string,
         nonce: number;
         accountId: number;

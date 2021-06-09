@@ -88,11 +88,9 @@ export declare class Wallet {
         toChain: number;
         tokenIn: TokenLike;
         tokenOut: TokenLike;
-        tokenLp: TokenLike;
         amountIn: BigNumberish;
         amountOut: BigNumberish;
         amountOutMin: BigNumberish;
-        pairAccountId: number;
         pairAddress: Address;
         fee0?: BigNumberish;
         fee1?: BigNumberish;
@@ -105,11 +103,9 @@ export declare class Wallet {
         toChain: number;
         tokenIn: TokenLike;
         tokenOut: TokenLike;
-        tokenLp: TokenLike;
         amountIn: BigNumberish;
         amountOut: BigNumberish;
         amountOutMin: BigNumberish;
-        pairAccountId: number;
         pairAddress: Address;
         fee0?: BigNumberish;
         fee1?: BigNumberish;
@@ -122,11 +118,9 @@ export declare class Wallet {
         toChain: number;
         tokenIn: TokenLike;
         tokenOut: TokenLike;
-        tokenLp: TokenLike;
         amountIn: BigNumberish;
         amountOut: BigNumberish;
         amountOutMin: BigNumberish;
-        pairAccountId: number;
         pairAddress: Address;
         fee0?: BigNumberish;
         fee1?: BigNumberish;

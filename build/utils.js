@@ -532,10 +532,8 @@ function serializeSwap(transfer) {
     const accountId = serializeAccountId(transfer.accountId);
     const account = serializeAddress(transfer.account);
     const pairAddress = serializeAddress(transfer.pairAddress);
-    const pairAccountId = serializeAccountId(transfer.pairAccountId);
     const tokenIn = serializeTokenId(transfer.tokenIn);
     const tokenOut = serializeTokenId(transfer.tokenOut);
-    const tokenLp = serializeTokenId(transfer.tokenLp);
     const amountIn = serializeAmountPacked(transfer.amountIn);
     const amountOut = serializeAmountPacked(transfer.amountOut);
     const amountOutMin = serializeAmountPacked(transfer.amountOutMin);

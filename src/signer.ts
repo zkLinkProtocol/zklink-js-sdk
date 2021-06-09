@@ -83,13 +83,11 @@ export class Signer {
         account: Address,  // this.address()
         tokenIdIn: number,
         tokenIdOut: number,
-        tokenIdLp: number,
         amountIn: BigNumberish,
         amountOut: BigNumberish,
         amountOutMin: BigNumberish,
         fee0: BigNumberish,
         fee1: BigNumberish,
-        pairAccountId: number,
         pairAddress: Address,
         
         nonce: number;
@@ -101,7 +99,6 @@ export class Signer {
             type: 'Swap',
             tokenIn: transfer.tokenIdIn,
             tokenOut: transfer.tokenIdOut,
-            tokenLp: transfer.tokenIdLp,
         };
         const msgBytes = utils.serializeSwap(tx);
         const signature = await signTransactionBytes(this.#privateKey, msgBytes);

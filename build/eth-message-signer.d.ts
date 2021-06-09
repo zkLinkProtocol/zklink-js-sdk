@@ -31,7 +31,6 @@ export declare class EthMessageSigner {
         stringFee1: string;
         stringTokenIn: string;
         stringTokenOut: string;
-        tokenLp: string;
         pairAddress: string;
     }): string;
     getSwapEthSignMessage(transfer: {
@@ -42,7 +41,6 @@ export declare class EthMessageSigner {
         stringFee1: string;
         stringTokenIn: string;
         stringTokenOut: string;
-        tokenLp: string;
         pairAddress: string;
         nonce: number;
         accountId: number;
@@ -55,7 +53,6 @@ export declare class EthMessageSigner {
         stringFee1: string;
         stringTokenIn: string;
         stringTokenOut: string;
-        tokenLp: string;
         pairAddress: string;
         nonce: number;
         accountId: number;

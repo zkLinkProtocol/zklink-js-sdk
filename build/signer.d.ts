@@ -36,13 +36,11 @@ export declare class Signer {
         account: Address;
         tokenIdIn: number;
         tokenIdOut: number;
-        tokenIdLp: number;
         amountIn: BigNumberish;
         amountOut: BigNumberish;
         amountOutMin: BigNumberish;
         fee0: BigNumberish;
         fee1: BigNumberish;
-        pairAccountId: number;
         pairAddress: Address;
         nonce: number;
         validFrom: number;

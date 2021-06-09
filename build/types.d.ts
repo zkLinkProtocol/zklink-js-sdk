@@ -126,10 +126,8 @@ export interface Swap {
     fee0: BigNumberish;
     fee1: BigNumberish;
     nonce: number;
-    pairAccountId: number;
     pairAddress: Address;
     tokenIn: number;
-    tokenLp: number;
     tokenOut: number;
     signature?: Signature;
     validFrom: number;
