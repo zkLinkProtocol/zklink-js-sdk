@@ -198,10 +198,10 @@ export class Wallet {
 
         const stringAmount = BigNumber.from(transfer.amount).isZero()
             ? null
-            : this.provider.tokenSet.formatToken(transfer.token, transfer.amount);
+            : utils.formatEther(transfer.amount);
         const stringFee = BigNumber.from(transfer.fee).isZero()
             ? null
-            : this.provider.tokenSet.formatToken(transfer.token, transfer.fee);
+            : utils.formatEther(transfer.fee);
         const stringToken = this.provider.tokenSet.resolveTokenSymbol(transfer.token);
         const ethereumSignature =
             this.ethSigner instanceof Create2WalletSigner
@@ -260,7 +260,7 @@ export class Wallet {
 
         const stringFee = BigNumber.from(forcedExit.fee).isZero()
             ? null
-            : this.provider.tokenSet.formatToken(forcedExit.token, forcedExit.fee);
+            : utils.formatEther(forcedExit.fee);
         const stringToken = this.provider.tokenSet.resolveTokenSymbol(forcedExit.token);
         const ethereumSignature =
             this.ethSigner instanceof Create2WalletSigner
@@ -387,6 +387,8 @@ export class Wallet {
     async getSwap(transfer: {
         fromChain: number,
         toChain: number,
+        tokenIdIn: number;
+        tokenIdOut: number;
         tokenIn: TokenLike;
         tokenOut: TokenLike;
         amountIn: BigNumberish;
@@ -405,8 +407,8 @@ export class Wallet {
 
         await this.setRequiredAccountIdFromServer('Transfer funds');
 
-        const tokenIdIn = this.provider.tokenSet.resolveTokenId(transfer.tokenIn);
-        const tokenIdOut = this.provider.tokenSet.resolveTokenId(transfer.tokenOut);
+        const tokenIdIn = transfer.tokenIdIn;
+        const tokenIdOut = transfer.tokenIdOut
 
         const transactionData = {
             fromChain: transfer.fromChain,
@@ -432,6 +434,8 @@ export class Wallet {
     async signSyncSwap(transfer: {
         fromChain: number,
         toChain: number,
+        tokenIdIn: number;
+        tokenIdOut: number;
         tokenIn: TokenLike;
         tokenOut: TokenLike;
         amountIn: BigNumberish;
@@ -450,21 +454,21 @@ export class Wallet {
 
         const stringAmountIn = BigNumber.from(transfer.amountIn).isZero()
             ? null
-            : this.provider.tokenSet.formatToken(transfer.tokenIn, transfer.amountIn);
+            : utils.formatEther(transfer.amountIn);
         const stringAmountOut = BigNumber.from(transfer.amountOut).isZero()
             ? null
-            : this.provider.tokenSet.formatToken(transfer.tokenOut, transfer.amountOut);
+            : utils.formatEther(transfer.amountOut);
         const stringAmountOutMin = BigNumber.from(transfer.amountOutMin).isZero()
             ? null
-            : this.provider.tokenSet.formatToken(transfer.tokenOut, transfer.amountOutMin);
+            : utils.formatEther(transfer.amountOutMin);
         const stringFee0 = BigNumber.from(transfer.fee0).isZero()
             ? null
-            : this.provider.tokenSet.formatToken(transfer.tokenIn, transfer.fee0);
+            : utils.formatEther(transfer.fee0);
         const stringFee1 = BigNumber.from(transfer.fee1).isZero()
             ? null
-            : this.provider.tokenSet.formatToken(transfer.tokenOut, transfer.fee1);
-        const stringTokenIn = this.provider.tokenSet.resolveTokenSymbol(transfer.tokenIn);
-        const stringTokenOut = this.provider.tokenSet.resolveTokenSymbol(transfer.tokenOut);
+            : utils.formatEther(transfer.fee1);
+        const stringTokenIn = transfer.tokenIn;
+        const stringTokenOut = transfer.tokenOut;
         const ethereumSignature =
             this.ethSigner instanceof Create2WalletSigner
                 ? null
@@ -710,17 +714,17 @@ export class Wallet {
 
         const stringAmount0 = BigNumber.from(transfer.amount0).isZero()
           ? null
-          : utils.formatEther(transfer.amount0.toString())
+          : utils.formatEther(transfer.amount0)
 
         const stringAmount0Min = BigNumber.from(transfer.amount0Min).isZero()
         ? null
-        : utils.formatEther(transfer.amount0Min.toString())
+        : utils.formatEther(transfer.amount0Min)
         const stringAmount1 = BigNumber.from(transfer.amount1).isZero()
           ? null
-          : utils.formatEther(transfer.amount1.toString())
+          : utils.formatEther(transfer.amount1)
         const stringAmount1Min = BigNumber.from(transfer.amount1Min).isZero()
           ? null
-          : utils.formatEther(transfer.amount1Min.toString())
+          : utils.formatEther(transfer.amount1Min)
 
         const stringToken0 = transfer.token0
         const stringToken1 = transfer.token1
