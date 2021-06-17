@@ -496,6 +496,8 @@ export class Wallet {
         toChain: number,
         tokenIn: TokenLike;
         tokenOut: TokenLike;
+        tokenIdIn: number;
+        tokenIdOut: number;
         amountIn: BigNumberish;
         amountOut: BigNumberish;
         amountOutMin: BigNumberish;
