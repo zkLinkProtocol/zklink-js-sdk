@@ -86,6 +86,8 @@ export declare class Wallet {
     getSwap(transfer: {
         fromChain: number;
         toChain: number;
+        tokenIdIn: number;
+        tokenIdOut: number;
         tokenIn: TokenLike;
         tokenOut: TokenLike;
         amountIn: BigNumberish;
@@ -101,6 +103,8 @@ export declare class Wallet {
     signSyncSwap(transfer: {
         fromChain: number;
         toChain: number;
+        tokenIdIn: number;
+        tokenIdOut: number;
         tokenIn: TokenLike;
         tokenOut: TokenLike;
         amountIn: BigNumberish;

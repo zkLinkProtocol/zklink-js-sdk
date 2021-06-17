@@ -588,10 +588,10 @@ export class Wallet {
 
         const stringAmount0 = BigNumber.from(transfer.minAmount1).isZero()
           ? null
-          : this.provider.tokenSet.formatToken(transfer.tokenIn, transfer.minAmount1);
+          : utils.formatEther(transfer.minAmount1);
         const stringAmount1 = BigNumber.from(transfer.minAmount2).isZero()
           ? null
-          : this.provider.tokenSet.formatToken(transfer.tokenOut, transfer.minAmount2);
+          : utils.formatEther(transfer.minAmount2);
 
         const stringTokenIn = this.provider.tokenSet.resolveTokenSymbol(transfer.tokenIn);
         const stringTokenOut = this.provider.tokenSet.resolveTokenSymbol(transfer.tokenOut);
