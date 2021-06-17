@@ -14,7 +14,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -27,18 +27,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
-    if (kind === "m") throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, privateMap, value) {
+    if (!privateMap.has(receiver)) {
+        throw new TypeError("attempted to set private field on non-instance");
+    }
+    privateMap.set(receiver, value);
+    return value;
 };
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, privateMap) {
+    if (!privateMap.has(receiver)) {
+        throw new TypeError("attempted to get private field on non-instance");
+    }
+    return privateMap.get(receiver);
 };
-var _Signer_privateKey;
+var _privateKey;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Create2WalletSigner = exports.Signer = void 0;
 const crypto_1 = require("./crypto");
@@ -46,12 +48,12 @@ const ethers_1 = require("ethers");
 const utils = __importStar(require("./utils"));
 class Signer {
     constructor(privKey) {
-        _Signer_privateKey.set(this, void 0);
-        __classPrivateFieldSet(this, _Signer_privateKey, privKey, "f");
+        _privateKey.set(this, void 0);
+        __classPrivateFieldSet(this, _privateKey, privKey);
     }
     pubKeyHash() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield crypto_1.privateKeyToPubKeyHash(__classPrivateFieldGet(this, _Signer_privateKey, "f"));
+            return yield crypto_1.privateKeyToPubKeyHash(__classPrivateFieldGet(this, _privateKey));
         });
     }
     /**
@@ -64,7 +66,7 @@ class Signer {
         return __awaiter(this, void 0, void 0, function* () {
             const tx = Object.assign(Object.assign({}, transfer), { type: 'Transfer', token: transfer.tokenId });
             const msgBytes = utils.serializeTransfer(tx);
-            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
+            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _privateKey), msgBytes);
             return Object.assign(Object.assign({}, tx), { amount: ethers_1.BigNumber.from(transfer.amount).toString(), fee: ethers_1.BigNumber.from(transfer.fee).toString(), signature });
         });
     }
@@ -72,7 +74,7 @@ class Signer {
         return __awaiter(this, void 0, void 0, function* () {
             const tx = Object.assign(Object.assign({}, transfer), { type: 'Swap', tokenIn: transfer.tokenIdIn, tokenOut: transfer.tokenIdOut });
             const msgBytes = utils.serializeSwap(tx);
-            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
+            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _privateKey), msgBytes);
             return Object.assign(Object.assign({}, tx), { amountIn: ethers_1.BigNumber.from(transfer.amountIn).toString(), amountOut: ethers_1.BigNumber.from(transfer.amountOut).toString(), amountOutMin: ethers_1.BigNumber.from(transfer.amountOutMin).toString(), fee0: ethers_1.BigNumber.from(transfer.fee0).toString(), fee1: ethers_1.BigNumber.from(transfer.fee1).toString(), signature });
         });
     }
@@ -80,7 +82,7 @@ class Signer {
         return __awaiter(this, void 0, void 0, function* () {
             const tx = Object.assign(Object.assign({}, transfer), { type: 'RemoveLiquidity', tokenIn: transfer.tokenIdIn, tokenOut: transfer.tokenIdOut, tokenLp: transfer.tokenIdLp });
             const msgBytes = utils.serializeRemoveLiquidity(tx);
-            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
+            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _privateKey), msgBytes);
             return Object.assign(Object.assign({}, tx), { minAmount1: ethers_1.BigNumber.from(transfer.minAmount1).toString(), minAmount2: ethers_1.BigNumber.from(transfer.minAmount2).toString(), fee1: ethers_1.BigNumber.from(transfer.fee1).toString(), fee2: ethers_1.BigNumber.from(transfer.fee2).toString(), signature });
         });
     }
@@ -88,7 +90,7 @@ class Signer {
         return __awaiter(this, void 0, void 0, function* () {
             const tx = Object.assign(Object.assign({}, transfer), { type: 'AddLiq', token0: transfer.tokenId0, token1: transfer.tokenId1 });
             const msgBytes = utils.serializeAddLiquidity(tx);
-            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
+            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _privateKey), msgBytes);
             return Object.assign(Object.assign({}, tx), { amount0: ethers_1.BigNumber.from(transfer.amount0).toString(), amount1: ethers_1.BigNumber.from(transfer.amount1).toString(), amount0Min: ethers_1.BigNumber.from(transfer.amount0Min).toString(), amount1Min: ethers_1.BigNumber.from(transfer.amount1Min).toString(), signature });
         });
     }
@@ -99,7 +101,7 @@ class Signer {
         return __awaiter(this, void 0, void 0, function* () {
             const tx = Object.assign(Object.assign({}, transfer), { type: 'CreatePool', token0: transfer.tokenId0, token1: transfer.tokenId1 });
             const msgBytes = utils.serializeCreatePool(tx);
-            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
+            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _privateKey), msgBytes);
             return Object.assign(Object.assign({}, tx), { signature });
         });
     }
@@ -113,7 +115,7 @@ class Signer {
         return __awaiter(this, void 0, void 0, function* () {
             const tx = Object.assign(Object.assign({}, withdraw), { type: 'Withdraw', to: withdraw.ethAddress, token: withdraw.tokenId });
             const msgBytes = utils.serializeWithdraw(tx);
-            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
+            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _privateKey), msgBytes);
             return Object.assign(Object.assign({}, tx), { amount: ethers_1.BigNumber.from(withdraw.amount).toString(), fee: ethers_1.BigNumber.from(withdraw.fee).toString(), signature });
         });
     }
@@ -127,7 +129,7 @@ class Signer {
         return __awaiter(this, void 0, void 0, function* () {
             const tx = Object.assign(Object.assign({}, forcedExit), { type: 'ForcedExit', token: forcedExit.tokenId });
             const msgBytes = utils.serializeForcedExit(tx);
-            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
+            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _privateKey), msgBytes);
             return Object.assign(Object.assign({}, tx), { fee: ethers_1.BigNumber.from(forcedExit.fee).toString(), signature });
         });
     }
@@ -143,7 +145,7 @@ class Signer {
         return __awaiter(this, void 0, void 0, function* () {
             const tx = Object.assign(Object.assign({}, changePubKey), { type: 'ChangePubKey', feeToken: changePubKey.feeTokenId });
             const msgBytes = utils.serializeChangePubKey(tx);
-            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
+            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _privateKey), msgBytes);
             return Object.assign(Object.assign({}, tx), { fee: ethers_1.BigNumber.from(changePubKey.fee).toString(), signature });
         });
     }
@@ -177,7 +179,7 @@ class Signer {
     }
 }
 exports.Signer = Signer;
-_Signer_privateKey = new WeakMap();
+_privateKey = new WeakMap();
 class Create2WalletSigner extends ethers_1.ethers.Signer {
     constructor(zkSyncPubkeyHash, create2WalletData, provider) {
         super();

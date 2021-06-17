@@ -710,17 +710,17 @@ export class Wallet {
 
         const stringAmount0 = BigNumber.from(transfer.amount0).isZero()
           ? null
-          : utils.parseEther(transfer.amount0.toString()).toString()
+          : utils.formatEther(transfer.amount0.toString())
 
         const stringAmount0Min = BigNumber.from(transfer.amount0Min).isZero()
         ? null
-        : utils.parseEther(transfer.amount0Min.toString()).toString()
+        : utils.formatEther(transfer.amount0Min.toString())
         const stringAmount1 = BigNumber.from(transfer.amount1).isZero()
           ? null
-          : utils.parseEther(transfer.amount1.toString()).toString()
+          : utils.formatEther(transfer.amount1.toString())
         const stringAmount1Min = BigNumber.from(transfer.amount1Min).isZero()
           ? null
-          : utils.parseEther(transfer.amount1Min.toString()).toString()
+          : utils.formatEther(transfer.amount1Min.toString())
 
         const stringToken0 = transfer.token0
         const stringToken1 = transfer.token1

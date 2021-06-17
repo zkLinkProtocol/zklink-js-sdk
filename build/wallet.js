@@ -447,16 +447,16 @@ class Wallet {
             const signedTransferTransaction = yield this.getAddLiquidity(transfer);
             const stringAmount0 = ethers_1.BigNumber.from(transfer.amount0).isZero()
                 ? null
-                : ethers_1.utils.parseEther(transfer.amount0.toString()).toString();
+                : ethers_1.utils.formatEther(transfer.amount0.toString());
             const stringAmount0Min = ethers_1.BigNumber.from(transfer.amount0Min).isZero()
                 ? null
-                : ethers_1.utils.parseEther(transfer.amount0Min.toString()).toString();
+                : ethers_1.utils.formatEther(transfer.amount0Min.toString());
             const stringAmount1 = ethers_1.BigNumber.from(transfer.amount1).isZero()
                 ? null
-                : ethers_1.utils.parseEther(transfer.amount1.toString()).toString();
+                : ethers_1.utils.formatEther(transfer.amount1.toString());
             const stringAmount1Min = ethers_1.BigNumber.from(transfer.amount1Min).isZero()
                 ? null
-                : ethers_1.utils.parseEther(transfer.amount1Min.toString()).toString();
+                : ethers_1.utils.formatEther(transfer.amount1Min.toString());
             const stringToken0 = transfer.token0;
             const stringToken1 = transfer.token1;
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
