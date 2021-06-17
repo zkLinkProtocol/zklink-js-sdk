@@ -661,20 +661,20 @@ export function serializeRemoveLiquidity(transfer: RemoveLiquidity): Uint8Array 
     const accountId = serializeAccountId(transfer.accountId);
     const pairAddress = serializeAddress(transfer.pairAddress);
     const from = serializeAddress(transfer.from);
-    const chainId0 = serializeChainId(transfer.chainId0);
-    const chainId1 = serializeChainId(transfer.chainId1);
+    const fromChainId = serializeChainId(transfer.fromChainId);
+    const toChainId = serializeChainId(transfer.toChainId);
     const minAmount1 = serializeAmountPacked(transfer.minAmount1);
     const minAmount2 = serializeAmountPacked(transfer.minAmount2);
     const lpQuantity = serializeAmountPacked(transfer.lpQuantity);
-    const tokenIn = serializeTokenId(transfer.tokenIn);
-    const tokenOut = serializeTokenId(transfer.tokenOut);
-    const tokenLp = serializeTokenId(transfer.tokenLp);
+    const tokenIn = serializeTokenId(transfer.token1);
+    const tokenOut = serializeTokenId(transfer.token2);
+    const tokenLp = serializeTokenId(transfer.lpToken);
     const fee1 = serializeAmountPacked(transfer.fee1);
     const fee2 = serializeAmountPacked(transfer.fee2);
     const nonce = serializeNonce(transfer.nonce);
     const validFrom = serializeTimestamp(transfer.validFrom);
     const validUntil = serializeTimestamp(transfer.validUntil);
-    return ethers.utils.concat([type, chainId0, chainId1, accountId, tokenIn, tokenLp, tokenOut, fee1, fee2, from, lpQuantity, minAmount1, minAmount2, pairAddress, nonce, validFrom, validUntil]);
+    return ethers.utils.concat([type, fromChainId, toChainId, accountId, from, pairAddress, tokenLp, tokenIn, tokenOut, lpQuantity, minAmount1, minAmount2, fee1, fee2, nonce, validFrom, validUntil]);
 }
 
 export function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array {

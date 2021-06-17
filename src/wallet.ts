@@ -520,11 +520,14 @@ export class Wallet {
 
 
     async getRemoveLiquidity(transfer: {
-        chainId0: number;
-        chainId1: number;
-        tokenIn: TokenLike,
-        tokenOut: TokenLike,
-        tokenLp: TokenLike,
+        fromChainId: number;
+        toChainId: number;
+        token1: TokenLike,
+        token2: TokenLike,
+        lpToken: TokenLike,
+        tokenId1: number,
+        tokenId2: number,
+        lpTokenId: number,
         minAmount1: BigNumberish,
         minAmount2: BigNumberish,
         fee1: BigNumberish,
@@ -541,22 +544,22 @@ export class Wallet {
 
         await this.setRequiredAccountIdFromServer('Transfer funds');
 
-        const tokenIdIn = this.provider.tokenSet.resolveTokenId(transfer.tokenIn);
-        const tokenIdOut = this.provider.tokenSet.resolveTokenId(transfer.tokenOut);
-        const tokenIdLp = this.provider.tokenSet.resolveTokenId(transfer.tokenLp);
+        const tokenId1 = transfer.tokenId1;
+        const tokenId2 = transfer.tokenId2;
+        const lpTokenId = transfer.lpTokenId;
         // const tokenId0 = this.provider.tokenSet.resolveTokenId(transfer.token0);
         // const tokenId1 = this.provider.tokenSet.resolveTokenId(transfer.token1);
 
         const transactionData = {
             accountId: this.accountId,
             pairAddress: transfer.pairAddress,
-            chainId0: transfer.chainId0,
-            chainId1: transfer.chainId1,
+            fromChainId: transfer.fromChainId,
+            toChainId: transfer.toChainId,
             lpQuantity: transfer.lpQuantity,
             from: this.address(),
-            tokenIdIn,
-            tokenIdOut,
-            tokenIdLp,
+            tokenId1,
+            tokenId2,
+            lpTokenId,
             fee1: transfer.fee1,
             fee2: transfer.fee2,
             minAmount1: transfer.minAmount1,
@@ -569,11 +572,14 @@ export class Wallet {
         return this.signer.signSyncRemoveLiquidity(transactionData);
     }
     async signSyncRemoveLiquidity(transfer: {
-        chainId0: number;
-        chainId1: number;
-        tokenIn: TokenLike,
-        tokenOut: TokenLike,
-        tokenLp: TokenLike,
+        fromChainId: number;
+        toChainId: number;
+        token1: TokenLike,
+        token2: TokenLike,
+        lpToken: TokenLike,
+        tokenId1: number,
+        tokenId2: number,
+        lpTokenId: number,
         minAmount1: BigNumberish,
         minAmount2: BigNumberish,
         fee1: string,
@@ -595,9 +601,9 @@ export class Wallet {
           ? null
           : utils.formatEther(transfer.minAmount2);
 
-        const stringTokenIn = this.provider.tokenSet.resolveTokenSymbol(transfer.tokenIn);
-        const stringTokenOut = this.provider.tokenSet.resolveTokenSymbol(transfer.tokenOut);
-        const stringTokenLp = this.provider.tokenSet.resolveTokenSymbol(transfer.tokenLp);
+        const stringTokenIn = transfer.token1;
+        const stringTokenOut = transfer.token2;
+        const stringTokenLp = transfer.lpToken;
         const ethereumSignature =
           this.ethSigner instanceof Create2WalletSigner
             ? null
@@ -622,10 +628,14 @@ export class Wallet {
         };
     }
     async syncRemoveLiquidity(transfer: {
-        chainId0: number;
-        chainId1: number;
-        token0: TokenLike,
+        fromChainId: number;
+        toChainId: number;
         token1: TokenLike,
+        token2: TokenLike,
+        tokenId1: number,
+        tokenId2: number,
+        lpToken: TokenLike,
+        lpTokenId: number,
         minAmount1: BigNumberish,
         minAmount2: BigNumberish,
         fee1: BigNumberish,
@@ -646,7 +656,7 @@ export class Wallet {
             // const fullFee = await this.provider.getTransactionFee('Transfer', transfer.pairAddress, transfer.token);
             // transfer.fee1 = fullFee.totalFee;
         }
-        const signedTransferTransaction = await this.signSyncAddLiquidity(transfer as any);
+        const signedTransferTransaction = await this.signSyncRemoveLiquidity(transfer as any);
         return submitSignedTransaction(signedTransferTransaction, this.provider);
     }
     async getAddLiquidity(transfer: {

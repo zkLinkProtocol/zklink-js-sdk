@@ -335,21 +335,21 @@ class Wallet {
                 throw new Error('ZKSync signer is required for sending zksync transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
-            const tokenIdIn = this.provider.tokenSet.resolveTokenId(transfer.tokenIn);
-            const tokenIdOut = this.provider.tokenSet.resolveTokenId(transfer.tokenOut);
-            const tokenIdLp = this.provider.tokenSet.resolveTokenId(transfer.tokenLp);
+            const tokenId1 = transfer.tokenId1;
+            const tokenId2 = transfer.tokenId2;
+            const lpTokenId = transfer.lpTokenId;
             // const tokenId0 = this.provider.tokenSet.resolveTokenId(transfer.token0);
             // const tokenId1 = this.provider.tokenSet.resolveTokenId(transfer.token1);
             const transactionData = {
                 accountId: this.accountId,
                 pairAddress: transfer.pairAddress,
-                chainId0: transfer.chainId0,
-                chainId1: transfer.chainId1,
+                fromChainId: transfer.fromChainId,
+                toChainId: transfer.toChainId,
                 lpQuantity: transfer.lpQuantity,
                 from: this.address(),
-                tokenIdIn,
-                tokenIdOut,
-                tokenIdLp,
+                tokenId1,
+                tokenId2,
+                lpTokenId,
                 fee1: transfer.fee1,
                 fee2: transfer.fee2,
                 minAmount1: transfer.minAmount1,
@@ -372,9 +372,9 @@ class Wallet {
             const stringAmount1 = ethers_1.BigNumber.from(transfer.minAmount2).isZero()
                 ? null
                 : ethers_1.utils.formatEther(transfer.minAmount2);
-            const stringTokenIn = this.provider.tokenSet.resolveTokenSymbol(transfer.tokenIn);
-            const stringTokenOut = this.provider.tokenSet.resolveTokenSymbol(transfer.tokenOut);
-            const stringTokenLp = this.provider.tokenSet.resolveTokenSymbol(transfer.tokenLp);
+            const stringTokenIn = transfer.token1;
+            const stringTokenOut = transfer.token2;
+            const stringTokenLp = transfer.lpToken;
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
                 : yield this.ethMessageSigner.ethSignRemoveLiquidity({
@@ -409,7 +409,7 @@ class Wallet {
                 // const fullFee = await this.provider.getTransactionFee('Transfer', transfer.pairAddress, transfer.token);
                 // transfer.fee1 = fullFee.totalFee;
             }
-            const signedTransferTransaction = yield this.signSyncAddLiquidity(transfer);
+            const signedTransferTransaction = yield this.signSyncRemoveLiquidity(transfer);
             return submitSignedTransaction(signedTransferTransaction, this.provider);
         });
     }

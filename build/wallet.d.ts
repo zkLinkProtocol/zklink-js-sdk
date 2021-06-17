@@ -135,11 +135,14 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<Transaction>;
     getRemoveLiquidity(transfer: {
-        chainId0: number;
-        chainId1: number;
-        tokenIn: TokenLike;
-        tokenOut: TokenLike;
-        tokenLp: TokenLike;
+        fromChainId: number;
+        toChainId: number;
+        token1: TokenLike;
+        token2: TokenLike;
+        lpToken: TokenLike;
+        tokenId1: number;
+        tokenId2: number;
+        lpTokenId: number;
         minAmount1: BigNumberish;
         minAmount2: BigNumberish;
         fee1: BigNumberish;
@@ -151,11 +154,14 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<RemoveLiquidity>;
     signSyncRemoveLiquidity(transfer: {
-        chainId0: number;
-        chainId1: number;
-        tokenIn: TokenLike;
-        tokenOut: TokenLike;
-        tokenLp: TokenLike;
+        fromChainId: number;
+        toChainId: number;
+        token1: TokenLike;
+        token2: TokenLike;
+        lpToken: TokenLike;
+        tokenId1: number;
+        tokenId2: number;
+        lpTokenId: number;
         minAmount1: BigNumberish;
         minAmount2: BigNumberish;
         fee1: string;
@@ -167,10 +173,14 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<SignedTransaction>;
     syncRemoveLiquidity(transfer: {
-        chainId0: number;
-        chainId1: number;
-        token0: TokenLike;
+        fromChainId: number;
+        toChainId: number;
         token1: TokenLike;
+        token2: TokenLike;
+        tokenId1: number;
+        tokenId2: number;
+        lpToken: TokenLike;
+        lpTokenId: number;
         minAmount1: BigNumberish;
         minAmount2: BigNumberish;
         fee1: BigNumberish;

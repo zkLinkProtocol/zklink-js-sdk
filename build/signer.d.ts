@@ -47,13 +47,13 @@ export declare class Signer {
         validUntil: number;
     }): Promise<Swap>;
     signSyncRemoveLiquidity(transfer: {
-        chainId0: number;
-        chainId1: number;
+        fromChainId: number;
+        toChainId: number;
         minAmount1: BigNumberish;
         minAmount2: BigNumberish;
-        tokenIdIn: number;
-        tokenIdOut: number;
-        tokenIdLp: number;
+        tokenId1: number;
+        tokenId2: number;
+        lpTokenId: number;
         fee1: BigNumberish;
         fee2: BigNumberish;
         from: Address;

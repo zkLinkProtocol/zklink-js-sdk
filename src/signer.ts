@@ -115,13 +115,13 @@ export class Signer {
     }
 
     async signSyncRemoveLiquidity(transfer: {
-        chainId0: number;
-        chainId1: number;
+        fromChainId: number;
+        toChainId: number;
         minAmount1: BigNumberish,
         minAmount2: BigNumberish,
-        tokenIdIn: number,
-        tokenIdOut: number,
-        tokenIdLp: number,
+        tokenId1: number,
+        tokenId2: number,
+        lpTokenId: number,
         fee1: BigNumberish,
         fee2: BigNumberish,
         from: Address;
@@ -135,9 +135,9 @@ export class Signer {
         const tx: RemoveLiquidity = {
             ...transfer,
             type: 'RemoveLiquidity',
-            tokenIn: transfer.tokenIdIn,
-            tokenOut: transfer.tokenIdOut,
-            tokenLp: transfer.tokenIdLp,
+            token1: transfer.tokenId1,
+            token2: transfer.tokenId2,
+            lpToken: transfer.lpTokenId,
         };
         const msgBytes = utils.serializeRemoveLiquidity(tx);
         const signature = await signTransactionBytes(this.#privateKey, msgBytes);

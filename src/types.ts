@@ -125,20 +125,20 @@ export interface AddLiquidity {
 
 export interface RemoveLiquidity {
     type: 'RemoveLiquidity';
-    chainId0: number;
-	chainId1: number;
+    fromChainId: number;
+	toChainId: number;
     accountId: number;
-    tokenIn: number,
-    tokenLp: number,
-    tokenOut: number,
+    token1: number,
+    token2: number,
+    lpToken: number,
     fee1: BigNumberish,
     fee2: BigNumberish,
     from: Address;
     lpQuantity: string;
     minAmount1: BigNumberish,
     minAmount2: BigNumberish,
-    nonce: number;
     pairAddress: Address,
+    nonce: number;
     signature?: Signature;
     validFrom: number;
     validUntil: number;
