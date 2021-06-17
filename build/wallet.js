@@ -419,15 +419,13 @@ class Wallet {
                 throw new Error('ZKSync signer is required for sending zksync transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
-            const tokenId0 = this.provider.tokenSet.resolveTokenId(transfer.token0);
-            const tokenId1 = this.provider.tokenSet.resolveTokenId(transfer.token1);
+            const tokenId0 = transfer.tokenId0;
+            const tokenId1 = transfer.tokenId1;
             const transactionData = {
                 accountId: this.accountId,
                 account: this.address(),
                 fromChainId: transfer.fromChainId,
                 toChainId: transfer.toChainId,
-                // fee1: transfer.fee1,
-                // fee2: transfer.fee2,
                 tokenId0,
                 tokenId1,
                 amount0: transfer.amount0,
@@ -439,7 +437,6 @@ class Wallet {
                 validFrom: transfer.validFrom,
                 validUntil: transfer.validUntil
             };
-            console.log(transactionData);
             return this.signer.signSyncAddLiquidity(transactionData);
         });
     }
@@ -450,18 +447,18 @@ class Wallet {
             const signedTransferTransaction = yield this.getAddLiquidity(transfer);
             const stringAmount0 = ethers_1.BigNumber.from(transfer.amount0).isZero()
                 ? null
-                : this.provider.tokenSet.formatToken(transfer.token0, transfer.amount0);
+                : ethers_1.utils.parseEther(transfer.amount0.toString()).toString();
             const stringAmount0Min = ethers_1.BigNumber.from(transfer.amount0Min).isZero()
                 ? null
-                : this.provider.tokenSet.formatToken(transfer.token0, transfer.amount0Min);
+                : ethers_1.utils.parseEther(transfer.amount0Min.toString()).toString();
             const stringAmount1 = ethers_1.BigNumber.from(transfer.amount1).isZero()
                 ? null
-                : this.provider.tokenSet.formatToken(transfer.token1, transfer.amount1);
+                : ethers_1.utils.parseEther(transfer.amount1.toString()).toString();
             const stringAmount1Min = ethers_1.BigNumber.from(transfer.amount1Min).isZero()
                 ? null
-                : this.provider.tokenSet.formatToken(transfer.token1, transfer.amount1Min);
-            const stringToken0 = this.provider.tokenSet.resolveTokenSymbol(transfer.token0);
-            const stringToken1 = this.provider.tokenSet.resolveTokenSymbol(transfer.token1);
+                : ethers_1.utils.parseEther(transfer.amount1Min.toString()).toString();
+            const stringToken0 = transfer.token0;
+            const stringToken1 = transfer.token1;
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
                 : yield this.ethMessageSigner.ethSignAddLiquidity({

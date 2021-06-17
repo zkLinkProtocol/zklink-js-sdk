@@ -180,6 +180,8 @@ export declare class Wallet {
         toChainId: number;
         token0: TokenLike;
         token1: TokenLike;
+        tokenId0: number;
+        tokenId1: number;
         amount0: BigNumberish;
         amount1: BigNumberish;
         amount0Min: BigNumberish;
@@ -195,6 +197,8 @@ export declare class Wallet {
         account: Address;
         token0: TokenLike;
         token1: TokenLike;
+        tokenId0: number;
+        tokenId1: number;
         amount0: BigNumberish;
         amount1: BigNumberish;
         amount0Min: BigNumberish;
@@ -209,6 +213,8 @@ export declare class Wallet {
         toChainId: number;
         token0: TokenLike;
         token1: TokenLike;
+        tokenId0: number;
+        tokenId1: number;
         amount0: BigNumberish;
         amount1: BigNumberish;
         amount0Min: BigNumberish;
