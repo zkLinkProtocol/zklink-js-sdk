@@ -60,7 +60,7 @@ export declare class EthMessageSigner {
     getRemoveLiquidityEthMessagePart(tx: {
         stringAmount0: string;
         stringAmount1: string;
-        lpQuantity: string;
+        stringLpQuantity: string;
         pairAddress: Address;
         fee1: string;
         fee2: string;
@@ -70,7 +70,7 @@ export declare class EthMessageSigner {
     getRemoveLiquidityEthSignMessage(transfer: {
         stringAmount0: string;
         stringAmount1: string;
-        lpQuantity: string;
+        stringLpQuantity: string;
         pairAddress: Address;
         fee1: string;
         fee2: string;
@@ -83,7 +83,7 @@ export declare class EthMessageSigner {
         stringTokenIn: string;
         stringTokenOut: string;
         stringTokenLp: string;
-        lpQuantity: string;
+        stringLpQuantity: string;
         pairAddress: Address;
         fee1: string;
         fee2: string;

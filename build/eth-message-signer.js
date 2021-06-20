@@ -78,7 +78,7 @@ class EthMessageSigner {
         message += '\n';
         message += `Pair Address: ${tx.pairAddress}`;
         message += '\n';
-        message += `LP: ${tx.lpQuantity}`;
+        message += `LP: ${tx.stringLpQuantity}`;
         message += '\n';
         message += `Amount: ${tx.stringAmount0} - ${tx.stringAmount1}`;
         message += '\n';

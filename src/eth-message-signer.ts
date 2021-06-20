@@ -114,7 +114,7 @@ export class EthMessageSigner {
     getRemoveLiquidityEthMessagePart(tx: {
         stringAmount0: string,
         stringAmount1: string,
-        lpQuantity: string,
+        stringLpQuantity: string,
         pairAddress: Address,
         fee1: string,
         fee2: string,
@@ -128,7 +128,7 @@ export class EthMessageSigner {
         message += '\n';
         message += `Pair Address: ${tx.pairAddress}`
         message += '\n';
-        message += `LP: ${tx.lpQuantity}`;
+        message += `LP: ${tx.stringLpQuantity}`;
         message += '\n';
         message += `Amount: ${tx.stringAmount0} - ${tx.stringAmount1}`
         message += '\n';
@@ -139,7 +139,7 @@ export class EthMessageSigner {
     getRemoveLiquidityEthSignMessage(transfer: {
         stringAmount0: string,
         stringAmount1: string,
-        lpQuantity: string,
+        stringLpQuantity: string,
         pairAddress: Address,
         fee1: string,
         fee2: string,
@@ -161,7 +161,7 @@ export class EthMessageSigner {
         stringTokenIn: string,
         stringTokenOut: string,
         stringTokenLp: string,
-        lpQuantity: string,
+        stringLpQuantity: string,
         pairAddress: Address,
         fee1: string,
         fee2: string,

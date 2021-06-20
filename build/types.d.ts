@@ -105,7 +105,7 @@ export interface RemoveLiquidity {
     fee1: BigNumberish;
     fee2: BigNumberish;
     from: Address;
-    lpQuantity: string;
+    lpQuantity: BigNumberish;
     minAmount1: BigNumberish;
     minAmount2: BigNumberish;
     pairAddress: Address;

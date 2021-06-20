@@ -58,7 +58,7 @@ export declare class Signer {
         fee2: BigNumberish;
         from: Address;
         pairAddress: Address;
-        lpQuantity: string;
+        lpQuantity: BigNumberish;
         accountId: number;
         nonce: number;
         validFrom: number;

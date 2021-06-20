@@ -126,7 +126,7 @@ export class Signer {
         fee2: BigNumberish,
         from: Address;
         pairAddress: Address,
-        lpQuantity: string;
+        lpQuantity: BigNumberish;
         accountId: number,
         nonce: number;
         validFrom: number;
@@ -148,6 +148,7 @@ export class Signer {
             minAmount2: BigNumber.from(transfer.minAmount2).toString(),
             fee1: BigNumber.from(transfer.fee1).toString(),
             fee2: BigNumber.from(transfer.fee2).toString(),
+            lpQuantity: BigNumber.from(transfer.lpQuantity).toString(),
             signature
         };
     }

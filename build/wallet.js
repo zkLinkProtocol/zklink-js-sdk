@@ -372,6 +372,9 @@ class Wallet {
             const stringAmount1 = ethers_1.BigNumber.from(transfer.minAmount2).isZero()
                 ? null
                 : ethers_1.utils.formatEther(transfer.minAmount2);
+            const stringLpQuantity = ethers_1.BigNumber.from(transfer.lpQuantity).isZero()
+                ? null
+                : ethers_1.utils.formatEther(transfer.lpQuantity);
             const stringTokenIn = transfer.token1;
             const stringTokenOut = transfer.token2;
             const stringTokenLp = transfer.lpToken;
@@ -385,7 +388,7 @@ class Wallet {
                     stringTokenLp,
                     // stringToken0,
                     // stringToken1,
-                    lpQuantity: transfer.lpQuantity,
+                    stringLpQuantity,
                     pairAddress: transfer.pairAddress,
                     fee1: transfer.fee1,
                     fee2: transfer.fee2,

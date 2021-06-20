@@ -533,7 +533,7 @@ export class Wallet {
         fee1: BigNumberish,
         fee2: BigNumberish,
         pairAddress: Address,
-        lpQuantity: string;
+        lpQuantity: BigNumberish;
         nonce?: number;
         validFrom?: number;
         validUntil?: number;
@@ -585,7 +585,7 @@ export class Wallet {
         fee1: string,
         fee2: string,
         pairAddress: Address,
-        lpQuantity: string;
+        lpQuantity: BigNumberish;
         nonce?: number;
         validFrom?: number;
         validUntil?: number;
@@ -600,6 +600,9 @@ export class Wallet {
         const stringAmount1 = BigNumber.from(transfer.minAmount2).isZero()
           ? null
           : utils.formatEther(transfer.minAmount2);
+        const stringLpQuantity = BigNumber.from(transfer.lpQuantity).isZero()
+        ? null
+        : utils.formatEther(transfer.lpQuantity);
 
         const stringTokenIn = transfer.token1;
         const stringTokenOut = transfer.token2;
@@ -615,7 +618,7 @@ export class Wallet {
                 stringTokenLp,
                 // stringToken0,
                 // stringToken1,
-                lpQuantity: transfer.lpQuantity,
+                stringLpQuantity,
                 pairAddress: transfer.pairAddress,
                 fee1: transfer.fee1,
                 fee2: transfer.fee2,
@@ -641,7 +644,7 @@ export class Wallet {
         fee1: BigNumberish,
         fee2: BigNumberish,
         pairAddress: Address,
-        lpQuantity: string;
+        lpQuantity: BigNumberish;
         nonce?: Nonce;
         validFrom?: number;
         validUntil?: number;

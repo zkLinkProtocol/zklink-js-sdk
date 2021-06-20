@@ -148,7 +148,7 @@ export declare class Wallet {
         fee1: BigNumberish;
         fee2: BigNumberish;
         pairAddress: Address;
-        lpQuantity: string;
+        lpQuantity: BigNumberish;
         nonce?: number;
         validFrom?: number;
         validUntil?: number;
@@ -167,7 +167,7 @@ export declare class Wallet {
         fee1: string;
         fee2: string;
         pairAddress: Address;
-        lpQuantity: string;
+        lpQuantity: BigNumberish;
         nonce?: number;
         validFrom?: number;
         validUntil?: number;
@@ -186,7 +186,7 @@ export declare class Wallet {
         fee1: BigNumberish;
         fee2: BigNumberish;
         pairAddress: Address;
-        lpQuantity: string;
+        lpQuantity: BigNumberish;
         nonce?: Nonce;
         validFrom?: number;
         validUntil?: number;

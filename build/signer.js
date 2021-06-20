@@ -81,7 +81,7 @@ class Signer {
             const tx = Object.assign(Object.assign({}, transfer), { type: 'RemoveLiquidity', token1: transfer.tokenId1, token2: transfer.tokenId2, lpToken: transfer.lpTokenId });
             const msgBytes = utils.serializeRemoveLiquidity(tx);
             const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
-            return Object.assign(Object.assign({}, tx), { minAmount1: ethers_1.BigNumber.from(transfer.minAmount1).toString(), minAmount2: ethers_1.BigNumber.from(transfer.minAmount2).toString(), fee1: ethers_1.BigNumber.from(transfer.fee1).toString(), fee2: ethers_1.BigNumber.from(transfer.fee2).toString(), signature });
+            return Object.assign(Object.assign({}, tx), { minAmount1: ethers_1.BigNumber.from(transfer.minAmount1).toString(), minAmount2: ethers_1.BigNumber.from(transfer.minAmount2).toString(), fee1: ethers_1.BigNumber.from(transfer.fee1).toString(), fee2: ethers_1.BigNumber.from(transfer.fee2).toString(), lpQuantity: ethers_1.BigNumber.from(transfer.lpQuantity).toString(), signature });
         });
     }
     signSyncAddLiquidity(transfer) {
