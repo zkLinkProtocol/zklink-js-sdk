@@ -387,15 +387,7 @@ export class Signer {
         signer: Signer;
         ethSignatureType: EthSignerType;
     }> {
-        let chainID = 1;
-        if (ethSigner.provider) {
-            const network = await ethSigner.provider.getNetwork();
-            chainID = network.chainId;
-        }
-        let message = 'Access zkSync account.\n\nOnly sign this message for a trusted client!';
-        if (chainID !== 1) {
-            message += `\nChain ID: ${chainID}.`;
-        }
+        let message = 'Access zkLink account.\n\nOnly sign this message for a trusted client!';
         const signedBytes = utils.getSignedBytesFromMessage(message, false);
         const signature = await utils.signMessagePersonalAPI(ethSigner, signedBytes);
         const address = await ethSigner.getAddress();

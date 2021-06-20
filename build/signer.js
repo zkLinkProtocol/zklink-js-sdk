@@ -157,15 +157,7 @@ class Signer {
     }
     static fromETHSignature(ethSigner) {
         return __awaiter(this, void 0, void 0, function* () {
-            let chainID = 1;
-            if (ethSigner.provider) {
-                const network = yield ethSigner.provider.getNetwork();
-                chainID = network.chainId;
-            }
-            let message = 'Access zkSync account.\n\nOnly sign this message for a trusted client!';
-            if (chainID !== 1) {
-                message += `\nChain ID: ${chainID}.`;
-            }
+            let message = 'Access zkLink account.\n\nOnly sign this message for a trusted client!';
             const signedBytes = utils.getSignedBytesFromMessage(message, false);
             const signature = yield utils.signMessagePersonalAPI(ethSigner, signedBytes);
             const address = yield ethSigner.getAddress();
