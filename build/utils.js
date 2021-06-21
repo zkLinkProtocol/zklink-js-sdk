@@ -615,8 +615,6 @@ function serializeChangePubKey(changePubKey) {
         type,
         accountIdBytes,
         accountBytes,
-        fromChainId,
-        toChainId,
         pubKeyHashBytes,
         tokenIdBytes,
         feeBytes,

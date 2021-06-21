@@ -693,8 +693,6 @@ export function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array {
         type,
         accountIdBytes,
         accountBytes,
-        fromChainId,
-        toChainId,
         pubKeyHashBytes,
         tokenIdBytes,
         feeBytes,
