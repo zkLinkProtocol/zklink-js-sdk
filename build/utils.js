@@ -609,10 +609,14 @@ function serializeChangePubKey(changePubKey) {
     const nonceBytes = serializeNonce(changePubKey.nonce);
     const validFrom = serializeTimestamp(changePubKey.validFrom);
     const validUntil = serializeTimestamp(changePubKey.validUntil);
+    const fromChainId = serializeChainId(changePubKey.fromChainId);
+    const toChainId = serializeChainId(changePubKey.toChainId);
     return ethers_1.ethers.utils.concat([
         type,
         accountIdBytes,
         accountBytes,
+        fromChainId,
+        toChainId,
         pubKeyHashBytes,
         tokenIdBytes,
         feeBytes,

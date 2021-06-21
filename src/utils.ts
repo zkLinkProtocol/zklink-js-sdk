@@ -687,10 +687,14 @@ export function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array {
     const nonceBytes = serializeNonce(changePubKey.nonce);
     const validFrom = serializeTimestamp(changePubKey.validFrom);
     const validUntil = serializeTimestamp(changePubKey.validUntil);
+    const fromChainId = serializeChainId(changePubKey.fromChainId);
+    const toChainId = serializeChainId(changePubKey.toChainId);
     return ethers.utils.concat([
         type,
         accountIdBytes,
         accountBytes,
+        fromChainId,
+        toChainId,
         pubKeyHashBytes,
         tokenIdBytes,
         feeBytes,

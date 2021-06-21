@@ -631,6 +631,8 @@ class Wallet {
                 account: this.address(),
                 newPkHash,
                 nonce: changePubKey.nonce,
+                fromChainId: changePubKey.fromChainId,
+                toChainId: changePubKey.toChainId,
                 feeTokenId,
                 fee: ethers_1.BigNumber.from(changePubKey.fee).toString(),
                 ethAuthData: changePubKey.ethAuthData,

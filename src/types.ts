@@ -214,6 +214,8 @@ export interface ChangePubKey {
     accountId: number;
     account: Address;
     newPkHash: PubKeyHash;
+    fromChainId: number;
+    toChainId: number;
     feeToken: number;
     fee: BigNumberish;
     nonce: number;

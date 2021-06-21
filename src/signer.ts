@@ -333,6 +333,8 @@ export class Signer {
         accountId: number;
         account: Address;
         newPkHash: PubKeyHash;
+        fromChainId: number;
+        toChainId: number;
         feeTokenId: number;
         fee: BigNumberish;
         nonce: number;
@@ -352,6 +354,8 @@ export class Signer {
         accountId: number;
         account: Address;
         newPkHash: PubKeyHash;
+        fromChainId: number;
+        toChainId: number;
         feeTokenId: number;
         fee: BigNumberish;
         nonce: number;

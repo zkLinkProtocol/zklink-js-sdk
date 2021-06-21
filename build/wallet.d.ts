@@ -300,6 +300,8 @@ export declare class Wallet {
         feeToken: TokenLike;
         fee: BigNumberish;
         nonce: number;
+        fromChainId: number;
+        toChainId: number;
         ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
         ethSignature?: string;
         validFrom: number;
@@ -308,6 +310,8 @@ export declare class Wallet {
     signSetSigningKey(changePubKey: {
         feeToken: TokenLike;
         fee: BigNumberish;
+        fromChainId: number;
+        toChainId: number;
         nonce: number;
         ethAuthType: ChangePubkeyTypes;
         batchHash?: string;

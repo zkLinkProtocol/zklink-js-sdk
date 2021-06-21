@@ -976,6 +976,8 @@ export class Wallet {
         feeToken: TokenLike;
         fee: BigNumberish;
         nonce: number;
+        fromChainId: number,
+        toChainId: number,
         ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
         ethSignature?: string;
         validFrom: number;
@@ -995,6 +997,8 @@ export class Wallet {
             account: this.address(),
             newPkHash,
             nonce: changePubKey.nonce,
+            fromChainId: changePubKey.fromChainId,
+            toChainId: changePubKey.toChainId,
             feeTokenId,
             fee: BigNumber.from(changePubKey.fee).toString(),
             ethAuthData: changePubKey.ethAuthData,
@@ -1009,6 +1013,8 @@ export class Wallet {
     async signSetSigningKey(changePubKey: {
         feeToken: TokenLike;
         fee: BigNumberish;
+        fromChainId: number;
+        toChainId: number;
         nonce: number;
         ethAuthType: ChangePubkeyTypes;
         batchHash?: string;
