@@ -987,7 +987,11 @@ export class Wallet {
             throw new Error('ZKSync signer is required for current pubkey calculation.');
         }
 
-        const feeTokenId = this.provider.tokenSet.resolveTokenId(changePubKey.feeToken);
+        let feeTokenId = 0;
+        try {
+            feeTokenId = this.provider.tokenSet.resolveTokenId(changePubKey.feeToken)
+        }
+        catch(e) {}
         const newPkHash = await this.signer.pubKeyHash();
 
         await this.setRequiredAccountIdFromServer('Set Signing Key');
