@@ -18,6 +18,17 @@ export type Nonce = number | 'committed';
 
 export type Network = 'localhost' | 'rinkeby' | 'ropsten' | 'mainnet' | 'rinkeby-beta' | 'ropsten-beta';
 
+export interface PairInfo {
+    chain0: number,
+    chain1: number
+    reserve0: string,  // wei
+    reserve1: string,  // wei
+    token0: number,
+    token1: number,
+    token_lp: number,
+    total_supply: string,  // wei
+  }
+
 export interface Create2Data {
     creatorAddress: string;
     saltArg: string;
@@ -46,6 +57,7 @@ export interface AccountState {
         };
         nonce: number;
         pubKeyHash: PubKeyHash;
+        pairInfo: PairInfo;
     };
     verified: {
         balances: {
