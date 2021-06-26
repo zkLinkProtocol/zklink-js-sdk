@@ -542,7 +542,7 @@ function serializeSwap(transfer) {
     const nonce = serializeNonce(transfer.nonce);
     const validFrom = serializeTimestamp(transfer.validFrom);
     const validUntil = serializeTimestamp(transfer.validUntil);
-    return ethers_1.ethers.utils.concat([type, fromChain, toChain, accountId, account, pairAddress, tokenIn, tokenOut, amountIn, amountOutMin, fee0, fee1, nonce, validFrom, validUntil]);
+    return ethers_1.ethers.utils.concat([type, fromChain, toChain, account, pairAddress, tokenIn, tokenOut, amountIn, amountOutMin, fee0, fee1, nonce, validFrom, validUntil]);
 }
 exports.serializeSwap = serializeSwap;
 function serializeCreatePool(transfer) {
@@ -575,7 +575,7 @@ function serializeAddLiquidity(transfer) {
     const nonce = serializeNonce(transfer.nonce);
     const validFrom = serializeTimestamp(transfer.validFrom);
     const validUntil = serializeTimestamp(transfer.validUntil);
-    return ethers_1.ethers.utils.concat([type, fromChainId, toChainId, accountId, account, token0, token1, pairAccount, amount0, amount1, amount0Min, amount1Min, nonce, validFrom, validUntil]);
+    return ethers_1.ethers.utils.concat([type, fromChainId, toChainId, account, token0, token1, pairAccount, amount0, amount1, amount0Min, amount1Min, nonce, validFrom, validUntil]);
 }
 exports.serializeAddLiquidity = serializeAddLiquidity;
 function serializeRemoveLiquidity(transfer) {
@@ -596,7 +596,7 @@ function serializeRemoveLiquidity(transfer) {
     const nonce = serializeNonce(transfer.nonce);
     const validFrom = serializeTimestamp(transfer.validFrom);
     const validUntil = serializeTimestamp(transfer.validUntil);
-    return ethers_1.ethers.utils.concat([type, fromChainId, toChainId, accountId, from, pairAddress, tokenLp, tokenIn, tokenOut, lpQuantity, minAmount1, minAmount2, fee1, fee2, nonce, validFrom, validUntil]);
+    return ethers_1.ethers.utils.concat([type, fromChainId, toChainId, from, pairAddress, tokenLp, tokenIn, tokenOut, lpQuantity, minAmount1, minAmount2, fee1, fee2, nonce, validFrom, validUntil]);
 }
 exports.serializeRemoveLiquidity = serializeRemoveLiquidity;
 function serializeChangePubKey(changePubKey) {
@@ -613,7 +613,7 @@ function serializeChangePubKey(changePubKey) {
     const toChainId = serializeChainId(changePubKey.toChainId);
     return ethers_1.ethers.utils.concat([
         type,
-        accountIdBytes,
+        // accountIdBytes,
         accountBytes,
         pubKeyHashBytes,
         tokenIdBytes,
