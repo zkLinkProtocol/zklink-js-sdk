@@ -591,8 +591,8 @@ function serializeRemoveLiquidity(transfer) {
     const tokenIn = serializeTokenId(transfer.token1);
     const tokenOut = serializeTokenId(transfer.token2);
     const tokenLp = serializeTokenId(transfer.lpToken);
-    const fee1 = serializeAmountPacked(transfer.fee1);
-    const fee2 = serializeAmountPacked(transfer.fee2);
+    const fee1 = serializeFeePacked(transfer.fee1);
+    const fee2 = serializeFeePacked(transfer.fee2);
     const nonce = serializeNonce(transfer.nonce);
     const validFrom = serializeTimestamp(transfer.validFrom);
     const validUntil = serializeTimestamp(transfer.validUntil);
