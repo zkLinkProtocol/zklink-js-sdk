@@ -402,7 +402,7 @@ export function getChangePubkeyLegacyMessage(pubKeyHash: PubKeyHash, nonce: numb
     const msgAccId = utils.hexlify(serializeAccountId(accountId));
     const msgPubKeyHash = utils.hexlify(serializeAddress(pubKeyHash)).substr(2);
     const message =
-        `Register zkSync pubkey:\n\n` +
+        `Register zkLink pubkey:\n\n` +
         `${msgPubKeyHash}\n` +
         `nonce: ${msgNonce}\n` +
         `account id: ${msgAccId}\n\n` +

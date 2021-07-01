@@ -335,7 +335,7 @@ function getChangePubkeyLegacyMessage(pubKeyHash, nonce, accountId) {
     const msgNonce = ethers_1.utils.hexlify(serializeNonce(nonce));
     const msgAccId = ethers_1.utils.hexlify(serializeAccountId(accountId));
     const msgPubKeyHash = ethers_1.utils.hexlify(serializeAddress(pubKeyHash)).substr(2);
-    const message = `Register zkSync pubkey:\n\n` +
+    const message = `Register zkLink pubkey:\n\n` +
         `${msgPubKeyHash}\n` +
         `nonce: ${msgNonce}\n` +
         `account id: ${msgAccId}\n\n` +
