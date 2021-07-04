@@ -52,7 +52,7 @@ class EthMessageSigner {
         message += '\n';
         message += `Amount: ${tx.stringAmountIn} to: ${tx.stringAmountOut}`;
         message += '\n';
-        message += `Fee: ${tx.stringFee0} ${tx.stringFee1}`;
+        message += `Fee: ${tx.stringFee0}`;
         message += '\n';
         return message;
     }
@@ -73,7 +73,7 @@ class EthMessageSigner {
     getRemoveLiquidityEthMessagePart(tx) {
         let message = '';
         if (tx.pairAddress != null) {
-            message += `Add Liquidity`;
+            message += `Remove Liquidity`;
         }
         message += '\n';
         message += `Pair Address: ${tx.pairAddress}`;
