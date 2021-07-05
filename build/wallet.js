@@ -341,7 +341,7 @@ class Wallet {
             // const tokenId0 = this.provider.tokenSet.resolveTokenId(transfer.token0);
             // const tokenId1 = this.provider.tokenSet.resolveTokenId(transfer.token1);
             const transactionData = {
-                accountId: this.accountId,
+                accountId: transfer.accountId || this.accountId,
                 pairAddress: transfer.pairAddress,
                 fromChainId: transfer.fromChainId,
                 toChainId: transfer.toChainId,
@@ -393,7 +393,7 @@ class Wallet {
                     fee1: transfer.fee1,
                     fee2: transfer.fee2,
                     nonce: transfer.nonce,
-                    accountId: this.accountId
+                    accountId: transfer.accountId || this.accountId
                 });
             return {
                 tx: signedTransferTransaction,
@@ -980,7 +980,7 @@ class Wallet {
             else {
                 const accountState = yield this.getAccountState();
                 if (!accountState.id) {
-                    throw new Error("Can't resolve account id from the zkSync node");
+                    throw new Error("Can't resolve account id from the zkLink node");
                 }
                 accountId = accountState.id;
             }
@@ -1019,7 +1019,7 @@ class Wallet {
             if (this.accountId === undefined) {
                 const accountIdFromServer = yield this.getAccountId();
                 if (accountIdFromServer == null) {
-                    throw new Error(`Failed to ${actionName}: Account does not exist in the zkSync network`);
+                    throw new Error(`Failed to ${actionName}: Account does not exist in the zkLink network`);
                 }
                 else {
                     this.accountId = accountIdFromServer;
@@ -1105,7 +1105,7 @@ class Transaction {
                 return;
             const receipt = yield this.sidechainProvider.notifyTransaction(this.txHash, 'COMMIT');
             if (!receipt.success) {
-                this.setErrorState(new ZKSyncTxError(`zkSync transaction failed: ${receipt.failReason}`, receipt));
+                this.setErrorState(new ZKSyncTxError(`zkLink transaction failed: ${receipt.failReason}`, receipt));
                 this.throwErrorIfFailedState();
             }
             this.state = 'Committed';
