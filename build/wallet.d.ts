@@ -277,17 +277,21 @@ export declare class Wallet {
     getWithdrawFromSyncToEthereum(withdraw: {
         ethAddress: string;
         token: TokenLike;
+        tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
         nonce: number;
+        accountId?: number;
         validFrom: number;
         validUntil: number;
     }): Promise<Withdraw>;
     signWithdrawFromSyncToEthereum(withdraw: {
         ethAddress: string;
         token: TokenLike;
+        tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
+        accountId?: number;
         nonce: number;
         validFrom?: number;
         validUntil?: number;

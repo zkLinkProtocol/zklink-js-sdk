@@ -882,9 +882,11 @@ export class Wallet {
     async getWithdrawFromSyncToEthereum(withdraw: {
         ethAddress: string;
         token: TokenLike;
+        tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
         nonce: number;
+        accountId?: number;
         validFrom: number;
         validUntil: number;
     }): Promise<Withdraw> {
@@ -893,9 +895,9 @@ export class Wallet {
         }
         await this.setRequiredAccountIdFromServer('Withdraw funds');
 
-        const tokenId = this.provider.tokenSet.resolveTokenId(withdraw.token);
+        const tokenId = withdraw.tokenId;
         const transactionData = {
-            accountId: this.accountId,
+            accountId: withdraw.accountId || this.accountId,
             from: this.address(),
             ethAddress: withdraw.ethAddress,
             tokenId,
@@ -912,8 +914,10 @@ export class Wallet {
     async signWithdrawFromSyncToEthereum(withdraw: {
         ethAddress: string;
         token: TokenLike;
+        tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
+        accountId?: number;
         nonce: number;
         validFrom?: number;
         validUntil?: number;
@@ -924,11 +928,12 @@ export class Wallet {
 
         const stringAmount = BigNumber.from(withdraw.amount).isZero()
             ? null
-            : this.provider.tokenSet.formatToken(withdraw.token, withdraw.amount);
+            : utils.formatEther(withdraw.amount)
         const stringFee = BigNumber.from(withdraw.fee).isZero()
             ? null
-            : this.provider.tokenSet.formatToken(withdraw.token, withdraw.fee);
-        const stringToken = this.provider.tokenSet.resolveTokenSymbol(withdraw.token);
+            : utils.formatEther(withdraw.fee)
+            
+        const stringToken = withdraw.token
         const ethereumSignature =
             this.ethSigner instanceof Create2WalletSigner
                 ? null
@@ -938,7 +943,7 @@ export class Wallet {
                       stringToken,
                       ethAddress: withdraw.ethAddress,
                       nonce: withdraw.nonce,
-                      accountId: this.accountId
+                      accountId: withdraw.accountId || this.accountId
                   });
 
         return {

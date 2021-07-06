@@ -182,6 +182,7 @@ export interface Withdraw {
     from: Address;
     to: Address;
     token: number;
+    tokenId: number;
     amount: BigNumberish;
     fee: BigNumberish;
     nonce: number;

@@ -554,9 +554,9 @@ class Wallet {
                 throw new Error('ZKSync signer is required for sending zksync transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Withdraw funds');
-            const tokenId = this.provider.tokenSet.resolveTokenId(withdraw.token);
+            const tokenId = withdraw.tokenId;
             const transactionData = {
-                accountId: this.accountId,
+                accountId: withdraw.accountId || this.accountId,
                 from: this.address(),
                 ethAddress: withdraw.ethAddress,
                 tokenId,
@@ -576,11 +576,11 @@ class Wallet {
             const signedWithdrawTransaction = yield this.getWithdrawFromSyncToEthereum(withdraw);
             const stringAmount = ethers_1.BigNumber.from(withdraw.amount).isZero()
                 ? null
-                : this.provider.tokenSet.formatToken(withdraw.token, withdraw.amount);
+                : ethers_1.utils.formatEther(withdraw.amount);
             const stringFee = ethers_1.BigNumber.from(withdraw.fee).isZero()
                 ? null
-                : this.provider.tokenSet.formatToken(withdraw.token, withdraw.fee);
-            const stringToken = this.provider.tokenSet.resolveTokenSymbol(withdraw.token);
+                : ethers_1.utils.formatEther(withdraw.fee);
+            const stringToken = withdraw.token;
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
                 : yield this.ethMessageSigner.ethSignWithdraw({
@@ -589,7 +589,7 @@ class Wallet {
                     stringToken,
                     ethAddress: withdraw.ethAddress,
                     nonce: withdraw.nonce,
-                    accountId: this.accountId
+                    accountId: withdraw.accountId || this.accountId
                 });
             return {
                 tx: signedWithdrawTransaction,
