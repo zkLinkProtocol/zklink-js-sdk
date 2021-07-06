@@ -28,6 +28,7 @@ export declare class Wallet {
         token: TokenLike;
         amount: BigNumberish;
         fee: BigNumberish;
+        accountId: number;
         nonce: number;
         validFrom: number;
         validUntil: number;
@@ -37,6 +38,7 @@ export declare class Wallet {
         token: TokenLike;
         amount: BigNumberish;
         fee: BigNumberish;
+        accountId?: number;
         nonce: number;
         validFrom?: number;
         validUntil?: number;
@@ -70,6 +72,7 @@ export declare class Wallet {
         token: TokenLike;
         amount: BigNumberish;
         fee: BigNumberish;
+        accountId?: number;
         nonce?: Nonce;
         validFrom?: number;
         validUntil?: number;
@@ -79,6 +82,7 @@ export declare class Wallet {
         token: TokenLike;
         amount: BigNumberish;
         fee?: BigNumberish;
+        accountId?: number;
         nonce?: Nonce;
         validFrom?: number;
         validUntil?: number;

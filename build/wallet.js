@@ -94,7 +94,7 @@ class Wallet {
             yield this.setRequiredAccountIdFromServer('Transfer funds');
             const tokenId = this.provider.tokenSet.resolveTokenId(transfer.token);
             const transactionData = {
-                accountId: this.accountId,
+                accountId: transfer.accountId || this.accountId,
                 from: this.address(),
                 to: transfer.to,
                 tokenId,
@@ -127,7 +127,7 @@ class Wallet {
                     stringToken,
                     to: transfer.to,
                     nonce: transfer.nonce,
-                    accountId: this.accountId
+                    accountId: transfer.accountId || this.accountId
                 });
             return {
                 tx: signedTransferTransaction,
@@ -221,6 +221,7 @@ class Wallet {
                     token: transfer.token,
                     amount: transfer.amount,
                     fee: transfer.fee,
+                    accountId: transfer.accountId,
                     nonce,
                     validFrom: transfer.validFrom || 0,
                     validUntil: transfer.validUntil || utils_1.MAX_TIMESTAMP

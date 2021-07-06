@@ -156,6 +156,7 @@ export class Wallet {
         token: TokenLike;
         amount: BigNumberish;
         fee: BigNumberish;
+        accountId: number;
         nonce: number;
         validFrom: number;
         validUntil: number;
@@ -169,7 +170,7 @@ export class Wallet {
         const tokenId = this.provider.tokenSet.resolveTokenId(transfer.token);
 
         const transactionData = {
-            accountId: this.accountId,
+            accountId: transfer.accountId || this.accountId,
             from: this.address(),
             to: transfer.to,
             tokenId,
@@ -188,6 +189,7 @@ export class Wallet {
         token: TokenLike;
         amount: BigNumberish;
         fee: BigNumberish;
+        accountId?: number;
         nonce: number;
         validFrom?: number;
         validUntil?: number;
@@ -212,7 +214,7 @@ export class Wallet {
                       stringToken,
                       to: transfer.to,
                       nonce: transfer.nonce,
-                      accountId: this.accountId
+                      accountId: transfer.accountId || this.accountId
                   });
         return {
             tx: signedTransferTransaction,
@@ -316,6 +318,7 @@ export class Wallet {
             token: TokenLike;
             amount: BigNumberish;
             fee: BigNumberish;
+            accountId?: number;
             nonce?: Nonce;
             validFrom?: number;
             validUntil?: number;
@@ -345,6 +348,7 @@ export class Wallet {
                 token: transfer.token,
                 amount: transfer.amount,
                 fee: transfer.fee,
+                accountId: transfer.accountId,
                 nonce,
                 validFrom: transfer.validFrom || 0,
                 validUntil: transfer.validUntil || MAX_TIMESTAMP
@@ -370,6 +374,7 @@ export class Wallet {
         token: TokenLike;
         amount: BigNumberish;
         fee?: BigNumberish;
+        accountId?: number;
         nonce?: Nonce;
         validFrom?: number;
         validUntil?: number;
