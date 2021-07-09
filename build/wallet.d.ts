@@ -26,6 +26,7 @@ export declare class Wallet {
     getTransfer(transfer: {
         to: Address;
         token: TokenLike;
+        tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
         accountId: number;
@@ -36,6 +37,7 @@ export declare class Wallet {
     signSyncTransfer(transfer: {
         to: Address;
         token: TokenLike;
+        tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
         accountId?: number;
@@ -70,6 +72,7 @@ export declare class Wallet {
     syncMultiTransfer(transfers: {
         to: Address;
         token: TokenLike;
+        tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
         accountId?: number;
@@ -80,6 +83,7 @@ export declare class Wallet {
     syncTransfer(transfer: {
         to: Address;
         token: TokenLike;
+        tokenId: number;
         amount: BigNumberish;
         fee?: BigNumberish;
         accountId?: number;

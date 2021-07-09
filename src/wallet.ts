@@ -154,6 +154,7 @@ export class Wallet {
     async getTransfer(transfer: {
         to: Address;
         token: TokenLike;
+        tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
         accountId: number;
@@ -167,7 +168,7 @@ export class Wallet {
 
         await this.setRequiredAccountIdFromServer('Transfer funds');
 
-        const tokenId = this.provider.tokenSet.resolveTokenId(transfer.token);
+        const tokenId = transfer.tokenId
 
         const transactionData = {
             accountId: transfer.accountId || this.accountId,
@@ -187,6 +188,7 @@ export class Wallet {
     async signSyncTransfer(transfer: {
         to: Address;
         token: TokenLike;
+        tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
         accountId?: number;
@@ -204,7 +206,7 @@ export class Wallet {
         const stringFee = BigNumber.from(transfer.fee).isZero()
             ? null
             : utils.formatEther(transfer.fee);
-        const stringToken = this.provider.tokenSet.resolveTokenSymbol(transfer.token);
+        const stringToken = transfer.token
         const ethereumSignature =
             this.ethSigner instanceof Create2WalletSigner
                 ? null
@@ -316,6 +318,7 @@ export class Wallet {
         transfers: {
             to: Address;
             token: TokenLike;
+            tokenId: number;
             amount: BigNumberish;
             fee: BigNumberish;
             accountId?: number;
@@ -346,6 +349,7 @@ export class Wallet {
             const tx: Transfer = await this.getTransfer({
                 to: transfer.to,
                 token: transfer.token,
+                tokenId: transfer.tokenId,
                 amount: transfer.amount,
                 fee: transfer.fee,
                 accountId: transfer.accountId,
@@ -372,6 +376,7 @@ export class Wallet {
     async syncTransfer(transfer: {
         to: Address;
         token: TokenLike;
+        tokenId: number;
         amount: BigNumberish;
         fee?: BigNumberish;
         accountId?: number;

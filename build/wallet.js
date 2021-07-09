@@ -92,7 +92,7 @@ class Wallet {
                 throw new Error('ZKSync signer is required for sending zksync transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
-            const tokenId = this.provider.tokenSet.resolveTokenId(transfer.token);
+            const tokenId = transfer.tokenId;
             const transactionData = {
                 accountId: transfer.accountId || this.accountId,
                 from: this.address(),
@@ -118,7 +118,7 @@ class Wallet {
             const stringFee = ethers_1.BigNumber.from(transfer.fee).isZero()
                 ? null
                 : ethers_1.utils.formatEther(transfer.fee);
-            const stringToken = this.provider.tokenSet.resolveTokenSymbol(transfer.token);
+            const stringToken = transfer.token;
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
                 : yield this.ethMessageSigner.ethSignTransfer({
@@ -219,6 +219,7 @@ class Wallet {
                 const tx = yield this.getTransfer({
                     to: transfer.to,
                     token: transfer.token,
+                    tokenId: transfer.tokenId,
                     amount: transfer.amount,
                     fee: transfer.fee,
                     accountId: transfer.accountId,
