@@ -1039,6 +1039,7 @@ export class Wallet {
         toChainId: number;
         nonce: number;
         ethAuthType: ChangePubkeyTypes;
+        accountId?: number;
         batchHash?: string;
         validFrom?: number;
         validUntil?: number;
@@ -1056,7 +1057,7 @@ export class Wallet {
             const changePubKeyMessage = getChangePubkeyMessage(
                 newPubKeyHash,
                 changePubKey.nonce,
-                this.accountId,
+                (changePubKey.accountId || this.accountId),
                 changePubKey.batchHash
             );
             const ethSignature = (await this.getEthMessageSignature(changePubKeyMessage)).signature;
@@ -1079,7 +1080,7 @@ export class Wallet {
             }
         } else if (changePubKey.ethAuthType === 'ECDSALegacyMessage') {
             await this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSALegacyMessage.');
-            const changePubKeyMessage = getChangePubkeyLegacyMessage(newPubKeyHash, changePubKey.nonce, this.accountId);
+            const changePubKeyMessage = getChangePubkeyLegacyMessage(newPubKeyHash, changePubKey.nonce, changePubKey.accountId || this.accountId);
             ethSignature = (await this.getEthMessageSignature(changePubKeyMessage)).signature;
         } else {
             throw new Error('Unsupported SetSigningKey type');

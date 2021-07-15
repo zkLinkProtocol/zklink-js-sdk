@@ -661,7 +661,7 @@ class Wallet {
             }
             else if (changePubKey.ethAuthType === 'ECDSA') {
                 yield this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSA.');
-                const changePubKeyMessage = utils_1.getChangePubkeyMessage(newPubKeyHash, changePubKey.nonce, this.accountId, changePubKey.batchHash);
+                const changePubKeyMessage = utils_1.getChangePubkeyMessage(newPubKeyHash, changePubKey.nonce, (changePubKey.accountId || this.accountId), changePubKey.batchHash);
                 const ethSignature = (yield this.getEthMessageSignature(changePubKeyMessage)).signature;
                 ethAuthData = {
                     type: 'ECDSA',
@@ -685,7 +685,7 @@ class Wallet {
             }
             else if (changePubKey.ethAuthType === 'ECDSALegacyMessage') {
                 yield this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSALegacyMessage.');
-                const changePubKeyMessage = utils_1.getChangePubkeyLegacyMessage(newPubKeyHash, changePubKey.nonce, this.accountId);
+                const changePubKeyMessage = utils_1.getChangePubkeyLegacyMessage(newPubKeyHash, changePubKey.nonce, changePubKey.accountId || this.accountId);
                 ethSignature = (yield this.getEthMessageSignature(changePubKeyMessage)).signature;
             }
             else {

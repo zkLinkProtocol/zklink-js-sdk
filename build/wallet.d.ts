@@ -329,6 +329,7 @@ export declare class Wallet {
         toChainId: number;
         nonce: number;
         ethAuthType: ChangePubkeyTypes;
+        accountId?: number;
         batchHash?: string;
         validFrom?: number;
         validUntil?: number;
