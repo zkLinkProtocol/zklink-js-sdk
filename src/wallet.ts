@@ -996,6 +996,7 @@ export class Wallet {
         nonce: number;
         fromChainId: number,
         toChainId: number,
+        accountId?: number,
         ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
         ethSignature?: string;
         validFrom: number;
@@ -1015,7 +1016,7 @@ export class Wallet {
         await this.setRequiredAccountIdFromServer('Set Signing Key');
 
         const changePubKeyTx: ChangePubKey = await this.signer.signSyncChangePubKey({
-            accountId: this.accountId,
+            accountId: changePubKey.accountId || this.accountId,
             account: this.address(),
             newPkHash,
             nonce: changePubKey.nonce,

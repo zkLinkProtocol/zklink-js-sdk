@@ -317,6 +317,7 @@ export declare class Wallet {
         nonce: number;
         fromChainId: number;
         toChainId: number;
+        accountId?: number;
         ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
         ethSignature?: string;
         validFrom: number;
