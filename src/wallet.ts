@@ -1488,7 +1488,7 @@ export class Wallet {
         if (this.accountId === undefined) {
             const accountIdFromServer = await this.getAccountId();
             if (accountIdFromServer == null) {
-                throw new Error(`Failed to ${actionName}: Account does not exist in the zkLink network`);
+                // throw new Error(`Failed to ${actionName}: Account does not exist in the zkLink network`);
             } else {
                 this.accountId = accountIdFromServer;
             }
