@@ -1,6 +1,6 @@
 {
     "name": "zksync-js-sdk",
-    "version": "0.10.22",
+    "version": "0.10.23",
     "license": "MIT",
     "main": "build/index.js",
     "types": "build/index.d.ts",
