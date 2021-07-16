@@ -214,7 +214,7 @@ export class DummyTransport extends AbstractJSONRPCTransport {
             //  - adds single entry of "DAI" token to the committed balances;
             //  - adds single entry of "USDC" token to the verified balances.
             return {
-                address: params[0],
+                address: params[1],
                 id: 42,
                 depositing: {},
                 committed: {

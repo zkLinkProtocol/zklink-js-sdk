@@ -24,6 +24,7 @@ export declare class Wallet {
     getEthMessageSignature(message: ethers.utils.BytesLike): Promise<TxEthSignature>;
     batchBuilder(nonce?: Nonce): BatchBuilder;
     getTransfer(transfer: {
+        chainId: string;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -35,6 +36,7 @@ export declare class Wallet {
         validUntil: number;
     }): Promise<Transfer>;
     signSyncTransfer(transfer: {
+        chainId: string;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -46,6 +48,7 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<SignedTransaction>;
     getForcedExit(forcedExit: {
+        chainId: string;
         target: Address;
         token: TokenLike;
         fee: BigNumberish;
@@ -54,6 +57,7 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<ForcedExit>;
     signSyncForcedExit(forcedExit: {
+        chainId: string;
         target: Address;
         token: TokenLike;
         fee: BigNumberish;
@@ -62,6 +66,7 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<SignedTransaction>;
     syncForcedExit(forcedExit: {
+        chainId: string;
         target: Address;
         token: TokenLike;
         fee?: BigNumberish;
@@ -70,6 +75,7 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<Transaction>;
     syncMultiTransfer(transfers: {
+        chainId: string;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -81,6 +87,7 @@ export declare class Wallet {
         validUntil?: number;
     }[]): Promise<Transaction[]>;
     syncTransfer(transfer: {
+        chainId: string;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -92,6 +99,7 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<Transaction>;
     getSwap(transfer: {
+        chainId: string;
         fromChain: number;
         toChain: number;
         tokenIdIn: number;
@@ -101,6 +109,7 @@ export declare class Wallet {
         amountIn: BigNumberish;
         amountOut: BigNumberish;
         amountOutMin: BigNumberish;
+        accountId: number;
         pairAddress: Address;
         fee0?: BigNumberish;
         fee1?: BigNumberish;
@@ -109,6 +118,7 @@ export declare class Wallet {
         validUntil: number;
     }): Promise<Swap>;
     signSyncSwap(transfer: {
+        chainId: string;
         fromChain: number;
         toChain: number;
         tokenIdIn: number;
@@ -119,6 +129,7 @@ export declare class Wallet {
         amountOut: BigNumberish;
         amountOutMin: BigNumberish;
         pairAddress: Address;
+        accountId?: number;
         fee0?: BigNumberish;
         fee1?: BigNumberish;
         nonce: number;
@@ -126,6 +137,7 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<SignedTransaction>;
     syncSwap(transfer: {
+        chainId: string;
         fromChain: number;
         toChain: number;
         tokenIn: TokenLike;
@@ -143,6 +155,7 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<Transaction>;
     getRemoveLiquidity(transfer: {
+        chainId: string;
         fromChainId: number;
         toChainId: number;
         token1: TokenLike;
@@ -157,12 +170,13 @@ export declare class Wallet {
         fee2: BigNumberish;
         pairAddress: Address;
         lpQuantity: BigNumberish;
-        accountId?: number;
+        accountId: number;
         nonce?: number;
         validFrom?: number;
         validUntil?: number;
     }): Promise<RemoveLiquidity>;
     signSyncRemoveLiquidity(transfer: {
+        chainId: string;
         fromChainId: number;
         toChainId: number;
         token1: TokenLike;
@@ -183,6 +197,7 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<SignedTransaction>;
     syncRemoveLiquidity(transfer: {
+        chainId: string;
         fromChainId: number;
         toChainId: number;
         token1: TokenLike;
@@ -203,6 +218,7 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<Transaction>;
     getAddLiquidity(transfer: {
+        chainId: string;
         fromChainId: number;
         toChainId: number;
         token0: TokenLike;
@@ -213,12 +229,14 @@ export declare class Wallet {
         amount1: BigNumberish;
         amount0Min: BigNumberish;
         amount1Min: BigNumberish;
+        accountId: number;
         pairAccount: Address;
         nonce?: number;
         validFrom?: number;
         validUntil?: number;
     }): Promise<AddLiquidity>;
     signSyncAddLiquidity(transfer: {
+        chainId: string;
         chainId0: number;
         chainId1: number;
         account: Address;
@@ -230,12 +248,14 @@ export declare class Wallet {
         amount1: BigNumberish;
         amount0Min: BigNumberish;
         amount1Min: BigNumberish;
+        accountId?: number;
         pairAccount: Address;
         nonce?: number;
         validFrom?: number;
         validUntil?: number;
     }): Promise<SignedTransaction>;
     syncAddLiquidity(transfer: {
+        chainId: string;
         fromChainId: number;
         toChainId: number;
         token0: TokenLike;
@@ -252,10 +272,12 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<Transaction>;
     getCreatePool(transfer: {
+        chainId: string;
         chainId0: number;
         chainId1: number;
         token0: TokenLike;
         token1: TokenLike;
+        accountId: number;
         nonce?: number;
         validFrom?: number;
         validUntil?: number;
@@ -270,6 +292,7 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<SignedTransaction>;
     syncCreatePool(transfer: {
+        chainId: string;
         chainId0: number;
         chainId1: number;
         token0: TokenLike;
@@ -279,17 +302,19 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<Transaction>;
     getWithdrawFromSyncToEthereum(withdraw: {
+        chainId: string;
         ethAddress: string;
         token: TokenLike;
         tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
         nonce: number;
-        accountId?: number;
+        accountId: number;
         validFrom: number;
         validUntil: number;
     }): Promise<Withdraw>;
     signWithdrawFromSyncToEthereum(withdraw: {
+        chainId: string;
         ethAddress: string;
         token: TokenLike;
         tokenId: number;
@@ -305,13 +330,15 @@ export declare class Wallet {
         token: TokenLike;
         amount: BigNumberish;
         fee?: BigNumberish;
+        chainId?: string;
         nonce?: Nonce;
         fastProcessing?: boolean;
         validFrom?: number;
         validUntil?: number;
     }): Promise<Transaction>;
-    isSigningKeySet(): Promise<boolean>;
+    isSigningKeySet(chainId: string): Promise<boolean>;
     getChangePubKey(changePubKey: {
+        chainId: string;
         feeToken: TokenLike;
         fee: BigNumberish;
         nonce: number;
@@ -324,6 +351,7 @@ export declare class Wallet {
         validUntil: number;
     }): Promise<ChangePubKey>;
     signSetSigningKey(changePubKey: {
+        chainId: string;
         feeToken: TokenLike;
         fee: BigNumberish;
         fromChainId: number;
@@ -336,6 +364,7 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<SignedTransaction>;
     setSigningKey(changePubKey: {
+        chainId: string;
         feeToken: TokenLike;
         ethAuthType: ChangePubkeyTypes;
         fee?: BigNumberish;
@@ -366,15 +395,15 @@ export declare class Wallet {
         fee: BigNumberish;
         nonce: number;
     }): string;
-    isOnchainAuthSigningKeySet(nonce?: Nonce): Promise<boolean>;
-    onchainAuthSigningKey(nonce?: Nonce, ethTxOptions?: ethers.providers.TransactionRequest): Promise<ContractTransaction>;
-    getCurrentPubKeyHash(): Promise<PubKeyHash>;
-    getNonce(nonce?: Nonce): Promise<number>;
-    getAccountId(): Promise<number | undefined>;
+    isOnchainAuthSigningKeySet(chainId: any, nonce?: Nonce): Promise<boolean>;
+    onchainAuthSigningKey(chainId: any, nonce?: Nonce, ethTxOptions?: ethers.providers.TransactionRequest): Promise<ContractTransaction>;
+    getCurrentPubKeyHash(chainId: string): Promise<PubKeyHash>;
+    getNonce(chainId: string, nonce?: Nonce): Promise<number>;
+    getAccountId(chainId: string): Promise<number | undefined>;
     address(): Address;
-    getAccountState(): Promise<AccountState>;
+    getAccountState(chainId: string): Promise<AccountState>;
     getAddressByPair(token0: TokenLike, token1: TokenLike): Promise<AccountState>;
-    getBalance(token: TokenLike, type?: 'committed' | 'verified'): Promise<BigNumber>;
+    getBalance(token: TokenLike, chainId: string, type?: 'committed' | 'verified'): Promise<BigNumber>;
     getEthereumBalance(token: TokenLike): Promise<BigNumber>;
     isERC20DepositsApproved(token: TokenLike, erc20ApproveThreshold?: BigNumber): Promise<boolean>;
     approveERC20TokenDeposits(token: TokenLike, max_erc20_approve_amount?: BigNumber): Promise<ContractTransaction>;
@@ -386,6 +415,7 @@ export declare class Wallet {
         approveDepositAmountForERC20?: boolean;
     }): Promise<ETHOperation>;
     emergencyWithdraw(withdraw: {
+        chainId: string;
         token: TokenLike;
         accountId?: number;
         ethTxOptions?: ethers.providers.TransactionRequest;
@@ -408,16 +438,17 @@ export declare class ETHOperation {
     private throwErrorIfFailedState;
 }
 export declare class Transaction {
+    chainId: string;
     txData: any;
     txHash: string;
     sidechainProvider: Provider;
     state: 'Sent' | 'Committed' | 'Verified' | 'Failed';
     error?: ZKSyncTxError;
-    constructor(txData: any, txHash: string, sidechainProvider: Provider);
+    constructor(chainId: string, txData: any, txHash: string, sidechainProvider: Provider);
     awaitReceipt(): Promise<TransactionReceipt>;
     awaitVerifyReceipt(): Promise<TransactionReceipt>;
     private setErrorState;
     private throwErrorIfFailedState;
 }
-export declare function submitSignedTransaction(signedTx: SignedTransaction, provider: Provider, fastProcessing?: boolean): Promise<Transaction>;
-export declare function submitSignedTransactionsBatch(provider: Provider, signedTxs: SignedTransaction[], ethSignatures?: TxEthSignature[]): Promise<Transaction[]>;
+export declare function submitSignedTransaction(chainId: string, signedTx: SignedTransaction, provider: Provider, fastProcessing?: boolean): Promise<Transaction>;
+export declare function submitSignedTransactionsBatch(chainId: string, provider: Provider, signedTxs: SignedTransaction[], ethSignatures?: TxEthSignature[]): Promise<Transaction[]>;

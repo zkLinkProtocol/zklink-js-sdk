@@ -78,6 +78,9 @@ class Provider {
         // For HTTP provider
         this.pollIntervalMilliSecs = 500;
     }
+    setChainId(chainId) {
+        this.chainId = String(chainId);
+    }
     /**
      * @deprecated Websocket support will be removed in future. Use HTTP transport instead.
      */
@@ -90,13 +93,17 @@ class Provider {
             return provider;
         });
     }
-    static newHttpProvider(address = 'http://127.0.0.1:3030', pollIntervalMilliSecs) {
+    static newHttpProvider(address = 'http://127.0.0.1:3030', chainId, pollIntervalMilliSecs) {
         return __awaiter(this, void 0, void 0, function* () {
             const transport = new transport_1.HTTPTransport(address);
             const provider = new Provider(transport);
             if (pollIntervalMilliSecs) {
                 provider.pollIntervalMilliSecs = pollIntervalMilliSecs;
             }
+            if (chainId !== undefined) {
+                provider.setChainId(chainId);
+            }
+            console.log('provider.chainId', provider.chainId);
             provider.contractAddress = yield provider.getContractAddress();
             provider.tokenSet = new utils_1.TokenSet(yield provider.getTokens());
             return provider;
@@ -116,9 +123,9 @@ class Provider {
         });
     }
     // return transaction hash (e.g. sync-tx:dead..beef)
-    submitTx(tx, signature, fastProcessing) {
+    submitTx({ chainId, tx, signature, fastProcessing }) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('tx_submit', [tx, signature, fastProcessing]);
+            return yield this.transport.request('tx_submit', [chainId, tx, signature, fastProcessing]);
         });
     }
     // Requests `zkSync` server to execute several transactions together.
@@ -137,17 +144,18 @@ class Provider {
             else {
                 signatures.push(ethSignatures);
             }
-            return yield this.transport.request('submit_txs_batch', [transactions, signatures]);
+            return yield this.transport.request('submit_txs_batch', [this.chainId, transactions, signatures]);
         });
     }
-    getContractAddress() {
+    getContractAddress(chainId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('contract_address', null);
+            console.log('provider.chainId', this.chainId);
+            return yield this.transport.request('contract_address', [(chainId || this.chainId)]);
         });
     }
-    getTokens() {
+    getTokens(chainId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('tokens', null);
+            return yield this.transport.request('tokens', [(chainId || this.chainId)]);
         });
     }
     updateTokenSet() {
@@ -156,37 +164,37 @@ class Provider {
             this.tokenSet = updatedTokenSet;
         });
     }
-    getState(address) {
+    getState(address, chainId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('account_info', [address]);
+            return yield this.transport.request('account_info', [chainId, address]);
         });
     }
     getAddressByPair(token0, token1) {
         return __awaiter(this, void 0, void 0, function* () {
             const tokenId0 = this.tokenSet.resolveTokenId(token0);
             const tokenId1 = this.tokenSet.resolveTokenId(token1);
-            return yield this.transport.request('address_by_pair', [tokenId0, tokenId1]);
+            return yield this.transport.request('address_by_pair', [this.chainId, tokenId0, tokenId1]);
         });
     }
     // get transaction status by its hash (e.g. 0xdead..beef)
-    getTxReceipt(txHash) {
+    getTxReceipt(chainId, txHash) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('tx_info', [txHash]);
+            return yield this.transport.request('tx_info', [chainId, txHash]);
         });
     }
-    getPriorityOpStatus(serialId) {
+    getPriorityOpStatus(serialId, chainId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('ethop_info', [serialId]);
+            return yield this.transport.request('ethop_info', [(chainId || this.chainId), serialId]);
         });
     }
-    getConfirmationsForEthOpAmount() {
+    getConfirmationsForEthOpAmount(chainId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('get_confirmations_for_eth_op_amount', []);
+            return yield this.transport.request('get_confirmations_for_eth_op_amount', [(chainId || this.chainId)]);
         });
     }
-    getEthTxForWithdrawal(withdrawal_hash) {
+    getEthTxForWithdrawal(withdrawal_hash, chainId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('get_eth_tx_for_withdrawal', [withdrawal_hash]);
+            return yield this.transport.request('get_eth_tx_for_withdrawal', [(chainId || this.chainId), withdrawal_hash]);
         });
     }
     notifyPriorityOp(serialId, action) {
@@ -217,11 +225,11 @@ class Provider {
             }
         });
     }
-    notifyTransaction(hash, action) {
+    notifyTransaction(chainId, hash, action) {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.transport.subscriptionsSupported()) {
                 return yield new Promise((resolve) => {
-                    const subscribe = this.transport.subscribe('tx_subscribe', [hash, action], 'tx_unsubscribe', (resp) => {
+                    const subscribe = this.transport.subscribe('tx_subscribe', [chainId, hash, action], 'tx_unsubscribe', (resp) => {
                         subscribe
                             .then((sub) => sub.unsubscribe())
                             .catch((err) => console.log(`WebSocket connection closed with reason: ${err}`));
@@ -231,7 +239,7 @@ class Provider {
             }
             else {
                 while (true) {
-                    const transactionStatus = yield this.getTxReceipt(hash);
+                    const transactionStatus = yield this.getTxReceipt(chainId, hash);
                     const notifyDone = action == 'COMMIT'
                         ? transactionStatus.block && transactionStatus.block.committed
                         : transactionStatus.block && transactionStatus.block.verified;
@@ -245,9 +253,9 @@ class Provider {
             }
         });
     }
-    getTransactionFee(txType, address, tokenLike) {
+    getTransactionFee(chainId, txType, address, tokenLike) {
         return __awaiter(this, void 0, void 0, function* () {
-            const transactionFee = yield this.transport.request('get_tx_fee', [txType, address.toString(), tokenLike]);
+            const transactionFee = yield this.transport.request('get_tx_fee', [chainId, txType, address.toString(), tokenLike]);
             return {
                 feeType: transactionFee.feeType,
                 gasTxAmount: ethers_1.BigNumber.from(transactionFee.gasTxAmount),
@@ -258,15 +266,15 @@ class Provider {
             };
         });
     }
-    getTransactionsBatchFee(txTypes, addresses, tokenLike) {
+    getTransactionsBatchFee(txTypes, addresses, tokenLike, chainId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const batchFee = yield this.transport.request('get_txs_batch_fee_in_wei', [txTypes, addresses, tokenLike]);
+            const batchFee = yield this.transport.request('get_txs_batch_fee_in_wei', [(chainId || this.chainId), txTypes, addresses, tokenLike]);
             return ethers_1.BigNumber.from(batchFee.totalFee);
         });
     }
-    getTokenPrice(tokenLike) {
+    getTokenPrice(tokenLike, chainId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const tokenPrice = yield this.transport.request('get_token_price', [tokenLike]);
+            const tokenPrice = yield this.transport.request('get_token_price', [(chainId || this.chainId), tokenLike]);
             return parseFloat(tokenPrice);
         });
     }

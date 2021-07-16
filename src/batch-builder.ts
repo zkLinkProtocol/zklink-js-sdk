@@ -45,6 +45,7 @@ export class BatchBuilder {
      * Possibly creates phantom transfer.
      */
     async build(
+        chainId: string,
         feeToken?: TokenLike
     ): Promise<{ txs: SignedTransaction[]; signature: TxEthSignature; totalFee: TotalFee }> {
         if (this.txs.length == 0) {
@@ -66,7 +67,7 @@ export class BatchBuilder {
             totalFee.set(token, curr.add(fee));
         }
 
-        const { txs, message } = await this.processTransactions();
+        const { txs, message } = await this.processTransactions(chainId);
 
         let signature = await this.wallet.getEthMessageSignature(message);
 
@@ -231,10 +232,10 @@ export class BatchBuilder {
     /**
      * Sets transactions nonces, assembles the batch and constructs the message to be signed by user.
      */
-    private async processTransactions(): Promise<{ txs: SignedTransaction[]; message: string }> {
+    private async processTransactions(chainId: string): Promise<{ txs: SignedTransaction[]; message: string }> {
         const processedTxs: SignedTransaction[] = [];
         let messages: string[] = [];
-        let nonce: number = await this.wallet.getNonce(this.nonce);
+        let nonce: number = await this.wallet.getNonce(chainId, this.nonce);
         const batchNonce = nonce;
         for (const tx of this.txs) {
             tx.tx.nonce = nonce++;
@@ -255,7 +256,7 @@ export class BatchBuilder {
                     const changePubKey: ChangePubKey = tx.alreadySigned
                         ? tx.tx
                         : (await this.wallet.signSetSigningKey(tx.tx)).tx;
-                    const currentPubKeyHash = await this.wallet.getCurrentPubKeyHash();
+                    const currentPubKeyHash = await this.wallet.getCurrentPubKeyHash(chainId);
                     if (currentPubKeyHash === changePubKey.newPkHash) {
                         throw new Error('Current signing key is already set');
                     }

@@ -8,36 +8,43 @@ export declare class Provider {
     contractAddress: ContractAddress;
     tokenSet: TokenSet;
     pollIntervalMilliSecs: number;
+    chainId: string;
     private constructor();
+    setChainId(chainId: string): void;
     /**
      * @deprecated Websocket support will be removed in future. Use HTTP transport instead.
      */
     static newWebsocketProvider(address: string): Promise<Provider>;
-    static newHttpProvider(address?: string, pollIntervalMilliSecs?: number): Promise<Provider>;
+    static newHttpProvider(address?: string, chainId?: string, pollIntervalMilliSecs?: number): Promise<Provider>;
     /**
      * Provides some hardcoded values the `Provider` responsible for
      * without communicating with the network
      */
     static newMockProvider(network: string, ethPrivateKey: Uint8Array, getTokens: Function): Promise<Provider>;
-    submitTx(tx: any, signature?: TxEthSignature, fastProcessing?: boolean): Promise<string>;
+    submitTx({ chainId, tx, signature, fastProcessing }: {
+        chainId?: string;
+        tx: any;
+        signature?: TxEthSignature;
+        fastProcessing?: boolean;
+    }): Promise<string>;
     submitTxsBatch(transactions: {
         tx: any;
         signature?: TxEthSignature;
     }[], ethSignatures?: TxEthSignature | TxEthSignature[]): Promise<string[]>;
-    getContractAddress(): Promise<ContractAddress>;
-    getTokens(): Promise<Tokens>;
+    getContractAddress(chainId?: string): Promise<ContractAddress>;
+    getTokens(chainId?: string): Promise<Tokens>;
     updateTokenSet(): Promise<void>;
-    getState(address: Address): Promise<AccountState>;
+    getState(address: Address, chainId: string): Promise<AccountState>;
     getAddressByPair(token0: TokenLike, token1: TokenLike): Promise<AccountState>;
-    getTxReceipt(txHash: string): Promise<TransactionReceipt>;
-    getPriorityOpStatus(serialId: number): Promise<PriorityOperationReceipt>;
-    getConfirmationsForEthOpAmount(): Promise<number>;
-    getEthTxForWithdrawal(withdrawal_hash: string): Promise<string>;
+    getTxReceipt(chainId: string, txHash: string): Promise<TransactionReceipt>;
+    getPriorityOpStatus(serialId: number, chainId?: string): Promise<PriorityOperationReceipt>;
+    getConfirmationsForEthOpAmount(chainId?: string): Promise<number>;
+    getEthTxForWithdrawal(withdrawal_hash: string, chainId?: string): Promise<string>;
     notifyPriorityOp(serialId: number, action: 'COMMIT' | 'VERIFY'): Promise<PriorityOperationReceipt>;
-    notifyTransaction(hash: string, action: 'COMMIT' | 'VERIFY'): Promise<TransactionReceipt>;
-    getTransactionFee(txType: 'Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee, address: Address, tokenLike: TokenLike): Promise<Fee>;
-    getTransactionsBatchFee(txTypes: ('Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee)[], addresses: Address[], tokenLike: TokenLike): Promise<BigNumber>;
-    getTokenPrice(tokenLike: TokenLike): Promise<number>;
+    notifyTransaction(chainId: string, hash: string, action: 'COMMIT' | 'VERIFY'): Promise<TransactionReceipt>;
+    getTransactionFee(chainId: string, txType: 'Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee, address: Address, tokenLike: TokenLike): Promise<Fee>;
+    getTransactionsBatchFee(txTypes: ('Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee)[], addresses: Address[], tokenLike: TokenLike, chainId?: string): Promise<BigNumber>;
+    getTokenPrice(tokenLike: TokenLike, chainId?: string): Promise<number>;
     disconnect(): Promise<any>;
 }
 export declare class ETHProxy {

@@ -68,8 +68,13 @@ export class Provider {
 
     // For HTTP provider
     public pollIntervalMilliSecs = 500;
+    public chainId: string;
 
     private constructor(public transport: AbstractJSONRPCTransport) {}
+
+    public setChainId(chainId: string) {
+        this.chainId = String(chainId)
+    }
 
     /**
      * @deprecated Websocket support will be removed in future. Use HTTP transport instead.
@@ -84,12 +89,16 @@ export class Provider {
 
     static async newHttpProvider(
         address: string = 'http://127.0.0.1:3030',
+        chainId?: string,
         pollIntervalMilliSecs?: number
     ): Promise<Provider> {
         const transport = new HTTPTransport(address);
         const provider = new Provider(transport);
         if (pollIntervalMilliSecs) {
             provider.pollIntervalMilliSecs = pollIntervalMilliSecs;
+        }
+        if (chainId !== undefined) {
+            provider.setChainId(chainId)
         }
         provider.contractAddress = await provider.getContractAddress();
         provider.tokenSet = new TokenSet(await provider.getTokens());
@@ -110,8 +119,18 @@ export class Provider {
     }
 
     // return transaction hash (e.g. sync-tx:dead..beef)
-    async submitTx(tx: any, signature?: TxEthSignature, fastProcessing?: boolean): Promise<string> {
-        return await this.transport.request('tx_submit', [tx, signature, fastProcessing]);
+    async submitTx({
+        chainId,
+        tx,
+        signature,
+        fastProcessing
+    }: {
+        chainId?: string,
+        tx: any,
+        signature?: TxEthSignature,
+        fastProcessing?: boolean
+    }): Promise<string> {
+        return await this.transport.request('tx_submit', [chainId, tx, signature, fastProcessing]);
     }
 
     // Requests `zkSync` server to execute several transactions together.
@@ -130,15 +149,15 @@ export class Provider {
         } else {
             signatures.push(ethSignatures);
         }
-        return await this.transport.request('submit_txs_batch', [transactions, signatures]);
+        return await this.transport.request('submit_txs_batch', [this.chainId, transactions, signatures]);
     }
 
-    async getContractAddress(): Promise<ContractAddress> {
-        return await this.transport.request('contract_address', null);
+    async getContractAddress(chainId?: string): Promise<ContractAddress> {
+        return await this.transport.request('contract_address', [(chainId || this.chainId)]);
     }
 
-    async getTokens(): Promise<Tokens> {
-        return await this.transport.request('tokens', null);
+    async getTokens(chainId?: string): Promise<Tokens> {
+        return await this.transport.request('tokens', [(chainId || this.chainId)]);
     }
 
     async updateTokenSet(): Promise<void> {
@@ -146,31 +165,31 @@ export class Provider {
         this.tokenSet = updatedTokenSet;
     }
 
-    async getState(address: Address): Promise<AccountState> {
-        return await this.transport.request('account_info', [address]);
+    async getState(address: Address, chainId: string): Promise<AccountState> {
+        return await this.transport.request('account_info', [chainId, address]);
     }
 
     async getAddressByPair(token0: TokenLike, token1: TokenLike): Promise<AccountState> {
         const tokenId0 = this.tokenSet.resolveTokenId(token0)
         const tokenId1 = this.tokenSet.resolveTokenId(token1)
-        return await this.transport.request('address_by_pair', [tokenId0, tokenId1]);
+        return await this.transport.request('address_by_pair', [this.chainId, tokenId0, tokenId1]);
     }
 
     // get transaction status by its hash (e.g. 0xdead..beef)
-    async getTxReceipt(txHash: string): Promise<TransactionReceipt> {
-        return await this.transport.request('tx_info', [txHash]);
+    async getTxReceipt(chainId: string, txHash: string): Promise<TransactionReceipt> {
+        return await this.transport.request('tx_info', [chainId, txHash]);
     }
 
-    async getPriorityOpStatus(serialId: number): Promise<PriorityOperationReceipt> {
-        return await this.transport.request('ethop_info', [serialId]);
+    async getPriorityOpStatus(serialId: number, chainId?: string): Promise<PriorityOperationReceipt> {
+        return await this.transport.request('ethop_info', [(chainId || this.chainId), serialId]);
     }
 
-    async getConfirmationsForEthOpAmount(): Promise<number> {
-        return await this.transport.request('get_confirmations_for_eth_op_amount', []);
+    async getConfirmationsForEthOpAmount(chainId?: string): Promise<number> {
+        return await this.transport.request('get_confirmations_for_eth_op_amount', [(chainId || this.chainId)]);
     }
 
-    async getEthTxForWithdrawal(withdrawal_hash: string): Promise<string> {
-        return await this.transport.request('get_eth_tx_for_withdrawal', [withdrawal_hash]);
+    async getEthTxForWithdrawal(withdrawal_hash: string, chainId?: string): Promise<string> {
+        return await this.transport.request('get_eth_tx_for_withdrawal', [(chainId || this.chainId), withdrawal_hash]);
     }
 
     async notifyPriorityOp(serialId: number, action: 'COMMIT' | 'VERIFY'): Promise<PriorityOperationReceipt> {
@@ -204,10 +223,10 @@ export class Provider {
         }
     }
 
-    async notifyTransaction(hash: string, action: 'COMMIT' | 'VERIFY'): Promise<TransactionReceipt> {
+    async notifyTransaction(chainId: string, hash: string, action: 'COMMIT' | 'VERIFY'): Promise<TransactionReceipt> {
         if (this.transport.subscriptionsSupported()) {
             return await new Promise((resolve) => {
-                const subscribe = this.transport.subscribe('tx_subscribe', [hash, action], 'tx_unsubscribe', (resp) => {
+                const subscribe = this.transport.subscribe('tx_subscribe', [chainId, hash, action], 'tx_unsubscribe', (resp) => {
                     subscribe
                         .then((sub) => sub.unsubscribe())
                         .catch((err) => console.log(`WebSocket connection closed with reason: ${err}`));
@@ -216,7 +235,7 @@ export class Provider {
             });
         } else {
             while (true) {
-                const transactionStatus = await this.getTxReceipt(hash);
+                const transactionStatus = await this.getTxReceipt(chainId, hash);
                 const notifyDone =
                     action == 'COMMIT'
                         ? transactionStatus.block && transactionStatus.block.committed
@@ -231,11 +250,12 @@ export class Provider {
     }
 
     async getTransactionFee(
+        chainId: string,
         txType: 'Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee,
         address: Address,
-        tokenLike: TokenLike
+        tokenLike: TokenLike,
     ): Promise<Fee> {
-        const transactionFee = await this.transport.request('get_tx_fee', [txType, address.toString(), tokenLike]);
+        const transactionFee = await this.transport.request('get_tx_fee', [chainId, txType, address.toString(), tokenLike]);
         return {
             feeType: transactionFee.feeType,
             gasTxAmount: BigNumber.from(transactionFee.gasTxAmount),
@@ -249,14 +269,15 @@ export class Provider {
     async getTransactionsBatchFee(
         txTypes: ('Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee)[],
         addresses: Address[],
-        tokenLike: TokenLike
+        tokenLike: TokenLike,
+        chainId?: string
     ): Promise<BigNumber> {
-        const batchFee = await this.transport.request('get_txs_batch_fee_in_wei', [txTypes, addresses, tokenLike]);
+        const batchFee = await this.transport.request('get_txs_batch_fee_in_wei', [(chainId || this.chainId), txTypes, addresses, tokenLike]);
         return BigNumber.from(batchFee.totalFee);
     }
 
-    async getTokenPrice(tokenLike: TokenLike): Promise<number> {
-        const tokenPrice = await this.transport.request('get_token_price', [tokenLike]);
+    async getTokenPrice(tokenLike: TokenLike, chainId?: string): Promise<number> {
+        const tokenPrice = await this.transport.request('get_token_price', [(chainId || this.chainId), tokenLike]);
         return parseFloat(tokenPrice);
     }
 

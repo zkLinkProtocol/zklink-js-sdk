@@ -31,7 +31,7 @@ class BatchBuilder {
      * @param feeToken If provided, the fee for the whole batch will be obtained from the server in this token.
      * Possibly creates phantom transfer.
      */
-    build(feeToken) {
+    build(chainId, feeToken) {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.txs.length == 0) {
                 throw new Error('Transaction batch cannot be empty');
@@ -51,7 +51,7 @@ class BatchBuilder {
                 const curr = totalFee.get(token) || ethers_1.BigNumber.from(0);
                 totalFee.set(token, curr.add(fee));
             }
-            const { txs, message } = yield this.processTransactions();
+            const { txs, message } = yield this.processTransactions(chainId);
             let signature = yield this.wallet.getEthMessageSignature(message);
             return {
                 txs,
@@ -178,11 +178,11 @@ class BatchBuilder {
     /**
      * Sets transactions nonces, assembles the batch and constructs the message to be signed by user.
      */
-    processTransactions() {
+    processTransactions(chainId) {
         return __awaiter(this, void 0, void 0, function* () {
             const processedTxs = [];
             let messages = [];
-            let nonce = yield this.wallet.getNonce(this.nonce);
+            let nonce = yield this.wallet.getNonce(chainId, this.nonce);
             const batchNonce = nonce;
             for (const tx of this.txs) {
                 tx.tx.nonce = nonce++;
@@ -203,7 +203,7 @@ class BatchBuilder {
                         const changePubKey = tx.alreadySigned
                             ? tx.tx
                             : (yield this.wallet.signSetSigningKey(tx.tx)).tx;
-                        const currentPubKeyHash = yield this.wallet.getCurrentPubKeyHash();
+                        const currentPubKeyHash = yield this.wallet.getCurrentPubKeyHash(chainId);
                         if (currentPubKeyHash === changePubKey.newPkHash) {
                             throw new Error('Current signing key is already set');
                         }
