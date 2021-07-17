@@ -103,7 +103,6 @@ class Provider {
             if (chainId !== undefined) {
                 provider.setChainId(chainId);
             }
-            console.log('provider.chainId', provider.chainId);
             provider.contractAddress = yield provider.getContractAddress();
             provider.tokenSet = new utils_1.TokenSet(yield provider.getTokens());
             return provider;
@@ -149,7 +148,6 @@ class Provider {
     }
     getContractAddress(chainId) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('provider.chainId', this.chainId);
             return yield this.transport.request('contract_address', [(chainId || this.chainId)]);
         });
     }
