@@ -101,20 +101,6 @@ export interface Transfer {
     validUntil: number;
 }
 
-export interface CreatePool {
-    type: 'CreatePool';
-    chainId0: number;
-	chainId1: number;
-    account: Address;
-    accountId: number;
-    nonce: number;
-    token0: number,
-    token1: number,
-    signature?: Signature;
-    validFrom: number;
-    validUntil: number;
-}
-
 export interface AddLiquidity {
     type: 'AddLiq';
     fromChainId: number;
@@ -248,7 +234,7 @@ export interface CloseAccount {
 }
 
 export interface SignedTransaction {
-    tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit | CreatePool | AddLiquidity | RemoveLiquidity | Swap;
+    tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit | AddLiquidity | RemoveLiquidity | Swap;
     ethereumSignature?: TxEthSignature;
 }
 

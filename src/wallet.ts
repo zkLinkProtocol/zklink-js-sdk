@@ -24,7 +24,6 @@ import {
     ChangePubKeyECDSA,
     ChangePubKeyCREATE2,
     Create2Data,
-    CreatePool,
     RemoveLiquidity,
     AddLiquidity,
     Swap
@@ -573,8 +572,6 @@ export class Wallet {
         const tokenId1 = transfer.tokenId1;
         const tokenId2 = transfer.tokenId2;
         const lpTokenId = transfer.lpTokenId;
-        // const tokenId0 = this.provider.tokenSet.resolveTokenId(transfer.token0);
-        // const tokenId1 = this.provider.tokenSet.resolveTokenId(transfer.token1);
 
         const transactionData = {
             accountId: transfer.accountId,
@@ -823,91 +820,6 @@ export class Wallet {
         //     transfer.fee = fullFee.totalFee;
         // }
         const signedTransferTransaction = await this.signSyncAddLiquidity(transfer as any);
-        return submitSignedTransaction(transfer.chainId, signedTransferTransaction, this.provider);
-    }
-
-    
-    async getCreatePool(transfer: {
-      chainId: string;
-      chainId0: number;
-      chainId1: number;
-      token0: TokenLike;
-      token1: TokenLike;
-      accountId: number;
-      nonce?: number;
-      validFrom?: number;
-      validUntil?: number;
-    }): Promise<CreatePool> {
-      if (!this.signer) {
-          throw new Error('ZKSync signer is required for sending zksync transactions.');
-      }
-    
-      await this.setRequiredAccountIdFromServer(transfer.chainId, 'Transfer funds');
-
-      const tokenId0 = this.provider.tokenSet.resolveTokenId(transfer.token0);
-      const tokenId1 = this.provider.tokenSet.resolveTokenId(transfer.token1);
-
-      const transactionData = {
-          accountId: this.accountId,
-          account: this.address(),
-          chainId0: transfer.chainId0,
-          chainId1: transfer.chainId1,
-          tokenId0,
-          tokenId1,
-          nonce: transfer.nonce,
-          validFrom: transfer.validFrom,
-          validUntil: transfer.validUntil
-      };
-
-      return this.signer.signSyncCreatePool(transactionData);
-    }
-    async signSyncCreatePool(transfer: {
-      chainId0: number;
-      chainId1: number;
-      token0: TokenLike;
-      token1: TokenLike;
-      nonce?: number;
-      validFrom?: number;
-      validUntil?: number;
-    }): Promise<SignedTransaction> {
-      transfer.validFrom = transfer.validFrom || 0;
-      transfer.validUntil = transfer.validUntil || MAX_TIMESTAMP;
-      const signedTransferTransaction = await this.getCreatePool(transfer as any);
-
-      const stringToken0 = this.provider.tokenSet.resolveTokenSymbol(transfer.token0);
-      const stringToken1 = this.provider.tokenSet.resolveTokenSymbol(transfer.token1);
-      const ethereumSignature =
-          this.ethSigner instanceof Create2WalletSigner
-              ? null
-              : await this.ethMessageSigner.ethSignCreatePool({
-                    token0: stringToken0,
-                    token1: stringToken1,
-                    nonce: transfer.nonce,
-                    accountId: this.accountId
-                });
-      return {
-          tx: signedTransferTransaction,
-          ethereumSignature
-      };
-    }
-
-    async syncCreatePool(transfer: {
-        chainId: string;
-        chainId0: number;
-        chainId1: number;
-        token0: TokenLike;
-        token1: TokenLike;
-        nonce?: Nonce;
-        validFrom?: number;
-        validUntil?: number;
-    }): Promise<Transaction> {
-        transfer.nonce = transfer.nonce != null ? await this.getNonce(transfer.chainId, transfer.nonce) : await this.getNonce(transfer.chainId);
-
-        // if (transfer.fee == null) {
-        //     const fullFee = await this.provider.getTransactionFee('Transfer', transfer.to, transfer.token);
-        //     transfer.fee = fullFee.totalFee;
-        // }
-        const signedTransferTransaction = await this.signSyncCreatePool(transfer as any);
         return submitSignedTransaction(transfer.chainId, signedTransferTransaction, this.provider);
     }
 

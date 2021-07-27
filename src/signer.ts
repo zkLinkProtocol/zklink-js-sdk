@@ -13,7 +13,7 @@ import {
     ChangePubKeyECDSA,
     ChangePubKeyCREATE2,
     Create2Data,
-    CreatePool, AddLiquidity, RemoveLiquidity, Swap
+    AddLiquidity, RemoveLiquidity, Swap
 } from './types';
 
 export class Signer {
@@ -186,50 +186,6 @@ export class Signer {
             amount1: BigNumber.from(transfer.amount1).toString(),
             amount0Min: BigNumber.from(transfer.amount0Min).toString(),
             amount1Min: BigNumber.from(transfer.amount1Min).toString(),
-            signature
-        };
-    }
-
-    createPoolSignBytes(transfer: {
-        accountId: number;
-        account: Address;
-        chainId0: number;
-        chainId1: number;
-        tokenId0: number;
-        tokenId1: number;
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Uint8Array {
-        return utils.serializeCreatePool({
-            ...transfer,
-            type: 'CreatePool',
-            token0: transfer.tokenId0,
-            token1: transfer.tokenId1,
-        });
-    }
-    async signSyncCreatePool(transfer: {
-        accountId: number;
-        account: Address;
-        chainId0: number;
-        chainId1: number;
-        tokenId0: number;
-        tokenId1: number;
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Promise<CreatePool> {
-        const tx: CreatePool = {
-            ...transfer,
-            type: 'CreatePool',
-            token0: transfer.tokenId0,
-            token1: transfer.tokenId1,
-        };
-        const msgBytes = utils.serializeCreatePool(tx);
-        const signature = await signTransactionBytes(this.#privateKey, msgBytes);
-
-        return {
-            ...tx,
             signature
         };
     }
