@@ -101,9 +101,7 @@ export class Provider {
             provider.setChainId(chainId)
         }
         provider.contractAddress = await provider.getContractAddress();
-        provider.getTokens().then(r => {
-            provider.tokenSet = new TokenSet(r);
-        })
+        provider.tokenSet = new TokenSet(await provider.getTokens());
         return provider;
     }
 

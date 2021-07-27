@@ -104,10 +104,7 @@ class Provider {
                 provider.setChainId(chainId);
             }
             provider.contractAddress = yield provider.getContractAddress();
-            provider.getTokens().then(r => {
-                provider.tokenSet = new utils_1.TokenSet(r);
-                console.log(provider);
-            });
+            provider.tokenSet = new utils_1.TokenSet(yield provider.getTokens());
             return provider;
         });
     }
