@@ -167,13 +167,6 @@ class Provider {
             return yield this.transport.request('account_info', [chainId, address]);
         });
     }
-    getAddressByPair(token0, token1) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const tokenId0 = this.tokenSet.resolveTokenId(token0);
-            const tokenId1 = this.tokenSet.resolveTokenId(token1);
-            return yield this.transport.request('address_by_pair', [this.chainId, tokenId0, tokenId1]);
-        });
-    }
     // get transaction status by its hash (e.g. 0xdead..beef)
     getTxReceipt(chainId, txHash) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -35,7 +35,6 @@ export declare class Provider {
     getTokens(chainId?: string): Promise<Tokens>;
     updateTokenSet(): Promise<void>;
     getState(address: Address, chainId: string): Promise<AccountState>;
-    getAddressByPair(token0: TokenLike, token1: TokenLike): Promise<AccountState>;
     getTxReceipt(chainId: string, txHash: string): Promise<TransactionReceipt>;
     getPriorityOpStatus(serialId: number, chainId?: string): Promise<PriorityOperationReceipt>;
     getConfirmationsForEthOpAmount(chainId?: string): Promise<number>;

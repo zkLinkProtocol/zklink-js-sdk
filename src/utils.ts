@@ -13,7 +13,7 @@ import {
     ChangePubKey,
     Withdraw,
     CloseAccount,
-    CreatePool, AddLiquidity, RemoveLiquidity, Swap
+    AddLiquidity, RemoveLiquidity, Swap
 } from './types';
 
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.

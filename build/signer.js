@@ -92,17 +92,6 @@ class Signer {
             return Object.assign(Object.assign({}, tx), { amount0: ethers_1.BigNumber.from(transfer.amount0).toString(), amount1: ethers_1.BigNumber.from(transfer.amount1).toString(), amount0Min: ethers_1.BigNumber.from(transfer.amount0Min).toString(), amount1Min: ethers_1.BigNumber.from(transfer.amount1Min).toString(), signature });
         });
     }
-    createPoolSignBytes(transfer) {
-        return utils.serializeCreatePool(Object.assign(Object.assign({}, transfer), { type: 'CreatePool', token0: transfer.tokenId0, token1: transfer.tokenId1 }));
-    }
-    signSyncCreatePool(transfer) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const tx = Object.assign(Object.assign({}, transfer), { type: 'CreatePool', token0: transfer.tokenId0, token1: transfer.tokenId1 });
-            const msgBytes = utils.serializeCreatePool(tx);
-            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
-            return Object.assign(Object.assign({}, tx), { signature });
-        });
-    }
     /**
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */

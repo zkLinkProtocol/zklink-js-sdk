@@ -1,6 +1,6 @@
 import { utils, ethers, BigNumber, BigNumberish } from 'ethers';
 import { Provider } from '.';
-import { PubKeyHash, TokenAddress, TokenLike, Tokens, TokenSymbol, EthSignerType, Address, Transfer, ForcedExit, ChangePubKey, Withdraw, CloseAccount, CreatePool, AddLiquidity, RemoveLiquidity, Swap } from './types';
+import { PubKeyHash, TokenAddress, TokenLike, Tokens, TokenSymbol, EthSignerType, Address, Transfer, ForcedExit, ChangePubKey, Withdraw, CloseAccount, AddLiquidity, RemoveLiquidity, Swap } from './types';
 export declare const MAX_TIMESTAMP = 4294967295;
 export declare const IERC20_INTERFACE: utils.Interface;
 export declare const SYNC_MAIN_CONTRACT_INTERFACE: utils.Interface;
@@ -70,7 +70,6 @@ export declare function serializeTimestamp(time: number): Uint8Array;
 export declare function serializeWithdraw(withdraw: Withdraw): Uint8Array;
 export declare function serializeTransfer(transfer: Transfer): Uint8Array;
 export declare function serializeSwap(transfer: Swap): Uint8Array;
-export declare function serializeCreatePool(transfer: CreatePool): Uint8Array;
 export declare function serializeAddLiquidity(transfer: AddLiquidity): Uint8Array;
 export declare function serializeRemoveLiquidity(transfer: RemoveLiquidity): Uint8Array;
 export declare function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array;

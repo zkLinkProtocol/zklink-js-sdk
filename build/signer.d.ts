@@ -1,5 +1,5 @@
 import { BigNumberish, ethers } from 'ethers';
-import { Address, EthSignerType, PubKeyHash, Transfer, Withdraw, ForcedExit, ChangePubKey, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, CreatePool, AddLiquidity, RemoveLiquidity, Swap } from './types';
+import { Address, EthSignerType, PubKeyHash, Transfer, Withdraw, ForcedExit, ChangePubKey, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, AddLiquidity, RemoveLiquidity, Swap } from './types';
 export declare class Signer {
     #private;
     private constructor();
@@ -80,28 +80,6 @@ export declare class Signer {
         validFrom: number;
         validUntil: number;
     }): Promise<AddLiquidity>;
-    createPoolSignBytes(transfer: {
-        accountId: number;
-        account: Address;
-        chainId0: number;
-        chainId1: number;
-        tokenId0: number;
-        tokenId1: number;
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Uint8Array;
-    signSyncCreatePool(transfer: {
-        accountId: number;
-        account: Address;
-        chainId0: number;
-        chainId1: number;
-        tokenId0: number;
-        tokenId1: number;
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Promise<CreatePool>;
     /**
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */

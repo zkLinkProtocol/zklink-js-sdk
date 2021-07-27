@@ -951,10 +951,6 @@ export class Wallet {
         }
 
         let feeTokenId = 0;
-        try {
-            feeTokenId = this.provider.tokenSet.resolveTokenId(changePubKey.feeToken)
-        }
-        catch(e) {}
         const newPkHash = await this.signer.pubKeyHash();
 
         await this.setRequiredAccountIdFromServer(changePubKey.chainId, 'Set Signing Key');
@@ -1229,10 +1225,6 @@ export class Wallet {
 
     async getAccountState(chainId: string): Promise<AccountState> {
         return this.provider.getState(this.address(), chainId);
-    }
-
-    async getAddressByPair(token0: TokenLike, token1: TokenLike): Promise<AccountState> {
-        return this.provider.getAddressByPair(token0, token1);
     }
 
     async getBalance(token: TokenLike, chainId: string, type: 'committed' | 'verified' = 'committed'): Promise<BigNumber> {

@@ -343,8 +343,6 @@ class Wallet {
             const tokenId1 = transfer.tokenId1;
             const tokenId2 = transfer.tokenId2;
             const lpTokenId = transfer.lpTokenId;
-            // const tokenId0 = this.provider.tokenSet.resolveTokenId(transfer.token0);
-            // const tokenId1 = this.provider.tokenSet.resolveTokenId(transfer.token1);
             const transactionData = {
                 accountId: transfer.accountId,
                 pairAddress: transfer.pairAddress,
@@ -500,60 +498,6 @@ class Wallet {
             return submitSignedTransaction(transfer.chainId, signedTransferTransaction, this.provider);
         });
     }
-    getCreatePool(transfer) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.signer) {
-                throw new Error('ZKSync signer is required for sending zksync transactions.');
-            }
-            yield this.setRequiredAccountIdFromServer(transfer.chainId, 'Transfer funds');
-            const tokenId0 = this.provider.tokenSet.resolveTokenId(transfer.token0);
-            const tokenId1 = this.provider.tokenSet.resolveTokenId(transfer.token1);
-            const transactionData = {
-                accountId: this.accountId,
-                account: this.address(),
-                chainId0: transfer.chainId0,
-                chainId1: transfer.chainId1,
-                tokenId0,
-                tokenId1,
-                nonce: transfer.nonce,
-                validFrom: transfer.validFrom,
-                validUntil: transfer.validUntil
-            };
-            return this.signer.signSyncCreatePool(transactionData);
-        });
-    }
-    signSyncCreatePool(transfer) {
-        return __awaiter(this, void 0, void 0, function* () {
-            transfer.validFrom = transfer.validFrom || 0;
-            transfer.validUntil = transfer.validUntil || utils_1.MAX_TIMESTAMP;
-            const signedTransferTransaction = yield this.getCreatePool(transfer);
-            const stringToken0 = this.provider.tokenSet.resolveTokenSymbol(transfer.token0);
-            const stringToken1 = this.provider.tokenSet.resolveTokenSymbol(transfer.token1);
-            const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
-                ? null
-                : yield this.ethMessageSigner.ethSignCreatePool({
-                    token0: stringToken0,
-                    token1: stringToken1,
-                    nonce: transfer.nonce,
-                    accountId: this.accountId
-                });
-            return {
-                tx: signedTransferTransaction,
-                ethereumSignature
-            };
-        });
-    }
-    syncCreatePool(transfer) {
-        return __awaiter(this, void 0, void 0, function* () {
-            transfer.nonce = transfer.nonce != null ? yield this.getNonce(transfer.chainId, transfer.nonce) : yield this.getNonce(transfer.chainId);
-            // if (transfer.fee == null) {
-            //     const fullFee = await this.provider.getTransactionFee('Transfer', transfer.to, transfer.token);
-            //     transfer.fee = fullFee.totalFee;
-            // }
-            const signedTransferTransaction = yield this.signSyncCreatePool(transfer);
-            return submitSignedTransaction(transfer.chainId, signedTransferTransaction, this.provider);
-        });
-    }
     getWithdrawFromSyncToEthereum(withdraw) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
@@ -632,10 +576,6 @@ class Wallet {
                 throw new Error('ZKSync signer is required for current pubkey calculation.');
             }
             let feeTokenId = 0;
-            try {
-                feeTokenId = this.provider.tokenSet.resolveTokenId(changePubKey.feeToken);
-            }
-            catch (e) { }
             const newPkHash = yield this.signer.pubKeyHash();
             yield this.setRequiredAccountIdFromServer(changePubKey.chainId, 'Set Signing Key');
             const changePubKeyTx = yield this.signer.signSyncChangePubKey({
@@ -854,11 +794,6 @@ class Wallet {
     getAccountState(chainId) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.provider.getState(this.address(), chainId);
-        });
-    }
-    getAddressByPair(token0, token1) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.provider.getAddressByPair(token0, token1);
         });
     }
     getBalance(token, chainId, type = 'committed') {

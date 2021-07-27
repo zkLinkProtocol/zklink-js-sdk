@@ -3,7 +3,7 @@ import { EthMessageSigner } from './eth-message-signer';
 import { Provider } from './provider';
 import { Signer } from './signer';
 import { BatchBuilder } from './batch-builder';
-import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKey, EthSignerType, SignedTransaction, Transfer, TxEthSignature, ForcedExit, Withdraw, ChangePubkeyTypes, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, CreatePool, RemoveLiquidity, AddLiquidity, Swap } from './types';
+import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKey, EthSignerType, SignedTransaction, Transfer, TxEthSignature, ForcedExit, Withdraw, ChangePubkeyTypes, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, RemoveLiquidity, AddLiquidity, Swap } from './types';
 export declare class ZKSyncTxError extends Error {
     value: PriorityOperationReceipt | TransactionReceipt;
     constructor(message: string, value: PriorityOperationReceipt | TransactionReceipt);
@@ -271,36 +271,6 @@ export declare class Wallet {
         validFrom?: number;
         validUntil?: number;
     }): Promise<Transaction>;
-    getCreatePool(transfer: {
-        chainId: string;
-        chainId0: number;
-        chainId1: number;
-        token0: TokenLike;
-        token1: TokenLike;
-        accountId: number;
-        nonce?: number;
-        validFrom?: number;
-        validUntil?: number;
-    }): Promise<CreatePool>;
-    signSyncCreatePool(transfer: {
-        chainId0: number;
-        chainId1: number;
-        token0: TokenLike;
-        token1: TokenLike;
-        nonce?: number;
-        validFrom?: number;
-        validUntil?: number;
-    }): Promise<SignedTransaction>;
-    syncCreatePool(transfer: {
-        chainId: string;
-        chainId0: number;
-        chainId1: number;
-        token0: TokenLike;
-        token1: TokenLike;
-        nonce?: Nonce;
-        validFrom?: number;
-        validUntil?: number;
-    }): Promise<Transaction>;
     getWithdrawFromSyncToEthereum(withdraw: {
         chainId: string;
         ethAddress: string;
@@ -402,7 +372,6 @@ export declare class Wallet {
     getAccountId(chainId: string): Promise<number | undefined>;
     address(): Address;
     getAccountState(chainId: string): Promise<AccountState>;
-    getAddressByPair(token0: TokenLike, token1: TokenLike): Promise<AccountState>;
     getBalance(token: TokenLike, chainId: string, type?: 'committed' | 'verified'): Promise<BigNumber>;
     getEthereumBalance(token: TokenLike): Promise<BigNumber>;
     isERC20DepositsApproved(token: TokenLike, erc20ApproveThreshold?: BigNumber): Promise<boolean>;
