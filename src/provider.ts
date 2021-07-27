@@ -72,8 +72,10 @@ export class Provider {
 
     private constructor(public transport: AbstractJSONRPCTransport) {}
 
-    public setChainId(chainId: string) {
+    public async setChainId(chainId: string) {
         this.chainId = String(chainId)
+        this.contractAddress = await this.getContractAddress();
+        this.tokenSet = new TokenSet(await this.getTokens());
     }
 
     /**

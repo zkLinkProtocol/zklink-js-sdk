@@ -79,7 +79,11 @@ class Provider {
         this.pollIntervalMilliSecs = 500;
     }
     setChainId(chainId) {
-        this.chainId = String(chainId);
+        return __awaiter(this, void 0, void 0, function* () {
+            this.chainId = String(chainId);
+            this.contractAddress = yield this.getContractAddress();
+            this.tokenSet = new utils_1.TokenSet(yield this.getTokens());
+        });
     }
     /**
      * @deprecated Websocket support will be removed in future. Use HTTP transport instead.

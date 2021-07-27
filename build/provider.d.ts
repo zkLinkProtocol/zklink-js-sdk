@@ -10,7 +10,7 @@ export declare class Provider {
     pollIntervalMilliSecs: number;
     chainId: string;
     private constructor();
-    setChainId(chainId: string): void;
+    setChainId(chainId: string): Promise<void>;
     /**
      * @deprecated Websocket support will be removed in future. Use HTTP transport instead.
      */
