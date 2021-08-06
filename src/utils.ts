@@ -17,7 +17,7 @@ import {
 } from './types';
 
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
-const MAX_NUMBER_OF_TOKENS = 128;
+const MAX_NUMBER_OF_TOKENS = 65535;
 // Max number of accounts for the current version, it is determined by the zkSync circuit implementation.
 const MAX_NUMBER_OF_ACCOUNTS = Math.pow(2, 24);
 

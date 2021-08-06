@@ -13,7 +13,7 @@ exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeR
 exports.getTxHash = exports.getPendingBalance = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.parseHexWithPrefix = exports.serializeTx = void 0;
 const ethers_1 = require("ethers");
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
-const MAX_NUMBER_OF_TOKENS = 128;
+const MAX_NUMBER_OF_TOKENS = 65535;
 // Max number of accounts for the current version, it is determined by the zkSync circuit implementation.
 const MAX_NUMBER_OF_ACCOUNTS = Math.pow(2, 24);
 exports.MAX_TIMESTAMP = 4294967295;
