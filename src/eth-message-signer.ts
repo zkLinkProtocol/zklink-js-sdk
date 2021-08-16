@@ -126,13 +126,9 @@ export class EthMessageSigner {
             message += `Remove Liquidity`;
         }
         message += '\n';
-        message += `Pair Address: ${tx.pairAddress}`
-        message += '\n';
         message += `LP: ${tx.stringLpQuantity}`;
         message += '\n';
         message += `Amount: ${tx.stringAmount0} - ${tx.stringAmount1}`
-        message += '\n';
-        message += `Fee: ${tx.fee1} - ${tx.fee2}`
         return message;
     }
 
