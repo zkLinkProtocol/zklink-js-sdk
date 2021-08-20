@@ -557,6 +557,12 @@ export function serializeNonce(nonce: number): Uint8Array {
 export function serializeChainId(chainId: number): Uint8Array {
     return numberToBytesBE(chainId, 1);
 }
+export function serializeFeeRatio(feeRatio: number): Uint8Array {
+    return numberToBytesBE(feeRatio, 2);
+}
+export function serializeFastWithdraw(fastWithdraw: boolean): Uint8Array {
+    return new Uint8Array([fastWithdraw ? 1 : 0])
+}
 
 export function serializeTimestamp(time: number): Uint8Array {
     if (time < 0) {
@@ -573,6 +579,8 @@ export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
     const tokenIdBytes = serializeTokenId(withdraw.token);
     const amountBytes = serializeAmountFull(withdraw.amount);
     const feeBytes = serializeFeePacked(withdraw.fee);
+    const feeRatioBytes = serializeFeePacked(withdraw.feeRatio);
+    const fastWithdrawBytes = serializeFastWithdraw(withdraw.fastWithdraw);
     const nonceBytes = serializeNonce(withdraw.nonce);
     const validFrom = serializeTimestamp(withdraw.validFrom);
     const validUntil = serializeTimestamp(withdraw.validUntil);
@@ -585,6 +593,8 @@ export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
         amountBytes,
         feeBytes,
         nonceBytes,
+        fastWithdrawBytes,
+        feeRatioBytes,
         validFrom,
         validUntil
     ]);

@@ -200,6 +200,8 @@ export class Signer {
         tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
+        feeRatio: number;
+        fastWithdraw: boolean;
         nonce: number;
         validFrom: number;
         validUntil: number;
@@ -219,6 +221,8 @@ export class Signer {
         tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
+        feeRatio: number;
+        fastWithdraw: boolean;
         nonce: number;
         validFrom: number;
         validUntil: number;

@@ -172,6 +172,8 @@ export interface Withdraw {
     tokenId: number;
     amount: BigNumberish;
     fee: BigNumberish;
+    feeRatio: number;
+    fastWithdraw: boolean;
     nonce: number;
     signature?: Signature;
     validFrom: number;

@@ -830,6 +830,8 @@ export class Wallet {
         tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
+        feeRatio: number;
+        fastWithdraw: boolean;
         nonce: number;
         accountId: number;
         validFrom: number;
@@ -847,6 +849,8 @@ export class Wallet {
             ethAddress: withdraw.ethAddress,
             tokenId,
             amount: withdraw.amount,
+            feeRatio: withdraw.feeRatio,
+            fastWithdraw: withdraw.fastWithdraw,
             fee: withdraw.fee,
             nonce: withdraw.nonce,
             validFrom: withdraw.validFrom,
@@ -863,12 +867,15 @@ export class Wallet {
         tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
+        feeRatio: number;
+        fastWithdraw: boolean;
         accountId?: number;
         nonce: number;
         validFrom?: number;
         validUntil?: number;
     }): Promise<SignedTransaction> {
         withdraw.validFrom = withdraw.validFrom || 0;
+        withdraw.feeRatio = withdraw.feeRatio || 0;
         withdraw.validUntil = withdraw.validUntil || MAX_TIMESTAMP;
         withdraw.accountId = await this.getAccountId(withdraw.chainId)
         const signedWithdrawTransaction = await this.getWithdrawFromSyncToEthereum(withdraw as any);
@@ -879,6 +886,7 @@ export class Wallet {
         const stringFee = BigNumber.from(withdraw.fee).isZero()
             ? null
             : utils.formatEther(withdraw.fee)
+        
             
         const stringToken = withdraw.token
         const ethereumSignature =
@@ -903,6 +911,8 @@ export class Wallet {
         ethAddress: string;
         token: TokenLike;
         amount: BigNumberish;
+        feeRatio: number;
+        fastWithdraw: boolean;
         fee?: BigNumberish;
         chainId?: string,
         nonce?: Nonce;
@@ -913,9 +923,7 @@ export class Wallet {
         withdraw.nonce = withdraw.nonce != null ? await this.getNonce(withdraw.chainId, withdraw.nonce) : await this.getNonce(withdraw.chainId);
 
         if (withdraw.fee == null) {
-            const feeType = withdraw.fastProcessing === true ? 'FastWithdraw' : 'Withdraw';
-
-            const fullFee = await this.provider.getTransactionFee(withdraw.chainId, feeType, withdraw.ethAddress, withdraw.token);
+            const fullFee = await this.provider.getTransactionFee(withdraw.chainId, 'Withdraw', withdraw.ethAddress, withdraw.token);
             withdraw.fee = fullFee.totalFee;
         }
 
