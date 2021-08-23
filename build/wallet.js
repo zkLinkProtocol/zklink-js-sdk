@@ -853,6 +853,97 @@ class Wallet {
             }
         });
     }
+    fastSwapAccepts(accepts) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const mainZkSyncContract = this.getZkSyncMainContract();
+            const hash = ethers_1.ethers.utils.solidityKeccak256(['address', 'number', 'string', 'string', 'number'], [accepts.receiver, accepts.tokenId, accepts.amount, accepts.withdrawFee, accepts.uNonce]);
+            const address = yield mainZkSyncContract.accepts(hash);
+            return address;
+        });
+    }
+    fastSwapUNonce(swap) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const uNonce = 1;
+            const acceptAddress = yield this.fastSwapAccepts(Object.assign(Object.assign({}, swap), { uNonce }));
+            if (acceptAddress) {
+                return yield this.fastSwapUNonce(swap);
+            }
+            return uNonce;
+        });
+    }
+    fastSwap(swap) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const gasPrice = yield this.ethSigner.provider.getGasPrice();
+            const mainZkSyncContract = this.getZkSyncMainContract();
+            let ethTransaction;
+            // amountIn, amountOutMin, withdrawFee, fromTokenId, toChainId, toTokenId, to, nonce
+            let uNonce = 0;
+            try {
+                // uNonce = randomBytes()
+                uNonce = yield this.fastSwapUNonce({
+                    receiver: swap.to,
+                    tokenId: swap.tokenId0,
+                    amount: swap.amountIn,
+                    withdrawFee: swap.withdrawFee
+                });
+            }
+            catch (e) {
+                this.modifyEthersError(e);
+            }
+            if (!uNonce) {
+                this.modifyEthersError(new Error('swap tx nonce is none'));
+            }
+            // -------------------------------
+            if (utils_1.isTokenETH(swap.token0)) {
+                try {
+                    // function swapExactETHForTokens(address _zkSyncAddress,uint104 _amountOutMin, uint16 _withdrawFee, uint8 _toChainId, uint16 _toTokenId, address _to, uint32 _nonce) external payable
+                    ethTransaction = yield mainZkSyncContract.swapExactETHForTokens(swap.from, swap.amountOutMin, swap.withdrawFee, swap.toChainId, swap.tokenId1, swap.to, uNonce, Object.assign({ value: ethers_1.BigNumber.from(swap.amountIn), gasLimit: ethers_1.BigNumber.from(utils_1.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT), gasPrice }, swap.ethTxOptions));
+                }
+                catch (e) {
+                    this.modifyEthersError(e);
+                }
+            }
+            else {
+                const tokenAddress = this.provider.tokenSet.resolveTokenAddress(swap.token0);
+                // ERC20 token deposit
+                let nonce;
+                // function swapExactTokensForTokens(address _zkSyncAddress, uint104 _amountIn, uint104 _amountOutMin, uint16 _withdrawFee, IERC20 _fromToken, uint8 _toChainId, uint16 _toTokenId, address _to, uint32 _nonce) external
+                const args = [
+                    swap.from,
+                    swap.amountIn,
+                    swap.amountOutMin,
+                    swap.withdrawFee,
+                    tokenAddress,
+                    swap.toChainId,
+                    swap.tokenId1,
+                    swap.to,
+                    uNonce,
+                    Object.assign({ nonce,
+                        gasPrice }, swap.ethTxOptions)
+                ];
+                // We set gas limit only if user does not set it using ethTxOptions.
+                const txRequest = args[args.length - 1];
+                if (txRequest.gasLimit == null) {
+                    try {
+                        const gasEstimate = yield mainZkSyncContract.estimateGas.swapExactTokensForTokens(...args).then((estimate) => estimate, () => ethers_1.BigNumber.from('0'));
+                        let recommendedGasLimit = utils_1.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT;
+                        txRequest.gasLimit = gasEstimate.gte(recommendedGasLimit) ? gasEstimate : recommendedGasLimit;
+                        args[args.length - 1] = txRequest;
+                    }
+                    catch (e) {
+                        this.modifyEthersError(e);
+                    }
+                }
+                try {
+                    ethTransaction = yield mainZkSyncContract.swapExactTokensForTokens(...args);
+                }
+                catch (e) {
+                    this.modifyEthersError(e);
+                }
+            }
+            return new ETHOperation(ethTransaction, this.provider);
+        });
+    }
     depositToSyncFromEthereum(deposit) {
         return __awaiter(this, void 0, void 0, function* () {
             const gasPrice = yield this.ethSigner.provider.getGasPrice();
@@ -892,10 +983,7 @@ class Wallet {
                 if (txRequest.gasLimit == null) {
                     try {
                         const gasEstimate = yield mainZkSyncContract.estimateGas.depositERC20(...args).then((estimate) => estimate, () => ethers_1.BigNumber.from('0'));
-                        const isMainnet = (yield this.ethSigner.getChainId()) == 1;
-                        let recommendedGasLimit = isMainnet && utils_1.ERC20_DEPOSIT_GAS_LIMIT[tokenAddress]
-                            ? ethers_1.BigNumber.from(utils_1.ERC20_DEPOSIT_GAS_LIMIT[tokenAddress])
-                            : utils_1.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT;
+                        let recommendedGasLimit = utils_1.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT;
                         txRequest.gasLimit = gasEstimate.gte(recommendedGasLimit) ? gasEstimate : recommendedGasLimit;
                         args[args.length - 1] = txRequest;
                     }

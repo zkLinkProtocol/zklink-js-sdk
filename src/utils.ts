@@ -22,6 +22,7 @@ const MAX_NUMBER_OF_TOKENS = 65535;
 const MAX_NUMBER_OF_ACCOUNTS = Math.pow(2, 24);
 
 export const MAX_TIMESTAMP = 4294967295;
+export const MAX_NONCE = 4294967295;
 
 export const IERC20_INTERFACE = new utils.Interface(require('../abi/IERC20.json').abi);
 export const SYNC_MAIN_CONTRACT_INTERFACE = new utils.Interface(require('../abi/SyncMain.json').abi);
@@ -48,6 +49,8 @@ export const ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = BigNumber.from('90000'); // 90k
 // For normal wallet/erc20 token 90k gas for deposit should be enough, but for some tokens this can go as high as ~200k
 // we try to be safe by default
 export const ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = BigNumber.from('300000'); // 300k
+export const ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT = BigNumber.from('90000'); // 90k
+export const ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT = BigNumber.from('300000'); // 300k
 
 const AMOUNT_EXPONENT_BIT_WIDTH = 5;
 const AMOUNT_MANTISSA_BIT_WIDTH = 35;
@@ -831,3 +834,13 @@ export function getTxHash(tx: Transfer | Withdraw | ChangePubKey | ForcedExit | 
     let txBytes = serializeTx(tx);
     return ethers.utils.sha256(txBytes).replace('0x', 'sync-tx:');
 }
+
+export function getRandom(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+export function getFastSwapNonce() {
+    
+    return getRandom(1, MAX_NONCE)
+}
+

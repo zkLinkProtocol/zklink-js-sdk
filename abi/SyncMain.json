@@ -5,6 +5,49 @@
       "inputs": [
         {
           "indexed": true,
+          "internalType": "address",
+          "name": "accepter",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "receiver",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint16",
+          "name": "tokenId",
+          "type": "uint16"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint128",
+          "name": "amount",
+          "type": "uint128"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint128",
+          "name": "fee",
+          "type": "uint128"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint32",
+          "name": "nonce",
+          "type": "uint32"
+        }
+      ],
+      "name": "Accept",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
           "internalType": "uint32",
           "name": "blockNumber",
           "type": "uint32"
@@ -43,6 +86,56 @@
         }
       ],
       "name": "BlocksRevert",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint16",
+          "name": "tokenAId",
+          "type": "uint16"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint16",
+          "name": "tokenBId",
+          "type": "uint16"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint16",
+          "name": "pairId",
+          "type": "uint16"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "pair",
+          "type": "address"
+        }
+      ],
+      "name": "CreatePair",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint16",
+          "name": "tokenId",
+          "type": "uint16"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint128",
+          "name": "amount",
+          "type": "uint128"
+        }
+      ],
+      "name": "Deposit",
       "type": "event"
     },
     {
@@ -193,29 +286,78 @@
         {
           "indexed": true,
           "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint16",
+          "name": "tokenId",
+          "type": "uint16"
+        }
+      ],
+      "name": "NewToken",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
           "name": "sender",
           "type": "address"
         },
         {
-          "indexed": true,
-          "internalType": "uint16",
-          "name": "tokenId",
-          "type": "uint16"
+          "indexed": false,
+          "internalType": "uint128",
+          "name": "amountIn",
+          "type": "uint128"
         },
         {
           "indexed": false,
           "internalType": "uint128",
-          "name": "amount",
+          "name": "amountOutMin",
           "type": "uint128"
         },
         {
+          "indexed": false,
+          "internalType": "uint16",
+          "name": "withdrawFee",
+          "type": "uint16"
+        },
+        {
           "indexed": true,
+          "internalType": "uint16",
+          "name": "fromTokenId",
+          "type": "uint16"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "toChainId",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint16",
+          "name": "toTokenId",
+          "type": "uint16"
+        },
+        {
+          "indexed": false,
           "internalType": "address",
-          "name": "owner",
+          "name": "to",
           "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint32",
+          "name": "nonce",
+          "type": "uint32"
         }
       ],
-      "name": "OnchainDeposit",
+      "name": "QuickSwap",
       "type": "event"
     },
     {
@@ -223,43 +365,6 @@
       "inputs": [
         {
           "indexed": true,
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "uint16",
-          "name": "tokenId",
-          "type": "uint16"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint128",
-          "name": "amount",
-          "type": "uint128"
-        },
-        {
-          "indexed": false,
-          "internalType": "bool",
-          "name": "success",
-          "type": "bool"
-        }
-      ],
-      "name": "OnchainWithdrawal",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "indexed": true,
           "internalType": "uint16",
           "name": "tokenId",
           "type": "uint16"
@@ -271,54 +376,30 @@
           "type": "uint128"
         }
       ],
-      "name": "RollupWithdrawal",
+      "name": "Withdrawal",
       "type": "event"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "fallback"
     },
     {
       "inputs": [
         {
-          "internalType": "contract IERC20",
-          "name": "_token",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint128",
-          "name": "_amount",
-          "type": "uint128"
-        },
-        {
-          "internalType": "uint128",
-          "name": "_maxAmount",
-          "type": "uint128"
-        }
-      ],
-      "name": "_transferERC20",
-      "outputs": [
-        {
-          "internalType": "uint128",
-          "name": "withdrawnAmount",
-          "type": "uint128"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "activateExodusMode",
-      "outputs": [
-        {
-          "internalType": "bool",
+          "internalType": "bytes32",
           "name": "",
-          "type": "bool"
+          "type": "bytes32"
         }
       ],
-      "stateMutability": "nonpayable",
+      "name": "accepts",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -366,93 +447,30 @@
     {
       "inputs": [
         {
-          "components": [
-            {
-              "internalType": "uint32",
-              "name": "blockNumber",
-              "type": "uint32"
-            },
-            {
-              "internalType": "uint64",
-              "name": "priorityOperations",
-              "type": "uint64"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "pendingOnchainOperationsHash",
-              "type": "bytes32"
-            },
-            {
-              "internalType": "uint256",
-              "name": "timestamp",
-              "type": "uint256"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "stateHash",
-              "type": "bytes32"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "commitment",
-              "type": "bytes32"
-            }
-          ],
-          "internalType": "struct Storage.StoredBlockInfo",
-          "name": "_lastCommittedBlockData",
-          "type": "tuple"
-        },
-        {
-          "components": [
-            {
-              "internalType": "bytes32",
-              "name": "newStateHash",
-              "type": "bytes32"
-            },
-            {
-              "internalType": "bytes",
-              "name": "publicData",
-              "type": "bytes"
-            },
-            {
-              "internalType": "uint256",
-              "name": "timestamp",
-              "type": "uint256"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "bytes",
-                  "name": "ethWitness",
-                  "type": "bytes"
-                },
-                {
-                  "internalType": "uint32",
-                  "name": "publicDataOffset",
-                  "type": "uint32"
-                }
-              ],
-              "internalType": "struct ZkSync.OnchainOperationData[]",
-              "name": "onchainOperations",
-              "type": "tuple[]"
-            },
-            {
-              "internalType": "uint32",
-              "name": "blockNumber",
-              "type": "uint32"
-            },
-            {
-              "internalType": "uint32",
-              "name": "feeAccount",
-              "type": "uint32"
-            }
-          ],
-          "internalType": "struct ZkSync.CommitBlockInfo[]",
-          "name": "_newBlocksData",
-          "type": "tuple[]"
+          "internalType": "address",
+          "name": "_tokenERC20",
+          "type": "address"
         }
       ],
-      "name": "commitBlocks",
+      "name": "createETHPair",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_tokenA",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_tokenB",
+          "type": "address"
+        }
+      ],
+      "name": "createPair",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -483,6 +501,29 @@
     {
       "inputs": [
         {
+          "internalType": "uint16",
+          "name": "_tokenId",
+          "type": "uint16"
+        },
+        {
+          "internalType": "address",
+          "name": "_zkSyncAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "depositERC20FromVault",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "address",
           "name": "_zkSyncAddress",
           "type": "address"
@@ -496,56 +537,17 @@
     {
       "inputs": [
         {
-          "components": [
-            {
-              "components": [
-                {
-                  "internalType": "uint32",
-                  "name": "blockNumber",
-                  "type": "uint32"
-                },
-                {
-                  "internalType": "uint64",
-                  "name": "priorityOperations",
-                  "type": "uint64"
-                },
-                {
-                  "internalType": "bytes32",
-                  "name": "pendingOnchainOperationsHash",
-                  "type": "bytes32"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "timestamp",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "bytes32",
-                  "name": "stateHash",
-                  "type": "bytes32"
-                },
-                {
-                  "internalType": "bytes32",
-                  "name": "commitment",
-                  "type": "bytes32"
-                }
-              ],
-              "internalType": "struct Storage.StoredBlockInfo",
-              "name": "storedBlock",
-              "type": "tuple"
-            },
-            {
-              "internalType": "bytes[]",
-              "name": "pendingOnchainOpsPubdata",
-              "type": "bytes[]"
-            }
-          ],
-          "internalType": "struct ZkSync.ExecuteBlockInfo[]",
-          "name": "_blocksData",
-          "type": "tuple[]"
+          "internalType": "address",
+          "name": "_zkSyncAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
         }
       ],
-      "name": "executeBlocks",
+      "name": "depositETHFromVault",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -653,73 +655,16 @@
       "type": "function"
     },
     {
-      "inputs": [
+      "inputs": [],
+      "name": "pairManager",
+      "outputs": [
         {
-          "components": [
-            {
-              "internalType": "uint32",
-              "name": "blockNumber",
-              "type": "uint32"
-            },
-            {
-              "internalType": "uint64",
-              "name": "priorityOperations",
-              "type": "uint64"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "pendingOnchainOperationsHash",
-              "type": "bytes32"
-            },
-            {
-              "internalType": "uint256",
-              "name": "timestamp",
-              "type": "uint256"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "stateHash",
-              "type": "bytes32"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "commitment",
-              "type": "bytes32"
-            }
-          ],
-          "internalType": "struct Storage.StoredBlockInfo",
-          "name": "_storedBlockInfo",
-          "type": "tuple"
-        },
-        {
-          "internalType": "address",
-          "name": "_owner",
+          "internalType": "contract IUniswapV2Factory",
+          "name": "",
           "type": "address"
-        },
-        {
-          "internalType": "uint32",
-          "name": "_accountId",
-          "type": "uint32"
-        },
-        {
-          "internalType": "uint16",
-          "name": "_tokenId",
-          "type": "uint16"
-        },
-        {
-          "internalType": "uint128",
-          "name": "_amount",
-          "type": "uint128"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "_proof",
-          "type": "uint256[]"
         }
       ],
-      "name": "performExodus",
-      "outputs": [],
-      "stateMutability": "nonpayable",
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -749,83 +694,6 @@
     {
       "inputs": [
         {
-          "components": [
-            {
-              "internalType": "uint32",
-              "name": "blockNumber",
-              "type": "uint32"
-            },
-            {
-              "internalType": "uint64",
-              "name": "priorityOperations",
-              "type": "uint64"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "pendingOnchainOperationsHash",
-              "type": "bytes32"
-            },
-            {
-              "internalType": "uint256",
-              "name": "timestamp",
-              "type": "uint256"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "stateHash",
-              "type": "bytes32"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "commitment",
-              "type": "bytes32"
-            }
-          ],
-          "internalType": "struct Storage.StoredBlockInfo[]",
-          "name": "_committedBlocks",
-          "type": "tuple[]"
-        },
-        {
-          "components": [
-            {
-              "internalType": "uint256[]",
-              "name": "recursiveInput",
-              "type": "uint256[]"
-            },
-            {
-              "internalType": "uint256[]",
-              "name": "proof",
-              "type": "uint256[]"
-            },
-            {
-              "internalType": "uint256[]",
-              "name": "commitments",
-              "type": "uint256[]"
-            },
-            {
-              "internalType": "uint8[]",
-              "name": "vkIndexes",
-              "type": "uint8[]"
-            },
-            {
-              "internalType": "uint256[16]",
-              "name": "subproofsLimbs",
-              "type": "uint256[16]"
-            }
-          ],
-          "internalType": "struct ZkSync.ProofInput",
-          "name": "_proof",
-          "type": "tuple"
-        }
-      ],
-      "name": "proveBlocks",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
           "internalType": "uint32",
           "name": "_accountId",
           "type": "uint32"
@@ -844,54 +712,34 @@
     {
       "inputs": [
         {
-          "components": [
-            {
-              "internalType": "uint32",
-              "name": "blockNumber",
-              "type": "uint32"
-            },
-            {
-              "internalType": "uint64",
-              "name": "priorityOperations",
-              "type": "uint64"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "pendingOnchainOperationsHash",
-              "type": "bytes32"
-            },
-            {
-              "internalType": "uint256",
-              "name": "timestamp",
-              "type": "uint256"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "stateHash",
-              "type": "bytes32"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "commitment",
-              "type": "bytes32"
-            }
-          ],
-          "internalType": "struct Storage.StoredBlockInfo[]",
-          "name": "_blocksToRevert",
-          "type": "tuple[]"
-        }
-      ],
-      "name": "revertBlocks",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
+          "internalType": "address",
+          "name": "_zkSyncAddress",
+          "type": "address"
+        },
         {
-          "internalType": "bytes",
-          "name": "_pubkey_hash",
-          "type": "bytes"
+          "internalType": "uint104",
+          "name": "_amountOutMin",
+          "type": "uint104"
+        },
+        {
+          "internalType": "uint16",
+          "name": "_withdrawFee",
+          "type": "uint16"
+        },
+        {
+          "internalType": "uint8",
+          "name": "_toChainId",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint16",
+          "name": "_toTokenId",
+          "type": "uint16"
+        },
+        {
+          "internalType": "address",
+          "name": "_to",
+          "type": "address"
         },
         {
           "internalType": "uint32",
@@ -899,9 +747,100 @@
           "type": "uint32"
         }
       ],
-      "name": "setAuthPubkeyHash",
+      "name": "swapExactETHForTokens",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_zkSyncAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint104",
+          "name": "_amountIn",
+          "type": "uint104"
+        },
+        {
+          "internalType": "uint104",
+          "name": "_amountOutMin",
+          "type": "uint104"
+        },
+        {
+          "internalType": "uint16",
+          "name": "_withdrawFee",
+          "type": "uint16"
+        },
+        {
+          "internalType": "contract IERC20",
+          "name": "_fromToken",
+          "type": "address"
+        },
+        {
+          "internalType": "uint8",
+          "name": "_toChainId",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint16",
+          "name": "_toTokenId",
+          "type": "uint16"
+        },
+        {
+          "internalType": "address",
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint32",
+          "name": "_nonce",
+          "type": "uint32"
+        }
+      ],
+      "name": "swapExactTokensForTokens",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint16",
+          "name": "",
+          "type": "uint16"
+        }
+      ],
+      "name": "tokenAddresses",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "tokenIds",
+      "outputs": [
+        {
+          "internalType": "uint16",
+          "name": "",
+          "type": "uint16"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -970,6 +909,19 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "totalPairTokens",
+      "outputs": [
+        {
+          "internalType": "uint16",
+          "name": "",
+          "type": "uint16"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "bytes",
@@ -1011,6 +963,38 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_tokenAddr",
+          "type": "address"
+        }
+      ],
+      "name": "validatePairTokenAddress",
+      "outputs": [
+        {
+          "internalType": "uint16",
+          "name": "",
+          "type": "uint16"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "vault",
+      "outputs": [
+        {
+          "internalType": "contract IVault",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "verifier",
       "outputs": [
@@ -1039,12 +1023,34 @@
           "internalType": "uint128",
           "name": "_amount",
           "type": "uint128"
+        },
+        {
+          "internalType": "uint16",
+          "name": "_lossBip",
+          "type": "uint16"
         }
       ],
       "name": "withdrawPendingBalance",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "zkSyncBlock",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
     }
   ]
 }
