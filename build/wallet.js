@@ -511,6 +511,8 @@ class Wallet {
                 ethAddress: withdraw.ethAddress,
                 tokenId,
                 amount: withdraw.amount,
+                withdrawFeeRatio: withdraw.withdrawFeeRatio,
+                fastWithdraw: withdraw.fastWithdraw,
                 fee: withdraw.fee,
                 nonce: withdraw.nonce,
                 validFrom: withdraw.validFrom,
@@ -522,6 +524,7 @@ class Wallet {
     signWithdrawFromSyncToEthereum(withdraw) {
         return __awaiter(this, void 0, void 0, function* () {
             withdraw.validFrom = withdraw.validFrom || 0;
+            withdraw.withdrawFeeRatio = withdraw.withdrawFeeRatio || 0;
             withdraw.validUntil = withdraw.validUntil || utils_1.MAX_TIMESTAMP;
             withdraw.accountId = yield this.getAccountId(withdraw.chainId);
             const signedWithdrawTransaction = yield this.getWithdrawFromSyncToEthereum(withdraw);
@@ -552,8 +555,7 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             withdraw.nonce = withdraw.nonce != null ? yield this.getNonce(withdraw.chainId, withdraw.nonce) : yield this.getNonce(withdraw.chainId);
             if (withdraw.fee == null) {
-                const feeType = withdraw.fastProcessing === true ? 'FastWithdraw' : 'Withdraw';
-                const fullFee = yield this.provider.getTransactionFee(withdraw.chainId, feeType, withdraw.ethAddress, withdraw.token);
+                const fullFee = yield this.provider.getTransactionFee(withdraw.chainId, 'Withdraw', withdraw.ethAddress, withdraw.token);
                 withdraw.fee = fullFee.totalFee;
             }
             const signedWithdrawTransaction = yield this.signWithdrawFromSyncToEthereum(withdraw);

@@ -830,8 +830,8 @@ export class Wallet {
         tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
-        feeRatio: number;
-        fastWithdraw: boolean;
+        withdrawFeeRatio: number;
+        fastWithdraw: number;
         nonce: number;
         accountId: number;
         validFrom: number;
@@ -849,7 +849,7 @@ export class Wallet {
             ethAddress: withdraw.ethAddress,
             tokenId,
             amount: withdraw.amount,
-            feeRatio: withdraw.feeRatio,
+            withdrawFeeRatio: withdraw.withdrawFeeRatio,
             fastWithdraw: withdraw.fastWithdraw,
             fee: withdraw.fee,
             nonce: withdraw.nonce,
@@ -867,15 +867,15 @@ export class Wallet {
         tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
-        feeRatio: number;
-        fastWithdraw: boolean;
+        withdrawFeeRatio: number;
+        fastWithdraw: number;
         accountId?: number;
         nonce: number;
         validFrom?: number;
         validUntil?: number;
     }): Promise<SignedTransaction> {
         withdraw.validFrom = withdraw.validFrom || 0;
-        withdraw.feeRatio = withdraw.feeRatio || 0;
+        withdraw.withdrawFeeRatio = withdraw.withdrawFeeRatio || 0;
         withdraw.validUntil = withdraw.validUntil || MAX_TIMESTAMP;
         withdraw.accountId = await this.getAccountId(withdraw.chainId)
         const signedWithdrawTransaction = await this.getWithdrawFromSyncToEthereum(withdraw as any);
@@ -911,8 +911,8 @@ export class Wallet {
         ethAddress: string;
         token: TokenLike;
         amount: BigNumberish;
-        feeRatio: number;
-        fastWithdraw: boolean;
+        withdrawFeeRatio: number;
+        fastWithdraw: number;
         fee?: BigNumberish;
         chainId?: string,
         nonce?: Nonce;

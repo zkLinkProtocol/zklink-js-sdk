@@ -66,6 +66,8 @@ export declare function serializeAmountFull(amount: BigNumberish): Uint8Array;
 export declare function serializeFeePacked(fee: BigNumberish): Uint8Array;
 export declare function serializeNonce(nonce: number): Uint8Array;
 export declare function serializeChainId(chainId: number): Uint8Array;
+export declare function serializeFeeRatio(withdrawFeeRatio: number): Uint8Array;
+export declare function serializeFastWithdraw(fastWithdraw: number): Uint8Array;
 export declare function serializeTimestamp(time: number): Uint8Array;
 export declare function serializeWithdraw(withdraw: Withdraw): Uint8Array;
 export declare function serializeTransfer(transfer: Transfer): Uint8Array;

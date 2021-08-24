@@ -278,6 +278,8 @@ export declare class Wallet {
         tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
+        withdrawFeeRatio: number;
+        fastWithdraw: number;
         nonce: number;
         accountId: number;
         validFrom: number;
@@ -290,6 +292,8 @@ export declare class Wallet {
         tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
+        withdrawFeeRatio: number;
+        fastWithdraw: number;
         accountId?: number;
         nonce: number;
         validFrom?: number;
@@ -299,6 +303,8 @@ export declare class Wallet {
         ethAddress: string;
         token: TokenLike;
         amount: BigNumberish;
+        withdrawFeeRatio: number;
+        fastWithdraw: number;
         fee?: BigNumberish;
         chainId?: string;
         nonce?: Nonce;
