@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.serializeAddLiquidity = exports.serializeSwap = exports.serializeTransfer = exports.serializeWithdraw = exports.serializeTimestamp = exports.serializeChainId = exports.serializeNonce = exports.serializeFeePacked = exports.serializeAmountFull = exports.serializeAmountPacked = exports.serializeTokenId = exports.serializeAccountId = exports.serializeAddress = exports.getEthSignatureType = exports.verifyERC1271Signature = exports.signMessagePersonalAPI = exports.getSignedBytesFromMessage = exports.getChangePubkeyLegacyMessage = exports.getChangePubkeyMessage = exports.TokenSet = exports.isTokenETH = exports.sleep = exports.buffer2bitsBE = exports.isTransactionFeePackable = exports.closestGreaterOrEqPackableTransactionFee = exports.closestPackableTransactionFee = exports.isTransactionAmountPackable = exports.closestGreaterOrEqPackableTransactionAmount = exports.closestPackableTransactionAmount = exports.packFeeChecked = exports.packAmountChecked = exports.reverseBits = exports.integerToFloatUp = exports.integerToFloat = exports.bitsIntoBytesInBEOrder = exports.floatToInteger = exports.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ERC20_APPROVE_TRESHOLD = exports.MAX_ERC20_APPROVE_AMOUNT = exports.ERC20_DEPOSIT_GAS_LIMIT = exports.MULTICALL_INTERFACE = exports.IEIP1271_INTERFACE = exports.SYNC_GOV_CONTRACT_INTERFACE = exports.SYNC_MAIN_CONTRACT_INTERFACE = exports.IERC20_INTERFACE = exports.MAX_NONCE = exports.MAX_TIMESTAMP = void 0;
-exports.getFastSwapNonce = exports.getRandom = exports.getTxHash = exports.getPendingBalance = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.parseHexWithPrefix = exports.serializeTx = exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeRemoveLiquidity = void 0;
+exports.serializeTransfer = exports.serializeWithdraw = exports.serializeTimestamp = exports.serializeFastWithdraw = exports.serializeFeeRatio = exports.serializeChainId = exports.serializeNonce = exports.serializeFeePacked = exports.serializeAmountFull = exports.serializeAmountPacked = exports.serializeTokenId = exports.serializeAccountId = exports.serializeAddress = exports.getEthSignatureType = exports.verifyERC1271Signature = exports.signMessagePersonalAPI = exports.getSignedBytesFromMessage = exports.getChangePubkeyLegacyMessage = exports.getChangePubkeyMessage = exports.TokenSet = exports.isTokenETH = exports.sleep = exports.buffer2bitsBE = exports.isTransactionFeePackable = exports.closestGreaterOrEqPackableTransactionFee = exports.closestPackableTransactionFee = exports.isTransactionAmountPackable = exports.closestGreaterOrEqPackableTransactionAmount = exports.closestPackableTransactionAmount = exports.packFeeChecked = exports.packAmountChecked = exports.reverseBits = exports.integerToFloatUp = exports.integerToFloat = exports.bitsIntoBytesInBEOrder = exports.floatToInteger = exports.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ERC20_APPROVE_TRESHOLD = exports.MAX_ERC20_APPROVE_AMOUNT = exports.ERC20_DEPOSIT_GAS_LIMIT = exports.MULTICALL_INTERFACE = exports.IEIP1271_INTERFACE = exports.SYNC_GOV_CONTRACT_INTERFACE = exports.SYNC_MAIN_CONTRACT_INTERFACE = exports.IERC20_INTERFACE = exports.MAX_NONCE = exports.MAX_TIMESTAMP = void 0;
+exports.getFastSwapNonce = exports.getRandom = exports.getTxHash = exports.getPendingBalance = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.parseHexWithPrefix = exports.serializeTx = exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeRemoveLiquidity = exports.serializeAddLiquidity = exports.serializeSwap = void 0;
 const ethers_1 = require("ethers");
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
 const MAX_NUMBER_OF_TOKENS = 65535;
@@ -481,6 +481,14 @@ function serializeChainId(chainId) {
     return numberToBytesBE(chainId, 1);
 }
 exports.serializeChainId = serializeChainId;
+function serializeFeeRatio(withdrawFeeRatio) {
+    return numberToBytesBE(withdrawFeeRatio, 2);
+}
+exports.serializeFeeRatio = serializeFeeRatio;
+function serializeFastWithdraw(fastWithdraw) {
+    return new Uint8Array([fastWithdraw]);
+}
+exports.serializeFastWithdraw = serializeFastWithdraw;
 function serializeTimestamp(time) {
     if (time < 0) {
         throw new Error('Negative timestamp');
@@ -496,6 +504,8 @@ function serializeWithdraw(withdraw) {
     const tokenIdBytes = serializeTokenId(withdraw.token);
     const amountBytes = serializeAmountFull(withdraw.amount);
     const feeBytes = serializeFeePacked(withdraw.fee);
+    const withdrawFeeRatioBytes = serializeFeeRatio(withdraw.withdrawFeeRatio);
+    const fastWithdrawBytes = serializeFastWithdraw(withdraw.fastWithdraw);
     const nonceBytes = serializeNonce(withdraw.nonce);
     const validFrom = serializeTimestamp(withdraw.validFrom);
     const validUntil = serializeTimestamp(withdraw.validUntil);
@@ -508,6 +518,8 @@ function serializeWithdraw(withdraw) {
         amountBytes,
         feeBytes,
         nonceBytes,
+        fastWithdrawBytes,
+        withdrawFeeRatioBytes,
         validFrom,
         validUntil
     ]);
