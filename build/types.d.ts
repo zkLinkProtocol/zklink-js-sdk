@@ -64,6 +64,8 @@ export interface Signature {
 export interface Transfer {
     type: 'Transfer';
     accountId: number;
+    fromChainId: number;
+    toChainId: number;
     from: Address;
     to: Address;
     token: number;

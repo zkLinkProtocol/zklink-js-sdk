@@ -2,7 +2,8 @@ import { utils, ethers, BigNumber, BigNumberish } from 'ethers';
 import { Provider } from '.';
 import { PubKeyHash, TokenAddress, TokenLike, Tokens, TokenSymbol, EthSignerType, Address, Transfer, ForcedExit, ChangePubKey, Withdraw, CloseAccount, AddLiquidity, RemoveLiquidity, Swap } from './types';
 export declare const MAX_TIMESTAMP = 4294967295;
-export declare const MAX_NONCE = 4294967295;
+export declare const MIN_UNONCE = 1;
+export declare const MAX_UNONCE = 4294967295;
 export declare const IERC20_INTERFACE: utils.Interface;
 export declare const SYNC_MAIN_CONTRACT_INTERFACE: utils.Interface;
 export declare const SYNC_GOV_CONTRACT_INTERFACE: utils.Interface;
@@ -97,5 +98,5 @@ export declare function getEthereumBalance(ethProvider: ethers.providers.Provide
 export declare function getPendingBalance(ethProvider: ethers.providers.Provider, syncProvider: Provider, address: Address, token: TokenLike): Promise<BigNumberish>;
 export declare function getTxHash(tx: Transfer | Withdraw | ChangePubKey | ForcedExit | CloseAccount): string;
 export declare function getRandom(min: number, max: number): number;
-export declare function getFastSwapNonce(): number;
+export declare function getFastSwapUNonce(): number;
 export {};

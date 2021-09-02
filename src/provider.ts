@@ -1,5 +1,5 @@
 import { AbstractJSONRPCTransport, DummyTransport, HTTPTransport, WSTransport } from './transport';
-import { BigNumber, Contract, ethers } from 'ethers';
+import { BigNumber, BigNumberish, constants, Contract, ContractTransaction, ethers } from 'ethers';
 import {
     AccountState,
     Address,
@@ -15,8 +15,11 @@ import {
     TransactionReceipt,
     TxEthSignature
 } from './types';
-import { isTokenETH, sleep, SYNC_GOV_CONTRACT_INTERFACE, TokenSet } from './utils';
+import { ERC20_APPROVE_TRESHOLD, ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT, ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT, getFastSwapUNonce, IERC20_INTERFACE, isTokenETH, MAX_ERC20_APPROVE_AMOUNT, sleep, SYNC_GOV_CONTRACT_INTERFACE, SYNC_MAIN_CONTRACT_INTERFACE, TokenSet } from './utils';
+import { ETHOperation } from './wallet';
+import { ErrorCode } from '@ethersproject/logger';
 
+const EthersErrorCode = ErrorCode;
 export async function getDefaultProvider(network: Network, transport: 'WS' | 'HTTP' = 'HTTP'): Promise<Provider> {
     if (transport === 'WS') {
         console.warn('Websocket support will be removed in future. Use HTTP transport instead.');
@@ -280,7 +283,207 @@ export class Provider {
     async disconnect() {
         return await this.transport.disconnect();
     }
+
+
+    async fastSwapAccepts(accepts: {
+        receiver: Address,
+        tokenId: number,
+        amount: BigNumberish,
+        withdrawFee: number,
+        uNonce: number,
+        ethSigner: ethers.Signer,
+    }): Promise<Address> {
+        const mainZkSyncContract = this.getZkSyncMainContract(accepts.ethSigner);
+        const hash = ethers.utils.solidityKeccak256(['address', 'uint', 'string', 'string', 'uint'], [accepts.receiver, accepts.tokenId, accepts.amount.toString(), accepts.withdrawFee, accepts.uNonce])
+        const address = await mainZkSyncContract.accepts(hash)
+        return address
+    }
+
+
+    getZkSyncMainContract(ethSigner) {
+        return new ethers.Contract(
+            this.contractAddress.mainContract,
+            SYNC_MAIN_CONTRACT_INTERFACE,
+            ethSigner
+        );
+    }
+
+
+    async isERC20DepositsApproved(
+        tokenAddress: Address,
+        accountAddress: Address,
+        ethSigner: ethers.Signer,
+        erc20ApproveThreshold: BigNumber = ERC20_APPROVE_TRESHOLD
+    ): Promise<boolean> {
+        if (isTokenETH(tokenAddress)) {
+            throw Error('ETH token does not need approval.');
+        }
+        const erc20contract = new Contract(tokenAddress, IERC20_INTERFACE, ethSigner);
+        try {
+            const currentAllowance = await erc20contract.allowance(
+                accountAddress,
+                this.contractAddress.mainContract
+            );
+            return BigNumber.from(currentAllowance).gte(erc20ApproveThreshold);
+        } catch (e) {
+            this.modifyEthersError(e);
+        }
+    }
+
+    async approveERC20TokenDeposits(
+        tokenAddress: Address,
+        ethSigner: ethers.Signer,
+        max_erc20_approve_amount: BigNumber = MAX_ERC20_APPROVE_AMOUNT
+    ): Promise<ContractTransaction> {
+        if (isTokenETH(tokenAddress)) {
+            throw Error('ETH token does not need approval.');
+        }
+        const erc20contract = new Contract(tokenAddress, IERC20_INTERFACE, ethSigner);
+
+        try {
+            return erc20contract.approve(this.contractAddress.mainContract, max_erc20_approve_amount);
+        } catch (e) {
+            this.modifyEthersError(e);
+        }
+    }
+
+    async fastSwapUNonce(swap: {
+        receiver: Address,
+        tokenId: number,
+        amount: BigNumberish,
+        withdrawFee: number,
+        ethSigner: ethers.Signer,
+    }): Promise<number> {
+        const uNonce = getFastSwapUNonce()
+        const acceptAddress = await this.fastSwapAccepts({
+            ...swap,
+            uNonce,
+        })
+        if (acceptAddress === constants.AddressZero) {
+            return uNonce
+        }
+        return await this.fastSwapUNonce(swap)
+    }
+
+    async fastSwap(swap: {
+        fromChainId: number;
+        toChainId: number;
+        from: Address;
+        to: Address;
+        tokenId0: number;
+        token0: TokenLike;
+        tokenId1: number;
+        token1: TokenLike;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        ethSigner: ethers.Signer;
+        withdrawFee: number; // 100 means 1%, 10000 = 100%
+        ethTxOptions?: ethers.providers.TransactionRequest;
+        approveDepositAmountForERC20?: boolean;
+    }): Promise<ETHOperation> {
+        const gasPrice = await swap.ethSigner.provider.getGasPrice();
+
+        const mainZkSyncContract = this.getZkSyncMainContract(swap.ethSigner);
+
+        let ethTransaction;
+        let uNonce: number = 0;
+
+        try {
+            uNonce = await this.fastSwapUNonce({
+                receiver: swap.to,
+                tokenId: swap.tokenId0,
+                amount: swap.amountIn,
+                withdrawFee: swap.withdrawFee,
+                ethSigner: swap.ethSigner,
+            })
+        }
+        catch(e) {
+            this.modifyEthersError(e)
+        }
+
+        if (!uNonce) {
+            this.modifyEthersError(new Error('swap tx nonce is none'));
+        }
+        // -------------------------------
+        if (isTokenETH(swap.token0)) {
+            try {
+                // function swapExactETHForTokens(address _zkSyncAddress,uint104 _amountOutMin, uint16 _withdrawFee, uint8 _toChainId, uint16 _toTokenId, address _to, uint32 _nonce) external payable
+                ethTransaction = await mainZkSyncContract.swapExactETHForTokens(swap.from, swap.amountOutMin, swap.withdrawFee, swap.toChainId, swap.tokenId1, swap.to, uNonce, {
+                    value: BigNumber.from(swap.amountIn),
+                    gasLimit: BigNumber.from(ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT),
+                    gasPrice,
+                    ...swap.ethTxOptions
+                });
+            } catch (e) {
+                this.modifyEthersError(e);
+            }
+        }
+        else {
+            const tokenAddress = this.tokenSet.resolveTokenAddress(swap.token0);
+            // ERC20 token deposit
+            let nonce: number;
+            // function swapExactTokensForTokens(address _zkSyncAddress, uint104 _amountIn, uint104 _amountOutMin, uint16 _withdrawFee, IERC20 _fromToken, uint8 _toChainId, uint16 _toTokenId, address _to, uint32 _nonce) external
+            const args = [
+                swap.from,
+                swap.amountIn,
+                swap.amountOutMin,
+                swap.withdrawFee,
+                tokenAddress,
+                swap.toChainId,
+                swap.tokenId1,
+                swap.to,
+                uNonce,
+                {
+                    nonce,
+                    gasPrice,
+                    ...swap.ethTxOptions
+                } as ethers.providers.TransactionRequest
+            ];
+
+            // We set gas limit only if user does not set it using ethTxOptions.
+            const txRequest = args[args.length - 1] as ethers.providers.TransactionRequest;
+            if (txRequest.gasLimit == null) {
+                try {
+                    const gasEstimate = await mainZkSyncContract.estimateGas.swapExactTokensForTokens(...args).then(
+                        (estimate) => estimate,
+                        () => BigNumber.from('0')
+                    );
+                    let recommendedGasLimit = ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT;
+                    txRequest.gasLimit = gasEstimate.gte(recommendedGasLimit) ? gasEstimate : recommendedGasLimit;
+                    args[args.length - 1] = txRequest;
+                } catch (e) {
+                    this.modifyEthersError(e);
+                }
+            }
+            try {
+                ethTransaction = await mainZkSyncContract.swapExactTokensForTokens(...args);
+            } catch (e) {
+                this.modifyEthersError(e);
+            }
+
+        }
+
+        return new ETHOperation(ethTransaction, this);
+    }
+
+    private modifyEthersError(error: any): never {
+        // List of errors that can be caused by user's actions, which have to be forwarded as-is.
+        const correct_errors = [
+            EthersErrorCode.NONCE_EXPIRED,
+            EthersErrorCode.INSUFFICIENT_FUNDS,
+            EthersErrorCode.REPLACEMENT_UNDERPRICED,
+            EthersErrorCode.UNPREDICTABLE_GAS_LIMIT
+        ];
+        if (!correct_errors.includes(error.code)) {
+            // This is an error which we don't expect
+            error.message = `Ethereum smart wallet JSON RPC server returned the following error while executing an operation: "${error.message}". Please contact your smart wallet support for help.`;
+        }
+
+        throw error;
+    }
 }
+
+
 
 export class ETHProxy {
     private governanceContract: Contract;

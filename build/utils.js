@@ -9,15 +9,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.serializeTransfer = exports.serializeWithdraw = exports.serializeTimestamp = exports.serializeFastWithdraw = exports.serializeFeeRatio = exports.serializeChainId = exports.serializeNonce = exports.serializeFeePacked = exports.serializeAmountFull = exports.serializeAmountPacked = exports.serializeTokenId = exports.serializeAccountId = exports.serializeAddress = exports.getEthSignatureType = exports.verifyERC1271Signature = exports.signMessagePersonalAPI = exports.getSignedBytesFromMessage = exports.getChangePubkeyLegacyMessage = exports.getChangePubkeyMessage = exports.TokenSet = exports.isTokenETH = exports.sleep = exports.buffer2bitsBE = exports.isTransactionFeePackable = exports.closestGreaterOrEqPackableTransactionFee = exports.closestPackableTransactionFee = exports.isTransactionAmountPackable = exports.closestGreaterOrEqPackableTransactionAmount = exports.closestPackableTransactionAmount = exports.packFeeChecked = exports.packAmountChecked = exports.reverseBits = exports.integerToFloatUp = exports.integerToFloat = exports.bitsIntoBytesInBEOrder = exports.floatToInteger = exports.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ERC20_APPROVE_TRESHOLD = exports.MAX_ERC20_APPROVE_AMOUNT = exports.ERC20_DEPOSIT_GAS_LIMIT = exports.MULTICALL_INTERFACE = exports.IEIP1271_INTERFACE = exports.SYNC_GOV_CONTRACT_INTERFACE = exports.SYNC_MAIN_CONTRACT_INTERFACE = exports.IERC20_INTERFACE = exports.MAX_NONCE = exports.MAX_TIMESTAMP = void 0;
-exports.getFastSwapNonce = exports.getRandom = exports.getTxHash = exports.getPendingBalance = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.parseHexWithPrefix = exports.serializeTx = exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeRemoveLiquidity = exports.serializeAddLiquidity = exports.serializeSwap = void 0;
+exports.serializeWithdraw = exports.serializeTimestamp = exports.serializeFastWithdraw = exports.serializeFeeRatio = exports.serializeChainId = exports.serializeNonce = exports.serializeFeePacked = exports.serializeAmountFull = exports.serializeAmountPacked = exports.serializeTokenId = exports.serializeAccountId = exports.serializeAddress = exports.getEthSignatureType = exports.verifyERC1271Signature = exports.signMessagePersonalAPI = exports.getSignedBytesFromMessage = exports.getChangePubkeyLegacyMessage = exports.getChangePubkeyMessage = exports.TokenSet = exports.isTokenETH = exports.sleep = exports.buffer2bitsBE = exports.isTransactionFeePackable = exports.closestGreaterOrEqPackableTransactionFee = exports.closestPackableTransactionFee = exports.isTransactionAmountPackable = exports.closestGreaterOrEqPackableTransactionAmount = exports.closestPackableTransactionAmount = exports.packFeeChecked = exports.packAmountChecked = exports.reverseBits = exports.integerToFloatUp = exports.integerToFloat = exports.bitsIntoBytesInBEOrder = exports.floatToInteger = exports.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ERC20_APPROVE_TRESHOLD = exports.MAX_ERC20_APPROVE_AMOUNT = exports.ERC20_DEPOSIT_GAS_LIMIT = exports.MULTICALL_INTERFACE = exports.IEIP1271_INTERFACE = exports.SYNC_GOV_CONTRACT_INTERFACE = exports.SYNC_MAIN_CONTRACT_INTERFACE = exports.IERC20_INTERFACE = exports.MAX_UNONCE = exports.MIN_UNONCE = exports.MAX_TIMESTAMP = void 0;
+exports.getFastSwapUNonce = exports.getRandom = exports.getTxHash = exports.getPendingBalance = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.parseHexWithPrefix = exports.serializeTx = exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeRemoveLiquidity = exports.serializeAddLiquidity = exports.serializeSwap = exports.serializeTransfer = void 0;
 const ethers_1 = require("ethers");
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
 const MAX_NUMBER_OF_TOKENS = 65535;
 // Max number of accounts for the current version, it is determined by the zkSync circuit implementation.
 const MAX_NUMBER_OF_ACCOUNTS = Math.pow(2, 24);
 exports.MAX_TIMESTAMP = 4294967295;
-exports.MAX_NONCE = 4294967295;
+exports.MIN_UNONCE = 1;
+exports.MAX_UNONCE = 4294967295;
 exports.IERC20_INTERFACE = new ethers_1.utils.Interface(require('../abi/IERC20.json').abi);
 exports.SYNC_MAIN_CONTRACT_INTERFACE = new ethers_1.utils.Interface(require('../abi/SyncMain.json').abi);
 exports.SYNC_GOV_CONTRACT_INTERFACE = new ethers_1.utils.Interface(require('../abi/SyncGov.json').abi);
@@ -527,6 +528,8 @@ function serializeWithdraw(withdraw) {
 exports.serializeWithdraw = serializeWithdraw;
 function serializeTransfer(transfer) {
     const type = new Uint8Array([5]); // tx type
+    const fromChainId = serializeChainId(transfer.fromChainId);
+    const toChainId = serializeChainId(transfer.toChainId);
     const accountId = serializeAccountId(transfer.accountId);
     const from = serializeAddress(transfer.from);
     const to = serializeAddress(transfer.to);
@@ -537,7 +540,7 @@ function serializeTransfer(transfer) {
     const validFrom = serializeTimestamp(transfer.validFrom);
     const validUntil = serializeTimestamp(transfer.validUntil);
     console.log('serializeTransfer transfer ', transfer);
-    return ethers_1.ethers.utils.concat([type, accountId, from, to, token, amount, fee, nonce, validFrom, validUntil]);
+    return ethers_1.ethers.utils.concat([type, fromChainId, toChainId, accountId, from, to, token, amount, fee, nonce, validFrom, validUntil]);
 }
 exports.serializeTransfer = serializeTransfer;
 function serializeSwap(transfer) {
@@ -732,7 +735,7 @@ function getRandom(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 exports.getRandom = getRandom;
-function getFastSwapNonce() {
-    return getRandom(1, exports.MAX_NONCE);
+function getFastSwapUNonce() {
+    return getRandom(exports.MIN_UNONCE, exports.MAX_UNONCE);
 }
-exports.getFastSwapNonce = getFastSwapNonce;
+exports.getFastSwapUNonce = getFastSwapUNonce;

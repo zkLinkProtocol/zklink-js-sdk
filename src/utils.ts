@@ -22,7 +22,8 @@ const MAX_NUMBER_OF_TOKENS = 65535;
 const MAX_NUMBER_OF_ACCOUNTS = Math.pow(2, 24);
 
 export const MAX_TIMESTAMP = 4294967295;
-export const MAX_NONCE = 4294967295;
+export const MIN_UNONCE = 1;
+export const MAX_UNONCE = 4294967295;
 
 export const IERC20_INTERFACE = new utils.Interface(require('../abi/IERC20.json').abi);
 export const SYNC_MAIN_CONTRACT_INTERFACE = new utils.Interface(require('../abi/SyncMain.json').abi);
@@ -605,6 +606,8 @@ export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
 
 export function serializeTransfer(transfer: Transfer): Uint8Array {
     const type = new Uint8Array([5]); // tx type
+    const fromChainId = serializeChainId(transfer.fromChainId);
+    const toChainId = serializeChainId(transfer.toChainId);
     const accountId = serializeAccountId(transfer.accountId);
     const from = serializeAddress(transfer.from);
     const to = serializeAddress(transfer.to);
@@ -615,7 +618,7 @@ export function serializeTransfer(transfer: Transfer): Uint8Array {
     const validFrom = serializeTimestamp(transfer.validFrom);
     const validUntil = serializeTimestamp(transfer.validUntil);
     console.log('serializeTransfer transfer ', transfer);
-    return ethers.utils.concat([type, accountId, from, to, token, amount, fee, nonce, validFrom, validUntil]);
+    return ethers.utils.concat([type, fromChainId, toChainId, accountId, from, to, token, amount, fee, nonce, validFrom, validUntil]);
 }
 
 export function serializeSwap(transfer: Swap): Uint8Array {
@@ -839,8 +842,7 @@ export function getRandom(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
-export function getFastSwapNonce() {
-    
-    return getRandom(1, MAX_NONCE)
+export function getFastSwapUNonce() {
+    return getRandom(MIN_UNONCE, MAX_UNONCE)
 }
 

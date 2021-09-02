@@ -25,6 +25,8 @@ export declare class Wallet {
     batchBuilder(nonce?: Nonce): BatchBuilder;
     getTransfer(transfer: {
         chainId: string;
+        fromChainId: number;
+        toChainId: number;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -37,6 +39,8 @@ export declare class Wallet {
     }): Promise<Transfer>;
     signSyncTransfer(transfer: {
         chainId: string;
+        fromChainId: number;
+        toChainId: number;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -76,6 +80,8 @@ export declare class Wallet {
     }): Promise<Transaction>;
     syncMultiTransfer(transfers: {
         chainId: string;
+        fromChainId: number;
+        toChainId: number;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -88,6 +94,8 @@ export declare class Wallet {
     }[]): Promise<Transaction[]>;
     syncTransfer(transfer: {
         chainId: string;
+        fromChainId: number;
+        toChainId: number;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -382,34 +390,6 @@ export declare class Wallet {
     getEthereumBalance(token: TokenLike): Promise<BigNumber>;
     isERC20DepositsApproved(token: TokenLike, erc20ApproveThreshold?: BigNumber): Promise<boolean>;
     approveERC20TokenDeposits(token: TokenLike, max_erc20_approve_amount?: BigNumber): Promise<ContractTransaction>;
-    fastSwapAccepts(accepts: {
-        receiver: Address;
-        tokenId: number;
-        amount: BigNumberish;
-        withdrawFee: BigNumberish;
-        uNonce: number;
-    }): Promise<boolean | Address>;
-    fastSwapUNonce(swap: {
-        receiver: Address;
-        tokenId: number;
-        amount: BigNumberish;
-        withdrawFee: BigNumberish;
-    }): Promise<number>;
-    fastSwap(swap: {
-        fromChainId: number;
-        toChainId: number;
-        from: Address;
-        to: Address;
-        tokenId0: number;
-        token0: TokenLike;
-        tokenId1: number;
-        token1: TokenLike;
-        amountIn: BigNumberish;
-        amountOutMin: BigNumberish;
-        withdrawFee: number;
-        ethTxOptions?: ethers.providers.TransactionRequest;
-        approveDepositAmountForERC20?: boolean;
-    }): Promise<ETHOperation>;
     depositToSyncFromEthereum(deposit: {
         depositTo: Address;
         token: TokenLike;

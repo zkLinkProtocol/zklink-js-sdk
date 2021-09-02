@@ -44,7 +44,8 @@ import {
     getChangePubkeyLegacyMessage,
     ERC20_DEPOSIT_GAS_LIMIT,
     ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT,
-    ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT
+    ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT,
+    getFastSwapUNonce
 } from './utils';
 import { randomBytes } from 'ethers/lib/utils';
 
@@ -155,6 +156,8 @@ export class Wallet {
 
     async getTransfer(transfer: {
         chainId: string,
+        fromChainId: number;
+        toChainId: number;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -175,6 +178,8 @@ export class Wallet {
 
         const transactionData = {
             accountId: transfer.accountId || this.accountId,
+            fromChainId: transfer.fromChainId,
+            toChainId: transfer.toChainId,
             from: this.address(),
             to: transfer.to,
             tokenId,
@@ -190,6 +195,8 @@ export class Wallet {
 
     async signSyncTransfer(transfer: {
         chainId: string,
+        fromChainId: number;
+        toChainId: number;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -324,6 +331,8 @@ export class Wallet {
     async syncMultiTransfer(
         transfers: {
             chainId: string,
+            fromChainId: number;
+            toChainId: number;
             to: Address;
             token: TokenLike;
             tokenId: number;
@@ -356,6 +365,8 @@ export class Wallet {
 
             const tx: Transfer = await this.getTransfer({
                 chainId: transfer.chainId,
+                fromChainId: transfer.fromChainId,
+                toChainId: transfer.toChainId,
                 to: transfer.to,
                 token: transfer.token,
                 tokenId: transfer.tokenId,
@@ -383,7 +394,9 @@ export class Wallet {
     }
 
     async syncTransfer(transfer: {
-        chainId: string,
+        chainId: string;
+        fromChainId: number;
+        toChainId: number;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -1295,137 +1308,6 @@ export class Wallet {
         }
     }
 
-    async fastSwapAccepts(accepts: {
-        receiver: Address,
-        tokenId: number,
-        amount: BigNumberish,
-        withdrawFee: BigNumberish,
-        uNonce: number,
-    }): Promise<boolean | Address> {
-        const mainZkSyncContract = this.getZkSyncMainContract();
-        const hash = ethers.utils.solidityKeccak256(['address', 'number', 'string', 'string', 'number'], [accepts.receiver, accepts.tokenId, accepts.amount, accepts.withdrawFee, accepts.uNonce])
-        const address = await mainZkSyncContract.accepts(hash)
-        return address
-    }
-
-    async fastSwapUNonce(swap: {
-        receiver: Address,
-        tokenId: number,
-        amount: BigNumberish,
-        withdrawFee: BigNumberish,
-    }): Promise<number> {
-        const uNonce = 1
-        const acceptAddress = await this.fastSwapAccepts({
-            ...swap,
-            uNonce,
-        })
-        if (acceptAddress) {
-            return await this.fastSwapUNonce(swap)
-        }
-        return uNonce
-    }
-
-    async fastSwap(swap: {
-        fromChainId: number;
-        toChainId: number;
-        from: Address;
-        to: Address;
-        tokenId0: number;
-        token0: TokenLike;
-        tokenId1: number;
-        token1: TokenLike;
-        amountIn: BigNumberish;
-        amountOutMin: BigNumberish;
-        withdrawFee: number; // 100 means 1%, 10000 = 100%
-        ethTxOptions?: ethers.providers.TransactionRequest;
-        approveDepositAmountForERC20?: boolean;
-    }): Promise<ETHOperation> {
-        const gasPrice = await this.ethSigner.provider.getGasPrice();
-
-        const mainZkSyncContract = this.getZkSyncMainContract();
-
-        let ethTransaction;
-        // amountIn, amountOutMin, withdrawFee, fromTokenId, toChainId, toTokenId, to, nonce
-        let uNonce: number = 0;
-
-        try {
-            // uNonce = randomBytes()
-            uNonce = await this.fastSwapUNonce({
-                receiver: swap.to,
-                tokenId: swap.tokenId0,
-                amount: swap.amountIn,
-                withdrawFee: swap.withdrawFee
-            })
-        }
-        catch(e) {
-            this.modifyEthersError(e)
-        }
-
-        if (!uNonce) {
-            this.modifyEthersError(new Error('swap tx nonce is none'));
-        }
-        // -------------------------------
-        if (isTokenETH(swap.token0)) {
-            try {
-                // function swapExactETHForTokens(address _zkSyncAddress,uint104 _amountOutMin, uint16 _withdrawFee, uint8 _toChainId, uint16 _toTokenId, address _to, uint32 _nonce) external payable
-                ethTransaction = await mainZkSyncContract.swapExactETHForTokens(swap.from, swap.amountOutMin, swap.withdrawFee, swap.toChainId, swap.tokenId1, swap.to, uNonce, {
-                    value: BigNumber.from(swap.amountIn),
-                    gasLimit: BigNumber.from(ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT),
-                    gasPrice,
-                    ...swap.ethTxOptions
-                });
-            } catch (e) {
-                this.modifyEthersError(e);
-            }
-        }
-        else {
-            const tokenAddress = this.provider.tokenSet.resolveTokenAddress(swap.token0);
-            // ERC20 token deposit
-            let nonce: number;
-            // function swapExactTokensForTokens(address _zkSyncAddress, uint104 _amountIn, uint104 _amountOutMin, uint16 _withdrawFee, IERC20 _fromToken, uint8 _toChainId, uint16 _toTokenId, address _to, uint32 _nonce) external
-            const args = [
-                swap.from,
-                swap.amountIn,
-                swap.amountOutMin,
-                swap.withdrawFee,
-                tokenAddress,
-                swap.toChainId,
-                swap.tokenId1,
-                swap.to,
-                uNonce,
-                {
-                    nonce,
-                    gasPrice,
-                    ...swap.ethTxOptions
-                } as ethers.providers.TransactionRequest
-            ];
-
-            // We set gas limit only if user does not set it using ethTxOptions.
-            const txRequest = args[args.length - 1] as ethers.providers.TransactionRequest;
-            if (txRequest.gasLimit == null) {
-                try {
-                    const gasEstimate = await mainZkSyncContract.estimateGas.swapExactTokensForTokens(...args).then(
-                        (estimate) => estimate,
-                        () => BigNumber.from('0')
-                    );
-                    let recommendedGasLimit = ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT;
-                    txRequest.gasLimit = gasEstimate.gte(recommendedGasLimit) ? gasEstimate : recommendedGasLimit;
-                    args[args.length - 1] = txRequest;
-                } catch (e) {
-                    this.modifyEthersError(e);
-                }
-            }
-
-            try {
-                ethTransaction = await mainZkSyncContract.swapExactTokensForTokens(...args);
-            } catch (e) {
-                this.modifyEthersError(e);
-            }
-
-        }
-
-        return new ETHOperation(ethTransaction, this.provider);
-    }
 
     async depositToSyncFromEthereum(deposit: {
         depositTo: Address;

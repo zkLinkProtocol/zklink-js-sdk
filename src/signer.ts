@@ -32,6 +32,8 @@ export class Signer {
      */
     transferSignBytes(transfer: {
         accountId: number;
+        fromChainId: number;
+        toChainId: number;
         from: Address;
         to: Address;
         tokenId: number;
@@ -50,6 +52,8 @@ export class Signer {
 
     async signSyncTransfer(transfer: {
         accountId: number;
+        fromChainId: number;
+        toChainId: number;
         from: Address;
         to: Address;
         tokenId: number;

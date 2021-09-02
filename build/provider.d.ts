@@ -1,7 +1,8 @@
 import { AbstractJSONRPCTransport } from './transport';
-import { BigNumber, ethers } from 'ethers';
+import { BigNumber, BigNumberish, Contract, ContractTransaction, ethers } from 'ethers';
 import { AccountState, Address, ChangePubKeyFee, ContractAddress, Fee, LegacyChangePubKeyFee, Network, PriorityOperationReceipt, TokenAddress, TokenLike, Tokens, TransactionReceipt, TxEthSignature } from './types';
 import { TokenSet } from './utils';
+import { ETHOperation } from './wallet';
 export declare function getDefaultProvider(network: Network, transport?: 'WS' | 'HTTP'): Promise<Provider>;
 export declare class Provider {
     transport: AbstractJSONRPCTransport;
@@ -45,6 +46,41 @@ export declare class Provider {
     getTransactionsBatchFee(txTypes: ('Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee)[], addresses: Address[], tokenLike: TokenLike, chainId?: string): Promise<BigNumber>;
     getTokenPrice(tokenLike: TokenLike, chainId?: string): Promise<number>;
     disconnect(): Promise<any>;
+    fastSwapAccepts(accepts: {
+        receiver: Address;
+        tokenId: number;
+        amount: BigNumberish;
+        withdrawFee: number;
+        uNonce: number;
+        ethSigner: ethers.Signer;
+    }): Promise<Address>;
+    getZkSyncMainContract(ethSigner: any): Contract;
+    isERC20DepositsApproved(tokenAddress: Address, accountAddress: Address, ethSigner: ethers.Signer, erc20ApproveThreshold?: BigNumber): Promise<boolean>;
+    approveERC20TokenDeposits(tokenAddress: Address, ethSigner: ethers.Signer, max_erc20_approve_amount?: BigNumber): Promise<ContractTransaction>;
+    fastSwapUNonce(swap: {
+        receiver: Address;
+        tokenId: number;
+        amount: BigNumberish;
+        withdrawFee: number;
+        ethSigner: ethers.Signer;
+    }): Promise<number>;
+    fastSwap(swap: {
+        fromChainId: number;
+        toChainId: number;
+        from: Address;
+        to: Address;
+        tokenId0: number;
+        token0: TokenLike;
+        tokenId1: number;
+        token1: TokenLike;
+        amountIn: BigNumberish;
+        amountOutMin: BigNumberish;
+        ethSigner: ethers.Signer;
+        withdrawFee: number;
+        ethTxOptions?: ethers.providers.TransactionRequest;
+        approveDepositAmountForERC20?: boolean;
+    }): Promise<ETHOperation>;
+    private modifyEthersError;
 }
 export declare class ETHProxy {
     private ethersProvider;

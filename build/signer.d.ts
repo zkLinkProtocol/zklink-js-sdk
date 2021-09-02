@@ -9,6 +9,8 @@ export declare class Signer {
      */
     transferSignBytes(transfer: {
         accountId: number;
+        fromChainId: number;
+        toChainId: number;
         from: Address;
         to: Address;
         tokenId: number;
@@ -20,6 +22,8 @@ export declare class Signer {
     }): Uint8Array;
     signSyncTransfer(transfer: {
         accountId: number;
+        fromChainId: number;
+        toChainId: number;
         from: Address;
         to: Address;
         tokenId: number;
