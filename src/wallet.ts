@@ -1327,7 +1327,7 @@ export class Wallet {
                 ethTransaction = await mainZkSyncContract.depositETH(deposit.depositTo, {
                     value: BigNumber.from(deposit.amount),
                     gasLimit: BigNumber.from(ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT),
-                    gasPrice,
+                    // gasPrice,
                     ...deposit.ethTxOptions
                 });
             } catch (e) {
@@ -1355,7 +1355,7 @@ export class Wallet {
                 deposit.depositTo,
                 {
                     nonce,
-                    gasPrice,
+                    // gasPrice,
                     ...deposit.ethTxOptions
                 } as ethers.providers.TransactionRequest
             ];

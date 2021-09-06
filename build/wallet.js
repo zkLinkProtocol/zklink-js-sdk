@@ -864,7 +864,7 @@ class Wallet {
             let ethTransaction;
             if (utils_1.isTokenETH(deposit.token)) {
                 try {
-                    ethTransaction = yield mainZkSyncContract.depositETH(deposit.depositTo, Object.assign({ value: ethers_1.BigNumber.from(deposit.amount), gasLimit: ethers_1.BigNumber.from(utils_1.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT), gasPrice }, deposit.ethTxOptions));
+                    ethTransaction = yield mainZkSyncContract.depositETH(deposit.depositTo, Object.assign({ value: ethers_1.BigNumber.from(deposit.amount), gasLimit: ethers_1.BigNumber.from(utils_1.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT) }, deposit.ethTxOptions));
                 }
                 catch (e) {
                     this.modifyEthersError(e);
@@ -888,8 +888,7 @@ class Wallet {
                     tokenAddress,
                     deposit.amount,
                     deposit.depositTo,
-                    Object.assign({ nonce,
-                        gasPrice }, deposit.ethTxOptions)
+                    Object.assign({ nonce }, deposit.ethTxOptions)
                 ];
                 // We set gas limit only if user does not set it using ethTxOptions.
                 const txRequest = args[args.length - 1];
