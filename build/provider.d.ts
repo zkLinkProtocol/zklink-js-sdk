@@ -57,6 +57,17 @@ export declare class Provider {
     getZkSyncMainContract(ethSigner: any): Contract;
     isERC20DepositsApproved(tokenAddress: Address, accountAddress: Address, ethSigner: ethers.Signer, erc20ApproveThreshold?: BigNumber): Promise<boolean>;
     approveERC20TokenDeposits(tokenAddress: Address, ethSigner: ethers.Signer, max_erc20_approve_amount?: BigNumber): Promise<ContractTransaction>;
+    bridge(bridge: {
+        from: Address;
+        to: Address;
+        amount: BigNumberish;
+        tokenAddress: Address;
+        tokenId: number;
+        toChainId: number;
+        withdrawFee: number;
+        ethSigner: ethers.Signer;
+        ethTxOptions?: ethers.providers.TransactionRequest;
+    }): Promise<ETHOperation>;
     fastSwapUNonce(swap: {
         receiver: Address;
         tokenId: number;
@@ -79,6 +90,17 @@ export declare class Provider {
         withdrawFee: number;
         ethTxOptions?: ethers.providers.TransactionRequest;
         approveDepositAmountForERC20?: boolean;
+    }): Promise<ETHOperation>;
+    getPendingBalance(pending: {
+        account: Address;
+        tokenAddress: Address;
+        ethSigner: ethers.Signer;
+    }): Promise<BigNumber>;
+    withdrawPendingBalance(withdraw: {
+        account: Address;
+        tokenAddress: Address;
+        amount: BigNumberish;
+        ethSigner: ethers.Signer;
     }): Promise<ETHOperation>;
     private modifyEthersError;
 }

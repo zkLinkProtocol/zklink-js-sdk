@@ -347,6 +347,74 @@ export class Provider {
         }
     }
 
+    async bridge(bridge: {
+        from: Address,
+        to: Address,
+        amount: BigNumberish,
+        tokenAddress: Address,
+        tokenId: number,
+        toChainId: number,
+        withdrawFee: number,
+        ethSigner: ethers.Signer,
+        ethTxOptions?: ethers.providers.TransactionRequest;
+    }): Promise<ETHOperation> {
+
+        const mainZkSyncContract = this.getZkSyncMainContract(bridge.ethSigner);
+
+        let ethTransaction;
+
+        let uNonce: number = 0;
+
+        try {
+            uNonce = await this.fastSwapUNonce({
+                receiver: bridge.to,
+                tokenId: bridge.tokenId,
+                amount: bridge.amount,
+                withdrawFee: bridge.withdrawFee,
+                ethSigner: bridge.ethSigner,
+            })
+        }
+        catch(e) {
+            this.modifyEthersError(e)
+        }
+
+        const args = [
+            bridge.from,
+            bridge.to,
+            bridge.amount,
+            bridge.tokenAddress,
+            bridge.toChainId,
+            uNonce,
+            bridge.withdrawFee,
+            {
+                ...bridge.ethTxOptions
+            } as ethers.providers.TransactionRequest
+        ];
+
+        // We set gas limit only if user does not set it using ethTxOptions.
+        const txRequest = args[args.length - 1] as ethers.providers.TransactionRequest;
+        if (txRequest.gasLimit == null) {
+            try {
+                const gasEstimate = await mainZkSyncContract.estimateGas.mappingToken(...args).then(
+                    (estimate) => estimate,
+                    () => BigNumber.from('0')
+                );
+                let recommendedGasLimit = ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT;
+                txRequest.gasLimit = gasEstimate.gte(recommendedGasLimit) ? gasEstimate : recommendedGasLimit;
+                args[args.length - 1] = txRequest;
+            } catch (e) {
+                this.modifyEthersError(e);
+            }
+        }
+        try {
+            ethTransaction = await mainZkSyncContract.mappingToken(...args);
+        } catch (e) {
+            this.modifyEthersError(e);
+        }
+
+        return new ETHOperation(ethTransaction, this);
+    }
+
     async fastSwapUNonce(swap: {
         receiver: Address,
         tokenId: number,
@@ -381,7 +449,6 @@ export class Provider {
         ethTxOptions?: ethers.providers.TransactionRequest;
         approveDepositAmountForERC20?: boolean;
     }): Promise<ETHOperation> {
-        const gasPrice = await swap.ethSigner.provider.getGasPrice();
 
         const mainZkSyncContract = this.getZkSyncMainContract(swap.ethSigner);
 
@@ -411,7 +478,6 @@ export class Provider {
                 ethTransaction = await mainZkSyncContract.swapExactETHForTokens(swap.from, swap.amountOutMin, swap.withdrawFee, swap.toChainId, swap.tokenId1, swap.to, uNonce, {
                     value: BigNumber.from(swap.amountIn),
                     gasLimit: BigNumber.from(ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT),
-                    gasPrice,
                     ...swap.ethTxOptions
                 });
             } catch (e) {
@@ -435,7 +501,6 @@ export class Provider {
                 uNonce,
                 {
                     nonce,
-                    gasPrice,
                     ...swap.ethTxOptions
                 } as ethers.providers.TransactionRequest
             ];
@@ -463,6 +528,27 @@ export class Provider {
 
         }
 
+        return new ETHOperation(ethTransaction, this);
+    }
+
+    async getPendingBalance(pending: {
+        account: Address,
+        tokenAddress: Address,
+        ethSigner: ethers.Signer,
+    }): Promise<BigNumber> {
+        const mainZkSyncContract = this.getZkSyncMainContract(pending.ethSigner);
+        const balance = mainZkSyncContract.getPendingBalance(pending.account, pending.tokenAddress)
+        return BigNumber.from(balance)
+    }
+
+    async withdrawPendingBalance(withdraw: {
+        account: Address,
+        tokenAddress: Address,
+        amount: BigNumberish,
+        ethSigner: ethers.Signer,
+    }): Promise<ETHOperation> {
+        const mainZkSyncContract = this.getZkSyncMainContract(withdraw.ethSigner);
+        const ethTransaction = mainZkSyncContract.withdrawPendingBalance(withdraw.account, withdraw.tokenAddress, BigNumber.from(withdraw.amount))
         return new ETHOperation(ethTransaction, this);
     }
 

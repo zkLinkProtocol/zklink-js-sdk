@@ -321,6 +321,55 @@ class Provider {
             }
         });
     }
+    bridge(bridge) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const mainZkSyncContract = this.getZkSyncMainContract(bridge.ethSigner);
+            let ethTransaction;
+            let uNonce = 0;
+            try {
+                uNonce = yield this.fastSwapUNonce({
+                    receiver: bridge.to,
+                    tokenId: bridge.tokenId,
+                    amount: bridge.amount,
+                    withdrawFee: bridge.withdrawFee,
+                    ethSigner: bridge.ethSigner,
+                });
+            }
+            catch (e) {
+                this.modifyEthersError(e);
+            }
+            const args = [
+                bridge.from,
+                bridge.to,
+                bridge.amount,
+                bridge.tokenAddress,
+                bridge.toChainId,
+                uNonce,
+                bridge.withdrawFee,
+                Object.assign({}, bridge.ethTxOptions)
+            ];
+            // We set gas limit only if user does not set it using ethTxOptions.
+            const txRequest = args[args.length - 1];
+            if (txRequest.gasLimit == null) {
+                try {
+                    const gasEstimate = yield mainZkSyncContract.estimateGas.mappingToken(...args).then((estimate) => estimate, () => ethers_1.BigNumber.from('0'));
+                    let recommendedGasLimit = utils_1.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT;
+                    txRequest.gasLimit = gasEstimate.gte(recommendedGasLimit) ? gasEstimate : recommendedGasLimit;
+                    args[args.length - 1] = txRequest;
+                }
+                catch (e) {
+                    this.modifyEthersError(e);
+                }
+            }
+            try {
+                ethTransaction = yield mainZkSyncContract.mappingToken(...args);
+            }
+            catch (e) {
+                this.modifyEthersError(e);
+            }
+            return new wallet_1.ETHOperation(ethTransaction, this);
+        });
+    }
     fastSwapUNonce(swap) {
         return __awaiter(this, void 0, void 0, function* () {
             const uNonce = utils_1.getFastSwapUNonce();
@@ -333,7 +382,6 @@ class Provider {
     }
     fastSwap(swap) {
         return __awaiter(this, void 0, void 0, function* () {
-            const gasPrice = yield swap.ethSigner.provider.getGasPrice();
             const mainZkSyncContract = this.getZkSyncMainContract(swap.ethSigner);
             let ethTransaction;
             let uNonce = 0;
@@ -356,7 +404,7 @@ class Provider {
             if (utils_1.isTokenETH(swap.token0)) {
                 try {
                     // function swapExactETHForTokens(address _zkSyncAddress,uint104 _amountOutMin, uint16 _withdrawFee, uint8 _toChainId, uint16 _toTokenId, address _to, uint32 _nonce) external payable
-                    ethTransaction = yield mainZkSyncContract.swapExactETHForTokens(swap.from, swap.amountOutMin, swap.withdrawFee, swap.toChainId, swap.tokenId1, swap.to, uNonce, Object.assign({ value: ethers_1.BigNumber.from(swap.amountIn), gasLimit: ethers_1.BigNumber.from(utils_1.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT), gasPrice }, swap.ethTxOptions));
+                    ethTransaction = yield mainZkSyncContract.swapExactETHForTokens(swap.from, swap.amountOutMin, swap.withdrawFee, swap.toChainId, swap.tokenId1, swap.to, uNonce, Object.assign({ value: ethers_1.BigNumber.from(swap.amountIn), gasLimit: ethers_1.BigNumber.from(utils_1.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT) }, swap.ethTxOptions));
                 }
                 catch (e) {
                     this.modifyEthersError(e);
@@ -377,8 +425,7 @@ class Provider {
                     swap.tokenId1,
                     swap.to,
                     uNonce,
-                    Object.assign({ nonce,
-                        gasPrice }, swap.ethTxOptions)
+                    Object.assign({ nonce }, swap.ethTxOptions)
                 ];
                 // We set gas limit only if user does not set it using ethTxOptions.
                 const txRequest = args[args.length - 1];
@@ -400,6 +447,20 @@ class Provider {
                     this.modifyEthersError(e);
                 }
             }
+            return new wallet_1.ETHOperation(ethTransaction, this);
+        });
+    }
+    getPendingBalance(pending) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const mainZkSyncContract = this.getZkSyncMainContract(pending.ethSigner);
+            const balance = mainZkSyncContract.getPendingBalance(pending.account, pending.tokenAddress);
+            return ethers_1.BigNumber.from(balance);
+        });
+    }
+    withdrawPendingBalance(withdraw) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const mainZkSyncContract = this.getZkSyncMainContract(withdraw.ethSigner);
+            const ethTransaction = mainZkSyncContract.withdrawPendingBalance(withdraw.account, withdraw.tokenAddress, ethers_1.BigNumber.from(withdraw.amount));
             return new wallet_1.ETHOperation(ethTransaction, this);
         });
     }
