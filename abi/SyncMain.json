@@ -605,6 +605,30 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        },
+        {
+          "internalType": "address[]",
+          "name": "_tokens",
+          "type": "address[]"
+        }
+      ],
+      "name": "getPendingBalances",
+      "outputs": [
+        {
+          "internalType": "uint128[]",
+          "name": "",
+          "type": "uint128[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "governance",
       "outputs": [
@@ -998,6 +1022,29 @@
         }
       ],
       "name": "withdrawPendingBalance",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address payable",
+          "name": "_owner",
+          "type": "address"
+        },
+        {
+          "internalType": "address[]",
+          "name": "_tokens",
+          "type": "address[]"
+        },
+        {
+          "internalType": "uint128[]",
+          "name": "_amounts",
+          "type": "uint128[]"
+        }
+      ],
+      "name": "withdrawMultiplePendingBalance",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

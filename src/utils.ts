@@ -656,7 +656,6 @@ export function serializeAddLiquidity(transfer: AddLiquidity): Uint8Array {
     const nonce = serializeNonce(transfer.nonce);
     const validFrom = serializeTimestamp(transfer.validFrom);
     const validUntil = serializeTimestamp(transfer.validUntil);
-    console.log([type, fromChainId, toChainId, account, token0, token1, pairAccount, amount0, amount1, amount0Min, amount1Min, nonce, validFrom, validUntil]);
     return ethers.utils.concat([type, fromChainId, toChainId, account, token0, token1, pairAccount, amount0, amount1, amount0Min, amount1Min, nonce, validFrom, validUntil]);
 }
 export function serializeRemoveLiquidity(transfer: RemoveLiquidity): Uint8Array {
