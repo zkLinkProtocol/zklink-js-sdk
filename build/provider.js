@@ -325,19 +325,19 @@ class Provider {
         return __awaiter(this, void 0, void 0, function* () {
             const mainZkSyncContract = this.getZkSyncMainContract(bridge.ethSigner);
             let ethTransaction;
-            let uNonce = 0;
-            try {
-                uNonce = yield this.fastSwapUNonce({
-                    receiver: bridge.to,
-                    tokenId: bridge.tokenId,
-                    amount: bridge.amount,
-                    withdrawFee: bridge.withdrawFee,
-                    ethSigner: bridge.ethSigner,
-                });
-            }
-            catch (e) {
-                this.modifyEthersError(e);
-            }
+            let uNonce = utils_1.getFastSwapUNonce();
+            // try {
+            //     uNonce = await this.fastSwapUNonce({
+            //         receiver: bridge.to,
+            //         tokenId: bridge.tokenId,
+            //         amount: bridge.amount,
+            //         withdrawFee: bridge.withdrawFee,
+            //         ethSigner: bridge.ethSigner,
+            //     })
+            // }
+            // catch(e) {
+            //     this.modifyEthersError(e)
+            // }
             const args = [
                 bridge.from,
                 bridge.to,
@@ -384,19 +384,19 @@ class Provider {
         return __awaiter(this, void 0, void 0, function* () {
             const mainZkSyncContract = this.getZkSyncMainContract(swap.ethSigner);
             let ethTransaction;
-            let uNonce = 0;
-            try {
-                uNonce = yield this.fastSwapUNonce({
-                    receiver: swap.to,
-                    tokenId: swap.tokenId0,
-                    amount: swap.amountIn,
-                    withdrawFee: swap.withdrawFee,
-                    ethSigner: swap.ethSigner,
-                });
-            }
-            catch (e) {
-                this.modifyEthersError(e);
-            }
+            let uNonce = utils_1.getFastSwapUNonce();
+            // try {
+            //     uNonce = await this.fastSwapUNonce({
+            //         receiver: swap.to,
+            //         tokenId: swap.tokenId0,
+            //         amount: swap.amountIn,
+            //         withdrawFee: swap.withdrawFee,
+            //         ethSigner: swap.ethSigner,
+            //     })
+            // }
+            // catch(e) {
+            //     this.modifyEthersError(e)
+            // }
             if (!uNonce) {
                 this.modifyEthersError(new Error('swap tx nonce is none'));
             }

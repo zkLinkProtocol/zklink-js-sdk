@@ -363,20 +363,20 @@ export class Provider {
 
         let ethTransaction;
 
-        let uNonce: number = 0;
+        let uNonce: number = getFastSwapUNonce();
 
-        try {
-            uNonce = await this.fastSwapUNonce({
-                receiver: bridge.to,
-                tokenId: bridge.tokenId,
-                amount: bridge.amount,
-                withdrawFee: bridge.withdrawFee,
-                ethSigner: bridge.ethSigner,
-            })
-        }
-        catch(e) {
-            this.modifyEthersError(e)
-        }
+        // try {
+        //     uNonce = await this.fastSwapUNonce({
+        //         receiver: bridge.to,
+        //         tokenId: bridge.tokenId,
+        //         amount: bridge.amount,
+        //         withdrawFee: bridge.withdrawFee,
+        //         ethSigner: bridge.ethSigner,
+        //     })
+        // }
+        // catch(e) {
+        //     this.modifyEthersError(e)
+        // }
 
         const args = [
             bridge.from,
@@ -453,20 +453,20 @@ export class Provider {
         const mainZkSyncContract = this.getZkSyncMainContract(swap.ethSigner);
 
         let ethTransaction;
-        let uNonce: number = 0;
+        let uNonce: number = getFastSwapUNonce();
 
-        try {
-            uNonce = await this.fastSwapUNonce({
-                receiver: swap.to,
-                tokenId: swap.tokenId0,
-                amount: swap.amountIn,
-                withdrawFee: swap.withdrawFee,
-                ethSigner: swap.ethSigner,
-            })
-        }
-        catch(e) {
-            this.modifyEthersError(e)
-        }
+        // try {
+        //     uNonce = await this.fastSwapUNonce({
+        //         receiver: swap.to,
+        //         tokenId: swap.tokenId0,
+        //         amount: swap.amountIn,
+        //         withdrawFee: swap.withdrawFee,
+        //         ethSigner: swap.ethSigner,
+        //     })
+        // }
+        // catch(e) {
+        //     this.modifyEthersError(e)
+        // }
 
         if (!uNonce) {
             this.modifyEthersError(new Error('swap tx nonce is none'));
