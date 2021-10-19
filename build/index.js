@@ -18,6 +18,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.crypto = exports.utils = exports.types = exports.wallet = exports.EthMessageSigner = exports.closestPackableTransactionFee = exports.closestPackableTransactionAmount = exports.Create2WalletSigner = exports.Signer = exports.getDefaultProvider = exports.ETHProxy = exports.Provider = exports.Wallet = void 0;
 var wallet_1 = require("./wallet");
@@ -38,4 +41,5 @@ exports.wallet = __importStar(require("./wallet"));
 exports.types = __importStar(require("./types"));
 exports.utils = __importStar(require("./utils"));
 exports.crypto = __importStar(require("./crypto"));
+__exportStar(require("./contract"), exports);
 require("./withdraw-helpers");

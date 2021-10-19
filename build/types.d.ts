@@ -4,6 +4,7 @@ export declare type PubKeyHash = string;
 export declare type TokenLike = TokenSymbol | TokenAddress;
 export declare type TokenSymbol = string;
 export declare type TokenAddress = string;
+export declare type TokenId = number;
 export declare type TotalFee = Map<TokenLike, BigNumber>;
 export declare type Nonce = number | 'committed';
 export declare type Network = 'localhost' | 'rinkeby' | 'ropsten' | 'mainnet' | 'rinkeby-beta' | 'ropsten-beta';

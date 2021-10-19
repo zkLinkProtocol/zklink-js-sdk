@@ -11,6 +11,7 @@ export type TokenLike = TokenSymbol | TokenAddress;
 export type TokenSymbol = string;
 // Token address (e.g. 0xde..ad for ERC20, or 0x00.00 for "ETH")
 export type TokenAddress = string;
+export type TokenId = number;
 
 export type TotalFee = Map<TokenLike, BigNumber>;
 
