@@ -259,7 +259,7 @@ export class LinkContract {
         tokenAddress: Address,
     }): Promise<BigNumber> {
         const exitContract = this.getExitContract();
-        const balance = exitContract.getPendingBalance(pending.account, pending.tokenAddress)
+        const balance = await exitContract.getPendingBalance(pending.account, pending.tokenAddress)
         return BigNumber.from(balance)
     }
     async getPendingBalances(pending: {
@@ -267,7 +267,7 @@ export class LinkContract {
         tokenAddresses: Address[],
     }): Promise<BigNumber[]> {
         const exitContract = this.getExitContract();
-        const balances = exitContract.getPendingBalances(pending.account, pending.tokenAddresses)
+        const balances = await exitContract.getPendingBalances(pending.account, pending.tokenAddresses)
         return balances
     }
 
@@ -277,7 +277,7 @@ export class LinkContract {
         amount: BigNumberish,
     }): Promise<ETHOperation> {
         const exitContract = this.getExitContract();
-        const ethTransaction = exitContract.withdrawPendingBalance(withdraw.account, withdraw.tokenAddress, BigNumber.from(withdraw.amount))
+        const ethTransaction = await exitContract.withdrawPendingBalance(withdraw.account, withdraw.tokenAddress, BigNumber.from(withdraw.amount))
         return new ETHOperation(ethTransaction, this.provider);
     }
 
@@ -287,7 +287,7 @@ export class LinkContract {
         amounts: BigNumberish[],
     }): Promise<ETHOperation> {
         const exitContract = this.getExitContract();
-        const ethTransaction = exitContract.withdrawMultiplePendingBalance(withdraw.account, withdraw.tokenAddresses, BigNumber.from(withdraw.amounts))
+        const ethTransaction = await exitContract.withdrawMultiplePendingBalance(withdraw.account, withdraw.tokenAddresses, BigNumber.from(withdraw.amounts))
         return new ETHOperation(ethTransaction, this.provider);
     }
     
