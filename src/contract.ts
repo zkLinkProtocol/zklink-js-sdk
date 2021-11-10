@@ -287,7 +287,7 @@ export class LinkContract {
         amounts: BigNumberish[],
     }): Promise<ETHOperation> {
         const exitContract = this.getExitContract();
-        const ethTransaction = await exitContract.withdrawMultiplePendingBalance(withdraw.account, withdraw.tokenAddresses, BigNumber.from(withdraw.amounts))
+        const ethTransaction = await exitContract.withdrawMultiplePendingBalance(withdraw.account, withdraw.tokenAddresses, withdraw.amounts)
         return new ETHOperation(ethTransaction, this.provider);
     }
     

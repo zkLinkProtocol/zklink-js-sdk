@@ -180,7 +180,7 @@ class LinkContract {
     withdrawMultiplePendingBalance(withdraw) {
         return __awaiter(this, void 0, void 0, function* () {
             const exitContract = this.getExitContract();
-            const ethTransaction = yield exitContract.withdrawMultiplePendingBalance(withdraw.account, withdraw.tokenAddresses, ethers_1.BigNumber.from(withdraw.amounts));
+            const ethTransaction = yield exitContract.withdrawMultiplePendingBalance(withdraw.account, withdraw.tokenAddresses, withdraw.amounts);
             return new wallet_1.ETHOperation(ethTransaction, this.provider);
         });
     }
