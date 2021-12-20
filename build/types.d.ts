@@ -5,17 +5,19 @@ export declare type TokenLike = TokenSymbol | TokenAddress;
 export declare type TokenSymbol = string;
 export declare type TokenAddress = string;
 export declare type TokenId = number;
+export declare type ChainId = number;
 export declare type TotalFee = Map<TokenLike, BigNumber>;
 export declare type Nonce = number | 'committed';
 export declare type Network = 'localhost' | 'rinkeby' | 'ropsten' | 'mainnet' | 'rinkeby-beta' | 'ropsten-beta';
 export interface PairInfo {
-    chain0: number;
-    chain1: number;
-    reserve0: string;
-    reserve1: string;
-    token0: number;
-    token1: number;
-    token_lp: number;
+    amplifier: number;
+    chains: ChainId[];
+    d: string;
+    kind: number;
+    lp_token: TokenId;
+    reserves: string[];
+    token_in_pool: number;
+    tokens: number[];
     total_supply: string;
 }
 export interface Create2Data {
@@ -92,6 +94,61 @@ export interface AddLiquidity {
     token0: number;
     token1: number;
     pairAccount: Address;
+    signature?: Signature;
+    validFrom: number;
+    validUntil: number;
+}
+export interface CurveAddLiquidity {
+    type: 'L2CurveAddLiq';
+    account: Address;
+    chains: ChainId[];
+    tokens: TokenId[];
+    amounts: BigNumberish[];
+    lpQuantity: BigNumberish;
+    minLpQuantity: BigNumberish;
+    fromChain: ChainId;
+    pairAddress: Address;
+    fee: BigNumberish;
+    feeToken: TokenId;
+    collectFees: BigNumberish[];
+    nonce: number;
+    signature?: Signature;
+    validFrom: number;
+    validUntil: number;
+}
+export interface CurveRemoveLiquidity {
+    type: 'L2CurveRemoveLiquidity';
+    account: Address;
+    fromChain: ChainId;
+    chains: ChainId[];
+    tokens: TokenId[];
+    amounts: BigNumberish[];
+    minAmounts: BigNumberish[];
+    lpQuantity: BigNumberish;
+    pairAddress: Address;
+    fee: BigNumberish;
+    feeToken: TokenId;
+    curveFee: BigNumberish;
+    nonce: number;
+    signature?: Signature;
+    validFrom: number;
+    validUntil: number;
+}
+export interface CurveSwap {
+    type: 'CurveSwap';
+    accountId: number;
+    account: Address;
+    pairAddress: Address;
+    chainIn: ChainId;
+    chainOut: ChainId;
+    tokenIn: TokenId;
+    tokenOut: TokenId;
+    amountIn: BigNumberish;
+    amountOut: BigNumberish;
+    amountOutMin: BigNumberish;
+    fee: BigNumberish;
+    adminFee: BigNumberish;
+    nonce: number;
     signature?: Signature;
     validFrom: number;
     validUntil: number;
@@ -200,7 +257,7 @@ export interface CloseAccount {
     signature: Signature;
 }
 export interface SignedTransaction {
-    tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit | AddLiquidity | RemoveLiquidity | Swap;
+    tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit | AddLiquidity | RemoveLiquidity | Swap | CurveAddLiquidity | CurveRemoveLiquidity | CurveSwap;
     ethereumSignature?: TxEthSignature;
 }
 export interface BlockInfo {

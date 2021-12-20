@@ -43,6 +43,7 @@ class EthMessageSigner {
     ethSignTransfer(transfer) {
         return __awaiter(this, void 0, void 0, function* () {
             const message = this.getTransferEthSignMessage(transfer);
+            console.log(message);
             return yield this.getEthMessageSignature(message);
         });
     }
@@ -118,6 +119,77 @@ class EthMessageSigner {
         message += `Token: ${tx.stringToken0} - ${tx.stringToken1}`;
         message += '\n';
         message += `Amount: ${tx.stringAmount0} - ${tx.stringAmount1}`;
+        return message;
+    }
+    ethSignCurveAddLiquidity(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const message = this.getCurveAddLiquidityEthSignMessage(payload);
+            return yield this.getEthMessageSignature(message);
+        });
+    }
+    getCurveAddLiquidityEthSignMessage(payload) {
+        let humanReadableTxInfo = this.getCurveAddLiquidityEthMessagePart(payload);
+        if (humanReadableTxInfo.length != 0) {
+            humanReadableTxInfo += '\n';
+        }
+        humanReadableTxInfo += `Nonce: ${payload.nonce}`;
+        return humanReadableTxInfo;
+    }
+    getCurveAddLiquidityEthMessagePart(tx) {
+        let message = '';
+        if (tx.account != null) {
+            message += `Add Liquidity`;
+        }
+        message += '\n';
+        message += `Amount: ${tx.stringAmounts.filter((a) => Number(a) != 0 && Number(a) != NaN).join('-')}`;
+        return message;
+    }
+    ethSignCurveRemoveLiquidity(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const message = this.getCurveRemoveLiquidityEthSignMessage(payload);
+            return yield this.getEthMessageSignature(message);
+        });
+    }
+    getCurveRemoveLiquidityEthSignMessage(payload) {
+        let humanReadableTxInfo = this.getCurveRemoveLiquidityEthMessagePart(payload);
+        if (humanReadableTxInfo.length != 0) {
+            humanReadableTxInfo += '\n';
+        }
+        humanReadableTxInfo += `Nonce: ${payload.nonce}`;
+        return humanReadableTxInfo;
+    }
+    getCurveRemoveLiquidityEthMessagePart(tx) {
+        let message = '';
+        if (tx.account != null) {
+            message += `Remove Liquidity`;
+        }
+        message += '\n';
+        message += `Amount: ${tx.stringAmounts.filter((a) => Number(a) != 0 && Number(a) != NaN).join('-')}`;
+        return message;
+    }
+    ethSignCurveSwap(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const message = this.getCurveSwapEthSignMessage(payload);
+            return yield this.getEthMessageSignature(message);
+        });
+    }
+    getCurveSwapEthSignMessage(payload) {
+        let humanReadableTxInfo = this.getCurveSwapEthMessagePart(payload);
+        if (humanReadableTxInfo.length != 0) {
+            humanReadableTxInfo += '\n';
+        }
+        humanReadableTxInfo += `Nonce: ${payload.nonce}`;
+        return humanReadableTxInfo;
+    }
+    getCurveSwapEthMessagePart(tx) {
+        let message = '';
+        if (tx.account != null) {
+            message += `Swap`;
+        }
+        message += '\n';
+        message += `Swap: ${tx.tokenIn} to ${tx.tokenOut}`;
+        message += '\n';
+        message += `Amount: ${tx.stringAmountIn} to ${tx.stringAmountOut}`;
         return message;
     }
     getCreatePoolEthMessagePart(tx) {

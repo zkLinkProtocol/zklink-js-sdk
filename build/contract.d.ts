@@ -31,7 +31,9 @@ export declare class LinkContract {
         tokenOutId: number;
         amountIn: BigNumberish;
         amountOutMin: BigNumberish;
-        withdrawFee: number;
+        pair: Address;
+        acceptTokenId: number;
+        acceptAmountOutMin: BigNumberish;
         ethTxOptions?: ethers.providers.TransactionRequest;
         approveDepositAmountForERC20?: boolean;
     }): Promise<ETHOperation>;

@@ -92,6 +92,30 @@ class Signer {
             return Object.assign(Object.assign({}, tx), { amount0: ethers_1.BigNumber.from(transfer.amount0).toString(), amount1: ethers_1.BigNumber.from(transfer.amount1).toString(), amount0Min: ethers_1.BigNumber.from(transfer.amount0Min).toString(), amount1Min: ethers_1.BigNumber.from(transfer.amount1Min).toString(), signature });
         });
     }
+    signSyncCurveAddLiquidity(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tx = Object.assign(Object.assign({}, payload), { type: 'L2CurveAddLiq' });
+            const msgBytes = utils.serializeCurveAddLiquidity(tx);
+            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
+            return Object.assign(Object.assign({}, tx), { amounts: payload.amounts.map(amount => ethers_1.BigNumber.from(amount).toString()), collectFees: payload.collectFees.map(fee => ethers_1.BigNumber.from(fee).toString()), fee: ethers_1.BigNumber.from(payload.fee).toString(), lpQuantity: ethers_1.BigNumber.from(payload.lpQuantity).toString(), minLpQuantity: ethers_1.BigNumber.from(payload.minLpQuantity).toString(), signature });
+        });
+    }
+    signSyncCurveRemoveLiquidity(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tx = Object.assign(Object.assign({}, payload), { type: 'L2CurveRemoveLiquidity' });
+            const msgBytes = utils.serializeCurveRemoveLiquidity(tx);
+            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
+            return Object.assign(Object.assign({}, tx), { amounts: payload.amounts.map(amount => ethers_1.BigNumber.from(amount).toString()), minAmounts: payload.minAmounts.map(amount => ethers_1.BigNumber.from(amount).toString()), fee: ethers_1.BigNumber.from(payload.fee).toString(), curveFee: ethers_1.BigNumber.from(payload.curveFee).toString(), lpQuantity: ethers_1.BigNumber.from(payload.lpQuantity).toString(), signature });
+        });
+    }
+    signSyncCurveSwap(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tx = Object.assign(Object.assign({}, payload), { type: 'CurveSwap' });
+            const msgBytes = utils.serializeCurveSwap(tx);
+            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
+            return Object.assign(Object.assign({}, tx), { amountIn: ethers_1.BigNumber.from(payload.amountIn).toString(), amountOut: ethers_1.BigNumber.from(payload.amountOut).toString(), amountOutMin: ethers_1.BigNumber.from(payload.amountOutMin).toString(), fee: ethers_1.BigNumber.from(payload.fee).toString(), adminFee: ethers_1.BigNumber.from(payload.adminFee).toString(), signature });
+        });
+    }
     /**
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */

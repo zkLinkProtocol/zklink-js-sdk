@@ -111,7 +111,7 @@ class LinkContract {
             if (utils_1.isTokenETH(swap.tokenInAddress)) {
                 try {
                     // function swapExactETHForTokens(address _zkSyncAddress,uint104 _amountOutMin, uint16 _withdrawFee, uint8 _toChainId, uint16 _toTokenId, address _to, uint32 _nonce) external payable
-                    ethTransaction = yield mainContract.swapExactETHForTokens(swap.from, swap.amountOutMin, swap.withdrawFee, swap.toChainId, swap.tokenOutId, swap.to, uNonce, Object.assign({ value: ethers_1.BigNumber.from(swap.amountIn), gasLimit: ethers_1.BigNumber.from(utils_1.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT) }, swap.ethTxOptions));
+                    ethTransaction = yield mainContract.swapExactETHForTokens(swap.from, swap.amountOutMin, swap.toChainId, swap.tokenOutId, swap.to, uNonce, swap.pair, swap.acceptTokenId, swap.acceptAmountOutMin, Object.assign({ value: ethers_1.BigNumber.from(swap.amountIn), gasLimit: ethers_1.BigNumber.from(utils_1.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT) }, swap.ethTxOptions));
                 }
                 catch (e) {
                     this.modifyEthersError(e);
@@ -125,12 +125,14 @@ class LinkContract {
                     swap.from,
                     swap.amountIn,
                     swap.amountOutMin,
-                    swap.withdrawFee,
                     swap.tokenInAddress,
                     swap.toChainId,
                     swap.tokenOutId,
                     swap.to,
                     uNonce,
+                    swap.pair,
+                    swap.acceptTokenId,
+                    swap.acceptAmountOutMin,
                     Object.assign({ nonce }, swap.ethTxOptions)
                 ];
                 // We set gas limit only if user does not set it using ethTxOptions.

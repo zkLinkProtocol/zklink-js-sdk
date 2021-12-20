@@ -49,6 +49,7 @@ export class EthMessageSigner {
         accountId: number;
     }): Promise<TxEthSignature> {
         const message = this.getTransferEthSignMessage(transfer);
+        console.log(message);
         return await this.getEthMessageSignature(message);
     }
 
@@ -221,6 +222,134 @@ export class EthMessageSigner {
         return message;
     }
 
+    async ethSignCurveAddLiquidity(payload: {
+        stringAmounts: string[],
+        account: string;
+        nonce: number;
+        pairAccount: Address;
+    }): Promise<TxEthSignature> {
+        const message = this.getCurveAddLiquidityEthSignMessage(payload);
+        return await this.getEthMessageSignature(message);
+    }
+
+    getCurveAddLiquidityEthSignMessage(payload: {
+        stringAmounts: string[],
+        account: string;
+        nonce: number;
+        pairAccount: Address;
+    }): string {
+        let humanReadableTxInfo = this.getCurveAddLiquidityEthMessagePart(payload);
+        if (humanReadableTxInfo.length != 0) {
+            humanReadableTxInfo += '\n';
+        }
+        humanReadableTxInfo += `Nonce: ${payload.nonce}`;
+
+        return humanReadableTxInfo;
+    }
+    getCurveAddLiquidityEthMessagePart(tx: {
+        stringAmounts: string[],
+        account: string;
+        nonce: number;
+        pairAccount: Address;
+    }): string {
+        let message = '';
+        if (tx.account != null) {
+            message += `Add Liquidity`;
+        }
+        message += '\n';
+        message += `Amount: ${tx.stringAmounts.filter((a) => Number(a) != 0 && Number(a) != NaN).join('-')}`
+        return message;
+    }
+
+
+    async ethSignCurveRemoveLiquidity(payload: {
+        stringAmounts: string[],
+        account: string;
+        nonce: number;
+        pairAccount: Address;
+    }): Promise<TxEthSignature> {
+        const message = this.getCurveRemoveLiquidityEthSignMessage(payload);
+        return await this.getEthMessageSignature(message);
+    }
+
+    getCurveRemoveLiquidityEthSignMessage(payload: {
+        stringAmounts: string[],
+        account: string;
+        nonce: number;
+        pairAccount: Address;
+    }): string {
+        let humanReadableTxInfo = this.getCurveRemoveLiquidityEthMessagePart(payload);
+        if (humanReadableTxInfo.length != 0) {
+            humanReadableTxInfo += '\n';
+        }
+        humanReadableTxInfo += `Nonce: ${payload.nonce}`;
+
+        return humanReadableTxInfo;
+    }
+    getCurveRemoveLiquidityEthMessagePart(tx: {
+        stringAmounts: string[],
+        account: string;
+        nonce: number;
+        pairAccount: Address;
+    }): string {
+        let message = '';
+        if (tx.account != null) {
+            message += `Remove Liquidity`;
+        }
+        message += '\n';
+        message += `Amount: ${tx.stringAmounts.filter((a) => Number(a) != 0 && Number(a) != NaN).join('-')}`
+        return message;
+    }
+
+    async ethSignCurveSwap(payload: {
+        stringAmountIn: string;
+        stringAmountOut: string;
+        tokenIn: string | number;
+        tokenOut: string | number;
+        account: string;
+        nonce: number;
+        pairAccount: Address;
+    }): Promise<TxEthSignature> {
+        const message = this.getCurveSwapEthSignMessage(payload);
+        return await this.getEthMessageSignature(message);
+    }
+
+    getCurveSwapEthSignMessage(payload: {
+        stringAmountIn: string;
+        stringAmountOut: string;
+        tokenIn: string | number;
+        tokenOut: string | number;
+        account: string;
+        nonce: number;
+        pairAccount: Address;
+    }): string {
+        let humanReadableTxInfo = this.getCurveSwapEthMessagePart(payload);
+        if (humanReadableTxInfo.length != 0) {
+            humanReadableTxInfo += '\n';
+        }
+        humanReadableTxInfo += `Nonce: ${payload.nonce}`;
+
+        return humanReadableTxInfo;
+    }
+    getCurveSwapEthMessagePart(tx: {
+        stringAmountIn: string;
+        stringAmountOut: string;
+        tokenIn: string | number;
+        tokenOut: string | number;
+        account: string;
+        nonce: number;
+        pairAccount: Address;
+    }): string {
+        let message = '';
+        if (tx.account != null) {
+            message += `Swap`;
+        }
+        message += '\n';
+        message += `Swap: ${tx.tokenIn} to ${tx.tokenOut}`
+        message += '\n';
+        message += `Amount: ${tx.stringAmountIn} to ${tx.stringAmountOut}`
+        return message;
+    }
 
     getCreatePoolEthMessagePart(tx: {
         token0: string;

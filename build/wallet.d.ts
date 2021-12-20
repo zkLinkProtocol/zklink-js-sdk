@@ -3,7 +3,7 @@ import { EthMessageSigner } from './eth-message-signer';
 import { Provider } from './provider';
 import { Signer } from './signer';
 import { BatchBuilder } from './batch-builder';
-import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKey, EthSignerType, SignedTransaction, Transfer, TxEthSignature, ForcedExit, Withdraw, ChangePubkeyTypes, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, RemoveLiquidity, AddLiquidity, Swap } from './types';
+import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKey, EthSignerType, SignedTransaction, Transfer, TxEthSignature, ForcedExit, Withdraw, ChangePubkeyTypes, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, RemoveLiquidity, AddLiquidity, Swap, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap } from './types';
 export declare class ZKSyncTxError extends Error {
     value: PriorityOperationReceipt | TransactionReceipt;
     constructor(message: string, value: PriorityOperationReceipt | TransactionReceipt);
@@ -275,6 +275,60 @@ export declare class Wallet {
         amount0Min: BigNumberish;
         amount1Min: BigNumberish;
         pairAccount: Address;
+        nonce?: Nonce;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<Transaction>;
+    getCurveAddLiquidity(payload: CurveAddLiquidity & {
+        chainId: number;
+        nonce?: number;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<CurveAddLiquidity>;
+    signSyncCurveAddLiquidity(payload: CurveAddLiquidity & {
+        chainId: number;
+        nonce?: number;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<SignedTransaction>;
+    syncCurveAddLiquidity(payload: CurveAddLiquidity & {
+        chainId: number;
+        nonce?: Nonce;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<Transaction>;
+    getCurveRemoveLiquidity(payload: CurveRemoveLiquidity & {
+        chainId: number;
+        nonce?: number;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<CurveRemoveLiquidity>;
+    signSyncCurveRemoveLiquidity(payload: CurveRemoveLiquidity & {
+        chainId: number;
+        nonce?: number;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<SignedTransaction>;
+    syncCurveRemoveLiquidity(payload: CurveRemoveLiquidity & {
+        chainId: number;
+        nonce?: Nonce;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<Transaction>;
+    getCurveSwap(payload: CurveSwap & {
+        chainId: number;
+        nonce?: number;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<CurveSwap>;
+    signSyncCurveSwap(payload: CurveSwap & {
+        chainId: number;
+        nonce?: number;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<SignedTransaction>;
+    syncCurveSwap(payload: CurveSwap & {
+        chainId: number;
         nonce?: Nonce;
         validFrom?: number;
         validUntil?: number;

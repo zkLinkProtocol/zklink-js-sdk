@@ -120,6 +120,69 @@ export declare class EthMessageSigner {
         nonce: number;
         accountId: number;
     }): string;
+    ethSignCurveAddLiquidity(payload: {
+        stringAmounts: string[];
+        account: string;
+        nonce: number;
+        pairAccount: Address;
+    }): Promise<TxEthSignature>;
+    getCurveAddLiquidityEthSignMessage(payload: {
+        stringAmounts: string[];
+        account: string;
+        nonce: number;
+        pairAccount: Address;
+    }): string;
+    getCurveAddLiquidityEthMessagePart(tx: {
+        stringAmounts: string[];
+        account: string;
+        nonce: number;
+        pairAccount: Address;
+    }): string;
+    ethSignCurveRemoveLiquidity(payload: {
+        stringAmounts: string[];
+        account: string;
+        nonce: number;
+        pairAccount: Address;
+    }): Promise<TxEthSignature>;
+    getCurveRemoveLiquidityEthSignMessage(payload: {
+        stringAmounts: string[];
+        account: string;
+        nonce: number;
+        pairAccount: Address;
+    }): string;
+    getCurveRemoveLiquidityEthMessagePart(tx: {
+        stringAmounts: string[];
+        account: string;
+        nonce: number;
+        pairAccount: Address;
+    }): string;
+    ethSignCurveSwap(payload: {
+        stringAmountIn: string;
+        stringAmountOut: string;
+        tokenIn: string | number;
+        tokenOut: string | number;
+        account: string;
+        nonce: number;
+        pairAccount: Address;
+    }): Promise<TxEthSignature>;
+    getCurveSwapEthSignMessage(payload: {
+        stringAmountIn: string;
+        stringAmountOut: string;
+        tokenIn: string | number;
+        tokenOut: string | number;
+        account: string;
+        nonce: number;
+        pairAccount: Address;
+    }): string;
+    getCurveSwapEthMessagePart(tx: {
+        stringAmountIn: string;
+        stringAmountOut: string;
+        tokenIn: string | number;
+        tokenOut: string | number;
+        account: string;
+        nonce: number;
+        pairAccount: Address;
+    }): string;
     getCreatePoolEthMessagePart(tx: {
         token0: string;
         token1: string;

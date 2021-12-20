@@ -26,7 +26,12 @@ import {
     Create2Data,
     RemoveLiquidity,
     AddLiquidity,
-    Swap
+    Swap,
+    CurveAddLiquidity,
+    ChainId,
+    TokenId,
+    CurveRemoveLiquidity,
+    CurveSwap
 } from './types';
 import {
     ERC20_APPROVE_TRESHOLD,
@@ -511,17 +516,17 @@ export class Wallet {
             this.ethSigner instanceof Create2WalletSigner
                 ? null
                 : await this.ethMessageSigner.ethSignSwap({
-                      stringAmountIn,
-                      stringAmountOut,
-                      stringAmountOutMin,
-                      stringFee0,
-                      stringFee1,
-                      stringTokenIn,
-                      stringTokenOut,
-                      pairAddress: transfer.pairAddress,
-                      nonce: transfer.nonce,
-                      accountId: transfer.accountId
-                  });
+                    stringAmountIn,
+                    stringAmountOut,
+                    stringAmountOutMin,
+                    stringFee0,
+                    stringFee1,
+                    stringTokenIn,
+                    stringTokenOut,
+                    pairAddress: transfer.pairAddress,
+                    nonce: transfer.nonce,
+                    accountId: transfer.accountId
+                });
         return {
             tx: signedTransferTransaction,
             ethereumSignature
@@ -637,11 +642,11 @@ export class Wallet {
         const signedTransferTransaction = await this.getRemoveLiquidity(transfer as any);
 
         const stringAmount0 = BigNumber.from(transfer.minAmount1).isZero()
-          ? null
-          : utils.formatEther(transfer.minAmount1);
+            ? null
+            : utils.formatEther(transfer.minAmount1);
         const stringAmount1 = BigNumber.from(transfer.minAmount2).isZero()
-          ? null
-          : utils.formatEther(transfer.minAmount2);
+            ? null
+            : utils.formatEther(transfer.minAmount2);
         const stringLpQuantity = BigNumber.from(transfer.lpQuantity).isZero()
         ? null
         : utils.formatEther(transfer.lpQuantity);
@@ -650,7 +655,7 @@ export class Wallet {
         const stringTokenOut = transfer.token2;
         const stringTokenLp = transfer.lpToken;
         const ethereumSignature =
-          this.ethSigner instanceof Create2WalletSigner
+            this.ethSigner instanceof Create2WalletSigner
             ? null
             : await this.ethMessageSigner.ethSignRemoveLiquidity({
                 stringAmount0,
@@ -777,23 +782,23 @@ export class Wallet {
         const signedTransferTransaction = await this.getAddLiquidity(transfer as any);
 
         const stringAmount0 = BigNumber.from(transfer.amount0).isZero()
-          ? null
-          : utils.formatEther(transfer.amount0)
+            ? null
+            : utils.formatEther(transfer.amount0)
 
         const stringAmount0Min = BigNumber.from(transfer.amount0Min).isZero()
         ? null
         : utils.formatEther(transfer.amount0Min)
         const stringAmount1 = BigNumber.from(transfer.amount1).isZero()
-          ? null
-          : utils.formatEther(transfer.amount1)
+            ? null
+            : utils.formatEther(transfer.amount1)
         const stringAmount1Min = BigNumber.from(transfer.amount1Min).isZero()
-          ? null
-          : utils.formatEther(transfer.amount1Min)
+            ? null
+            : utils.formatEther(transfer.amount1Min)
 
         const stringToken0 = transfer.token0
         const stringToken1 = transfer.token1
         const ethereumSignature =
-          this.ethSigner instanceof Create2WalletSigner
+            this.ethSigner instanceof Create2WalletSigner
             ? null
             : await this.ethMessageSigner.ethSignAddLiquidity({
                 stringAmount0,
@@ -830,13 +835,192 @@ export class Wallet {
         validUntil?: number;
     }): Promise<Transaction> {
         transfer.nonce = transfer.nonce != null ? await this.getNonce(transfer.chainId, transfer.nonce) : await this.getNonce(transfer.chainId);
-
-        // if (transfer.fee == null) {
-        //     const fullFee = await this.provider.getTransactionFee('Transfer', transfer.to, transfer.token);
-        //     transfer.fee = fullFee.totalFee;
-        // }
         const signedTransferTransaction = await this.signSyncAddLiquidity(transfer as any);
         return submitSignedTransaction(transfer.chainId, signedTransferTransaction, this.provider);
+    }
+
+
+    async getCurveAddLiquidity(payload: CurveAddLiquidity & {
+        chainId: number;
+        nonce?: number;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<CurveAddLiquidity> {
+        if (!this.signer) {
+            throw new Error('ZKSync signer is required for sending zksync transactions.');
+        }
+
+        await this.setRequiredAccountIdFromServer(payload.chainId, 'Transfer funds');
+
+        payload.account = this.address()
+        return this.signer.signSyncCurveAddLiquidity(payload as any);
+    }
+
+    async signSyncCurveAddLiquidity(payload: CurveAddLiquidity & {
+        chainId: number;
+        nonce?: number;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<SignedTransaction> {
+        payload.validFrom = payload.validFrom || 0;
+        payload.validUntil = payload.validUntil || MAX_TIMESTAMP;
+        console.log(payload);
+        const signedTransferTransaction = await this.getCurveAddLiquidity(payload as any);
+        console.log(signedTransferTransaction);
+
+        const stringAmounts = payload.amounts.map((amount) => {
+            return BigNumber.from(amount).isZero()
+            ? null
+            : utils.formatEther(amount)
+        })
+        console.log(stringAmounts);
+
+        const ethereumSignature =
+            this.ethSigner instanceof Create2WalletSigner
+            ? null
+            : await this.ethMessageSigner.ethSignCurveAddLiquidity({
+                stringAmounts,
+                account: payload.account,
+                nonce: payload.nonce,
+                pairAccount: payload.pairAddress,
+            });
+        console.log(ethereumSignature);
+        return {
+            tx: signedTransferTransaction,
+            ethereumSignature
+        };
+    }
+    async syncCurveAddLiquidity(payload: CurveAddLiquidity & {
+        chainId: number;
+        nonce?: Nonce;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<Transaction> {
+        payload.nonce = payload.nonce != null ? await this.getNonce(String(payload.chainId), payload.nonce) : await this.getNonce(String(payload.chainId));
+        const signedTransferTransaction = await this.signSyncCurveAddLiquidity(payload as any);
+        return submitSignedTransaction(String(payload.chainId), signedTransferTransaction, this.provider);
+    }
+
+
+    async getCurveRemoveLiquidity(payload: CurveRemoveLiquidity & {
+        chainId: number;
+        nonce?: number;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<CurveRemoveLiquidity> {
+        if (!this.signer) {
+            throw new Error('ZKSync signer is required for sending zksync transactions.');
+        }
+
+        await this.setRequiredAccountIdFromServer(payload.chainId, 'Transfer funds');
+
+        payload.account = this.address()
+        return this.signer.signSyncCurveRemoveLiquidity(payload as any);
+    }
+
+    async signSyncCurveRemoveLiquidity(payload: CurveRemoveLiquidity & {
+        chainId: number;
+        nonce?: number;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<SignedTransaction> {
+        payload.validFrom = payload.validFrom || 0;
+        payload.validUntil = payload.validUntil || MAX_TIMESTAMP;
+        const signedTransferTransaction = await this.getCurveRemoveLiquidity(payload as any);
+
+        const stringAmounts = payload.amounts.map((amount) => {
+            return BigNumber.from(amount).isZero()
+            ? null
+            : utils.formatEther(amount)
+        })
+
+        const ethereumSignature =
+            this.ethSigner instanceof Create2WalletSigner
+            ? null
+            : await this.ethMessageSigner.ethSignCurveRemoveLiquidity({
+                stringAmounts,
+                account: payload.account,
+                nonce: payload.nonce,
+                pairAccount: payload.pairAddress,
+            });
+        return {
+            tx: signedTransferTransaction,
+            ethereumSignature
+        };
+    }
+
+    async syncCurveRemoveLiquidity(payload: CurveRemoveLiquidity & {
+        chainId: number;
+        nonce?: Nonce;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<Transaction> {
+        payload.nonce = payload.nonce != null ? await this.getNonce(String(payload.chainId), payload.nonce) : await this.getNonce(String(payload.chainId));
+        const signedTransferTransaction = await this.signSyncCurveRemoveLiquidity(payload as any);
+        return submitSignedTransaction(String(payload.chainId), signedTransferTransaction, this.provider);
+    }
+
+
+    async getCurveSwap(payload: CurveSwap & {
+        chainId: number;
+        nonce?: number;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<CurveSwap> {
+        if (!this.signer) {
+            throw new Error('ZKSync signer is required for sending zksync transactions.');
+        }
+
+        await this.setRequiredAccountIdFromServer(payload.chainId, 'Transfer funds');
+        payload.accountId = await this.getAccountId(String(payload.chainId))
+        payload.account = this.address()
+        return this.signer.signSyncCurveSwap(payload as any);
+    }
+
+    async signSyncCurveSwap(payload: CurveSwap & {
+        chainId: number;
+        nonce?: number;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<SignedTransaction> {
+        payload.validFrom = payload.validFrom || 0;
+        payload.validUntil = payload.validUntil || MAX_TIMESTAMP;
+        const signedTransferTransaction = await this.getCurveSwap(payload as any);
+
+        const stringAmountIn = BigNumber.from(payload.amountIn).isZero()
+            ? null
+            : utils.formatEther(payload.amountIn)
+        const stringAmountOut = BigNumber.from(payload.amountOut).isZero()
+            ? null
+            : utils.formatEther(payload.amountIn)
+
+        const ethereumSignature =
+            this.ethSigner instanceof Create2WalletSigner
+            ? null
+            : await this.ethMessageSigner.ethSignCurveSwap({
+                tokenIn: payload.tokenIn,
+                tokenOut: payload.tokenOut,
+                stringAmountIn,
+                stringAmountOut,
+                account: payload.account,
+                nonce: payload.nonce,
+                pairAccount: payload.pairAddress,
+            });
+        return {
+            tx: signedTransferTransaction,
+            ethereumSignature
+        };
+    }
+
+    async syncCurveSwap(payload: CurveSwap & {
+        chainId: number;
+        nonce?: Nonce;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<Transaction> {
+        payload.nonce = payload.nonce != null ? await this.getNonce(String(payload.chainId), payload.nonce) : await this.getNonce(String(payload.chainId));
+        const signedTransferTransaction = await this.signSyncCurveSwap(payload as any);
+        return submitSignedTransaction(String(payload.chainId), signedTransferTransaction, this.provider);
     }
 
     async getWithdrawFromSyncToEthereum(withdraw: {

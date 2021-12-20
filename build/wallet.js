@@ -494,12 +494,140 @@ class Wallet {
     syncAddLiquidity(transfer) {
         return __awaiter(this, void 0, void 0, function* () {
             transfer.nonce = transfer.nonce != null ? yield this.getNonce(transfer.chainId, transfer.nonce) : yield this.getNonce(transfer.chainId);
-            // if (transfer.fee == null) {
-            //     const fullFee = await this.provider.getTransactionFee('Transfer', transfer.to, transfer.token);
-            //     transfer.fee = fullFee.totalFee;
-            // }
             const signedTransferTransaction = yield this.signSyncAddLiquidity(transfer);
             return submitSignedTransaction(transfer.chainId, signedTransferTransaction, this.provider);
+        });
+    }
+    getCurveAddLiquidity(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.signer) {
+                throw new Error('ZKSync signer is required for sending zksync transactions.');
+            }
+            yield this.setRequiredAccountIdFromServer(payload.chainId, 'Transfer funds');
+            payload.account = this.address();
+            return this.signer.signSyncCurveAddLiquidity(payload);
+        });
+    }
+    signSyncCurveAddLiquidity(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            payload.validFrom = payload.validFrom || 0;
+            payload.validUntil = payload.validUntil || utils_1.MAX_TIMESTAMP;
+            console.log(payload);
+            const signedTransferTransaction = yield this.getCurveAddLiquidity(payload);
+            console.log(signedTransferTransaction);
+            const stringAmounts = payload.amounts.map((amount) => {
+                return ethers_1.BigNumber.from(amount).isZero()
+                    ? null
+                    : ethers_1.utils.formatEther(amount);
+            });
+            console.log(stringAmounts);
+            const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
+                ? null
+                : yield this.ethMessageSigner.ethSignCurveAddLiquidity({
+                    stringAmounts,
+                    account: payload.account,
+                    nonce: payload.nonce,
+                    pairAccount: payload.pairAddress,
+                });
+            console.log(ethereumSignature);
+            return {
+                tx: signedTransferTransaction,
+                ethereumSignature
+            };
+        });
+    }
+    syncCurveAddLiquidity(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            payload.nonce = payload.nonce != null ? yield this.getNonce(String(payload.chainId), payload.nonce) : yield this.getNonce(String(payload.chainId));
+            const signedTransferTransaction = yield this.signSyncCurveAddLiquidity(payload);
+            return submitSignedTransaction(String(payload.chainId), signedTransferTransaction, this.provider);
+        });
+    }
+    getCurveRemoveLiquidity(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.signer) {
+                throw new Error('ZKSync signer is required for sending zksync transactions.');
+            }
+            yield this.setRequiredAccountIdFromServer(payload.chainId, 'Transfer funds');
+            payload.account = this.address();
+            return this.signer.signSyncCurveRemoveLiquidity(payload);
+        });
+    }
+    signSyncCurveRemoveLiquidity(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            payload.validFrom = payload.validFrom || 0;
+            payload.validUntil = payload.validUntil || utils_1.MAX_TIMESTAMP;
+            const signedTransferTransaction = yield this.getCurveRemoveLiquidity(payload);
+            const stringAmounts = payload.amounts.map((amount) => {
+                return ethers_1.BigNumber.from(amount).isZero()
+                    ? null
+                    : ethers_1.utils.formatEther(amount);
+            });
+            const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
+                ? null
+                : yield this.ethMessageSigner.ethSignCurveRemoveLiquidity({
+                    stringAmounts,
+                    account: payload.account,
+                    nonce: payload.nonce,
+                    pairAccount: payload.pairAddress,
+                });
+            return {
+                tx: signedTransferTransaction,
+                ethereumSignature
+            };
+        });
+    }
+    syncCurveRemoveLiquidity(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            payload.nonce = payload.nonce != null ? yield this.getNonce(String(payload.chainId), payload.nonce) : yield this.getNonce(String(payload.chainId));
+            const signedTransferTransaction = yield this.signSyncCurveRemoveLiquidity(payload);
+            return submitSignedTransaction(String(payload.chainId), signedTransferTransaction, this.provider);
+        });
+    }
+    getCurveSwap(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.signer) {
+                throw new Error('ZKSync signer is required for sending zksync transactions.');
+            }
+            yield this.setRequiredAccountIdFromServer(payload.chainId, 'Transfer funds');
+            payload.accountId = yield this.getAccountId(String(payload.chainId));
+            payload.account = this.address();
+            return this.signer.signSyncCurveSwap(payload);
+        });
+    }
+    signSyncCurveSwap(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            payload.validFrom = payload.validFrom || 0;
+            payload.validUntil = payload.validUntil || utils_1.MAX_TIMESTAMP;
+            const signedTransferTransaction = yield this.getCurveSwap(payload);
+            const stringAmountIn = ethers_1.BigNumber.from(payload.amountIn).isZero()
+                ? null
+                : ethers_1.utils.formatEther(payload.amountIn);
+            const stringAmountOut = ethers_1.BigNumber.from(payload.amountOut).isZero()
+                ? null
+                : ethers_1.utils.formatEther(payload.amountIn);
+            const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
+                ? null
+                : yield this.ethMessageSigner.ethSignCurveSwap({
+                    tokenIn: payload.tokenIn,
+                    tokenOut: payload.tokenOut,
+                    stringAmountIn,
+                    stringAmountOut,
+                    account: payload.account,
+                    nonce: payload.nonce,
+                    pairAccount: payload.pairAddress,
+                });
+            return {
+                tx: signedTransferTransaction,
+                ethereumSignature
+            };
+        });
+    }
+    syncCurveSwap(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            payload.nonce = payload.nonce != null ? yield this.getNonce(String(payload.chainId), payload.nonce) : yield this.getNonce(String(payload.chainId));
+            const signedTransferTransaction = yield this.signSyncCurveSwap(payload);
+            return submitSignedTransaction(String(payload.chainId), signedTransferTransaction, this.provider);
         });
     }
     getWithdrawFromSyncToEthereum(withdraw) {

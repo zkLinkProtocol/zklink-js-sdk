@@ -181,7 +181,9 @@ export class LinkContract {
         tokenOutId: number;
         amountIn: BigNumberish;
         amountOutMin: BigNumberish;
-        withdrawFee: number; // 100 means 1%, 10000 = 100%
+        pair: Address;
+        acceptTokenId: number;
+        acceptAmountOutMin: BigNumberish;
         ethTxOptions?: ethers.providers.TransactionRequest;
         approveDepositAmountForERC20?: boolean;
     }): Promise<ETHOperation> {
@@ -199,7 +201,7 @@ export class LinkContract {
         if (isTokenETH(swap.tokenInAddress)) {
             try {
                 // function swapExactETHForTokens(address _zkSyncAddress,uint104 _amountOutMin, uint16 _withdrawFee, uint8 _toChainId, uint16 _toTokenId, address _to, uint32 _nonce) external payable
-                ethTransaction = await mainContract.swapExactETHForTokens(swap.from, swap.amountOutMin, swap.withdrawFee, swap.toChainId, swap.tokenOutId, swap.to, uNonce, {
+                ethTransaction = await mainContract.swapExactETHForTokens(swap.from, swap.amountOutMin, swap.toChainId, swap.tokenOutId, swap.to, uNonce, swap.pair, swap.acceptTokenId, swap.acceptAmountOutMin, {
                     value: BigNumber.from(swap.amountIn),
                     gasLimit: BigNumber.from(ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT),
                     ...swap.ethTxOptions
@@ -216,12 +218,14 @@ export class LinkContract {
                 swap.from,
                 swap.amountIn,
                 swap.amountOutMin,
-                swap.withdrawFee,
                 swap.tokenInAddress,
                 swap.toChainId,
                 swap.tokenOutId,
                 swap.to,
                 uNonce,
+                swap.pair,
+                swap.acceptTokenId,
+                swap.acceptAmountOutMin,
                 {
                     nonce,
                     ...swap.ethTxOptions

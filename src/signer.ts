@@ -13,7 +13,7 @@ import {
     ChangePubKeyECDSA,
     ChangePubKeyCREATE2,
     Create2Data,
-    AddLiquidity, RemoveLiquidity, Swap
+    AddLiquidity, RemoveLiquidity, Swap, ChainId, TokenId, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap
 } from './types';
 
 export class Signer {
@@ -194,6 +194,77 @@ export class Signer {
         };
     }
 
+    async signSyncCurveAddLiquidity(payload: CurveAddLiquidity & {
+        chainId: string;
+        nonce: number;
+        validFrom: number;
+        validUntil: number;
+    }): Promise<CurveAddLiquidity> {
+        const tx: CurveAddLiquidity = {
+            ...payload,
+            type: 'L2CurveAddLiq',
+        };
+        const msgBytes = utils.serializeCurveAddLiquidity(tx);
+        const signature = await signTransactionBytes(this.#privateKey, msgBytes);
+
+        return {
+            ...tx,
+            amounts: payload.amounts.map(amount => BigNumber.from(amount).toString()),
+            collectFees: payload.collectFees.map(fee => BigNumber.from(fee).toString()),
+            fee: BigNumber.from(payload.fee).toString(),
+            lpQuantity: BigNumber.from(payload.lpQuantity).toString(),
+            minLpQuantity: BigNumber.from(payload.minLpQuantity).toString(),
+            signature
+        };
+    }
+
+    async signSyncCurveRemoveLiquidity(payload: CurveRemoveLiquidity & {
+        chainId: string;
+        nonce: number;
+        validFrom: number;
+        validUntil: number;
+    }): Promise<CurveRemoveLiquidity> {
+        const tx: CurveRemoveLiquidity = {
+            ...payload,
+            type: 'L2CurveRemoveLiquidity',
+        };
+        const msgBytes = utils.serializeCurveRemoveLiquidity(tx);
+        const signature = await signTransactionBytes(this.#privateKey, msgBytes);
+
+        return {
+            ...tx,
+            amounts: payload.amounts.map(amount => BigNumber.from(amount).toString()),
+            minAmounts: payload.minAmounts.map(amount => BigNumber.from(amount).toString()),
+            fee: BigNumber.from(payload.fee).toString(),
+            curveFee: BigNumber.from(payload.curveFee).toString(),
+            lpQuantity: BigNumber.from(payload.lpQuantity).toString(),
+            signature
+        };
+    }
+
+    async signSyncCurveSwap(payload: CurveSwap & {
+        chainId: string;
+        nonce: number;
+        validFrom: number;
+        validUntil: number;
+    }): Promise<CurveSwap> {
+        const tx: CurveSwap = {
+            ...payload,
+            type: 'CurveSwap',
+        };
+        const msgBytes = utils.serializeCurveSwap(tx);
+        const signature = await signTransactionBytes(this.#privateKey, msgBytes);
+
+        return {
+            ...tx,
+            amountIn: BigNumber.from(payload.amountIn).toString(),
+            amountOut: BigNumber.from(payload.amountOut).toString(),
+            amountOutMin: BigNumber.from(payload.amountOutMin).toString(),
+            fee: BigNumber.from(payload.fee).toString(),
+            adminFee: BigNumber.from(payload.adminFee).toString(),
+            signature
+        };
+    }
     /**
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
