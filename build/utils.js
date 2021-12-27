@@ -584,7 +584,7 @@ function serializeAddLiquidity(transfer) {
 }
 exports.serializeAddLiquidity = serializeAddLiquidity;
 function serializeCurveAddLiquidity(payload) {
-    const type = new Uint8Array([13]);
+    const type = new Uint8Array([12]);
     const account = serializeAddress(payload.account);
     const chainId = serializeChainId(payload.fromChain);
     const pairAccount = serializeAddress(payload.pairAddress);
@@ -601,7 +601,7 @@ function serializeCurveAddLiquidity(payload) {
 }
 exports.serializeCurveAddLiquidity = serializeCurveAddLiquidity;
 function serializeCurveRemoveLiquidity(payload) {
-    const type = new Uint8Array([15]);
+    const type = new Uint8Array([14]);
     const account = serializeAddress(payload.account);
     const fromChain = serializeChainId(payload.fromChain);
     const chains = chainsCompletion(payload.chains, exports.TOTAL_CHAIN_NUM, 0).map(chainId => serializeChainId(chainId));
@@ -617,7 +617,7 @@ function serializeCurveRemoveLiquidity(payload) {
 }
 exports.serializeCurveRemoveLiquidity = serializeCurveRemoveLiquidity;
 function serializeCurveSwap(payload) {
-    const type = new Uint8Array([14]);
+    const type = new Uint8Array([13]);
     const chainIn = serializeChainId(payload.chainIn);
     const chainOut = serializeChainId(payload.chainOut);
     const account = serializeAddress(payload.account);
