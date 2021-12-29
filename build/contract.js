@@ -14,6 +14,7 @@ const ethers_1 = require("ethers");
 const utils_1 = require("./utils");
 const wallet_1 = require("./wallet");
 const logger_1 = require("@ethersproject/logger");
+const utils_2 = require("ethers/lib/utils");
 const EthersErrorCode = logger_1.ErrorCode;
 class LinkContract {
     constructor(provider, ethSigner) {
@@ -32,6 +33,9 @@ class LinkContract {
     }
     getExitContract() {
         return new ethers_1.ethers.Contract(this.provider.contractAddress.mainContract, utils_1.SYNC_EXIT_CONTRACT_INTERFACE, this.ethSigner);
+    }
+    getZKLContract() {
+        return new ethers_1.ethers.Contract(this.provider.contractAddress.mainContract, utils_1.ZKL_CONTRACT_INTERFACE, this.ethSigner);
     }
     isERC20DepositsApproved(tokenAddress, accountAddress, erc20ApproveThreshold = utils_1.ERC20_APPROVE_TRESHOLD) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -64,24 +68,23 @@ class LinkContract {
     }
     bridge(bridge) {
         return __awaiter(this, void 0, void 0, function* () {
-            const mainContract = this.getMainContract();
+            const zklContract = this.getZKLContract();
             let ethTransaction;
             let uNonce = utils_1.getFastSwapUNonce();
+            // Wait for the ABI to implement this function, Temporarily use 0.1
+            // const lzFees = await zklContract.estimateBridgeFees(bridge.toChainId, bridge.to, bridge.amount)
+            const lzFees = utils_2.parseEther('0.1');
             const args = [
-                bridge.from,
+                bridge.toChainId,
                 bridge.to,
                 bridge.amount,
-                bridge.tokenAddress,
-                bridge.toChainId,
-                uNonce,
-                bridge.withdrawFee,
-                Object.assign({}, bridge.ethTxOptions)
+                Object.assign({ value: lzFees }, bridge.ethTxOptions)
             ];
             // We set gas limit only if user does not set it using ethTxOptions.
             const txRequest = args[args.length - 1];
             if (txRequest.gasLimit == null) {
                 try {
-                    const gasEstimate = yield mainContract.estimateGas.mappingToken(...args).then((estimate) => estimate, () => ethers_1.BigNumber.from('0'));
+                    const gasEstimate = yield zklContract.estimateGas.bridge(...args).then((estimate) => estimate, () => ethers_1.BigNumber.from('0'));
                     let recommendedGasLimit = utils_1.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT;
                     txRequest.gasLimit = gasEstimate.gte(recommendedGasLimit) ? gasEstimate : recommendedGasLimit;
                     args[args.length - 1] = txRequest;
@@ -91,7 +94,7 @@ class LinkContract {
                 }
             }
             try {
-                ethTransaction = yield mainContract.mappingToken(...args);
+                ethTransaction = yield zklContract.bridge(...args);
             }
             catch (e) {
                 this.modifyEthersError(e);

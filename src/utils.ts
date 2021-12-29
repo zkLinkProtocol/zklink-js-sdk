@@ -28,6 +28,7 @@ export const MAX_UNONCE = 4294967295;
 export const IERC20_INTERFACE = new utils.Interface(require('../abi/IERC20.json').abi);
 export const SYNC_MAIN_CONTRACT_INTERFACE = new utils.Interface(require('../abi/SyncMain.json').abi);
 export const SYNC_EXIT_CONTRACT_INTERFACE = new utils.Interface(require('../abi/SyncExit.json').abi);
+export const ZKL_CONTRACT_INTERFACE = new utils.Interface(require('../abi/ZKL.json').abi);
 
 export const SYNC_GOV_CONTRACT_INTERFACE = new utils.Interface(require('../abi/SyncGov.json').abi);
 

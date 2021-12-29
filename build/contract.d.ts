@@ -10,16 +10,13 @@ export declare class LinkContract {
     static fromEthSigner(provider: Provider, ethSigner: ethers.Signer): LinkContract;
     getMainContract(): Contract;
     getExitContract(): Contract;
+    getZKLContract(): Contract;
     isERC20DepositsApproved(tokenAddress: Address, accountAddress: Address, erc20ApproveThreshold?: BigNumber): Promise<boolean>;
     approveERC20TokenDeposits(tokenAddress: Address, max_erc20_approve_amount?: BigNumber): Promise<ContractTransaction>;
     bridge(bridge: {
-        from: Address;
         to: Address;
-        amount: BigNumberish;
-        tokenAddress: Address;
-        tokenId: number;
         toChainId: number;
-        withdrawFee: number;
+        amount: BigNumberish;
         ethTxOptions?: ethers.providers.TransactionRequest;
     }): Promise<ETHOperation>;
     fastSwap(swap: {

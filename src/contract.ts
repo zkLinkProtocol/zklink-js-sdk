@@ -37,9 +37,11 @@ import {
     SYNC_MAIN_CONTRACT_INTERFACE,
     SYNC_EXIT_CONTRACT_INTERFACE,
     TokenSet,
+    ZKL_CONTRACT_INTERFACE,
 } from './utils';
 import { ETHOperation } from './wallet';
 import { ErrorCode } from '@ethersproject/logger';
+import { parseEther } from 'ethers/lib/utils';
 
 const EthersErrorCode = ErrorCode;
 
@@ -67,6 +69,14 @@ export class LinkContract {
         return new ethers.Contract(
             this.provider.contractAddress.mainContract,
             SYNC_EXIT_CONTRACT_INTERFACE,
+            this.ethSigner
+        );
+    }
+
+    getZKLContract() {
+        return new ethers.Contract(
+            this.provider.contractAddress.mainContract,
+            ZKL_CONTRACT_INTERFACE,
             this.ethSigner
         );
     }
@@ -119,32 +129,29 @@ export class LinkContract {
     }
 
     async bridge(bridge: {
-        from: Address,
         to: Address,
-        amount: BigNumberish,
-        tokenAddress: Address,
-        tokenId: number,
         toChainId: number,
-        withdrawFee: number,
+        amount: BigNumberish,
         ethTxOptions?: ethers.providers.TransactionRequest;
     }): Promise<ETHOperation> {
 
-        const mainContract = this.getMainContract();
+        const zklContract = this.getZKLContract();
 
         let ethTransaction;
 
         let uNonce: number = getFastSwapUNonce();
 
+        // Wait for the ABI to implement this function, Temporarily use 0.1
+        // const lzFees = await zklContract.estimateBridgeFees(bridge.toChainId, bridge.to, bridge.amount)
+        const lzFees = parseEther('0.1')
+
         const args = [
-            bridge.from,
+            bridge.toChainId,
             bridge.to,
             bridge.amount,
-            bridge.tokenAddress,
-            bridge.toChainId,
-            uNonce,
-            bridge.withdrawFee,
             {
-                ...bridge.ethTxOptions
+                value: lzFees,
+                ...bridge.ethTxOptions,
             } as ethers.providers.TransactionRequest
         ];
 
@@ -152,7 +159,7 @@ export class LinkContract {
         const txRequest = args[args.length - 1] as ethers.providers.TransactionRequest;
         if (txRequest.gasLimit == null) {
             try {
-                const gasEstimate = await mainContract.estimateGas.mappingToken(...args).then(
+                const gasEstimate = await zklContract.estimateGas.bridge(...args).then(
                     (estimate) => estimate,
                     () => BigNumber.from('0')
                 );
@@ -164,7 +171,7 @@ export class LinkContract {
             }
         }
         try {
-            ethTransaction = await mainContract.mappingToken(...args);
+            ethTransaction = await zklContract.bridge(...args);
         } catch (e) {
             this.modifyEthersError(e);
         }
