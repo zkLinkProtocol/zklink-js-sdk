@@ -39,6 +39,7 @@ export class Signer {
         tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
+        ts: number;
         nonce: number;
         validFrom: number;
         validUntil: number;
@@ -59,6 +60,7 @@ export class Signer {
         tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
+        ts: number;
         nonce: number;
         validFrom: number;
         validUntil: number;
@@ -277,6 +279,7 @@ export class Signer {
         fee: BigNumberish;
         withdrawFeeRatio: number;
         fastWithdraw: number;
+        ts: number;
         nonce: number;
         validFrom: number;
         validUntil: number;
@@ -298,6 +301,7 @@ export class Signer {
         fee: BigNumberish;
         withdrawFeeRatio: number;
         fastWithdraw: number;
+        ts: number;
         nonce: number;
         validFrom: number;
         validUntil: number;
@@ -372,6 +376,7 @@ export class Signer {
         toChainId: number;
         feeTokenId: number;
         fee: BigNumberish;
+        ts: number;
         nonce: number;
         validFrom: number;
         validUntil: number;
@@ -393,6 +398,7 @@ export class Signer {
         toChainId: number;
         feeTokenId: number;
         fee: BigNumberish;
+        ts: number;
         nonce: number;
         ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
         ethSignature?: string;
