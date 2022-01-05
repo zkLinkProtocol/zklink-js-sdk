@@ -14,7 +14,6 @@ const ethers_1 = require("ethers");
 const utils_1 = require("./utils");
 const wallet_1 = require("./wallet");
 const logger_1 = require("@ethersproject/logger");
-const utils_2 = require("ethers/lib/utils");
 const EthersErrorCode = logger_1.ErrorCode;
 class LinkContract {
     constructor(provider, ethSigner) {
@@ -34,8 +33,8 @@ class LinkContract {
     getExitContract() {
         return new ethers_1.ethers.Contract(this.provider.contractAddress.mainContract, utils_1.SYNC_EXIT_CONTRACT_INTERFACE, this.ethSigner);
     }
-    getZKLContract() {
-        return new ethers_1.ethers.Contract(this.provider.contractAddress.mainContract, utils_1.ZKL_CONTRACT_INTERFACE, this.ethSigner);
+    getZKLContract(contractAddress) {
+        return new ethers_1.ethers.Contract(contractAddress, utils_1.ZKL_CONTRACT_INTERFACE, this.ethSigner);
     }
     isERC20DepositsApproved(tokenAddress, accountAddress, erc20ApproveThreshold = utils_1.ERC20_APPROVE_TRESHOLD) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -68,12 +67,10 @@ class LinkContract {
     }
     bridge(bridge) {
         return __awaiter(this, void 0, void 0, function* () {
-            const zklContract = this.getZKLContract();
+            const zklContract = this.getZKLContract(bridge.contractAddress);
             let ethTransaction;
             let uNonce = utils_1.getFastSwapUNonce();
-            // Wait for the ABI to implement this function, Temporarily use 0.1
-            // const lzFees = await zklContract.estimateBridgeFees(bridge.toChainId, bridge.to, bridge.amount)
-            const lzFees = utils_2.parseEther('0.1');
+            const lzFees = yield zklContract.estimateBridgeFees(bridge.toChainId, bridge.to, bridge.amount);
             const args = [
                 bridge.toChainId,
                 bridge.to,
@@ -93,6 +90,7 @@ class LinkContract {
                     this.modifyEthersError(e);
                 }
             }
+            console.log(args);
             try {
                 ethTransaction = yield zklContract.bridge(...args);
             }
