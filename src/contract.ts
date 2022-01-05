@@ -73,9 +73,9 @@ export class LinkContract {
         );
     }
 
-    getZKLContract() {
+    getZKLContract(contractAddress) {
         return new ethers.Contract(
-            this.provider.contractAddress.mainContract,
+            contractAddress,
             ZKL_CONTRACT_INTERFACE,
             this.ethSigner
         );
@@ -132,18 +132,17 @@ export class LinkContract {
         to: Address,
         toChainId: number,
         amount: BigNumberish,
+        contractAddress: Address,
         ethTxOptions?: ethers.providers.TransactionRequest;
     }): Promise<ETHOperation> {
 
-        const zklContract = this.getZKLContract();
+        const zklContract = this.getZKLContract(bridge.contractAddress);
 
         let ethTransaction;
 
         let uNonce: number = getFastSwapUNonce();
 
-        // Wait for the ABI to implement this function, Temporarily use 0.1
-        // const lzFees = await zklContract.estimateBridgeFees(bridge.toChainId, bridge.to, bridge.amount)
-        const lzFees = parseEther('0.1')
+        const lzFees = await zklContract.estimateBridgeFees(bridge.toChainId, bridge.to, bridge.amount)
 
         const args = [
             bridge.toChainId,
@@ -170,6 +169,7 @@ export class LinkContract {
                 this.modifyEthersError(e);
             }
         }
+        console.log(args);
         try {
             ethTransaction = await zklContract.bridge(...args);
         } catch (e) {
