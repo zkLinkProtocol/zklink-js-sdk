@@ -100,6 +100,7 @@ export interface Transfer {
     tokenId: number;
     amount: BigNumberish;
     fee: BigNumberish;
+    ts: number;
     nonce: number;
     signature?: Signature;
     validFrom: number;
@@ -140,6 +141,7 @@ export interface CurveAddLiquidity {
     fee: BigNumberish;
     feeToken: TokenId;
     collectFees: BigNumberish[];
+    ts?: number;
     nonce: number;
     signature?: Signature;
     validFrom: number;
@@ -164,6 +166,7 @@ export interface CurveRemoveLiquidity {
     feeToken: TokenId,
 
     curveFee: BigNumberish,
+    ts?: number;
     
     // fee1: BigNumberish,
     // fee2: BigNumberish,
@@ -192,6 +195,7 @@ export interface CurveSwap {
     fee: BigNumberish;
 
     adminFee: BigNumberish;
+    ts?: number;
 
     // fee1: BigNumberish,
     // fee2: BigNumberish,
@@ -253,6 +257,7 @@ export interface Withdraw {
     fee: BigNumberish;
     withdrawFeeRatio: number;
     fastWithdraw: number;
+    ts: number;
     nonce: number;
     signature?: Signature;
     validFrom: number;
@@ -299,6 +304,7 @@ export interface ChangePubKey {
     toChainId: number;
     feeToken: number;
     fee: BigNumberish;
+    ts: number;
     nonce: number;
     signature?: Signature;
     ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;

@@ -50,7 +50,8 @@ import {
     ERC20_DEPOSIT_GAS_LIMIT,
     ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT,
     ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT,
-    getFastSwapUNonce
+    getFastSwapUNonce,
+    getTimestamp
 } from './utils';
 import { randomBytes } from 'ethers/lib/utils';
 
@@ -169,6 +170,7 @@ export class Wallet {
         amount: BigNumberish;
         fee: BigNumberish;
         accountId: number;
+        ts: number;
         nonce: number;
         validFrom: number;
         validUntil: number;
@@ -190,6 +192,7 @@ export class Wallet {
             tokenId,
             amount: transfer.amount,
             fee: transfer.fee,
+            ts: transfer.ts,
             nonce: transfer.nonce,
             validFrom: transfer.validFrom,
             validUntil: transfer.validUntil
@@ -208,6 +211,7 @@ export class Wallet {
         amount: BigNumberish;
         fee: BigNumberish;
         accountId?: number;
+        ts?: number;
         nonce: number;
         validFrom?: number;
         validUntil?: number;
@@ -215,6 +219,7 @@ export class Wallet {
         transfer.validFrom = transfer.validFrom || 0;
         transfer.validUntil = transfer.validUntil || MAX_TIMESTAMP;
         transfer.accountId = await this.getAccountId(transfer.chainId)
+        transfer.ts = transfer.ts || getTimestamp()
         const signedTransferTransaction = await this.getTransfer(transfer as any);
 
         const stringAmount = BigNumber.from(transfer.amount).isZero()
@@ -344,6 +349,7 @@ export class Wallet {
             amount: BigNumberish;
             fee: BigNumberish;
             accountId?: number;
+            ts: number;
             nonce?: Nonce;
             validFrom?: number;
             validUntil?: number;
@@ -378,6 +384,7 @@ export class Wallet {
                 amount: transfer.amount,
                 fee: transfer.fee,
                 accountId: transfer.accountId,
+                ts: transfer.ts,
                 nonce,
                 validFrom: transfer.validFrom || 0,
                 validUntil: transfer.validUntil || MAX_TIMESTAMP
@@ -864,7 +871,7 @@ export class Wallet {
     }): Promise<SignedTransaction> {
         payload.validFrom = payload.validFrom || 0;
         payload.validUntil = payload.validUntil || MAX_TIMESTAMP;
-        console.log(payload);
+        payload.ts = payload.ts || getTimestamp()
         const signedTransferTransaction = await this.getCurveAddLiquidity(payload as any);
         console.log(signedTransferTransaction);
 
@@ -926,6 +933,7 @@ export class Wallet {
     }): Promise<SignedTransaction> {
         payload.validFrom = payload.validFrom || 0;
         payload.validUntil = payload.validUntil || MAX_TIMESTAMP;
+        payload.ts = payload.ts || getTimestamp()
         const signedTransferTransaction = await this.getCurveRemoveLiquidity(payload as any);
 
         const stringAmounts = payload.amounts.map((amount) => {
@@ -985,6 +993,7 @@ export class Wallet {
     }): Promise<SignedTransaction> {
         payload.validFrom = payload.validFrom || 0;
         payload.validUntil = payload.validUntil || MAX_TIMESTAMP;
+        payload.ts = payload.ts || getTimestamp()
         const signedTransferTransaction = await this.getCurveSwap(payload as any);
 
         const stringAmountIn = BigNumber.from(payload.amountIn).isZero()
@@ -1032,6 +1041,7 @@ export class Wallet {
         fee: BigNumberish;
         withdrawFeeRatio: number;
         fastWithdraw: number;
+        ts: number;
         nonce: number;
         accountId: number;
         validFrom: number;
@@ -1052,6 +1062,7 @@ export class Wallet {
             withdrawFeeRatio: withdraw.withdrawFeeRatio,
             fastWithdraw: withdraw.fastWithdraw,
             fee: withdraw.fee,
+            ts: withdraw.ts,
             nonce: withdraw.nonce,
             validFrom: withdraw.validFrom,
             validUntil: withdraw.validUntil
@@ -1070,6 +1081,7 @@ export class Wallet {
         withdrawFeeRatio: number;
         fastWithdraw: number;
         accountId?: number;
+        ts?: number;
         nonce: number;
         validFrom?: number;
         validUntil?: number;
@@ -1078,6 +1090,7 @@ export class Wallet {
         withdraw.withdrawFeeRatio = withdraw.withdrawFeeRatio || 0;
         withdraw.validUntil = withdraw.validUntil || MAX_TIMESTAMP;
         withdraw.accountId = await this.getAccountId(withdraw.chainId)
+        withdraw.ts = withdraw.ts || getTimestamp()
         const signedWithdrawTransaction = await this.getWithdrawFromSyncToEthereum(withdraw as any);
 
         const stringAmount = BigNumber.from(withdraw.amount).isZero()
@@ -1151,6 +1164,7 @@ export class Wallet {
         accountId?: number,
         ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
         ethSignature?: string;
+        ts: number;
         validFrom: number;
         validUntil: number;
     }): Promise<ChangePubKey> {
@@ -1172,6 +1186,7 @@ export class Wallet {
             toChainId: changePubKey.toChainId,
             feeTokenId,
             fee: BigNumber.from(changePubKey.fee).toString(),
+            ts: changePubKey.ts,
             ethAuthData: changePubKey.ethAuthData,
             ethSignature: changePubKey.ethSignature,
             validFrom: changePubKey.validFrom,
@@ -1191,9 +1206,11 @@ export class Wallet {
         ethAuthType: ChangePubkeyTypes;
         accountId?: number;
         batchHash?: string;
+        ts?: number;
         validFrom?: number;
         validUntil?: number;
     }): Promise<SignedTransaction> {
+        changePubKey.ts = changePubKey.ts || getTimestamp()
         const newPubKeyHash = await this.signer.pubKeyHash();
         changePubKey.accountId = await this.getAccountId(changePubKey.chainId)
 
