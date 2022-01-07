@@ -106,4 +106,5 @@ export declare function getTxHash(tx: Transfer | Withdraw | ChangePubKey | Force
 export declare function getRandom(min: number, max: number): number;
 export declare function getFastSwapUNonce(): number;
 export declare function chainsCompletion(chains: any[], chainNum: number, item: any): any[];
+export declare function getTimestamp(): number;
 export {};

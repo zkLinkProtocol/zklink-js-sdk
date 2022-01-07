@@ -102,6 +102,7 @@ class Wallet {
                 tokenId,
                 amount: transfer.amount,
                 fee: transfer.fee,
+                ts: transfer.ts,
                 nonce: transfer.nonce,
                 validFrom: transfer.validFrom,
                 validUntil: transfer.validUntil
@@ -114,6 +115,7 @@ class Wallet {
             transfer.validFrom = transfer.validFrom || 0;
             transfer.validUntil = transfer.validUntil || utils_1.MAX_TIMESTAMP;
             transfer.accountId = yield this.getAccountId(transfer.chainId);
+            transfer.ts = transfer.ts || utils_1.getTimestamp();
             const signedTransferTransaction = yield this.getTransfer(transfer);
             const stringAmount = ethers_1.BigNumber.from(transfer.amount).isZero()
                 ? null
@@ -229,6 +231,7 @@ class Wallet {
                     amount: transfer.amount,
                     fee: transfer.fee,
                     accountId: transfer.accountId,
+                    ts: transfer.ts,
                     nonce,
                     validFrom: transfer.validFrom || 0,
                     validUntil: transfer.validUntil || utils_1.MAX_TIMESTAMP
@@ -512,7 +515,7 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             payload.validFrom = payload.validFrom || 0;
             payload.validUntil = payload.validUntil || utils_1.MAX_TIMESTAMP;
-            console.log(payload);
+            payload.ts = payload.ts || utils_1.getTimestamp();
             const signedTransferTransaction = yield this.getCurveAddLiquidity(payload);
             console.log(signedTransferTransaction);
             const stringAmounts = payload.amounts.map((amount) => {
@@ -557,6 +560,7 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             payload.validFrom = payload.validFrom || 0;
             payload.validUntil = payload.validUntil || utils_1.MAX_TIMESTAMP;
+            payload.ts = payload.ts || utils_1.getTimestamp();
             const signedTransferTransaction = yield this.getCurveRemoveLiquidity(payload);
             const stringAmounts = payload.amounts.map((amount) => {
                 return ethers_1.BigNumber.from(amount).isZero()
@@ -599,6 +603,7 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             payload.validFrom = payload.validFrom || 0;
             payload.validUntil = payload.validUntil || utils_1.MAX_TIMESTAMP;
+            payload.ts = payload.ts || utils_1.getTimestamp();
             const signedTransferTransaction = yield this.getCurveSwap(payload);
             const stringAmountIn = ethers_1.BigNumber.from(payload.amountIn).isZero()
                 ? null
@@ -646,6 +651,7 @@ class Wallet {
                 withdrawFeeRatio: withdraw.withdrawFeeRatio,
                 fastWithdraw: withdraw.fastWithdraw,
                 fee: withdraw.fee,
+                ts: withdraw.ts,
                 nonce: withdraw.nonce,
                 validFrom: withdraw.validFrom,
                 validUntil: withdraw.validUntil
@@ -659,6 +665,7 @@ class Wallet {
             withdraw.withdrawFeeRatio = withdraw.withdrawFeeRatio || 0;
             withdraw.validUntil = withdraw.validUntil || utils_1.MAX_TIMESTAMP;
             withdraw.accountId = yield this.getAccountId(withdraw.chainId);
+            withdraw.ts = withdraw.ts || utils_1.getTimestamp();
             const signedWithdrawTransaction = yield this.getWithdrawFromSyncToEthereum(withdraw);
             const stringAmount = ethers_1.BigNumber.from(withdraw.amount).isZero()
                 ? null
@@ -721,6 +728,7 @@ class Wallet {
                 toChainId: changePubKey.toChainId,
                 feeTokenId,
                 fee: ethers_1.BigNumber.from(changePubKey.fee).toString(),
+                ts: changePubKey.ts,
                 ethAuthData: changePubKey.ethAuthData,
                 ethSignature: changePubKey.ethSignature,
                 validFrom: changePubKey.validFrom,
@@ -731,6 +739,7 @@ class Wallet {
     }
     signSetSigningKey(changePubKey) {
         return __awaiter(this, void 0, void 0, function* () {
+            changePubKey.ts = changePubKey.ts || utils_1.getTimestamp();
             const newPubKeyHash = yield this.signer.pubKeyHash();
             changePubKey.accountId = yield this.getAccountId(changePubKey.chainId);
             let ethAuthData;

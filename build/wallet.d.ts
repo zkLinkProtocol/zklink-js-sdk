@@ -33,6 +33,7 @@ export declare class Wallet {
         amount: BigNumberish;
         fee: BigNumberish;
         accountId: number;
+        ts: number;
         nonce: number;
         validFrom: number;
         validUntil: number;
@@ -47,6 +48,7 @@ export declare class Wallet {
         amount: BigNumberish;
         fee: BigNumberish;
         accountId?: number;
+        ts?: number;
         nonce: number;
         validFrom?: number;
         validUntil?: number;
@@ -88,6 +90,7 @@ export declare class Wallet {
         amount: BigNumberish;
         fee: BigNumberish;
         accountId?: number;
+        ts: number;
         nonce?: Nonce;
         validFrom?: number;
         validUntil?: number;
@@ -342,6 +345,7 @@ export declare class Wallet {
         fee: BigNumberish;
         withdrawFeeRatio: number;
         fastWithdraw: number;
+        ts: number;
         nonce: number;
         accountId: number;
         validFrom: number;
@@ -357,6 +361,7 @@ export declare class Wallet {
         withdrawFeeRatio: number;
         fastWithdraw: number;
         accountId?: number;
+        ts?: number;
         nonce: number;
         validFrom?: number;
         validUntil?: number;
@@ -385,6 +390,7 @@ export declare class Wallet {
         accountId?: number;
         ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
         ethSignature?: string;
+        ts: number;
         validFrom: number;
         validUntil: number;
     }): Promise<ChangePubKey>;
@@ -398,6 +404,7 @@ export declare class Wallet {
         ethAuthType: ChangePubkeyTypes;
         accountId?: number;
         batchHash?: string;
+        ts?: number;
         validFrom?: number;
         validUntil?: number;
     }): Promise<SignedTransaction>;
