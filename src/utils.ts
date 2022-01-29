@@ -624,7 +624,6 @@ export function serializeTransfer(transfer: Transfer): Uint8Array {
     const nonce = serializeNonce(transfer.nonce);
     const validFrom = serializeTimestamp(transfer.validFrom);
     const validUntil = serializeTimestamp(transfer.validUntil);
-    console.log(ethers.utils.concat([type, fromChainId, toChainId, accountId, from, to, token, amount, fee, nonce, validFrom, validUntil, tsBytes]));
     return ethers.utils.concat([type, fromChainId, toChainId, accountId, from, to, token, amount, fee, nonce, validFrom, validUntil, tsBytes]);
 }
 
