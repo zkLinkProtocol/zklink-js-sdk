@@ -321,7 +321,7 @@ export interface CloseAccount {
 }
 
 export interface SignedTransaction {
-    tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit | AddLiquidity | RemoveLiquidity | Swap | CurveAddLiquidity | CurveRemoveLiquidity | CurveSwap;
+    tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit | AddLiquidity | RemoveLiquidity | Swap | CurveAddLiquidity | CurveRemoveLiquidity | CurveSwap | Order;
     ethereumSignature?: TxEthSignature;
 }
 
@@ -395,4 +395,21 @@ export interface Fee {
 export interface BatchFee {
     // Total fee amount (in wei)
     totalFee: BigNumber;
+}
+
+export interface Order {
+    type: 'Order';
+    accountId: number;
+    slotId: number;
+    nonce: number;
+    basedTokenId: TokenId;
+    quoteTokenId: TokenId;
+    amount: BigNumberish;
+    price: BigNumberish;
+    isSell: number;
+    validFrom: number;
+    validUntil: number;
+    signature?: Signature;
+    ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
+    ethSignature?: string;
 }

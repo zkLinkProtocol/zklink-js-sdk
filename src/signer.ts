@@ -13,7 +13,7 @@ import {
     ChangePubKeyECDSA,
     ChangePubKeyCREATE2,
     Create2Data,
-    AddLiquidity, RemoveLiquidity, Swap, ChainId, TokenId, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap
+    AddLiquidity, RemoveLiquidity, Swap, ChainId, TokenId, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order
 } from './types';
 
 export class Signer {
@@ -264,6 +264,25 @@ export class Signer {
             amountOutMin: BigNumber.from(payload.amountOutMin).toString(),
             fee: BigNumber.from(payload.fee).toString(),
             adminFee: BigNumber.from(payload.adminFee).toString(),
+            signature
+        };
+    }
+
+    async signSyncOrder(payload: Order & {
+        validFrom: number;
+        validUntil: number;
+    }): Promise<Order> {
+        const tx: Order = {
+            ...payload,
+            type: 'Order'
+        };
+        const msgBytes = utils.serializeOrder(tx);
+        const signature = await signTransactionBytes(this.#privateKey, msgBytes);
+
+        return {
+            ...tx,
+            price: BigNumber.from(payload.price).toString(),
+            amount: BigNumber.from(payload.amount).toString(),
             signature
         };
     }

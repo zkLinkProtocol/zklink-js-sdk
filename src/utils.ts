@@ -13,7 +13,7 @@ import {
     ChangePubKey,
     Withdraw,
     CloseAccount,
-    AddLiquidity, RemoveLiquidity, Swap, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap
+    AddLiquidity, RemoveLiquidity, Swap, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order
 } from './types';
 
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
@@ -779,6 +779,33 @@ export function serializeForcedExit(forcedExit: ForcedExit): Uint8Array {
     ]);
 }
 
+export function serializeOrder(order: Order): Uint8Array {
+    const type = new Uint8Array([255]);
+    const accountIdBytes = serializeAccountId(order.accountId);
+    const slotBytes = numberToBytesBE(order.slotId, 1);
+    const nonceBytes = serializeNonce(order.nonce);
+    const basedTokenIdBytes = serializeTokenId(order.basedTokenId);
+    const quoteTokenIdBytes = serializeTokenId(order.quoteTokenId);
+    const priceBytes = bigintToBytesBE(BigNumber.from(order.price).toBigInt(), 15);
+    const isSellBytes = numberToBytesBE(order.isSell, 1);
+    const amountBytes = serializeAmountPacked(order.amount);
+    const validFrom = numberToBytesBE(order.validFrom, 8);
+    const validUntil = bigintToBytesBE(BigNumber.from(String(order.validUntil)).toBigInt(), 8);
+    return ethers.utils.concat([
+        type,
+        accountIdBytes,
+        slotBytes,
+        nonceBytes,
+        basedTokenIdBytes,
+        quoteTokenIdBytes,
+        priceBytes,
+        isSellBytes,
+        amountBytes,
+        validFrom,
+        validUntil
+    ]);
+}
+
 /**
  * Encodes the transaction data as the byte sequence according to the zkSync protocol.
  * @param tx A transaction to serialize.
@@ -798,11 +825,20 @@ export function serializeTx(tx: Transfer | Withdraw | ChangePubKey | CloseAccoun
     }
 }
 
-function numberToBytesBE(number: number, bytes: number): Uint8Array {
+export function numberToBytesBE(number: number, bytes: number): Uint8Array {
     const result = new Uint8Array(bytes);
     for (let i = bytes - 1; i >= 0; i--) {
         result[i] = number & 0xff;
         number >>= 8;
+    }
+    return result;
+}
+
+export function bigintToBytesBE(number1: bigint, bytes: number): Uint8Array {
+    const result = new Uint8Array(bytes);
+    for (let i = bytes - 1; i >= 0; i--) {
+        result[i] = Number(number1 & BigInt('0xff'));
+        number1 >>= BigInt(8);
     }
     return result;
 }

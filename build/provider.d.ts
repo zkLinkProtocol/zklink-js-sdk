@@ -39,6 +39,7 @@ export declare class Provider {
     getPriorityOpStatus(serialId: number, chainId?: string): Promise<PriorityOperationReceipt>;
     getConfirmationsForEthOpAmount(chainId?: string): Promise<number>;
     getEthTxForWithdrawal(withdrawal_hash: string, chainId?: string): Promise<string>;
+    getAccountOrderNonce(chainId: string, accountId: number, slotId: number): Promise<PriorityOperationReceipt>;
     notifyPriorityOp(serialId: number, action: 'COMMIT' | 'VERIFY'): Promise<PriorityOperationReceipt>;
     notifyTransaction(chainId: string, hash: string, action: 'COMMIT' | 'VERIFY'): Promise<TransactionReceipt>;
     getTransactionFee(chainId: string, txType: 'Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee, address: Address, tokenLike: TokenLike): Promise<Fee>;

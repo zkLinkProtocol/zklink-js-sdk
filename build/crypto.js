@@ -28,7 +28,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadZkSyncCrypto = exports.privateKeyToPubKeyHash = exports.signTransactionBytes = exports.privateKeyFromSeed = void 0;
+exports.loadZkSyncCrypto = exports.rescueHashOrders = exports.privateKeyToPubKeyHash = exports.signTransactionBytes = exports.privateKeyFromSeed = void 0;
 const zks = __importStar(require("zksync-crypto"));
 const ethers_1 = require("ethers");
 /**
@@ -72,6 +72,14 @@ function privateKeyToPubKeyHash(privateKey) {
     });
 }
 exports.privateKeyToPubKeyHash = privateKeyToPubKeyHash;
+function rescueHashOrders(orders) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield loadZkSyncCrypto();
+        const _zks = asmJs || zks;
+        return _zks.rescueHashOrders(orders);
+    });
+}
+exports.rescueHashOrders = rescueHashOrders;
 let zksyncCryptoLoaded = false;
 function loadZkSyncCrypto(wasmFileUrl) {
     return __awaiter(this, void 0, void 0, function* () {

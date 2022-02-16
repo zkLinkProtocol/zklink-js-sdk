@@ -1,24 +1,25 @@
-// import { expect } from 'chai';
-// import { BigNumber, ethers } from 'ethers';
-// import { Wallet } from '../src/wallet';
-// import { getTokens } from 'reading-tool';
+import { parseEther } from 'ethers/lib/utils';
+import { expect } from 'chai';
+import { BigNumber, ethers } from 'ethers';
+import { Wallet } from '../src/wallet';
 
-// import { Provider } from '../src/provider';
+import { Provider } from '../src/provider';
+import { closestPackableTransactionAmount } from '../src';
 
-// describe('Wallet with mock provider', function () {
-//     async function getWallet(ethPrivateKey: Uint8Array, network: string): Promise<Wallet> {
-//         const ethWallet = new ethers.Wallet(ethPrivateKey);
-//         const tokens = getTokens(network);
-//         const mockProvider = await Provider.newMockProvider(network, ethPrivateKey, () => [...tokens]);
-//         const wallet = await Wallet.fromEthSigner(ethWallet, mockProvider);
-//         return wallet;
-//     }
+export async function getWallet(ethPrivateKey: Uint8Array, network: string): Promise<Wallet> {
+  const ethWallet = new ethers.Wallet(ethPrivateKey);
+  const tokens = []
+  const mockProvider = await Provider.newMockProvider(network, ethPrivateKey, () => [...tokens]);
+  const wallet = await Wallet.fromEthSigner(ethWallet, mockProvider);
+  return wallet;
+}
+describe('Wallet with mock provider', function () {
 
-//     it('Wallet has valid address', async function () {
-//         const key = new Uint8Array(new Array(32).fill(5));
-//         const wallet = await getWallet(key, 'mainnet');
-//         expect(wallet.address()).eq('0xd09Ad14080d4b257a819a4f579b8485Be88f086c', 'Wallet address does not match');
-//     });
+  it('Wallet has valid address', async function () {
+    const key = new Uint8Array(new Array(32).fill(5));
+    const wallet = await getWallet(key, 'mainnet');
+    expect(wallet.address()).eq('0xd09Ad14080d4b257a819a4f579b8485Be88f086c', 'Wallet address does not match');
+  });
 
 //     it("Wallet's account info has the same address as the wallet itself", async function () {
 //         const key = new Uint8Array(new Array(32).fill(10));
@@ -87,4 +88,4 @@
 //         const wallet = await getWallet(key, 'mainnet');
 //         expect(await wallet.isSigningKeySet()).eq(true, "Wallet's signing key is unset");
 //     });
-// });
+});

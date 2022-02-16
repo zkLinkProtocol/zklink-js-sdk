@@ -635,6 +635,28 @@ class Wallet {
             return submitSignedTransaction(String(payload.chainId), signedTransferTransaction, this.provider);
         });
     }
+    getOrder(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.signer) {
+                throw new Error('ZKSync signer is required for sending zksync transactions.');
+            }
+            return this.signer.signSyncOrder(payload);
+        });
+    }
+    signSyncOrder(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            payload.validFrom = payload.validFrom || 0;
+            payload.validUntil = payload.validUntil || 9007199254740991;
+            const signedTransferTransaction = yield this.getOrder(payload);
+            const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
+                ? null
+                : yield this.ethMessageSigner.ethSignOrder(payload);
+            return {
+                tx: signedTransferTransaction,
+                ethereumSignature
+            };
+        });
+    }
     getWithdrawFromSyncToEthereum(withdraw) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {

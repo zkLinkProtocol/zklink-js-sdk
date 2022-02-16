@@ -116,6 +116,14 @@ class Signer {
             return Object.assign(Object.assign({}, tx), { amountIn: ethers_1.BigNumber.from(payload.amountIn).toString(), amountOut: ethers_1.BigNumber.from(payload.amountOut).toString(), amountOutMin: ethers_1.BigNumber.from(payload.amountOutMin).toString(), fee: ethers_1.BigNumber.from(payload.fee).toString(), adminFee: ethers_1.BigNumber.from(payload.adminFee).toString(), signature });
         });
     }
+    signSyncOrder(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tx = Object.assign(Object.assign({}, payload), { type: 'Order' });
+            const msgBytes = utils.serializeOrder(tx);
+            const signature = yield crypto_1.signTransactionBytes(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
+            return Object.assign(Object.assign({}, tx), { price: ethers_1.BigNumber.from(payload.price).toString(), amount: ethers_1.BigNumber.from(payload.amount).toString(), signature });
+        });
+    }
     /**
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */

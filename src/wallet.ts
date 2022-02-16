@@ -31,7 +31,8 @@ import {
     ChainId,
     TokenId,
     CurveRemoveLiquidity,
-    CurveSwap
+    CurveSwap,
+    Order
 } from './types';
 import {
     ERC20_APPROVE_TRESHOLD,
@@ -1030,6 +1031,33 @@ export class Wallet {
         payload.nonce = payload.nonce != null ? await this.getNonce(String(payload.chainId), payload.nonce) : await this.getNonce(String(payload.chainId));
         const signedTransferTransaction = await this.signSyncCurveSwap(payload as any);
         return submitSignedTransaction(String(payload.chainId), signedTransferTransaction, this.provider);
+    }
+
+    async getOrder(payload: Order & {
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<Order> {
+        if (!this.signer) {
+            throw new Error('ZKSync signer is required for sending zksync transactions.');
+        }
+        return this.signer.signSyncOrder(payload as any);
+    }
+    async signSyncOrder(payload: Order & {
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<SignedTransaction> {
+        payload.validFrom = payload.validFrom || 0;
+        payload.validUntil = payload.validUntil || 9007199254740991;
+        const signedTransferTransaction = await this.getOrder(payload as any);
+
+        const ethereumSignature =
+            this.ethSigner instanceof Create2WalletSigner
+            ? null
+            : await this.ethMessageSigner.ethSignOrder(payload);
+        return {
+            tx: signedTransferTransaction,
+            ethereumSignature
+        };
     }
 
     async getWithdrawFromSyncToEthereum(withdraw: {

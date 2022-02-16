@@ -3,7 +3,7 @@ import { EthMessageSigner } from './eth-message-signer';
 import { Provider } from './provider';
 import { Signer } from './signer';
 import { BatchBuilder } from './batch-builder';
-import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKey, EthSignerType, SignedTransaction, Transfer, TxEthSignature, ForcedExit, Withdraw, ChangePubkeyTypes, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, RemoveLiquidity, AddLiquidity, Swap, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap } from './types';
+import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKey, EthSignerType, SignedTransaction, Transfer, TxEthSignature, ForcedExit, Withdraw, ChangePubkeyTypes, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, RemoveLiquidity, AddLiquidity, Swap, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order } from './types';
 export declare class ZKSyncTxError extends Error {
     value: PriorityOperationReceipt | TransactionReceipt;
     constructor(message: string, value: PriorityOperationReceipt | TransactionReceipt);
@@ -336,6 +336,14 @@ export declare class Wallet {
         validFrom?: number;
         validUntil?: number;
     }): Promise<Transaction>;
+    getOrder(payload: Order & {
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<Order>;
+    signSyncOrder(payload: Order & {
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<SignedTransaction>;
     getWithdrawFromSyncToEthereum(withdraw: {
         chainId: string;
         ethAddress: string;

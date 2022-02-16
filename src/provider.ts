@@ -190,6 +190,10 @@ export class Provider {
         return await this.transport.request('get_eth_tx_for_withdrawal', [(chainId || this.chainId), withdrawal_hash]);
     }
 
+    async getAccountOrderNonce(chainId: string, accountId: number, slotId: number): Promise<PriorityOperationReceipt> {
+        return await this.transport.request('ethop_info', [(chainId || this.chainId), accountId, slotId]);
+    }
+
     async notifyPriorityOp(serialId: number, action: 'COMMIT' | 'VERIFY'): Promise<PriorityOperationReceipt> {
         if (this.transport.subscriptionsSupported()) {
             return await new Promise((resolve) => {

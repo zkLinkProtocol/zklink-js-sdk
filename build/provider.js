@@ -194,6 +194,11 @@ class Provider {
             return yield this.transport.request('get_eth_tx_for_withdrawal', [(chainId || this.chainId), withdrawal_hash]);
         });
     }
+    getAccountOrderNonce(chainId, accountId, slotId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.transport.request('ethop_info', [(chainId || this.chainId), accountId, slotId]);
+        });
+    }
     notifyPriorityOp(serialId, action) {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.transport.subscriptionsSupported()) {

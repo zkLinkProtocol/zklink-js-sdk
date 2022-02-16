@@ -192,6 +192,26 @@ class EthMessageSigner {
         message += `Amount: ${tx.stringAmountIn} to ${tx.stringAmountOut}`;
         return message;
     }
+    ethSignOrder(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const message = this.getOrderEthSignMessage(payload);
+            return yield this.getEthMessageSignature(message);
+        });
+    }
+    getOrderEthSignMessage(payload) {
+        let humanReadableTxInfo = this.getOrderEthMessagePart(payload);
+        if (humanReadableTxInfo.length != 0) {
+            humanReadableTxInfo += '\n';
+        }
+        humanReadableTxInfo += `Nonce: ${payload.nonce}`;
+        return humanReadableTxInfo;
+    }
+    getOrderEthMessagePart(tx) {
+        let message = '';
+        message += `Order`;
+        message += '\n';
+        return message;
+    }
     getCreatePoolEthMessagePart(tx) {
         let message = '';
         message += `Token: ${tx.token0} - ${tx.token1}`;

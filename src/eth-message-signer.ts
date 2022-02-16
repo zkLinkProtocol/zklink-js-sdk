@@ -1,5 +1,5 @@
 import * as ethers from 'ethers';
-import { TxEthSignature, EthSignerType, PubKeyHash, Address } from './types';
+import { TxEthSignature, EthSignerType, PubKeyHash, Address, Order } from './types';
 import { getSignedBytesFromMessage, signMessagePersonalAPI, getChangePubkeyMessage } from './utils';
 
 /**
@@ -350,6 +350,29 @@ export class EthMessageSigner {
         message += `Amount: ${tx.stringAmountIn} to ${tx.stringAmountOut}`
         return message;
     }
+    
+
+    async ethSignOrder(payload: Order): Promise<TxEthSignature> {
+        const message = this.getOrderEthSignMessage(payload);
+        return await this.getEthMessageSignature(message);
+    }
+
+    getOrderEthSignMessage(payload: Order): string {
+        let humanReadableTxInfo = this.getOrderEthMessagePart(payload);
+        if (humanReadableTxInfo.length != 0) {
+            humanReadableTxInfo += '\n';
+        }
+        humanReadableTxInfo += `Nonce: ${payload.nonce}`;
+
+        return humanReadableTxInfo;
+    }
+    getOrderEthMessagePart(tx: Order): string {
+        let message = '';
+        message += `Order`;
+        message += '\n';
+        return message;
+    }
+    
 
     getCreatePoolEthMessagePart(tx: {
         token0: string;

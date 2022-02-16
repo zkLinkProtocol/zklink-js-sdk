@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.serializeFeeRatio = exports.serializeChainId = exports.serializeNonce = exports.serializeFeePacked = exports.serializeAmountFull = exports.serializeAmountPacked = exports.serializeTokenId = exports.serializeAccountId = exports.serializeAddress = exports.getEthSignatureType = exports.verifyERC1271Signature = exports.signMessagePersonalAPI = exports.getSignedBytesFromMessage = exports.getChangePubkeyLegacyMessage = exports.getChangePubkeyMessage = exports.TokenSet = exports.isTokenETH = exports.sleep = exports.buffer2bitsBE = exports.isTransactionFeePackable = exports.closestGreaterOrEqPackableTransactionFee = exports.closestPackableTransactionFee = exports.isTransactionAmountPackable = exports.closestGreaterOrEqPackableTransactionAmount = exports.closestPackableTransactionAmount = exports.packFeeChecked = exports.packAmountChecked = exports.reverseBits = exports.integerToFloatUp = exports.integerToFloat = exports.bitsIntoBytesInBEOrder = exports.floatToInteger = exports.TOTAL_CHAIN_NUM = exports.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ERC20_APPROVE_TRESHOLD = exports.MAX_ERC20_APPROVE_AMOUNT = exports.ERC20_DEPOSIT_GAS_LIMIT = exports.MULTICALL_INTERFACE = exports.IEIP1271_INTERFACE = exports.SYNC_GOV_CONTRACT_INTERFACE = exports.ZKL_CONTRACT_INTERFACE = exports.SYNC_EXIT_CONTRACT_INTERFACE = exports.SYNC_MAIN_CONTRACT_INTERFACE = exports.IERC20_INTERFACE = exports.MAX_UNONCE = exports.MIN_UNONCE = exports.MAX_TIMESTAMP = void 0;
-exports.getTimestamp = exports.chainsCompletion = exports.getFastSwapUNonce = exports.getRandom = exports.getTxHash = exports.getPendingBalance = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.parseHexWithPrefix = exports.serializeTx = exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeRemoveLiquidity = exports.serializeCurveSwap = exports.serializeCurveRemoveLiquidity = exports.serializeCurveAddLiquidity = exports.serializeAddLiquidity = exports.serializeSwap = exports.serializeTransfer = exports.serializeWithdraw = exports.serializeTimestamp = exports.serializeFastWithdraw = void 0;
+exports.getTimestamp = exports.chainsCompletion = exports.getFastSwapUNonce = exports.getRandom = exports.getTxHash = exports.getPendingBalance = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.parseHexWithPrefix = exports.bigintToBytesBE = exports.numberToBytesBE = exports.serializeTx = exports.serializeOrder = exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeRemoveLiquidity = exports.serializeCurveSwap = exports.serializeCurveRemoveLiquidity = exports.serializeCurveAddLiquidity = exports.serializeAddLiquidity = exports.serializeSwap = exports.serializeTransfer = exports.serializeWithdraw = exports.serializeTimestamp = exports.serializeFastWithdraw = void 0;
 const ethers_1 = require("ethers");
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
 const MAX_NUMBER_OF_TOKENS = 65535;
@@ -545,7 +545,6 @@ function serializeTransfer(transfer) {
     const nonce = serializeNonce(transfer.nonce);
     const validFrom = serializeTimestamp(transfer.validFrom);
     const validUntil = serializeTimestamp(transfer.validUntil);
-    console.log(ethers_1.ethers.utils.concat([type, fromChainId, toChainId, accountId, from, to, token, amount, fee, nonce, validFrom, validUntil, tsBytes]));
     return ethers_1.ethers.utils.concat([type, fromChainId, toChainId, accountId, from, to, token, amount, fee, nonce, validFrom, validUntil, tsBytes]);
 }
 exports.serializeTransfer = serializeTransfer;
@@ -706,6 +705,33 @@ function serializeForcedExit(forcedExit) {
     ]);
 }
 exports.serializeForcedExit = serializeForcedExit;
+function serializeOrder(order) {
+    const type = new Uint8Array([255]);
+    const accountIdBytes = serializeAccountId(order.accountId);
+    const slotBytes = numberToBytesBE(order.slotId, 1);
+    const nonceBytes = serializeNonce(order.nonce);
+    const basedTokenIdBytes = serializeTokenId(order.basedTokenId);
+    const quoteTokenIdBytes = serializeTokenId(order.quoteTokenId);
+    const priceBytes = bigintToBytesBE(ethers_1.BigNumber.from(order.price).toBigInt(), 15);
+    const isSellBytes = numberToBytesBE(order.isSell, 1);
+    const amountBytes = serializeAmountPacked(order.amount);
+    const validFrom = numberToBytesBE(order.validFrom, 8);
+    const validUntil = bigintToBytesBE(ethers_1.BigNumber.from(String(order.validUntil)).toBigInt(), 8);
+    return ethers_1.ethers.utils.concat([
+        type,
+        accountIdBytes,
+        slotBytes,
+        nonceBytes,
+        basedTokenIdBytes,
+        quoteTokenIdBytes,
+        priceBytes,
+        isSellBytes,
+        amountBytes,
+        validFrom,
+        validUntil
+    ]);
+}
+exports.serializeOrder = serializeOrder;
 /**
  * Encodes the transaction data as the byte sequence according to the zkSync protocol.
  * @param tx A transaction to serialize.
@@ -733,6 +759,16 @@ function numberToBytesBE(number, bytes) {
     }
     return result;
 }
+exports.numberToBytesBE = numberToBytesBE;
+function bigintToBytesBE(number1, bytes) {
+    const result = new Uint8Array(bytes);
+    for (let i = bytes - 1; i >= 0; i--) {
+        result[i] = Number(number1 & BigInt('0xff'));
+        number1 >>= BigInt(8);
+    }
+    return result;
+}
+exports.bigintToBytesBE = bigintToBytesBE;
 function parseHexWithPrefix(str) {
     return Uint8Array.from(Buffer.from(str.slice(2), 'hex'));
 }

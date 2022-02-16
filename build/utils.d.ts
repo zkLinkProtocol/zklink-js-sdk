@@ -1,6 +1,6 @@
 import { utils, ethers, BigNumber, BigNumberish } from 'ethers';
 import { Provider } from '.';
-import { PubKeyHash, TokenAddress, TokenLike, Tokens, TokenSymbol, EthSignerType, Address, Transfer, ForcedExit, ChangePubKey, Withdraw, CloseAccount, AddLiquidity, RemoveLiquidity, Swap, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap } from './types';
+import { PubKeyHash, TokenAddress, TokenLike, Tokens, TokenSymbol, EthSignerType, Address, Transfer, ForcedExit, ChangePubKey, Withdraw, CloseAccount, AddLiquidity, RemoveLiquidity, Swap, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order } from './types';
 export declare const MAX_TIMESTAMP = 4294967295;
 export declare const MIN_UNONCE = 1;
 export declare const MAX_UNONCE = 4294967295;
@@ -86,11 +86,14 @@ export declare function serializeCurveSwap(payload: CurveSwap): Uint8Array;
 export declare function serializeRemoveLiquidity(transfer: RemoveLiquidity): Uint8Array;
 export declare function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array;
 export declare function serializeForcedExit(forcedExit: ForcedExit): Uint8Array;
+export declare function serializeOrder(order: Order): Uint8Array;
 /**
  * Encodes the transaction data as the byte sequence according to the zkSync protocol.
  * @param tx A transaction to serialize.
  */
 export declare function serializeTx(tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit): Uint8Array;
+export declare function numberToBytesBE(number: number, bytes: number): Uint8Array;
+export declare function bigintToBytesBE(number1: bigint, bytes: number): Uint8Array;
 export declare function parseHexWithPrefix(str: string): Uint8Array;
 export declare function getCREATE2AddressAndSalt(syncPubkeyHash: string, create2Data: {
     creatorAddress: string;

@@ -1,5 +1,5 @@
 import * as ethers from 'ethers';
-import { TxEthSignature, EthSignerType, PubKeyHash, Address } from './types';
+import { TxEthSignature, EthSignerType, PubKeyHash, Address, Order } from './types';
 /**
  * Wrapper around `ethers.Signer` which provides convenient methods to get and sign messages required for zkSync.
  */
@@ -183,6 +183,9 @@ export declare class EthMessageSigner {
         nonce: number;
         pairAccount: Address;
     }): string;
+    ethSignOrder(payload: Order): Promise<TxEthSignature>;
+    getOrderEthSignMessage(payload: Order): string;
+    getOrderEthMessagePart(tx: Order): string;
     getCreatePoolEthMessagePart(tx: {
         token0: string;
         token1: string;
