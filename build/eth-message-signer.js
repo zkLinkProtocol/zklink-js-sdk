@@ -24,8 +24,8 @@ class EthMessageSigner {
             if (this.ethSignerType == null) {
                 throw new Error('ethSignerType is unknown');
             }
-            const signedBytes = utils_1.getSignedBytesFromMessage(message, !this.ethSignerType.isSignedMsgPrefixed);
-            const signature = yield utils_1.signMessagePersonalAPI(this.ethSigner, signedBytes);
+            const signedBytes = (0, utils_1.getSignedBytesFromMessage)(message, !this.ethSignerType.isSignedMsgPrefixed);
+            const signature = yield (0, utils_1.signMessagePersonalAPI)(this.ethSigner, signedBytes);
             return {
                 type: this.ethSignerType.verificationMethod === 'ECDSA' ? 'EthereumSignature' : 'EIP1271Signature',
                 signature
@@ -300,7 +300,7 @@ class EthMessageSigner {
         });
     }
     getChangePubKeyEthSignMessage(changePubKey) {
-        return utils_1.getChangePubkeyMessage(changePubKey.pubKeyHash, changePubKey.nonce, changePubKey.accountId);
+        return (0, utils_1.getChangePubkeyMessage)(changePubKey.pubKeyHash, changePubKey.nonce, changePubKey.accountId);
     }
     ethSignChangePubKey(changePubKey) {
         return __awaiter(this, void 0, void 0, function* () {

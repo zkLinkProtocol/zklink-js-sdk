@@ -5,6 +5,7 @@ import { Wallet } from '../src/wallet';
 
 import { Provider } from '../src/provider';
 import { closestPackableTransactionAmount } from '../src';
+import { rescueHashOrders } from '../src/crypto';
 
 export async function getWallet(ethPrivateKey: Uint8Array, network: string): Promise<Wallet> {
   const ethWallet = new ethers.Wallet(ethPrivateKey);
@@ -19,6 +20,9 @@ describe('Wallet with mock provider', function () {
     const key = new Uint8Array(new Array(32).fill(5));
     const wallet = await getWallet(key, 'mainnet');
     expect(wallet.address()).eq('0xd09Ad14080d4b257a819a4f579b8485Be88f086c', 'Wallet address does not match');
+
+    const a = await rescueHashOrders(new Uint8Array(178))
+    console.log(a);
   });
 
 //     it("Wallet's account info has the same address as the wallet itself", async function () {

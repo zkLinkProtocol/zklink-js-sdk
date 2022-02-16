@@ -221,7 +221,7 @@ class Provider {
                         return priorOpStatus;
                     }
                     else {
-                        yield utils_1.sleep(this.pollIntervalMilliSecs);
+                        yield (0, utils_1.sleep)(this.pollIntervalMilliSecs);
                     }
                 }
             }
@@ -249,7 +249,7 @@ class Provider {
                         return transactionStatus;
                     }
                     else {
-                        yield utils_1.sleep(this.pollIntervalMilliSecs);
+                        yield (0, utils_1.sleep)(this.pollIntervalMilliSecs);
                     }
                 }
             }
@@ -295,7 +295,7 @@ class ETHProxy {
     }
     resolveTokenId(token) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (utils_1.isTokenETH(token)) {
+            if ((0, utils_1.isTokenETH)(token)) {
                 return 0;
             }
             else {

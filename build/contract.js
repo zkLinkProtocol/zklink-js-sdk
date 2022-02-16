@@ -38,7 +38,7 @@ class LinkContract {
     }
     isERC20DepositsApproved(tokenAddress, accountAddress, erc20ApproveThreshold = utils_1.ERC20_APPROVE_TRESHOLD) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (utils_1.isTokenETH(tokenAddress)) {
+            if ((0, utils_1.isTokenETH)(tokenAddress)) {
                 throw Error('ETH token does not need approval.');
             }
             const erc20contract = new ethers_1.Contract(tokenAddress, utils_1.IERC20_INTERFACE, this.ethSigner);
@@ -53,7 +53,7 @@ class LinkContract {
     }
     approveERC20TokenDeposits(tokenAddress, max_erc20_approve_amount = utils_1.MAX_ERC20_APPROVE_AMOUNT) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (utils_1.isTokenETH(tokenAddress)) {
+            if ((0, utils_1.isTokenETH)(tokenAddress)) {
                 throw Error('ETH token does not need approval.');
             }
             const erc20contract = new ethers_1.Contract(tokenAddress, utils_1.IERC20_INTERFACE, this.ethSigner);
@@ -69,7 +69,7 @@ class LinkContract {
         return __awaiter(this, void 0, void 0, function* () {
             const zklContract = this.getZKLContract(bridge.contractAddress);
             let ethTransaction;
-            let uNonce = utils_1.getFastSwapUNonce();
+            let uNonce = (0, utils_1.getFastSwapUNonce)();
             const lzFees = yield zklContract.estimateBridgeFees(bridge.toChainId, bridge.to, bridge.amount);
             const args = [
                 bridge.toChainId,
@@ -104,12 +104,12 @@ class LinkContract {
         return __awaiter(this, void 0, void 0, function* () {
             const mainContract = this.getMainContract();
             let ethTransaction;
-            let uNonce = utils_1.getFastSwapUNonce();
+            let uNonce = (0, utils_1.getFastSwapUNonce)();
             if (!uNonce) {
                 this.modifyEthersError(new Error('swap tx nonce is none'));
             }
             // -------------------------------
-            if (utils_1.isTokenETH(swap.tokenInAddress)) {
+            if ((0, utils_1.isTokenETH)(swap.tokenInAddress)) {
                 try {
                     // function swapExactETHForTokens(address _zkSyncAddress,uint104 _amountOutMin, uint16 _withdrawFee, uint8 _toChainId, uint16 _toTokenId, address _to, uint32 _nonce) external payable
                     ethTransaction = yield mainContract.swapExactETHForTokens(swap.from, swap.amountOutMin, swap.toChainId, swap.tokenOutId, swap.to, uNonce, swap.pair, swap.acceptTokenId, swap.acceptAmountOutMin, Object.assign({ value: ethers_1.BigNumber.from(swap.amountIn), gasLimit: ethers_1.BigNumber.from(utils_1.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT) }, swap.ethTxOptions));

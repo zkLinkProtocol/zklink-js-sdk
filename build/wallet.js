@@ -75,8 +75,8 @@ class Wallet {
             if (this.ethSignerType == null) {
                 throw new Error('ethSignerType is unknown');
             }
-            const signedBytes = utils_1.getSignedBytesFromMessage(message, !this.ethSignerType.isSignedMsgPrefixed);
-            const signature = yield utils_1.signMessagePersonalAPI(this.ethSigner, signedBytes);
+            const signedBytes = (0, utils_1.getSignedBytesFromMessage)(message, !this.ethSignerType.isSignedMsgPrefixed);
+            const signature = yield (0, utils_1.signMessagePersonalAPI)(this.ethSigner, signedBytes);
             return {
                 type: this.ethSignerType.verificationMethod === 'ECDSA' ? 'EthereumSignature' : 'EIP1271Signature',
                 signature
@@ -115,7 +115,7 @@ class Wallet {
             transfer.validFrom = transfer.validFrom || 0;
             transfer.validUntil = transfer.validUntil || utils_1.MAX_TIMESTAMP;
             transfer.accountId = yield this.getAccountId(transfer.chainId);
-            transfer.ts = transfer.ts || utils_1.getTimestamp();
+            transfer.ts = transfer.ts || (0, utils_1.getTimestamp)();
             const signedTransferTransaction = yield this.getTransfer(transfer);
             const stringAmount = ethers_1.BigNumber.from(transfer.amount).isZero()
                 ? null
@@ -515,7 +515,7 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             payload.validFrom = payload.validFrom || 0;
             payload.validUntil = payload.validUntil || utils_1.MAX_TIMESTAMP;
-            payload.ts = payload.ts || utils_1.getTimestamp();
+            payload.ts = payload.ts || (0, utils_1.getTimestamp)();
             const signedTransferTransaction = yield this.getCurveAddLiquidity(payload);
             console.log(signedTransferTransaction);
             const stringAmounts = payload.amounts.map((amount) => {
@@ -560,7 +560,7 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             payload.validFrom = payload.validFrom || 0;
             payload.validUntil = payload.validUntil || utils_1.MAX_TIMESTAMP;
-            payload.ts = payload.ts || utils_1.getTimestamp();
+            payload.ts = payload.ts || (0, utils_1.getTimestamp)();
             const signedTransferTransaction = yield this.getCurveRemoveLiquidity(payload);
             const stringAmounts = payload.amounts.map((amount) => {
                 return ethers_1.BigNumber.from(amount).isZero()
@@ -603,7 +603,7 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             payload.validFrom = payload.validFrom || 0;
             payload.validUntil = payload.validUntil || utils_1.MAX_TIMESTAMP;
-            payload.ts = payload.ts || utils_1.getTimestamp();
+            payload.ts = payload.ts || (0, utils_1.getTimestamp)();
             const signedTransferTransaction = yield this.getCurveSwap(payload);
             const stringAmountIn = ethers_1.BigNumber.from(payload.amountIn).isZero()
                 ? null
@@ -687,7 +687,7 @@ class Wallet {
             withdraw.withdrawFeeRatio = withdraw.withdrawFeeRatio || 0;
             withdraw.validUntil = withdraw.validUntil || utils_1.MAX_TIMESTAMP;
             withdraw.accountId = yield this.getAccountId(withdraw.chainId);
-            withdraw.ts = withdraw.ts || utils_1.getTimestamp();
+            withdraw.ts = withdraw.ts || (0, utils_1.getTimestamp)();
             const signedWithdrawTransaction = yield this.getWithdrawFromSyncToEthereum(withdraw);
             const stringAmount = ethers_1.BigNumber.from(withdraw.amount).isZero()
                 ? null
@@ -761,7 +761,7 @@ class Wallet {
     }
     signSetSigningKey(changePubKey) {
         return __awaiter(this, void 0, void 0, function* () {
-            changePubKey.ts = changePubKey.ts || utils_1.getTimestamp();
+            changePubKey.ts = changePubKey.ts || (0, utils_1.getTimestamp)();
             const newPubKeyHash = yield this.signer.pubKeyHash();
             changePubKey.accountId = yield this.getAccountId(changePubKey.chainId);
             let ethAuthData;
@@ -773,7 +773,7 @@ class Wallet {
             }
             else if (changePubKey.ethAuthType === 'ECDSA') {
                 yield this.setRequiredAccountIdFromServer(changePubKey.chainId, 'ChangePubKey authorized by ECDSA.');
-                const changePubKeyMessage = utils_1.getChangePubkeyMessage(newPubKeyHash, changePubKey.nonce, (changePubKey.accountId || this.accountId), changePubKey.batchHash);
+                const changePubKeyMessage = (0, utils_1.getChangePubkeyMessage)(newPubKeyHash, changePubKey.nonce, (changePubKey.accountId || this.accountId), changePubKey.batchHash);
                 const ethSignature = (yield this.getEthMessageSignature(changePubKeyMessage)).signature;
                 ethAuthData = {
                     type: 'ECDSA',
@@ -797,7 +797,7 @@ class Wallet {
             }
             else if (changePubKey.ethAuthType === 'ECDSALegacyMessage') {
                 yield this.setRequiredAccountIdFromServer(changePubKey.chainId, 'ChangePubKey authorized by ECDSALegacyMessage.');
-                const changePubKeyMessage = utils_1.getChangePubkeyLegacyMessage(newPubKeyHash, changePubKey.nonce, changePubKey.accountId || this.accountId);
+                const changePubKeyMessage = (0, utils_1.getChangePubkeyLegacyMessage)(newPubKeyHash, changePubKey.nonce, changePubKey.accountId || this.accountId);
                 ethSignature = (yield this.getEthMessageSignature(changePubKeyMessage)).signature;
             }
             else {
@@ -978,7 +978,7 @@ class Wallet {
     getEthereumBalance(token) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return utils_1.getEthereumBalance(this.ethSigner.provider, this.provider, this.cachedAddress, token);
+                return (0, utils_1.getEthereumBalance)(this.ethSigner.provider, this.provider, this.cachedAddress, token);
             }
             catch (e) {
                 this.modifyEthersError(e);
@@ -987,7 +987,7 @@ class Wallet {
     }
     isERC20DepositsApproved(token, erc20ApproveThreshold = utils_1.ERC20_APPROVE_TRESHOLD) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (utils_1.isTokenETH(token)) {
+            if ((0, utils_1.isTokenETH)(token)) {
                 throw Error('ETH token does not need approval.');
             }
             const tokenAddress = this.provider.tokenSet.resolveTokenAddress(token);
@@ -1003,7 +1003,7 @@ class Wallet {
     }
     approveERC20TokenDeposits(token, max_erc20_approve_amount = utils_1.MAX_ERC20_APPROVE_AMOUNT) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (utils_1.isTokenETH(token)) {
+            if ((0, utils_1.isTokenETH)(token)) {
                 throw Error('ETH token does not need approval.');
             }
             const tokenAddress = this.provider.tokenSet.resolveTokenAddress(token);
@@ -1021,7 +1021,7 @@ class Wallet {
             const gasPrice = yield this.ethSigner.provider.getGasPrice();
             const mainZkSyncContract = this.getZkSyncMainContract();
             let ethTransaction;
-            if (utils_1.isTokenETH(deposit.token)) {
+            if ((0, utils_1.isTokenETH)(deposit.token)) {
                 try {
                     ethTransaction = yield mainZkSyncContract.depositETH(deposit.depositTo, Object.assign({ value: ethers_1.BigNumber.from(deposit.amount), gasLimit: ethers_1.BigNumber.from(utils_1.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT) }, deposit.ethTxOptions));
                 }
