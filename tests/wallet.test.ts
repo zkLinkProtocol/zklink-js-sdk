@@ -20,9 +20,7 @@ describe('Wallet with mock provider', function () {
     const key = new Uint8Array(new Array(32).fill(5));
     const wallet = await getWallet(key, 'mainnet');
     expect(wallet.address()).eq('0xd09Ad14080d4b257a819a4f579b8485Be88f086c', 'Wallet address does not match');
-
-    const a = await rescueHashOrders(new Uint8Array(178))
-    console.log(a);
+    expect(await wallet.signer.pubKeyHash()).eq('sync:05ded0fbbe3c269ed1a8d17b3a9f973ad78be767')
   });
 
 //     it("Wallet's account info has the same address as the wallet itself", async function () {

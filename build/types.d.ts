@@ -43,6 +43,9 @@ export interface AccountState {
         nonce: number;
         pubKeyHash: PubKeyHash;
         pairInfo: PairInfo;
+        orderNonces: {
+            [slotId: number]: {};
+        };
     };
     verified: {
         balances: {

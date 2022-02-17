@@ -43,7 +43,6 @@ class EthMessageSigner {
     ethSignTransfer(transfer) {
         return __awaiter(this, void 0, void 0, function* () {
             const message = this.getTransferEthSignMessage(transfer);
-            console.log(message);
             return yield this.getEthMessageSignature(message);
         });
     }

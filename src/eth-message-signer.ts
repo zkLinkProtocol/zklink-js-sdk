@@ -49,7 +49,6 @@ export class EthMessageSigner {
         accountId: number;
     }): Promise<TxEthSignature> {
         const message = this.getTransferEthSignMessage(transfer);
-        console.log(message);
         return await this.getEthMessageSignature(message);
     }
 
