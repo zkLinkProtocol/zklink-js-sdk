@@ -34,7 +34,7 @@
     "scripts": {
         "lint:ts": "tslint -c tslint.json {examples,test,src}/**/*.ts",
         "lint:ts-fix": "tslint -c tslint.json --fix {examples,test,src}/**/*.ts",
-        "tests": "mocha -r ts-node/register --timeout 0 tests/**/*.test.ts",
+        "test": "mocha -r ts-node/register --timeout 0 tests/**/*.test.ts",
         "build": "tsc",
         "watch": "tsc --watch",
         "prepublish": "yarn build && rollup -c",

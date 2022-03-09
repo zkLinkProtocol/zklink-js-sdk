@@ -57,7 +57,7 @@ describe('order', () => {
   it('signature order 1', async function () {
     const wallet = await getWallet('0xdf8eaa5f7581d6c04e988932b97366d746c6ab45a61d411503da1f02c41b7351' as any, 'mainnet');
     expect(wallet.address()).eq('0x199AaA230f18432a715528B4091120cdCc7D9779', 'Wallet address does not match');
-    console.log('pubKeyHash', await wallet.signer.pubKeyHash());
+    expect(await wallet.signer.pubKeyHash()).eq('sync:772d51f4755bcb6254530e0f95e7fcdb03dbea06')
     const signedTransaction = await wallet.signSyncOrder({
       accountId: 4,
       slotId: 0,
@@ -68,7 +68,10 @@ describe('order', () => {
       amount: parseEther('1'),
       price: parseEther('1')
     } as any)
-    console.log(signedTransaction);
+    expect(signedTransaction.tx.signature).eql({
+      pubKey: 'dad5e08206f93ce40baeecc3d456c4bef90fb66fd28c260fa8c510df0bcd69aa',
+      signature: 'a4edf6cadde6225f5ca6e250c395a922471d31e41b6866d5af69b32e96d0ce1b51bdcc7dfd248dfcd45cfeaa453bb54c8dd1a2409edef6a44735e764daca2801'
+    })
   });
   // it('signature order 2', async function () {
   //   const wallet = await getWallet('0xdf8eaa5f7581d6c04e988932b97366d746c6ab45a61d411503da1f02c41b7351' as any, 'mainnet');
