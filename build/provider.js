@@ -82,7 +82,7 @@ class Provider {
     }
     setChainId(chainId) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.chainId = String(chainId);
+            this.chainId = Number(chainId);
             this.contractAddress = yield this.getContractAddress();
             this.tokenSet = new utils_1.TokenSet(yield this.getTokens());
         });
@@ -118,19 +118,22 @@ class Provider {
      * Provides some hardcoded values the `Provider` responsible for
      * without communicating with the network
      */
-    static newMockProvider(network, ethPrivateKey, getTokens) {
+    static newMockProvider(network, ethPrivateKey, getTokens, chainId) {
         return __awaiter(this, void 0, void 0, function* () {
             const transport = new transport_1.DummyTransport(network, ethPrivateKey, getTokens);
             const provider = new Provider(transport);
+            if (chainId !== undefined) {
+                provider.setChainId(chainId);
+            }
             provider.contractAddress = yield provider.getContractAddress();
             provider.tokenSet = new utils_1.TokenSet(yield provider.getTokens());
             return provider;
         });
     }
     // return transaction hash (e.g. sync-tx:dead..beef)
-    submitTx({ chainId, tx, signature, fastProcessing }) {
+    submitTx({ tx, signature, fastProcessing }) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('tx_submit', [chainId, tx, signature, fastProcessing]);
+            return yield this.transport.request('tx_submit', [this.chainId, tx, signature, fastProcessing]);
         });
     }
     // Requests `zkSync` server to execute several transactions together.
@@ -152,14 +155,14 @@ class Provider {
             return yield this.transport.request('submit_txs_batch', [this.chainId, transactions, signatures]);
         });
     }
-    getContractAddress(chainId) {
+    getContractAddress() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('contract_address', [(chainId || this.chainId)]);
+            return yield this.transport.request('contract_address', [this.chainId]);
         });
     }
-    getTokens(chainId) {
+    getTokens() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('tokens', [(chainId || this.chainId)]);
+            return yield this.transport.request('tokens', [this.chainId]);
         });
     }
     updateTokenSet() {
@@ -168,35 +171,35 @@ class Provider {
             this.tokenSet = updatedTokenSet;
         });
     }
-    getState(address, chainId) {
+    getState(address) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('account_info', [chainId, address]);
+            return yield this.transport.request('account_info', [this.chainId, address]);
         });
     }
     // get transaction status by its hash (e.g. 0xdead..beef)
-    getTxReceipt(chainId, txHash) {
+    getTxReceipt(txHash) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('tx_info', [chainId, txHash]);
+            return yield this.transport.request('tx_info', [this.chainId, txHash]);
         });
     }
-    getPriorityOpStatus(serialId, chainId) {
+    getPriorityOpStatus(serialId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('ethop_info', [(chainId || this.chainId), serialId]);
+            return yield this.transport.request('ethop_info', [this.chainId, serialId]);
         });
     }
-    getConfirmationsForEthOpAmount(chainId) {
+    getConfirmationsForEthOpAmount() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('get_confirmations_for_eth_op_amount', [(chainId || this.chainId)]);
+            return yield this.transport.request('get_confirmations_for_eth_op_amount', [this.chainId]);
         });
     }
-    getEthTxForWithdrawal(withdrawal_hash, chainId) {
+    getEthTxForWithdrawal(withdrawal_hash) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('get_eth_tx_for_withdrawal', [(chainId || this.chainId), withdrawal_hash]);
+            return yield this.transport.request('get_eth_tx_for_withdrawal', [this.chainId, withdrawal_hash]);
         });
     }
-    getAccountOrderNonce(chainId, accountId, slotId) {
+    getAccountOrderNonce(accountId, slotId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('ethop_info', [(chainId || this.chainId), accountId, slotId]);
+            return yield this.transport.request('ethop_info', [this.chainId, accountId, slotId]);
         });
     }
     notifyPriorityOp(serialId, action) {
@@ -227,11 +230,11 @@ class Provider {
             }
         });
     }
-    notifyTransaction(chainId, hash, action) {
+    notifyTransaction(hash, action) {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.transport.subscriptionsSupported()) {
                 return yield new Promise((resolve) => {
-                    const subscribe = this.transport.subscribe('tx_subscribe', [chainId, hash, action], 'tx_unsubscribe', (resp) => {
+                    const subscribe = this.transport.subscribe('tx_subscribe', [this.chainId, hash, action], 'tx_unsubscribe', (resp) => {
                         subscribe
                             .then((sub) => sub.unsubscribe())
                             .catch((err) => console.log(`WebSocket connection closed with reason: ${err}`));
@@ -241,10 +244,10 @@ class Provider {
             }
             else {
                 while (true) {
-                    const transactionStatus = yield this.getTxReceipt(chainId, hash);
+                    const transactionStatus = yield this.getTxReceipt(hash);
                     const notifyDone = action == 'COMMIT'
-                        ? transactionStatus.block && transactionStatus.block.committed
-                        : transactionStatus.block && transactionStatus.block.verified;
+                        ? transactionStatus.failReason || transactionStatus.block && transactionStatus.block.committed
+                        : transactionStatus.failReason || transactionStatus.block && transactionStatus.block.verified;
                     if (notifyDone) {
                         return transactionStatus;
                     }
@@ -255,9 +258,9 @@ class Provider {
             }
         });
     }
-    getTransactionFee(chainId, txType, address, tokenLike) {
+    getTransactionFee(txType, address, tokenLike) {
         return __awaiter(this, void 0, void 0, function* () {
-            const transactionFee = yield this.transport.request('get_tx_fee', [chainId, txType, address.toString(), tokenLike]);
+            const transactionFee = yield this.transport.request('get_tx_fee', [this.chainId, txType, address.toString(), tokenLike]);
             return {
                 feeType: transactionFee.feeType,
                 gasTxAmount: ethers_1.BigNumber.from(transactionFee.gasTxAmount),

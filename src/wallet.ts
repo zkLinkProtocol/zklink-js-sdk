@@ -162,7 +162,6 @@ export class Wallet {
     }
 
     async getTransfer(transfer: {
-        chainId: string,
         fromChainId: number;
         toChainId: number;
         to: Address;
@@ -180,7 +179,7 @@ export class Wallet {
             throw new Error('ZKSync signer is required for sending zksync transactions.');
         }
 
-        await this.setRequiredAccountIdFromServer(transfer.chainId, 'Transfer funds');
+        await this.setRequiredAccountIdFromServer('Transfer funds');
 
         const tokenId = transfer.tokenId
 
@@ -203,7 +202,6 @@ export class Wallet {
     }
 
     async signSyncTransfer(transfer: {
-        chainId: string,
         fromChainId: number;
         toChainId: number;
         to: Address;
@@ -219,7 +217,7 @@ export class Wallet {
     }): Promise<SignedTransaction> {
         transfer.validFrom = transfer.validFrom || 0;
         transfer.validUntil = transfer.validUntil || MAX_TIMESTAMP;
-        transfer.accountId = await this.getAccountId(transfer.chainId)
+        transfer.accountId = await this.getAccountId()
         transfer.ts = transfer.ts || getTimestamp()
         const signedTransferTransaction = await this.getTransfer(transfer as any);
 
@@ -248,7 +246,6 @@ export class Wallet {
     }
 
     async getForcedExit(forcedExit: {
-        chainId: string;
         target: Address;
         token: TokenLike;
         fee: BigNumberish;
@@ -259,7 +256,7 @@ export class Wallet {
         if (!this.signer) {
             throw new Error('ZKSync signer is required for sending zksync transactions.');
         }
-        await this.setRequiredAccountIdFromServer(forcedExit.chainId, 'perform a Forced Exit');
+        await this.setRequiredAccountIdFromServer('perform a Forced Exit');
 
         const tokenId = this.provider.tokenSet.resolveTokenId(forcedExit.token);
 
@@ -277,7 +274,6 @@ export class Wallet {
     }
 
     async signSyncForcedExit(forcedExit: {
-        chainId: string;
         target: Address;
         token: TokenLike;
         fee: BigNumberish;
@@ -308,7 +304,6 @@ export class Wallet {
     }
 
     async syncForcedExit(forcedExit: {
-        chainId: string;
         target: Address;
         token: TokenLike;
         fee?: BigNumberish;
@@ -316,14 +311,14 @@ export class Wallet {
         validFrom?: number;
         validUntil?: number;
     }): Promise<Transaction> {
-        forcedExit.nonce = forcedExit.nonce != null ? await this.getNonce(forcedExit.chainId, forcedExit.nonce) : await this.getNonce(forcedExit.chainId);
+        forcedExit.nonce = forcedExit.nonce != null ? await this.getNonce(forcedExit.nonce) : await this.getNonce();
         if (forcedExit.fee == null) {
             // Fee for forced exit is defined by `Withdraw` transaction type (as it's essentially just a forced withdraw).
-            const fullFee = await this.provider.getTransactionFee(forcedExit.chainId, 'Withdraw', forcedExit.target, forcedExit.token);
+            const fullFee = await this.provider.getTransactionFee('Withdraw', forcedExit.target, forcedExit.token);
             forcedExit.fee = fullFee.totalFee;
         }
         const signedForcedExitTransaction = await this.signSyncForcedExit(forcedExit as any);
-        return submitSignedTransaction(forcedExit.chainId, signedForcedExitTransaction, this.provider);
+        return submitSignedTransaction(signedForcedExitTransaction, this.provider);
     }
 
     // Note that in syncMultiTransfer, unlike in syncTransfer,
@@ -341,7 +336,6 @@ export class Wallet {
     // That's why we want the users to be explicit about fees in multitransfers.
     async syncMultiTransfer(
         transfers: {
-            chainId: string,
             fromChainId: number;
             toChainId: number;
             to: Address;
@@ -362,12 +356,12 @@ export class Wallet {
 
         if (transfers.length == 0) return [];
 
-        await this.setRequiredAccountIdFromServer(transfers[0].chainId, 'Transfer funds');
+        await this.setRequiredAccountIdFromServer('Transfer funds');
 
         let batch = [];
         let messages: string[] = [];
 
-        let nextNonce = transfers[0].nonce != null ? await this.getNonce(transfers[0].chainId, transfers[0].nonce) : await this.getNonce(transfers[0].chainId);
+        let nextNonce = transfers[0].nonce != null ? await this.getNonce(transfers[0].nonce) : await this.getNonce();
         const batchNonce = nextNonce;
 
         for (let i = 0; i < transfers.length; i++) {
@@ -376,7 +370,6 @@ export class Wallet {
             nextNonce += 1;
 
             const tx: Transfer = await this.getTransfer({
-                chainId: transfer.chainId,
                 fromChainId: transfer.fromChainId,
                 toChainId: transfer.toChainId,
                 to: transfer.to,
@@ -403,11 +396,10 @@ export class Wallet {
                 : [await this.ethMessageSigner.getEthMessageSignature(message)];
 
         const transactionHashes = await this.provider.submitTxsBatch(batch, ethSignatures);
-        return transactionHashes.map((txHash, idx) => new Transaction(transfers[idx].chainId, batch[idx], txHash, this.provider));
+        return transactionHashes.map((txHash, idx) => new Transaction(batch[idx], txHash, this.provider));
     }
 
     async syncTransfer(transfer: {
-        chainId: string;
         fromChainId: number;
         toChainId: number;
         to: Address;
@@ -420,18 +412,17 @@ export class Wallet {
         validFrom?: number;
         validUntil?: number;
     }): Promise<Transaction> {
-        transfer.nonce = transfer.nonce != null ? await this.getNonce(transfer.chainId, transfer.nonce) : await this.getNonce(transfer.chainId);
+        transfer.nonce = transfer.nonce != null ? await this.getNonce(transfer.nonce) : await this.getNonce();
 
         if (transfer.fee == null) {
-            const fullFee = await this.provider.getTransactionFee(transfer.chainId, 'Transfer', transfer.to, transfer.token);
+            const fullFee = await this.provider.getTransactionFee('Transfer', transfer.to, transfer.token);
             transfer.fee = fullFee.totalFee;
         }
         const signedTransferTransaction = await this.signSyncTransfer(transfer as any);
-        return submitSignedTransaction(transfer.chainId, signedTransferTransaction, this.provider);
+        return submitSignedTransaction(signedTransferTransaction, this.provider);
     }
 
     async getSwap(transfer: {
-        chainId: string,
         fromChain: number,
         toChain: number,
         tokenIdIn: number;
@@ -453,7 +444,7 @@ export class Wallet {
             throw new Error('ZKSync signer is required for sending zksync transactions.');
         }
 
-        await this.setRequiredAccountIdFromServer(transfer.chainId, 'Transfer funds');
+        await this.setRequiredAccountIdFromServer('Transfer funds');
 
         const tokenIdIn = transfer.tokenIdIn;
         const tokenIdOut = transfer.tokenIdOut
@@ -480,7 +471,6 @@ export class Wallet {
     }
 
     async signSyncSwap(transfer: {
-        chainId: string,
         fromChain: number,
         toChain: number,
         tokenIdIn: number;
@@ -500,7 +490,7 @@ export class Wallet {
     }): Promise<SignedTransaction> {
         transfer.validFrom = transfer.validFrom || 0;
         transfer.validUntil = transfer.validUntil || MAX_TIMESTAMP;
-        transfer.accountId = await this.getAccountId(transfer.chainId)
+        transfer.accountId = await this.getAccountId()
         const signedTransferTransaction = await this.getSwap(transfer as any);
 
         const stringAmountIn = BigNumber.from(transfer.amountIn).isZero()
@@ -543,7 +533,6 @@ export class Wallet {
 
 
     async syncSwap(transfer: {
-        chainId: string,
         fromChain: number,
         toChain: number,
         tokenIn: TokenLike;
@@ -560,19 +549,18 @@ export class Wallet {
         validFrom?: number;
         validUntil?: number;
     }): Promise<Transaction> {
-        transfer.nonce = transfer.nonce != null ? await this.getNonce(transfer.chainId, transfer.nonce) : await this.getNonce(transfer.chainId);
+        transfer.nonce = transfer.nonce != null ? await this.getNonce(transfer.nonce) : await this.getNonce();
 
         // if (transfer.fee == null) {
         //     const fullFee = await this.provider.getTransactionFee('Transfer', transfer.to, transfer.token);
         //     transfer.fee = fullFee.totalFee;
         // }
         const signedTransferTransaction = await this.signSyncSwap(transfer as any);
-        return submitSignedTransaction(transfer.chainId, signedTransferTransaction, this.provider);
+        return submitSignedTransaction(signedTransferTransaction, this.provider);
     }
 
 
     async getRemoveLiquidity(transfer: {
-        chainId: string,
         fromChainId: number;
         toChainId: number;
         token1: TokenLike,
@@ -596,7 +584,7 @@ export class Wallet {
             throw new Error('ZKSync signer is required for sending zksync transactions.');
         }
 
-        await this.setRequiredAccountIdFromServer(transfer.chainId, 'Transfer funds');
+        await this.setRequiredAccountIdFromServer('Transfer funds');
 
         const tokenId1 = transfer.tokenId1;
         const tokenId2 = transfer.tokenId2;
@@ -624,7 +612,6 @@ export class Wallet {
         return this.signer.signSyncRemoveLiquidity(transactionData);
     }
     async signSyncRemoveLiquidity(transfer: {
-        chainId: string,
         fromChainId: number;
         toChainId: number;
         token1: TokenLike,
@@ -646,7 +633,7 @@ export class Wallet {
     }): Promise<SignedTransaction> {
         transfer.validFrom = transfer.validFrom || 0;
         transfer.validUntil = transfer.validUntil || MAX_TIMESTAMP;
-        transfer.accountId = await this.getAccountId(transfer.chainId)
+        transfer.accountId = await this.getAccountId()
         const signedTransferTransaction = await this.getRemoveLiquidity(transfer as any);
 
         const stringAmount0 = BigNumber.from(transfer.minAmount1).isZero()
@@ -686,7 +673,6 @@ export class Wallet {
         };
     }
     async syncRemoveLiquidity(transfer: {
-        chainId: string,
         fromChainId: number;
         toChainId: number;
         token1: TokenLike,
@@ -706,7 +692,7 @@ export class Wallet {
         validFrom?: number;
         validUntil?: number;
     }): Promise<Transaction> {
-        transfer.nonce = transfer.nonce != null ? await this.getNonce(transfer.chainId, transfer.nonce) : await this.getNonce(transfer.chainId);
+        transfer.nonce = transfer.nonce != null ? await this.getNonce(transfer.nonce) : await this.getNonce();
 
         if (transfer.fee1 == null) {
             // const fullFee = await this.provider.getTransactionFee('Transfer', transfer.pairAddress, transfer.token);
@@ -717,10 +703,9 @@ export class Wallet {
             // transfer.fee1 = fullFee.totalFee;
         }
         const signedTransferTransaction = await this.signSyncRemoveLiquidity(transfer as any);
-        return submitSignedTransaction(transfer.chainId, signedTransferTransaction, this.provider);
+        return submitSignedTransaction(signedTransferTransaction, this.provider);
     }
     async getAddLiquidity(transfer: {
-        chainId: string;
         fromChainId: number;
         toChainId: number;
         token0: TokenLike;
@@ -741,7 +726,7 @@ export class Wallet {
             throw new Error('ZKSync signer is required for sending zksync transactions.');
         }
 
-        await this.setRequiredAccountIdFromServer(transfer.chainId, 'Transfer funds');
+        await this.setRequiredAccountIdFromServer('Transfer funds');
 
         const tokenId0 = transfer.tokenId0
         const tokenId1 = transfer.tokenId1
@@ -766,7 +751,6 @@ export class Wallet {
         return this.signer.signSyncAddLiquidity(transactionData);
     }
     async signSyncAddLiquidity(transfer: {
-        chainId: string;
         chainId0: number;
         chainId1: number;
         account: Address;
@@ -786,7 +770,7 @@ export class Wallet {
     }): Promise<SignedTransaction> {
         transfer.validFrom = transfer.validFrom || 0;
         transfer.validUntil = transfer.validUntil || MAX_TIMESTAMP;
-        transfer.accountId = await this.getAccountId(transfer.chainId)
+        transfer.accountId = await this.getAccountId()
         const signedTransferTransaction = await this.getAddLiquidity(transfer as any);
 
         const stringAmount0 = BigNumber.from(transfer.amount0).isZero()
@@ -826,7 +810,6 @@ export class Wallet {
         };
     }
     async syncAddLiquidity(transfer: {
-        chainId: string;
         fromChainId: number;
         toChainId: number;
         token0: TokenLike;
@@ -842,14 +825,13 @@ export class Wallet {
         validFrom?: number;
         validUntil?: number;
     }): Promise<Transaction> {
-        transfer.nonce = transfer.nonce != null ? await this.getNonce(transfer.chainId, transfer.nonce) : await this.getNonce(transfer.chainId);
+        transfer.nonce = transfer.nonce != null ? await this.getNonce(transfer.nonce) : await this.getNonce();
         const signedTransferTransaction = await this.signSyncAddLiquidity(transfer as any);
-        return submitSignedTransaction(transfer.chainId, signedTransferTransaction, this.provider);
+        return submitSignedTransaction(signedTransferTransaction, this.provider);
     }
 
 
     async getCurveAddLiquidity(payload: CurveAddLiquidity & {
-        chainId: number;
         nonce?: number;
         validFrom?: number;
         validUntil?: number;
@@ -858,14 +840,13 @@ export class Wallet {
             throw new Error('ZKSync signer is required for sending zksync transactions.');
         }
 
-        await this.setRequiredAccountIdFromServer(payload.chainId, 'Transfer funds');
+        await this.setRequiredAccountIdFromServer('Transfer funds');
 
         payload.account = this.address()
         return this.signer.signSyncCurveAddLiquidity(payload as any);
     }
 
     async signSyncCurveAddLiquidity(payload: CurveAddLiquidity & {
-        chainId: number;
         nonce?: number;
         validFrom?: number;
         validUntil?: number;
@@ -899,19 +880,17 @@ export class Wallet {
         };
     }
     async syncCurveAddLiquidity(payload: CurveAddLiquidity & {
-        chainId: number;
         nonce?: Nonce;
         validFrom?: number;
         validUntil?: number;
     }): Promise<Transaction> {
-        payload.nonce = payload.nonce != null ? await this.getNonce(String(payload.chainId), payload.nonce) : await this.getNonce(String(payload.chainId));
+        payload.nonce = payload.nonce != null ? await this.getNonce(payload.nonce) : await this.getNonce();
         const signedTransferTransaction = await this.signSyncCurveAddLiquidity(payload as any);
-        return submitSignedTransaction(String(payload.chainId), signedTransferTransaction, this.provider);
+        return submitSignedTransaction(signedTransferTransaction, this.provider);
     }
 
 
     async getCurveRemoveLiquidity(payload: CurveRemoveLiquidity & {
-        chainId: number;
         nonce?: number;
         validFrom?: number;
         validUntil?: number;
@@ -920,14 +899,13 @@ export class Wallet {
             throw new Error('ZKSync signer is required for sending zksync transactions.');
         }
 
-        await this.setRequiredAccountIdFromServer(payload.chainId, 'Transfer funds');
+        await this.setRequiredAccountIdFromServer('Transfer funds');
 
         payload.account = this.address()
         return this.signer.signSyncCurveRemoveLiquidity(payload as any);
     }
 
     async signSyncCurveRemoveLiquidity(payload: CurveRemoveLiquidity & {
-        chainId: number;
         nonce?: number;
         validFrom?: number;
         validUntil?: number;
@@ -959,19 +937,17 @@ export class Wallet {
     }
 
     async syncCurveRemoveLiquidity(payload: CurveRemoveLiquidity & {
-        chainId: number;
         nonce?: Nonce;
         validFrom?: number;
         validUntil?: number;
     }): Promise<Transaction> {
-        payload.nonce = payload.nonce != null ? await this.getNonce(String(payload.chainId), payload.nonce) : await this.getNonce(String(payload.chainId));
+        payload.nonce = payload.nonce != null ? await this.getNonce(payload.nonce) : await this.getNonce();
         const signedTransferTransaction = await this.signSyncCurveRemoveLiquidity(payload as any);
-        return submitSignedTransaction(String(payload.chainId), signedTransferTransaction, this.provider);
+        return submitSignedTransaction(signedTransferTransaction, this.provider);
     }
 
 
     async getCurveSwap(payload: CurveSwap & {
-        chainId: number;
         nonce?: number;
         validFrom?: number;
         validUntil?: number;
@@ -980,14 +956,13 @@ export class Wallet {
             throw new Error('ZKSync signer is required for sending zksync transactions.');
         }
 
-        await this.setRequiredAccountIdFromServer(payload.chainId, 'Transfer funds');
-        payload.accountId = await this.getAccountId(String(payload.chainId))
+        await this.setRequiredAccountIdFromServer('Transfer funds');
+        payload.accountId = await this.getAccountId()
         payload.account = this.address()
         return this.signer.signSyncCurveSwap(payload as any);
     }
 
     async signSyncCurveSwap(payload: CurveSwap & {
-        chainId: number;
         nonce?: number;
         validFrom?: number;
         validUntil?: number;
@@ -1023,14 +998,13 @@ export class Wallet {
     }
 
     async syncCurveSwap(payload: CurveSwap & {
-        chainId: number;
         nonce?: Nonce;
         validFrom?: number;
         validUntil?: number;
     }): Promise<Transaction> {
-        payload.nonce = payload.nonce != null ? await this.getNonce(String(payload.chainId), payload.nonce) : await this.getNonce(String(payload.chainId));
+        payload.nonce = payload.nonce != null ? await this.getNonce(payload.nonce) : await this.getNonce();
         const signedTransferTransaction = await this.signSyncCurveSwap(payload as any);
-        return submitSignedTransaction(String(payload.chainId), signedTransferTransaction, this.provider);
+        return submitSignedTransaction(signedTransferTransaction, this.provider);
     }
 
     async getOrder(payload: Order & {
@@ -1061,7 +1035,6 @@ export class Wallet {
     }
 
     async getWithdrawFromSyncToEthereum(withdraw: {
-        chainId: string;
         ethAddress: string;
         token: TokenLike;
         tokenId: number;
@@ -1078,7 +1051,7 @@ export class Wallet {
         if (!this.signer) {
             throw new Error('ZKSync signer is required for sending zksync transactions.');
         }
-        await this.setRequiredAccountIdFromServer(withdraw.chainId, 'Withdraw funds');
+        await this.setRequiredAccountIdFromServer('Withdraw funds');
 
         const tokenId = withdraw.tokenId;
         const transactionData = {
@@ -1100,7 +1073,6 @@ export class Wallet {
     }
 
     async signWithdrawFromSyncToEthereum(withdraw: {
-        chainId: string;
         ethAddress: string;
         token: TokenLike;
         tokenId: number;
@@ -1117,7 +1089,7 @@ export class Wallet {
         withdraw.validFrom = withdraw.validFrom || 0;
         withdraw.withdrawFeeRatio = withdraw.withdrawFeeRatio || 0;
         withdraw.validUntil = withdraw.validUntil || MAX_TIMESTAMP;
-        withdraw.accountId = await this.getAccountId(withdraw.chainId)
+        withdraw.accountId = await this.getAccountId()
         withdraw.ts = withdraw.ts || getTimestamp()
         const signedWithdrawTransaction = await this.getWithdrawFromSyncToEthereum(withdraw as any);
 
@@ -1155,35 +1127,33 @@ export class Wallet {
         withdrawFeeRatio: number;
         fastWithdraw: number;
         fee?: BigNumberish;
-        chainId?: string,
         nonce?: Nonce;
         fastProcessing?: boolean;
         validFrom?: number;
         validUntil?: number;
     }): Promise<Transaction> {
-        withdraw.nonce = withdraw.nonce != null ? await this.getNonce(withdraw.chainId, withdraw.nonce) : await this.getNonce(withdraw.chainId);
+        withdraw.nonce = withdraw.nonce != null ? await this.getNonce(withdraw.nonce) : await this.getNonce();
 
         if (withdraw.fee == null) {
-            const fullFee = await this.provider.getTransactionFee(withdraw.chainId, 'Withdraw', withdraw.ethAddress, withdraw.token);
+            const fullFee = await this.provider.getTransactionFee('Withdraw', withdraw.ethAddress, withdraw.token);
             withdraw.fee = fullFee.totalFee;
         }
 
         const signedWithdrawTransaction = await this.signWithdrawFromSyncToEthereum(withdraw as any);
 
-        return submitSignedTransaction(withdraw.chainId, signedWithdrawTransaction, this.provider, withdraw.fastProcessing);
+        return submitSignedTransaction(signedWithdrawTransaction, this.provider, withdraw.fastProcessing);
     }
 
-    async isSigningKeySet(chainId: string): Promise<boolean> {
+    async isSigningKeySet(): Promise<boolean> {
         if (!this.signer) {
             throw new Error('ZKSync signer is required for current pubkey calculation.');
         }
-        const currentPubKeyHash = await this.getCurrentPubKeyHash(chainId);
+        const currentPubKeyHash = await this.getCurrentPubKeyHash();
         const signerPubKeyHash = await this.signer.pubKeyHash();
         return currentPubKeyHash === signerPubKeyHash;
     }
 
     async getChangePubKey(changePubKey: {
-        chainId: string;
         feeToken: TokenLike;
         fee: BigNumberish;
         nonce: number;
@@ -1203,7 +1173,7 @@ export class Wallet {
         let feeTokenId = 0;
         const newPkHash = await this.signer.pubKeyHash();
 
-        await this.setRequiredAccountIdFromServer(changePubKey.chainId, 'Set Signing Key');
+        await this.setRequiredAccountIdFromServer('Set Signing Key');
 
         const changePubKeyTx: ChangePubKey = await this.signer.signSyncChangePubKey({
             accountId: changePubKey.accountId || this.accountId,
@@ -1225,7 +1195,6 @@ export class Wallet {
     }
 
     async signSetSigningKey(changePubKey: {
-        chainId: string;
         feeToken: TokenLike;
         fee: BigNumberish;
         fromChainId: number;
@@ -1240,7 +1209,7 @@ export class Wallet {
     }): Promise<SignedTransaction> {
         changePubKey.ts = changePubKey.ts || getTimestamp()
         const newPubKeyHash = await this.signer.pubKeyHash();
-        changePubKey.accountId = await this.getAccountId(changePubKey.chainId)
+        changePubKey.accountId = await this.getAccountId()
 
         let ethAuthData;
         let ethSignature;
@@ -1249,7 +1218,7 @@ export class Wallet {
                 type: 'Onchain'
             };
         } else if (changePubKey.ethAuthType === 'ECDSA') {
-            await this.setRequiredAccountIdFromServer(changePubKey.chainId, 'ChangePubKey authorized by ECDSA.');
+            await this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSA.');
             const changePubKeyMessage = getChangePubkeyMessage(
                 newPubKeyHash,
                 changePubKey.nonce,
@@ -1275,7 +1244,7 @@ export class Wallet {
                 throw new Error('CREATE2 wallet authentication is only available for CREATE2 wallets');
             }
         } else if (changePubKey.ethAuthType === 'ECDSALegacyMessage') {
-            await this.setRequiredAccountIdFromServer(changePubKey.chainId, 'ChangePubKey authorized by ECDSALegacyMessage.');
+            await this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSALegacyMessage.');
             const changePubKeyMessage = getChangePubkeyLegacyMessage(newPubKeyHash, changePubKey.nonce, changePubKey.accountId || this.accountId);
             ethSignature = (await this.getEthMessageSignature(changePubKeyMessage)).signature;
         } else {
@@ -1293,7 +1262,6 @@ export class Wallet {
     }
 
     async setSigningKey(changePubKey: {
-        chainId: string;
         feeToken: TokenLike;
         ethAuthType: ChangePubkeyTypes;
         fee?: BigNumberish;
@@ -1302,7 +1270,7 @@ export class Wallet {
         validUntil?: number;
     }): Promise<Transaction> {
         changePubKey.nonce =
-            changePubKey.nonce != null ? await this.getNonce(changePubKey.chainId, changePubKey.nonce) : await this.getNonce(changePubKey.chainId);
+            changePubKey.nonce != null ? await this.getNonce(changePubKey.nonce) : await this.getNonce();
 
         if (changePubKey.fee == null) {
             changePubKey.fee = 0;
@@ -1313,25 +1281,25 @@ export class Wallet {
                         onchainPubkeyAuth: true
                     }
                 };
-                const fullFee = await this.provider.getTransactionFee(changePubKey.chainId, feeType, this.address(), changePubKey.feeToken);
+                const fullFee = await this.provider.getTransactionFee(feeType, this.address(), changePubKey.feeToken);
                 changePubKey.fee = fullFee.totalFee;
             } else {
                 const feeType = {
                     ChangePubKey: changePubKey.ethAuthType
                 };
-                const fullFee = await this.provider.getTransactionFee(changePubKey.chainId, feeType, this.address(), changePubKey.feeToken);
+                const fullFee = await this.provider.getTransactionFee(feeType, this.address(), changePubKey.feeToken);
                 changePubKey.fee = fullFee.totalFee;
             }
         }
 
         const txData = await this.signSetSigningKey(changePubKey as any);
 
-        const currentPubKeyHash = await this.getCurrentPubKeyHash(changePubKey.chainId);
+        const currentPubKeyHash = await this.getCurrentPubKeyHash();
         if (currentPubKeyHash === (txData.tx as ChangePubKey).newPkHash) {
             throw new Error('Current signing key is already set');
         }
 
-        return submitSignedTransaction(changePubKey.chainId, txData, this.provider);
+        return submitSignedTransaction(txData, this.provider);
     }
 
     // The following methods are needed in case user decided to build
@@ -1414,10 +1382,10 @@ export class Wallet {
         });
     }
 
-    async isOnchainAuthSigningKeySet(chainId, nonce: Nonce = 'committed'): Promise<boolean> {
+    async isOnchainAuthSigningKeySet(nonce: Nonce = 'committed'): Promise<boolean> {
         const mainZkSyncContract = this.getZkSyncMainContract();
 
-        const numNonce = await this.getNonce(chainId, nonce);
+        const numNonce = await this.getNonce(nonce);
         try {
             const onchainAuthFact = await mainZkSyncContract.authFacts(this.address(), numNonce);
             return onchainAuthFact !== '0x0000000000000000000000000000000000000000000000000000000000000000';
@@ -1427,7 +1395,6 @@ export class Wallet {
     }
 
     async onchainAuthSigningKey(
-        chainId,
         nonce: Nonce = 'committed',
         ethTxOptions?: ethers.providers.TransactionRequest
     ): Promise<ContractTransaction> {
@@ -1435,14 +1402,14 @@ export class Wallet {
             throw new Error('ZKSync signer is required for current pubkey calculation.');
         }
 
-        const currentPubKeyHash = await this.getCurrentPubKeyHash(chainId);
+        const currentPubKeyHash = await this.getCurrentPubKeyHash();
         const newPubKeyHash = await this.signer.pubKeyHash();
 
         if (currentPubKeyHash === newPubKeyHash) {
             throw new Error('Current PubKeyHash is the same as new');
         }
 
-        const numNonce = await this.getNonce(chainId, nonce);
+        const numNonce = await this.getNonce(nonce);
 
         const mainZkSyncContract = this.getZkSyncMainContract();
 
@@ -1456,32 +1423,32 @@ export class Wallet {
         }
     }
 
-    async getCurrentPubKeyHash(chainId: string): Promise<PubKeyHash> {
-        return (await this.provider.getState(this.address(), chainId)).committed.pubKeyHash;
+    async getCurrentPubKeyHash(): Promise<PubKeyHash> {
+        return (await this.provider.getState(this.address())).committed.pubKeyHash;
     }
 
-    async getNonce(chainId: string, nonce: Nonce = 'committed'): Promise<number> {
+    async getNonce(nonce: Nonce = 'committed'): Promise<number> {
         if (nonce === 'committed') {
-            return (await this.provider.getState(this.address(), chainId)).committed.nonce;
+            return (await this.provider.getState(this.address())).committed.nonce;
         } else if (typeof nonce === 'number') {
             return nonce;
         }
     }
 
-    async getAccountId(chainId: string): Promise<number | undefined> {
-        return (await this.provider.getState(this.address(), chainId)).id;
+    async getAccountId(): Promise<number | undefined> {
+        return (await this.provider.getState(this.address())).id;
     }
 
     address(): Address {
         return this.cachedAddress;
     }
 
-    async getAccountState(chainId: string): Promise<AccountState> {
-        return this.provider.getState(this.address(), chainId);
+    async getAccountState(): Promise<AccountState> {
+        return this.provider.getState(this.address());
     }
 
-    async getBalance(token: TokenLike, chainId: string, type: 'committed' | 'verified' = 'committed'): Promise<BigNumber> {
-        const accountState = await this.getAccountState(chainId);
+    async getBalance(token: TokenLike, type: 'committed' | 'verified' = 'committed'): Promise<BigNumber> {
+        const accountState = await this.getAccountState();
         const tokenSymbol = this.provider.tokenSet.resolveTokenSymbol(token);
         let balance: BigNumberish;
         if (type === 'committed') {
@@ -1616,7 +1583,6 @@ export class Wallet {
     }
 
     async emergencyWithdraw(withdraw: {
-        chainId: string;
         token: TokenLike;
         accountId?: number;
         ethTxOptions?: ethers.providers.TransactionRequest;
@@ -1629,7 +1595,7 @@ export class Wallet {
         } else if (this.accountId !== undefined) {
             accountId = this.accountId;
         } else {
-            const accountState = await this.getAccountState(withdraw.chainId);
+            const accountState = await this.getAccountState();
             if (!accountState.id) {
                 throw new Error("Can't resolve account id from the zkLink node");
             }
@@ -1677,9 +1643,9 @@ export class Wallet {
         throw error;
     }
 
-    private async setRequiredAccountIdFromServer(chainId, actionName: string) {
+    private async setRequiredAccountIdFromServer(actionName: string) {
         if (this.accountId === undefined) {
-            const accountIdFromServer = await this.getAccountId(chainId);
+            const accountIdFromServer = await this.getAccountId();
             if (accountIdFromServer == null) {
                 // throw new Error(`Failed to ${actionName}: Account does not exist in the zkLink network`);
             } else {
@@ -1759,7 +1725,7 @@ export class Transaction {
     state: 'Sent' | 'Committed' | 'Verified' | 'Failed';
     error?: ZKSyncTxError;
 
-    constructor(public chainId: string, public txData, public txHash: string, public sidechainProvider: Provider) {
+    constructor(public txData, public txHash: string, public sidechainProvider: Provider) {
         this.state = 'Sent';
     }
 
@@ -1768,7 +1734,7 @@ export class Transaction {
 
         if (this.state !== 'Sent') return;
 
-        const receipt = await this.sidechainProvider.notifyTransaction(this.chainId, this.txHash, 'COMMIT');
+        const receipt = await this.sidechainProvider.notifyTransaction(this.txHash, 'COMMIT');
 
         if (!receipt.success) {
             this.setErrorState(new ZKSyncTxError(`zkLink transaction failed: ${receipt.failReason}`, receipt));
@@ -1781,7 +1747,7 @@ export class Transaction {
 
     async awaitVerifyReceipt(): Promise<TransactionReceipt> {
         await this.awaitReceipt();
-        const receipt = await this.sidechainProvider.notifyTransaction(this.chainId, this.txHash, 'VERIFY');
+        const receipt = await this.sidechainProvider.notifyTransaction(this.txHash, 'VERIFY');
 
         this.state = 'Verified';
         return receipt;
@@ -1798,22 +1764,19 @@ export class Transaction {
 }
 
 export async function submitSignedTransaction(
-    chainId: string,
     signedTx: SignedTransaction,
     provider: Provider,
     fastProcessing?: boolean
 ): Promise<Transaction> {
     const transactionHash = await provider.submitTx({
-        chainId,
         tx: signedTx.tx,
         signature: signedTx.ethereumSignature,
         fastProcessing
     });
-    return new Transaction(chainId, signedTx, transactionHash, provider);
+    return new Transaction(signedTx, transactionHash, provider);
 }
 
 export async function submitSignedTransactionsBatch(
-    chainId: string,
     provider: Provider,
     signedTxs: SignedTransaction[],
     ethSignatures?: TxEthSignature[]
@@ -1824,5 +1787,5 @@ export async function submitSignedTransactionsBatch(
         }),
         ethSignatures
     );
-    return transactionHashes.map((txHash, idx) => new Transaction(chainId, signedTxs[idx], txHash, provider));
+    return transactionHashes.map((txHash, idx) => new Transaction(signedTxs[idx], txHash, provider));
 }

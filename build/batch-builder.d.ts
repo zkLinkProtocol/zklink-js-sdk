@@ -16,7 +16,7 @@ export declare class BatchBuilder {
      * @param feeToken If provided, the fee for the whole batch will be obtained from the server in this token.
      * Possibly creates phantom transfer.
      */
-    build(chainId: string, feeToken?: TokenLike): Promise<{
+    build(feeToken?: TokenLike): Promise<{
         txs: SignedTransaction[];
         signature: TxEthSignature;
         totalFee: TotalFee;

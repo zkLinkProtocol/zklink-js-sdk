@@ -91,7 +91,7 @@ class Wallet {
             if (!this.signer) {
                 throw new Error('ZKSync signer is required for sending zksync transactions.');
             }
-            yield this.setRequiredAccountIdFromServer(transfer.chainId, 'Transfer funds');
+            yield this.setRequiredAccountIdFromServer('Transfer funds');
             const tokenId = transfer.tokenId;
             const transactionData = {
                 accountId: transfer.accountId || this.accountId,
@@ -114,7 +114,7 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             transfer.validFrom = transfer.validFrom || 0;
             transfer.validUntil = transfer.validUntil || utils_1.MAX_TIMESTAMP;
-            transfer.accountId = yield this.getAccountId(transfer.chainId);
+            transfer.accountId = yield this.getAccountId();
             transfer.ts = transfer.ts || (0, utils_1.getTimestamp)();
             const signedTransferTransaction = yield this.getTransfer(transfer);
             const stringAmount = ethers_1.BigNumber.from(transfer.amount).isZero()
@@ -145,7 +145,7 @@ class Wallet {
             if (!this.signer) {
                 throw new Error('ZKSync signer is required for sending zksync transactions.');
             }
-            yield this.setRequiredAccountIdFromServer(forcedExit.chainId, 'perform a Forced Exit');
+            yield this.setRequiredAccountIdFromServer('perform a Forced Exit');
             const tokenId = this.provider.tokenSet.resolveTokenId(forcedExit.token);
             const transactionData = {
                 initiatorAccountId: this.accountId,
@@ -182,14 +182,14 @@ class Wallet {
     }
     syncForcedExit(forcedExit) {
         return __awaiter(this, void 0, void 0, function* () {
-            forcedExit.nonce = forcedExit.nonce != null ? yield this.getNonce(forcedExit.chainId, forcedExit.nonce) : yield this.getNonce(forcedExit.chainId);
+            forcedExit.nonce = forcedExit.nonce != null ? yield this.getNonce(forcedExit.nonce) : yield this.getNonce();
             if (forcedExit.fee == null) {
                 // Fee for forced exit is defined by `Withdraw` transaction type (as it's essentially just a forced withdraw).
-                const fullFee = yield this.provider.getTransactionFee(forcedExit.chainId, 'Withdraw', forcedExit.target, forcedExit.token);
+                const fullFee = yield this.provider.getTransactionFee('Withdraw', forcedExit.target, forcedExit.token);
                 forcedExit.fee = fullFee.totalFee;
             }
             const signedForcedExitTransaction = yield this.signSyncForcedExit(forcedExit);
-            return submitSignedTransaction(forcedExit.chainId, signedForcedExitTransaction, this.provider);
+            return submitSignedTransaction(signedForcedExitTransaction, this.provider);
         });
     }
     // Note that in syncMultiTransfer, unlike in syncTransfer,
@@ -212,17 +212,16 @@ class Wallet {
             }
             if (transfers.length == 0)
                 return [];
-            yield this.setRequiredAccountIdFromServer(transfers[0].chainId, 'Transfer funds');
+            yield this.setRequiredAccountIdFromServer('Transfer funds');
             let batch = [];
             let messages = [];
-            let nextNonce = transfers[0].nonce != null ? yield this.getNonce(transfers[0].chainId, transfers[0].nonce) : yield this.getNonce(transfers[0].chainId);
+            let nextNonce = transfers[0].nonce != null ? yield this.getNonce(transfers[0].nonce) : yield this.getNonce();
             const batchNonce = nextNonce;
             for (let i = 0; i < transfers.length; i++) {
                 const transfer = transfers[i];
                 const nonce = nextNonce;
                 nextNonce += 1;
                 const tx = yield this.getTransfer({
-                    chainId: transfer.chainId,
                     fromChainId: transfer.fromChainId,
                     toChainId: transfer.toChainId,
                     to: transfer.to,
@@ -245,18 +244,18 @@ class Wallet {
                 ? []
                 : [yield this.ethMessageSigner.getEthMessageSignature(message)];
             const transactionHashes = yield this.provider.submitTxsBatch(batch, ethSignatures);
-            return transactionHashes.map((txHash, idx) => new Transaction(transfers[idx].chainId, batch[idx], txHash, this.provider));
+            return transactionHashes.map((txHash, idx) => new Transaction(batch[idx], txHash, this.provider));
         });
     }
     syncTransfer(transfer) {
         return __awaiter(this, void 0, void 0, function* () {
-            transfer.nonce = transfer.nonce != null ? yield this.getNonce(transfer.chainId, transfer.nonce) : yield this.getNonce(transfer.chainId);
+            transfer.nonce = transfer.nonce != null ? yield this.getNonce(transfer.nonce) : yield this.getNonce();
             if (transfer.fee == null) {
-                const fullFee = yield this.provider.getTransactionFee(transfer.chainId, 'Transfer', transfer.to, transfer.token);
+                const fullFee = yield this.provider.getTransactionFee('Transfer', transfer.to, transfer.token);
                 transfer.fee = fullFee.totalFee;
             }
             const signedTransferTransaction = yield this.signSyncTransfer(transfer);
-            return submitSignedTransaction(transfer.chainId, signedTransferTransaction, this.provider);
+            return submitSignedTransaction(signedTransferTransaction, this.provider);
         });
     }
     getSwap(transfer) {
@@ -264,7 +263,7 @@ class Wallet {
             if (!this.signer) {
                 throw new Error('ZKSync signer is required for sending zksync transactions.');
             }
-            yield this.setRequiredAccountIdFromServer(transfer.chainId, 'Transfer funds');
+            yield this.setRequiredAccountIdFromServer('Transfer funds');
             const tokenIdIn = transfer.tokenIdIn;
             const tokenIdOut = transfer.tokenIdOut;
             const transactionData = {
@@ -291,7 +290,7 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             transfer.validFrom = transfer.validFrom || 0;
             transfer.validUntil = transfer.validUntil || utils_1.MAX_TIMESTAMP;
-            transfer.accountId = yield this.getAccountId(transfer.chainId);
+            transfer.accountId = yield this.getAccountId();
             const signedTransferTransaction = yield this.getSwap(transfer);
             const stringAmountIn = ethers_1.BigNumber.from(transfer.amountIn).isZero()
                 ? null
@@ -332,13 +331,13 @@ class Wallet {
     }
     syncSwap(transfer) {
         return __awaiter(this, void 0, void 0, function* () {
-            transfer.nonce = transfer.nonce != null ? yield this.getNonce(transfer.chainId, transfer.nonce) : yield this.getNonce(transfer.chainId);
+            transfer.nonce = transfer.nonce != null ? yield this.getNonce(transfer.nonce) : yield this.getNonce();
             // if (transfer.fee == null) {
             //     const fullFee = await this.provider.getTransactionFee('Transfer', transfer.to, transfer.token);
             //     transfer.fee = fullFee.totalFee;
             // }
             const signedTransferTransaction = yield this.signSyncSwap(transfer);
-            return submitSignedTransaction(transfer.chainId, signedTransferTransaction, this.provider);
+            return submitSignedTransaction(signedTransferTransaction, this.provider);
         });
     }
     getRemoveLiquidity(transfer) {
@@ -346,7 +345,7 @@ class Wallet {
             if (!this.signer) {
                 throw new Error('ZKSync signer is required for sending zksync transactions.');
             }
-            yield this.setRequiredAccountIdFromServer(transfer.chainId, 'Transfer funds');
+            yield this.setRequiredAccountIdFromServer('Transfer funds');
             const tokenId1 = transfer.tokenId1;
             const tokenId2 = transfer.tokenId2;
             const lpTokenId = transfer.lpTokenId;
@@ -375,7 +374,7 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             transfer.validFrom = transfer.validFrom || 0;
             transfer.validUntil = transfer.validUntil || utils_1.MAX_TIMESTAMP;
-            transfer.accountId = yield this.getAccountId(transfer.chainId);
+            transfer.accountId = yield this.getAccountId();
             const signedTransferTransaction = yield this.getRemoveLiquidity(transfer);
             const stringAmount0 = ethers_1.BigNumber.from(transfer.minAmount1).isZero()
                 ? null
@@ -414,7 +413,7 @@ class Wallet {
     }
     syncRemoveLiquidity(transfer) {
         return __awaiter(this, void 0, void 0, function* () {
-            transfer.nonce = transfer.nonce != null ? yield this.getNonce(transfer.chainId, transfer.nonce) : yield this.getNonce(transfer.chainId);
+            transfer.nonce = transfer.nonce != null ? yield this.getNonce(transfer.nonce) : yield this.getNonce();
             if (transfer.fee1 == null) {
                 // const fullFee = await this.provider.getTransactionFee('Transfer', transfer.pairAddress, transfer.token);
                 // transfer.fee1 = fullFee.totalFee;
@@ -424,7 +423,7 @@ class Wallet {
                 // transfer.fee1 = fullFee.totalFee;
             }
             const signedTransferTransaction = yield this.signSyncRemoveLiquidity(transfer);
-            return submitSignedTransaction(transfer.chainId, signedTransferTransaction, this.provider);
+            return submitSignedTransaction(signedTransferTransaction, this.provider);
         });
     }
     getAddLiquidity(transfer) {
@@ -432,7 +431,7 @@ class Wallet {
             if (!this.signer) {
                 throw new Error('ZKSync signer is required for sending zksync transactions.');
             }
-            yield this.setRequiredAccountIdFromServer(transfer.chainId, 'Transfer funds');
+            yield this.setRequiredAccountIdFromServer('Transfer funds');
             const tokenId0 = transfer.tokenId0;
             const tokenId1 = transfer.tokenId1;
             const transactionData = {
@@ -458,7 +457,7 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             transfer.validFrom = transfer.validFrom || 0;
             transfer.validUntil = transfer.validUntil || utils_1.MAX_TIMESTAMP;
-            transfer.accountId = yield this.getAccountId(transfer.chainId);
+            transfer.accountId = yield this.getAccountId();
             const signedTransferTransaction = yield this.getAddLiquidity(transfer);
             const stringAmount0 = ethers_1.BigNumber.from(transfer.amount0).isZero()
                 ? null
@@ -496,9 +495,9 @@ class Wallet {
     }
     syncAddLiquidity(transfer) {
         return __awaiter(this, void 0, void 0, function* () {
-            transfer.nonce = transfer.nonce != null ? yield this.getNonce(transfer.chainId, transfer.nonce) : yield this.getNonce(transfer.chainId);
+            transfer.nonce = transfer.nonce != null ? yield this.getNonce(transfer.nonce) : yield this.getNonce();
             const signedTransferTransaction = yield this.signSyncAddLiquidity(transfer);
-            return submitSignedTransaction(transfer.chainId, signedTransferTransaction, this.provider);
+            return submitSignedTransaction(signedTransferTransaction, this.provider);
         });
     }
     getCurveAddLiquidity(payload) {
@@ -506,7 +505,7 @@ class Wallet {
             if (!this.signer) {
                 throw new Error('ZKSync signer is required for sending zksync transactions.');
             }
-            yield this.setRequiredAccountIdFromServer(payload.chainId, 'Transfer funds');
+            yield this.setRequiredAccountIdFromServer('Transfer funds');
             payload.account = this.address();
             return this.signer.signSyncCurveAddLiquidity(payload);
         });
@@ -541,9 +540,9 @@ class Wallet {
     }
     syncCurveAddLiquidity(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            payload.nonce = payload.nonce != null ? yield this.getNonce(String(payload.chainId), payload.nonce) : yield this.getNonce(String(payload.chainId));
+            payload.nonce = payload.nonce != null ? yield this.getNonce(payload.nonce) : yield this.getNonce();
             const signedTransferTransaction = yield this.signSyncCurveAddLiquidity(payload);
-            return submitSignedTransaction(String(payload.chainId), signedTransferTransaction, this.provider);
+            return submitSignedTransaction(signedTransferTransaction, this.provider);
         });
     }
     getCurveRemoveLiquidity(payload) {
@@ -551,7 +550,7 @@ class Wallet {
             if (!this.signer) {
                 throw new Error('ZKSync signer is required for sending zksync transactions.');
             }
-            yield this.setRequiredAccountIdFromServer(payload.chainId, 'Transfer funds');
+            yield this.setRequiredAccountIdFromServer('Transfer funds');
             payload.account = this.address();
             return this.signer.signSyncCurveRemoveLiquidity(payload);
         });
@@ -583,9 +582,9 @@ class Wallet {
     }
     syncCurveRemoveLiquidity(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            payload.nonce = payload.nonce != null ? yield this.getNonce(String(payload.chainId), payload.nonce) : yield this.getNonce(String(payload.chainId));
+            payload.nonce = payload.nonce != null ? yield this.getNonce(payload.nonce) : yield this.getNonce();
             const signedTransferTransaction = yield this.signSyncCurveRemoveLiquidity(payload);
-            return submitSignedTransaction(String(payload.chainId), signedTransferTransaction, this.provider);
+            return submitSignedTransaction(signedTransferTransaction, this.provider);
         });
     }
     getCurveSwap(payload) {
@@ -593,8 +592,8 @@ class Wallet {
             if (!this.signer) {
                 throw new Error('ZKSync signer is required for sending zksync transactions.');
             }
-            yield this.setRequiredAccountIdFromServer(payload.chainId, 'Transfer funds');
-            payload.accountId = yield this.getAccountId(String(payload.chainId));
+            yield this.setRequiredAccountIdFromServer('Transfer funds');
+            payload.accountId = yield this.getAccountId();
             payload.account = this.address();
             return this.signer.signSyncCurveSwap(payload);
         });
@@ -630,9 +629,9 @@ class Wallet {
     }
     syncCurveSwap(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            payload.nonce = payload.nonce != null ? yield this.getNonce(String(payload.chainId), payload.nonce) : yield this.getNonce(String(payload.chainId));
+            payload.nonce = payload.nonce != null ? yield this.getNonce(payload.nonce) : yield this.getNonce();
             const signedTransferTransaction = yield this.signSyncCurveSwap(payload);
-            return submitSignedTransaction(String(payload.chainId), signedTransferTransaction, this.provider);
+            return submitSignedTransaction(signedTransferTransaction, this.provider);
         });
     }
     getOrder(payload) {
@@ -662,7 +661,7 @@ class Wallet {
             if (!this.signer) {
                 throw new Error('ZKSync signer is required for sending zksync transactions.');
             }
-            yield this.setRequiredAccountIdFromServer(withdraw.chainId, 'Withdraw funds');
+            yield this.setRequiredAccountIdFromServer('Withdraw funds');
             const tokenId = withdraw.tokenId;
             const transactionData = {
                 accountId: withdraw.accountId || this.accountId,
@@ -686,7 +685,7 @@ class Wallet {
             withdraw.validFrom = withdraw.validFrom || 0;
             withdraw.withdrawFeeRatio = withdraw.withdrawFeeRatio || 0;
             withdraw.validUntil = withdraw.validUntil || utils_1.MAX_TIMESTAMP;
-            withdraw.accountId = yield this.getAccountId(withdraw.chainId);
+            withdraw.accountId = yield this.getAccountId();
             withdraw.ts = withdraw.ts || (0, utils_1.getTimestamp)();
             const signedWithdrawTransaction = yield this.getWithdrawFromSyncToEthereum(withdraw);
             const stringAmount = ethers_1.BigNumber.from(withdraw.amount).isZero()
@@ -714,21 +713,21 @@ class Wallet {
     }
     withdrawFromSyncToEthereum(withdraw) {
         return __awaiter(this, void 0, void 0, function* () {
-            withdraw.nonce = withdraw.nonce != null ? yield this.getNonce(withdraw.chainId, withdraw.nonce) : yield this.getNonce(withdraw.chainId);
+            withdraw.nonce = withdraw.nonce != null ? yield this.getNonce(withdraw.nonce) : yield this.getNonce();
             if (withdraw.fee == null) {
-                const fullFee = yield this.provider.getTransactionFee(withdraw.chainId, 'Withdraw', withdraw.ethAddress, withdraw.token);
+                const fullFee = yield this.provider.getTransactionFee('Withdraw', withdraw.ethAddress, withdraw.token);
                 withdraw.fee = fullFee.totalFee;
             }
             const signedWithdrawTransaction = yield this.signWithdrawFromSyncToEthereum(withdraw);
-            return submitSignedTransaction(withdraw.chainId, signedWithdrawTransaction, this.provider, withdraw.fastProcessing);
+            return submitSignedTransaction(signedWithdrawTransaction, this.provider, withdraw.fastProcessing);
         });
     }
-    isSigningKeySet(chainId) {
+    isSigningKeySet() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
                 throw new Error('ZKSync signer is required for current pubkey calculation.');
             }
-            const currentPubKeyHash = yield this.getCurrentPubKeyHash(chainId);
+            const currentPubKeyHash = yield this.getCurrentPubKeyHash();
             const signerPubKeyHash = yield this.signer.pubKeyHash();
             return currentPubKeyHash === signerPubKeyHash;
         });
@@ -740,7 +739,7 @@ class Wallet {
             }
             let feeTokenId = 0;
             const newPkHash = yield this.signer.pubKeyHash();
-            yield this.setRequiredAccountIdFromServer(changePubKey.chainId, 'Set Signing Key');
+            yield this.setRequiredAccountIdFromServer('Set Signing Key');
             const changePubKeyTx = yield this.signer.signSyncChangePubKey({
                 accountId: changePubKey.accountId || this.accountId,
                 account: this.address(),
@@ -763,7 +762,7 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             changePubKey.ts = changePubKey.ts || (0, utils_1.getTimestamp)();
             const newPubKeyHash = yield this.signer.pubKeyHash();
-            changePubKey.accountId = yield this.getAccountId(changePubKey.chainId);
+            changePubKey.accountId = yield this.getAccountId();
             let ethAuthData;
             let ethSignature;
             if (changePubKey.ethAuthType === 'Onchain') {
@@ -772,7 +771,7 @@ class Wallet {
                 };
             }
             else if (changePubKey.ethAuthType === 'ECDSA') {
-                yield this.setRequiredAccountIdFromServer(changePubKey.chainId, 'ChangePubKey authorized by ECDSA.');
+                yield this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSA.');
                 const changePubKeyMessage = (0, utils_1.getChangePubkeyMessage)(newPubKeyHash, changePubKey.nonce, (changePubKey.accountId || this.accountId), changePubKey.batchHash);
                 const ethSignature = (yield this.getEthMessageSignature(changePubKeyMessage)).signature;
                 ethAuthData = {
@@ -796,7 +795,7 @@ class Wallet {
                 }
             }
             else if (changePubKey.ethAuthType === 'ECDSALegacyMessage') {
-                yield this.setRequiredAccountIdFromServer(changePubKey.chainId, 'ChangePubKey authorized by ECDSALegacyMessage.');
+                yield this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSALegacyMessage.');
                 const changePubKeyMessage = (0, utils_1.getChangePubkeyLegacyMessage)(newPubKeyHash, changePubKey.nonce, changePubKey.accountId || this.accountId);
                 ethSignature = (yield this.getEthMessageSignature(changePubKeyMessage)).signature;
             }
@@ -815,7 +814,7 @@ class Wallet {
     setSigningKey(changePubKey) {
         return __awaiter(this, void 0, void 0, function* () {
             changePubKey.nonce =
-                changePubKey.nonce != null ? yield this.getNonce(changePubKey.chainId, changePubKey.nonce) : yield this.getNonce(changePubKey.chainId);
+                changePubKey.nonce != null ? yield this.getNonce(changePubKey.nonce) : yield this.getNonce();
             if (changePubKey.fee == null) {
                 changePubKey.fee = 0;
                 if (changePubKey.ethAuthType === 'ECDSALegacyMessage') {
@@ -824,23 +823,23 @@ class Wallet {
                             onchainPubkeyAuth: true
                         }
                     };
-                    const fullFee = yield this.provider.getTransactionFee(changePubKey.chainId, feeType, this.address(), changePubKey.feeToken);
+                    const fullFee = yield this.provider.getTransactionFee(feeType, this.address(), changePubKey.feeToken);
                     changePubKey.fee = fullFee.totalFee;
                 }
                 else {
                     const feeType = {
                         ChangePubKey: changePubKey.ethAuthType
                     };
-                    const fullFee = yield this.provider.getTransactionFee(changePubKey.chainId, feeType, this.address(), changePubKey.feeToken);
+                    const fullFee = yield this.provider.getTransactionFee(feeType, this.address(), changePubKey.feeToken);
                     changePubKey.fee = fullFee.totalFee;
                 }
             }
             const txData = yield this.signSetSigningKey(changePubKey);
-            const currentPubKeyHash = yield this.getCurrentPubKeyHash(changePubKey.chainId);
+            const currentPubKeyHash = yield this.getCurrentPubKeyHash();
             if (currentPubKeyHash === txData.tx.newPkHash) {
                 throw new Error('Current signing key is already set');
             }
-            return submitSignedTransaction(changePubKey.chainId, txData, this.provider);
+            return submitSignedTransaction(txData, this.provider);
         });
     }
     // The following methods are needed in case user decided to build
@@ -900,10 +899,10 @@ class Wallet {
             target: forcedExit.target
         });
     }
-    isOnchainAuthSigningKeySet(chainId, nonce = 'committed') {
+    isOnchainAuthSigningKeySet(nonce = 'committed') {
         return __awaiter(this, void 0, void 0, function* () {
             const mainZkSyncContract = this.getZkSyncMainContract();
-            const numNonce = yield this.getNonce(chainId, nonce);
+            const numNonce = yield this.getNonce(nonce);
             try {
                 const onchainAuthFact = yield mainZkSyncContract.authFacts(this.address(), numNonce);
                 return onchainAuthFact !== '0x0000000000000000000000000000000000000000000000000000000000000000';
@@ -913,17 +912,17 @@ class Wallet {
             }
         });
     }
-    onchainAuthSigningKey(chainId, nonce = 'committed', ethTxOptions) {
+    onchainAuthSigningKey(nonce = 'committed', ethTxOptions) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
                 throw new Error('ZKSync signer is required for current pubkey calculation.');
             }
-            const currentPubKeyHash = yield this.getCurrentPubKeyHash(chainId);
+            const currentPubKeyHash = yield this.getCurrentPubKeyHash();
             const newPubKeyHash = yield this.signer.pubKeyHash();
             if (currentPubKeyHash === newPubKeyHash) {
                 throw new Error('Current PubKeyHash is the same as new');
             }
-            const numNonce = yield this.getNonce(chainId, nonce);
+            const numNonce = yield this.getNonce(nonce);
             const mainZkSyncContract = this.getZkSyncMainContract();
             try {
                 return mainZkSyncContract.setAuthPubkeyHash(newPubKeyHash.replace('sync:', '0x'), numNonce, Object.assign({ gasLimit: ethers_1.BigNumber.from('200000') }, ethTxOptions));
@@ -933,37 +932,37 @@ class Wallet {
             }
         });
     }
-    getCurrentPubKeyHash(chainId) {
+    getCurrentPubKeyHash() {
         return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.provider.getState(this.address(), chainId)).committed.pubKeyHash;
+            return (yield this.provider.getState(this.address())).committed.pubKeyHash;
         });
     }
-    getNonce(chainId, nonce = 'committed') {
+    getNonce(nonce = 'committed') {
         return __awaiter(this, void 0, void 0, function* () {
             if (nonce === 'committed') {
-                return (yield this.provider.getState(this.address(), chainId)).committed.nonce;
+                return (yield this.provider.getState(this.address())).committed.nonce;
             }
             else if (typeof nonce === 'number') {
                 return nonce;
             }
         });
     }
-    getAccountId(chainId) {
+    getAccountId() {
         return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.provider.getState(this.address(), chainId)).id;
+            return (yield this.provider.getState(this.address())).id;
         });
     }
     address() {
         return this.cachedAddress;
     }
-    getAccountState(chainId) {
+    getAccountState() {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.provider.getState(this.address(), chainId);
+            return this.provider.getState(this.address());
         });
     }
-    getBalance(token, chainId, type = 'committed') {
+    getBalance(token, type = 'committed') {
         return __awaiter(this, void 0, void 0, function* () {
-            const accountState = yield this.getAccountState(chainId);
+            const accountState = yield this.getAccountState();
             const tokenSymbol = this.provider.tokenSet.resolveTokenSymbol(token);
             let balance;
             if (type === 'committed') {
@@ -1083,7 +1082,7 @@ class Wallet {
                 accountId = this.accountId;
             }
             else {
-                const accountState = yield this.getAccountState(withdraw.chainId);
+                const accountState = yield this.getAccountState();
                 if (!accountState.id) {
                     throw new Error("Can't resolve account id from the zkLink node");
                 }
@@ -1119,10 +1118,10 @@ class Wallet {
         }
         throw error;
     }
-    setRequiredAccountIdFromServer(chainId, actionName) {
+    setRequiredAccountIdFromServer(actionName) {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.accountId === undefined) {
-                const accountIdFromServer = yield this.getAccountId(chainId);
+                const accountIdFromServer = yield this.getAccountId();
                 if (accountIdFromServer == null) {
                     // throw new Error(`Failed to ${actionName}: Account does not exist in the zkLink network`);
                 }
@@ -1197,8 +1196,7 @@ class ETHOperation {
 }
 exports.ETHOperation = ETHOperation;
 class Transaction {
-    constructor(chainId, txData, txHash, sidechainProvider) {
-        this.chainId = chainId;
+    constructor(txData, txHash, sidechainProvider) {
         this.txData = txData;
         this.txHash = txHash;
         this.sidechainProvider = sidechainProvider;
@@ -1209,7 +1207,7 @@ class Transaction {
             this.throwErrorIfFailedState();
             if (this.state !== 'Sent')
                 return;
-            const receipt = yield this.sidechainProvider.notifyTransaction(this.chainId, this.txHash, 'COMMIT');
+            const receipt = yield this.sidechainProvider.notifyTransaction(this.txHash, 'COMMIT');
             if (!receipt.success) {
                 this.setErrorState(new ZKSyncTxError(`zkLink transaction failed: ${receipt.failReason}`, receipt));
                 this.throwErrorIfFailedState();
@@ -1221,7 +1219,7 @@ class Transaction {
     awaitVerifyReceipt() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.awaitReceipt();
-            const receipt = yield this.sidechainProvider.notifyTransaction(this.chainId, this.txHash, 'VERIFY');
+            const receipt = yield this.sidechainProvider.notifyTransaction(this.txHash, 'VERIFY');
             this.state = 'Verified';
             return receipt;
         });
@@ -1236,24 +1234,23 @@ class Transaction {
     }
 }
 exports.Transaction = Transaction;
-function submitSignedTransaction(chainId, signedTx, provider, fastProcessing) {
+function submitSignedTransaction(signedTx, provider, fastProcessing) {
     return __awaiter(this, void 0, void 0, function* () {
         const transactionHash = yield provider.submitTx({
-            chainId,
             tx: signedTx.tx,
             signature: signedTx.ethereumSignature,
             fastProcessing
         });
-        return new Transaction(chainId, signedTx, transactionHash, provider);
+        return new Transaction(signedTx, transactionHash, provider);
     });
 }
 exports.submitSignedTransaction = submitSignedTransaction;
-function submitSignedTransactionsBatch(chainId, provider, signedTxs, ethSignatures) {
+function submitSignedTransactionsBatch(provider, signedTxs, ethSignatures) {
     return __awaiter(this, void 0, void 0, function* () {
         const transactionHashes = yield provider.submitTxsBatch(signedTxs.map((tx) => {
             return { tx: tx.tx, signature: tx.ethereumSignature };
         }), ethSignatures);
-        return transactionHashes.map((txHash, idx) => new Transaction(chainId, signedTxs[idx], txHash, provider));
+        return transactionHashes.map((txHash, idx) => new Transaction(signedTxs[idx], txHash, provider));
     });
 }
 exports.submitSignedTransactionsBatch = submitSignedTransactionsBatch;

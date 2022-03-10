@@ -70,12 +70,12 @@ export class Provider {
 
     // For HTTP provider
     public pollIntervalMilliSecs = 500;
-    public chainId: string;
+    public chainId: number;
 
     private constructor(public transport: AbstractJSONRPCTransport) {}
 
-    public async setChainId(chainId: string) {
-        this.chainId = String(chainId)
+    public async setChainId(chainId: number | string) {
+        this.chainId = Number(chainId)
         this.contractAddress = await this.getContractAddress();
         this.tokenSet = new TokenSet(await this.getTokens());
     }
@@ -93,7 +93,7 @@ export class Provider {
 
     static async newHttpProvider(
         address: string = 'http://127.0.0.1:3030',
-        chainId?: string,
+        chainId?: number | string,
         pollIntervalMilliSecs?: number
     ): Promise<Provider> {
         const transport = new HTTPTransport(address);
@@ -113,9 +113,13 @@ export class Provider {
      * Provides some hardcoded values the `Provider` responsible for
      * without communicating with the network
      */
-    static async newMockProvider(network: string, ethPrivateKey: Uint8Array, getTokens: Function): Promise<Provider> {
+    static async newMockProvider(network: string, ethPrivateKey: Uint8Array, getTokens: Function, chainId: number): Promise<Provider> {
         const transport = new DummyTransport(network, ethPrivateKey, getTokens);
         const provider = new Provider(transport);
+
+        if (chainId !== undefined) {
+            provider.setChainId(chainId)
+        }
 
         provider.contractAddress = await provider.getContractAddress();
         provider.tokenSet = new TokenSet(await provider.getTokens());
@@ -124,17 +128,15 @@ export class Provider {
 
     // return transaction hash (e.g. sync-tx:dead..beef)
     async submitTx({
-        chainId,
         tx,
         signature,
         fastProcessing
     }: {
-        chainId?: string,
         tx: any,
         signature?: TxEthSignature,
         fastProcessing?: boolean
     }): Promise<string> {
-        return await this.transport.request('tx_submit', [chainId, tx, signature, fastProcessing]);
+        return await this.transport.request('tx_submit', [this.chainId, tx, signature, fastProcessing]);
     }
 
     // Requests `zkSync` server to execute several transactions together.
@@ -156,12 +158,12 @@ export class Provider {
         return await this.transport.request('submit_txs_batch', [this.chainId, transactions, signatures]);
     }
 
-    async getContractAddress(chainId?: string): Promise<ContractAddress> {
-        return await this.transport.request('contract_address', [(chainId || this.chainId)]);
+    async getContractAddress(): Promise<ContractAddress> {
+        return await this.transport.request('contract_address', [this.chainId]);
     }
 
-    async getTokens(chainId?: string): Promise<Tokens> {
-        return await this.transport.request('tokens', [(chainId || this.chainId)]);
+    async getTokens(): Promise<Tokens> {
+        return await this.transport.request('tokens', [this.chainId]);
     }
 
     async updateTokenSet(): Promise<void> {
@@ -169,29 +171,29 @@ export class Provider {
         this.tokenSet = updatedTokenSet;
     }
 
-    async getState(address: Address, chainId: string): Promise<AccountState> {
-        return await this.transport.request('account_info', [chainId, address]);
+    async getState(address: Address): Promise<AccountState> {
+        return await this.transport.request('account_info', [this.chainId, address]);
     }
 
     // get transaction status by its hash (e.g. 0xdead..beef)
-    async getTxReceipt(chainId: string, txHash: string): Promise<TransactionReceipt> {
-        return await this.transport.request('tx_info', [chainId, txHash]);
+    async getTxReceipt(txHash: string): Promise<TransactionReceipt> {
+        return await this.transport.request('tx_info', [this.chainId, txHash]);
     }
 
-    async getPriorityOpStatus(serialId: number, chainId?: string): Promise<PriorityOperationReceipt> {
-        return await this.transport.request('ethop_info', [(chainId || this.chainId), serialId]);
+    async getPriorityOpStatus(serialId: number): Promise<PriorityOperationReceipt> {
+        return await this.transport.request('ethop_info', [this.chainId, serialId]);
     }
 
-    async getConfirmationsForEthOpAmount(chainId?: string): Promise<number> {
-        return await this.transport.request('get_confirmations_for_eth_op_amount', [(chainId || this.chainId)]);
+    async getConfirmationsForEthOpAmount(): Promise<number> {
+        return await this.transport.request('get_confirmations_for_eth_op_amount', [this.chainId]);
     }
 
-    async getEthTxForWithdrawal(withdrawal_hash: string, chainId?: string): Promise<string> {
-        return await this.transport.request('get_eth_tx_for_withdrawal', [(chainId || this.chainId), withdrawal_hash]);
+    async getEthTxForWithdrawal(withdrawal_hash: string): Promise<string> {
+        return await this.transport.request('get_eth_tx_for_withdrawal', [this.chainId, withdrawal_hash]);
     }
 
-    async getAccountOrderNonce(chainId: string, accountId: number, slotId: number): Promise<PriorityOperationReceipt> {
-        return await this.transport.request('ethop_info', [(chainId || this.chainId), accountId, slotId]);
+    async getAccountOrderNonce(accountId: number, slotId: number): Promise<PriorityOperationReceipt> {
+        return await this.transport.request('ethop_info', [this.chainId, accountId, slotId]);
     }
 
     async notifyPriorityOp(serialId: number, action: 'COMMIT' | 'VERIFY'): Promise<PriorityOperationReceipt> {
@@ -225,10 +227,10 @@ export class Provider {
         }
     }
 
-    async notifyTransaction(chainId: string, hash: string, action: 'COMMIT' | 'VERIFY'): Promise<TransactionReceipt> {
+    async notifyTransaction(hash: string, action: 'COMMIT' | 'VERIFY'): Promise<TransactionReceipt> {
         if (this.transport.subscriptionsSupported()) {
             return await new Promise((resolve) => {
-                const subscribe = this.transport.subscribe('tx_subscribe', [chainId, hash, action], 'tx_unsubscribe', (resp) => {
+                const subscribe = this.transport.subscribe('tx_subscribe', [this.chainId, hash, action], 'tx_unsubscribe', (resp) => {
                     subscribe
                         .then((sub) => sub.unsubscribe())
                         .catch((err) => console.log(`WebSocket connection closed with reason: ${err}`));
@@ -237,11 +239,11 @@ export class Provider {
             });
         } else {
             while (true) {
-                const transactionStatus = await this.getTxReceipt(chainId, hash);
+                const transactionStatus = await this.getTxReceipt(hash);
                 const notifyDone =
                     action == 'COMMIT'
-                        ? transactionStatus.block && transactionStatus.block.committed
-                        : transactionStatus.block && transactionStatus.block.verified;
+                        ? transactionStatus.failReason || transactionStatus.block && transactionStatus.block.committed
+                        : transactionStatus.failReason || transactionStatus.block && transactionStatus.block.verified;
                 if (notifyDone) {
                     return transactionStatus;
                 } else {
@@ -252,12 +254,11 @@ export class Provider {
     }
 
     async getTransactionFee(
-        chainId: string,
         txType: 'Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee,
         address: Address,
         tokenLike: TokenLike,
     ): Promise<Fee> {
-        const transactionFee = await this.transport.request('get_tx_fee', [chainId, txType, address.toString(), tokenLike]);
+        const transactionFee = await this.transport.request('get_tx_fee', [this.chainId, txType, address.toString(), tokenLike]);
         return {
             feeType: transactionFee.feeType,
             gasTxAmount: BigNumber.from(transactionFee.gasTxAmount),
