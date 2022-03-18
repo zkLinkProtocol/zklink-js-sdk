@@ -114,7 +114,6 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             transfer.validFrom = transfer.validFrom || 0;
             transfer.validUntil = transfer.validUntil || utils_1.MAX_TIMESTAMP;
-            transfer.accountId = yield this.getAccountId();
             transfer.ts = transfer.ts || (0, utils_1.getTimestamp)();
             const signedTransferTransaction = yield this.getTransfer(transfer);
             const stringAmount = ethers_1.BigNumber.from(transfer.amount).isZero()
@@ -685,7 +684,6 @@ class Wallet {
             withdraw.validFrom = withdraw.validFrom || 0;
             withdraw.withdrawFeeRatio = withdraw.withdrawFeeRatio || 0;
             withdraw.validUntil = withdraw.validUntil || utils_1.MAX_TIMESTAMP;
-            withdraw.accountId = yield this.getAccountId();
             withdraw.ts = withdraw.ts || (0, utils_1.getTimestamp)();
             const signedWithdrawTransaction = yield this.getWithdrawFromSyncToEthereum(withdraw);
             const stringAmount = ethers_1.BigNumber.from(withdraw.amount).isZero()

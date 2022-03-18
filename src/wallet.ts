@@ -209,7 +209,7 @@ export class Wallet {
         tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
-        accountId?: number;
+        accountId: number;
         ts?: number;
         nonce: number;
         validFrom?: number;
@@ -217,7 +217,6 @@ export class Wallet {
     }): Promise<SignedTransaction> {
         transfer.validFrom = transfer.validFrom || 0;
         transfer.validUntil = transfer.validUntil || MAX_TIMESTAMP;
-        transfer.accountId = await this.getAccountId()
         transfer.ts = transfer.ts || getTimestamp()
         const signedTransferTransaction = await this.getTransfer(transfer as any);
 
@@ -1080,7 +1079,7 @@ export class Wallet {
         fee: BigNumberish;
         withdrawFeeRatio: number;
         fastWithdraw: number;
-        accountId?: number;
+        accountId: number;
         ts?: number;
         nonce: number;
         validFrom?: number;
@@ -1089,7 +1088,6 @@ export class Wallet {
         withdraw.validFrom = withdraw.validFrom || 0;
         withdraw.withdrawFeeRatio = withdraw.withdrawFeeRatio || 0;
         withdraw.validUntil = withdraw.validUntil || MAX_TIMESTAMP;
-        withdraw.accountId = await this.getAccountId()
         withdraw.ts = withdraw.ts || getTimestamp()
         const signedWithdrawTransaction = await this.getWithdrawFromSyncToEthereum(withdraw as any);
 

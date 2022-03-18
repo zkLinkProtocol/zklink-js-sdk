@@ -45,7 +45,7 @@ export declare class Wallet {
         tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
-        accountId?: number;
+        accountId: number;
         ts?: number;
         nonce: number;
         validFrom?: number;
@@ -341,7 +341,7 @@ export declare class Wallet {
         fee: BigNumberish;
         withdrawFeeRatio: number;
         fastWithdraw: number;
-        accountId?: number;
+        accountId: number;
         ts?: number;
         nonce: number;
         validFrom?: number;
