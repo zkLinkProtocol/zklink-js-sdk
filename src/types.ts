@@ -252,6 +252,7 @@ export interface Swap {
 
 export interface Withdraw {
     type: 'Withdraw';
+    chainId: number;
     accountId: number;
     from: Address;
     to: Address;

@@ -112,6 +112,7 @@ export declare class Signer {
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
     withdrawSignBytes(withdraw: {
+        chainId: number;
         accountId: number;
         from: Address;
         ethAddress: string;
@@ -126,6 +127,7 @@ export declare class Signer {
         validUntil: number;
     }): Uint8Array;
     signSyncWithdraw(withdraw: {
+        chainId: number;
         accountId: number;
         from: Address;
         ethAddress: string;

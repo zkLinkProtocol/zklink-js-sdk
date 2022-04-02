@@ -290,6 +290,7 @@ export class Signer {
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
     withdrawSignBytes(withdraw: {
+        chainId: number;
         accountId: number;
         from: Address;
         ethAddress: string;
@@ -312,6 +313,7 @@ export class Signer {
     }
 
     async signSyncWithdraw(withdraw: {
+        chainId: number;
         accountId: number;
         from: Address;
         ethAddress: string;

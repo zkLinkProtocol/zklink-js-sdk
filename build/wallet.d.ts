@@ -320,6 +320,7 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<SignedTransaction>;
     getWithdrawFromSyncToEthereum(withdraw: {
+        chainId: number;
         ethAddress: string;
         token: TokenLike;
         tokenId: number;
@@ -334,6 +335,7 @@ export declare class Wallet {
         validUntil: number;
     }): Promise<Withdraw>;
     signWithdrawFromSyncToEthereum(withdraw: {
+        chainId: number;
         ethAddress: string;
         token: TokenLike;
         tokenId: number;

@@ -663,6 +663,7 @@ class Wallet {
             yield this.setRequiredAccountIdFromServer('Withdraw funds');
             const tokenId = withdraw.tokenId;
             const transactionData = {
+                chainId: withdraw.chainId,
                 accountId: withdraw.accountId || this.accountId,
                 from: this.address(),
                 ethAddress: withdraw.ethAddress,

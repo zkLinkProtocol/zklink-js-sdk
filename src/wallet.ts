@@ -1034,6 +1034,7 @@ export class Wallet {
     }
 
     async getWithdrawFromSyncToEthereum(withdraw: {
+        chainId: number;
         ethAddress: string;
         token: TokenLike;
         tokenId: number;
@@ -1054,6 +1055,7 @@ export class Wallet {
 
         const tokenId = withdraw.tokenId;
         const transactionData = {
+            chainId: withdraw.chainId,
             accountId: withdraw.accountId || this.accountId,
             from: this.address(),
             ethAddress: withdraw.ethAddress,
@@ -1072,6 +1074,7 @@ export class Wallet {
     }
 
     async signWithdrawFromSyncToEthereum(withdraw: {
+        chainId: number;
         ethAddress: string;
         token: TokenLike;
         tokenId: number;
