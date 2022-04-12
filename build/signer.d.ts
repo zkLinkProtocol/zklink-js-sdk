@@ -23,8 +23,6 @@ export declare class Signer {
     }): Uint8Array;
     signSyncTransfer(transfer: {
         accountId: number;
-        fromChainId: number;
-        toChainId: number;
         from: Address;
         to: Address;
         tokenId: number;
@@ -182,8 +180,6 @@ export declare class Signer {
         accountId: number;
         account: Address;
         newPkHash: PubKeyHash;
-        fromChainId: number;
-        toChainId: number;
         feeTokenId: number;
         fee: BigNumberish;
         ts: number;

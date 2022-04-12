@@ -70,8 +70,6 @@ export interface Signature {
 export interface Transfer {
     type: 'Transfer';
     accountId: number;
-    fromChainId: number;
-    toChainId: number;
     from: Address;
     to: Address;
     token: number;
@@ -105,12 +103,10 @@ export interface AddLiquidity {
 export interface CurveAddLiquidity {
     type: 'L2CurveAddLiq';
     account: Address;
-    chains: ChainId[];
     tokens: TokenId[];
     amounts: BigNumberish[];
     lpQuantity: BigNumberish;
     minLpQuantity: BigNumberish;
-    fromChain: ChainId;
     pairAddress: Address;
     fee: BigNumberish;
     feeToken: TokenId;
@@ -124,8 +120,6 @@ export interface CurveAddLiquidity {
 export interface CurveRemoveLiquidity {
     type: 'L2CurveRemoveLiquidity';
     account: Address;
-    fromChain: ChainId;
-    chains: ChainId[];
     tokens: TokenId[];
     amounts: BigNumberish[];
     minAmounts: BigNumberish[];
@@ -145,8 +139,6 @@ export interface CurveSwap {
     accountId: number;
     account: Address;
     pairAddress: Address;
-    chainIn: ChainId;
-    chainOut: ChainId;
     tokenIn: TokenId;
     tokenOut: TokenId;
     amountIn: BigNumberish;
@@ -248,8 +240,6 @@ export interface ChangePubKey {
     accountId: number;
     account: Address;
     newPkHash: PubKeyHash;
-    fromChainId: number;
-    toChainId: number;
     feeToken: number;
     fee: BigNumberish;
     ts: number;

@@ -24,8 +24,6 @@ export declare class Wallet {
     getEthMessageSignature(message: ethers.utils.BytesLike): Promise<TxEthSignature>;
     batchBuilder(nonce?: Nonce): BatchBuilder;
     getTransfer(transfer: {
-        fromChainId: number;
-        toChainId: number;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -38,8 +36,6 @@ export declare class Wallet {
         validUntil: number;
     }): Promise<Transfer>;
     signSyncTransfer(transfer: {
-        fromChainId: number;
-        toChainId: number;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -76,8 +72,6 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<Transaction>;
     syncMultiTransfer(transfers: {
-        fromChainId: number;
-        toChainId: number;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -366,8 +360,6 @@ export declare class Wallet {
         feeToken: TokenLike;
         fee: BigNumberish;
         nonce: number;
-        fromChainId: number;
-        toChainId: number;
         accountId?: number;
         ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
         ethSignature?: string;
@@ -378,8 +370,6 @@ export declare class Wallet {
     signSetSigningKey(changePubKey: {
         feeToken: TokenLike;
         fee: BigNumberish;
-        fromChainId: number;
-        toChainId: number;
         nonce: number;
         ethAuthType: ChangePubkeyTypes;
         accountId?: number;

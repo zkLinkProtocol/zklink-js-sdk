@@ -95,8 +95,6 @@ class Wallet {
             const tokenId = transfer.tokenId;
             const transactionData = {
                 accountId: transfer.accountId || this.accountId,
-                fromChainId: transfer.fromChainId,
-                toChainId: transfer.toChainId,
                 from: this.address(),
                 to: transfer.to,
                 tokenId,
@@ -221,8 +219,6 @@ class Wallet {
                 const nonce = nextNonce;
                 nextNonce += 1;
                 const tx = yield this.getTransfer({
-                    fromChainId: transfer.fromChainId,
-                    toChainId: transfer.toChainId,
                     to: transfer.to,
                     token: transfer.token,
                     tokenId: transfer.tokenId,
@@ -744,8 +740,6 @@ class Wallet {
                 account: this.address(),
                 newPkHash,
                 nonce: changePubKey.nonce,
-                fromChainId: changePubKey.fromChainId,
-                toChainId: changePubKey.toChainId,
                 feeTokenId,
                 fee: ethers_1.BigNumber.from(changePubKey.fee).toString(),
                 ts: changePubKey.ts,

@@ -53,8 +53,6 @@ export class Signer {
 
     async signSyncTransfer(transfer: {
         accountId: number;
-        fromChainId: number;
-        toChainId: number;
         from: Address;
         to: Address;
         tokenId: number;
@@ -415,8 +413,6 @@ export class Signer {
         accountId: number;
         account: Address;
         newPkHash: PubKeyHash;
-        fromChainId: number;
-        toChainId: number;
         feeTokenId: number;
         fee: BigNumberish;
         ts: number;

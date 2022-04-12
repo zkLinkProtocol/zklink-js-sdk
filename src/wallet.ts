@@ -162,8 +162,6 @@ export class Wallet {
     }
 
     async getTransfer(transfer: {
-        fromChainId: number;
-        toChainId: number;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -185,8 +183,6 @@ export class Wallet {
 
         const transactionData = {
             accountId: transfer.accountId || this.accountId,
-            fromChainId: transfer.fromChainId,
-            toChainId: transfer.toChainId,
             from: this.address(),
             to: transfer.to,
             tokenId,
@@ -202,8 +198,6 @@ export class Wallet {
     }
 
     async signSyncTransfer(transfer: {
-        fromChainId: number;
-        toChainId: number;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -335,8 +329,6 @@ export class Wallet {
     // That's why we want the users to be explicit about fees in multitransfers.
     async syncMultiTransfer(
         transfers: {
-            fromChainId: number;
-            toChainId: number;
             to: Address;
             token: TokenLike;
             tokenId: number;
@@ -369,8 +361,6 @@ export class Wallet {
             nextNonce += 1;
 
             const tx: Transfer = await this.getTransfer({
-                fromChainId: transfer.fromChainId,
-                toChainId: transfer.toChainId,
                 to: transfer.to,
                 token: transfer.token,
                 tokenId: transfer.tokenId,
@@ -1158,8 +1148,6 @@ export class Wallet {
         feeToken: TokenLike;
         fee: BigNumberish;
         nonce: number;
-        fromChainId: number,
-        toChainId: number,
         accountId?: number,
         ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
         ethSignature?: string;
@@ -1181,8 +1169,6 @@ export class Wallet {
             account: this.address(),
             newPkHash,
             nonce: changePubKey.nonce,
-            fromChainId: changePubKey.fromChainId,
-            toChainId: changePubKey.toChainId,
             feeTokenId,
             fee: BigNumber.from(changePubKey.fee).toString(),
             ts: changePubKey.ts,
@@ -1198,8 +1184,6 @@ export class Wallet {
     async signSetSigningKey(changePubKey: {
         feeToken: TokenLike;
         fee: BigNumberish;
-        fromChainId: number;
-        toChainId: number;
         nonce: number;
         ethAuthType: ChangePubkeyTypes;
         accountId?: number;

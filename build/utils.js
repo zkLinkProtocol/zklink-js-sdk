@@ -535,8 +535,6 @@ function serializeWithdraw(withdraw) {
 exports.serializeWithdraw = serializeWithdraw;
 function serializeTransfer(transfer) {
     const type = new Uint8Array([5]); // tx type
-    // const fromChainId = serializeChainId(transfer.fromChainId);
-    // const toChainId = serializeChainId(transfer.toChainId);
     const accountId = serializeAccountId(transfer.accountId);
     const from = serializeAddress(transfer.from);
     const to = serializeAddress(transfer.to);
@@ -590,10 +588,8 @@ function serializeAddLiquidity(transfer) {
 }
 exports.serializeAddLiquidity = serializeAddLiquidity;
 function serializeCurveAddLiquidity(payload) {
-    const type = new Uint8Array([12]);
-    // const chainId = serializeChainId(payload.fromChain);
+    const type = new Uint8Array([9]);
     const account = serializeAddress(payload.account);
-    // const chains = chainsCompletion(payload.chains, TOTAL_CHAIN_NUM, 0).map(chainId => serializeChainId(chainId))
     const tokens = chainsCompletion(payload.tokens, exports.TOTAL_CHAIN_NUM, 0).map(tokenId => serializeTokenId(tokenId));
     const amounts = chainsCompletion(payload.amounts, exports.TOTAL_CHAIN_NUM, '0').map(amount => serializeAmountPacked(amount));
     const minLpQuantity = serializeAmountPacked(payload.minLpQuantity);
@@ -607,10 +603,8 @@ function serializeCurveAddLiquidity(payload) {
 }
 exports.serializeCurveAddLiquidity = serializeCurveAddLiquidity;
 function serializeCurveRemoveLiquidity(payload) {
-    const type = new Uint8Array([14]);
-    // const fromChain = serializeChainId(payload.fromChain);
+    const type = new Uint8Array([11]);
     const account = serializeAddress(payload.account);
-    // const chains = chainsCompletion(payload.chains, TOTAL_CHAIN_NUM, 0).map(chainId => serializeChainId(chainId))
     const tokens = chainsCompletion(payload.tokens, exports.TOTAL_CHAIN_NUM, 0).map(tokenId => serializeTokenId(tokenId));
     const minAmounts = chainsCompletion(payload.minAmounts, exports.TOTAL_CHAIN_NUM, '0').map(amount => serializeAmountPacked(amount));
     const lpQuantity = serializeAmountPacked(payload.lpQuantity);
@@ -624,9 +618,7 @@ function serializeCurveRemoveLiquidity(payload) {
 }
 exports.serializeCurveRemoveLiquidity = serializeCurveRemoveLiquidity;
 function serializeCurveSwap(payload) {
-    const type = new Uint8Array([13]);
-    // const chainIn = serializeChainId(payload.chainIn);
-    // const chainOut = serializeChainId(payload.chainOut);
+    const type = new Uint8Array([10]);
     const account = serializeAddress(payload.account);
     const pairAddress = serializeAddress(payload.pairAddress);
     const tokenIn = serializeTokenId(payload.tokenIn);
