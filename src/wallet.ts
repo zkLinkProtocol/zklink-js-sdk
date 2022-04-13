@@ -1669,12 +1669,12 @@ export class ETHOperation {
         return txReceipt;
     }
 
-    async awaitReceipt(): Promise<PriorityOperationReceipt> {
+    async awaitReceipt(linkChainId: number): Promise<PriorityOperationReceipt> {
         this.throwErrorIfFailedState();
 
         await this.awaitEthereumTxCommit();
         if (this.state !== 'Mined') return;
-        const receipt = await this.zkSyncProvider.notifyPriorityOp(this.priorityOpId.toNumber(), 'COMMIT');
+        const receipt = await this.zkSyncProvider.notifyPriorityOp(linkChainId, this.priorityOpId.toNumber(), 'COMMIT');
 
         if (!receipt.executed) {
             this.setErrorState(new ZKSyncTxError('Priority operation failed', receipt));
@@ -1685,11 +1685,11 @@ export class ETHOperation {
         return receipt;
     }
 
-    async awaitVerifyReceipt(): Promise<PriorityOperationReceipt> {
-        await this.awaitReceipt();
+    async awaitVerifyReceipt(linkChainId: number): Promise<PriorityOperationReceipt> {
+        await this.awaitReceipt(linkChainId);
         if (this.state !== 'Committed') return;
 
-        const receipt = await this.zkSyncProvider.notifyPriorityOp(this.priorityOpId.toNumber(), 'VERIFY');
+        const receipt = await this.zkSyncProvider.notifyPriorityOp(linkChainId ,this.priorityOpId.toNumber(), 'VERIFY');
 
         this.state = 'Verified';
 

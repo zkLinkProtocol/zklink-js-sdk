@@ -19,50 +19,6 @@ import { isTokenETH, sleep, SYNC_GOV_CONTRACT_INTERFACE, TokenSet } from './util
 import { ErrorCode } from '@ethersproject/logger';
 
 const EthersErrorCode = ErrorCode;
-export async function getDefaultProvider(network: Network, transport: 'WS' | 'HTTP' = 'HTTP'): Promise<Provider> {
-    if (transport === 'WS') {
-        console.warn('Websocket support will be removed in future. Use HTTP transport instead.');
-    }
-    if (network === 'localhost') {
-        if (transport === 'WS') {
-            return await Provider.newWebsocketProvider('ws://127.0.0.1:3031');
-        } else if (transport === 'HTTP') {
-            return await Provider.newHttpProvider('http://127.0.0.1:3030');
-        }
-    } else if (network === 'ropsten') {
-        if (transport === 'WS') {
-            return await Provider.newWebsocketProvider('wss://ropsten-api.zksync.io/jsrpc-ws');
-        } else if (transport === 'HTTP') {
-            return await Provider.newHttpProvider('https://ropsten-api.zksync.io/jsrpc');
-        }
-    } else if (network === 'rinkeby') {
-        if (transport === 'WS') {
-            return await Provider.newWebsocketProvider('wss://rinkeby-api.zksync.io/jsrpc-ws');
-        } else if (transport === 'HTTP') {
-            return await Provider.newHttpProvider('https://rinkeby-api.zksync.io/jsrpc');
-        }
-    } else if (network === 'ropsten-beta') {
-        if (transport === 'WS') {
-            return await Provider.newWebsocketProvider('wss://ropsten-beta-api.zksync.io/jsrpc-ws');
-        } else if (transport === 'HTTP') {
-            return await Provider.newHttpProvider('https://ropsten-beta-api.zksync.io/jsrpc');
-        }
-    } else if (network === 'rinkeby-beta') {
-        if (transport === 'WS') {
-            return await Provider.newWebsocketProvider('wss://rinkeby-beta-api.zksync.io/jsrpc-ws');
-        } else if (transport === 'HTTP') {
-            return await Provider.newHttpProvider('https://rinkeby-beta-api.zksync.io/jsrpc');
-        }
-    } else if (network === 'mainnet') {
-        if (transport === 'WS') {
-            return await Provider.newWebsocketProvider('wss://api.zksync.io/jsrpc-ws');
-        } else if (transport === 'HTTP') {
-            return await Provider.newHttpProvider('https://api.zksync.io/jsrpc');
-        }
-    } else {
-        throw new Error(`Ethereum network ${network} is not supported`);
-    }
-}
 
 export class Provider {
     contractAddress: ContractAddress;
@@ -74,26 +30,20 @@ export class Provider {
 
     private constructor(public transport: AbstractJSONRPCTransport) {}
 
-    public async setChainId(chainId: number | string) {
-        this.chainId = Number(chainId)
-        this.contractAddress = await this.getContractAddress();
-        this.tokenSet = new TokenSet(await this.getTokens());
-    }
-
     /**
      * @deprecated Websocket support will be removed in future. Use HTTP transport instead.
      */
-    static async newWebsocketProvider(address: string): Promise<Provider> {
+    static async newWebsocketProvider(address: string, linkChainId: number): Promise<Provider> {
         const transport = await WSTransport.connect(address);
         const provider = new Provider(transport);
-        provider.contractAddress = await provider.getContractAddress();
-        provider.tokenSet = new TokenSet(await provider.getTokens());
+        provider.contractAddress = await provider.getContractAddress(linkChainId);
+        provider.tokenSet = new TokenSet(await provider.getTokens(linkChainId));
         return provider;
     }
 
     static async newHttpProvider(
         address: string = 'http://127.0.0.1:3030',
-        chainId?: number | string,
+        linkChainId: number,
         pollIntervalMilliSecs?: number
     ): Promise<Provider> {
         const transport = new HTTPTransport(address);
@@ -101,11 +51,8 @@ export class Provider {
         if (pollIntervalMilliSecs) {
             provider.pollIntervalMilliSecs = pollIntervalMilliSecs;
         }
-        if (chainId !== undefined) {
-            provider.setChainId(chainId)
-        }
-        provider.contractAddress = await provider.getContractAddress();
-        provider.tokenSet = new TokenSet(await provider.getTokens());
+        provider.contractAddress = await provider.getContractAddress(linkChainId);
+        provider.tokenSet = new TokenSet(await provider.getTokens(linkChainId));
         return provider;
     }
 
@@ -113,16 +60,12 @@ export class Provider {
      * Provides some hardcoded values the `Provider` responsible for
      * without communicating with the network
      */
-    static async newMockProvider(network: string, ethPrivateKey: Uint8Array, getTokens: Function, chainId: number): Promise<Provider> {
+    static async newMockProvider(network: string, ethPrivateKey: Uint8Array, getTokens: Function, linkChainId: number): Promise<Provider> {
         const transport = new DummyTransport(network, ethPrivateKey, getTokens);
         const provider = new Provider(transport);
 
-        if (chainId !== undefined) {
-            provider.setChainId(chainId)
-        }
-
-        provider.contractAddress = await provider.getContractAddress();
-        provider.tokenSet = new TokenSet(await provider.getTokens());
+        provider.contractAddress = await provider.getContractAddress(linkChainId);
+        provider.tokenSet = new TokenSet(await provider.getTokens(linkChainId));
         return provider;
     }
 
@@ -136,7 +79,7 @@ export class Provider {
         signature?: TxEthSignature,
         fastProcessing?: boolean
     }): Promise<string> {
-        return await this.transport.request('tx_submit', [this.chainId, tx, signature, fastProcessing]);
+        return await this.transport.request('tx_submit', [tx, signature, fastProcessing]);
     }
 
     // Requests `zkSync` server to execute several transactions together.
@@ -155,48 +98,44 @@ export class Provider {
         } else {
             signatures.push(ethSignatures);
         }
-        return await this.transport.request('submit_txs_batch', [this.chainId, transactions, signatures]);
+        return await this.transport.request('submit_txs_batch', [transactions, signatures]);
     }
 
-    async getContractAddress(): Promise<ContractAddress> {
-        return await this.transport.request('contract_address', [this.chainId]);
+    async getContractAddress(linkChainId: number): Promise<ContractAddress> {
+        return await this.transport.request('contract_address', [linkChainId]);
     }
 
-    async getTokens(): Promise<Tokens> {
-        return await this.transport.request('tokens', [this.chainId]);
+    async getTokens(linkChainId: number): Promise<Tokens> {
+        return await this.transport.request('tokens', [linkChainId]);
     }
 
-    async updateTokenSet(): Promise<void> {
-        const updatedTokenSet = new TokenSet(await this.getTokens());
+    async updateTokenSet(linkChainId: number): Promise<void> {
+        const updatedTokenSet = new TokenSet(await this.getTokens(linkChainId));
         this.tokenSet = updatedTokenSet;
     }
 
     async getState(address: Address): Promise<AccountState> {
-        return await this.transport.request('account_info', [this.chainId, address]);
+        return await this.transport.request('account_info', [address]);
     }
 
     // get transaction status by its hash (e.g. 0xdead..beef)
     async getTxReceipt(txHash: string): Promise<TransactionReceipt> {
-        return await this.transport.request('tx_info', [this.chainId, txHash]);
+        return await this.transport.request('tx_info', [txHash]);
     }
 
-    async getPriorityOpStatus(serialId: number): Promise<PriorityOperationReceipt> {
-        return await this.transport.request('ethop_info', [this.chainId, serialId]);
+    async getPriorityOpStatus(linkChainId: number, serialId: number): Promise<PriorityOperationReceipt> {
+        return await this.transport.request('ethop_info', [linkChainId, serialId]);
     }
 
     async getConfirmationsForEthOpAmount(): Promise<number> {
-        return await this.transport.request('get_confirmations_for_eth_op_amount', [this.chainId]);
+        return await this.transport.request('get_confirmations_for_eth_op_amount', []);
     }
 
     async getEthTxForWithdrawal(withdrawal_hash: string): Promise<string> {
-        return await this.transport.request('get_eth_tx_for_withdrawal', [this.chainId, withdrawal_hash]);
+        return await this.transport.request('get_eth_tx_for_withdrawal', [withdrawal_hash]);
     }
 
-    async getAccountOrderNonce(accountId: number, slotId: number): Promise<PriorityOperationReceipt> {
-        return await this.transport.request('ethop_info', [this.chainId, accountId, slotId]);
-    }
-
-    async notifyPriorityOp(serialId: number, action: 'COMMIT' | 'VERIFY'): Promise<PriorityOperationReceipt> {
+    async notifyPriorityOp(linkChainId: number, serialId: number, action: 'COMMIT' | 'VERIFY'): Promise<PriorityOperationReceipt> {
         if (this.transport.subscriptionsSupported()) {
             return await new Promise((resolve) => {
                 const subscribe = this.transport.subscribe(
@@ -213,7 +152,7 @@ export class Provider {
             });
         } else {
             while (true) {
-                const priorOpStatus = await this.getPriorityOpStatus(serialId);
+                const priorOpStatus = await this.getPriorityOpStatus(linkChainId, serialId);
                 const notifyDone =
                     action === 'COMMIT'
                         ? priorOpStatus.block && priorOpStatus.block.committed
@@ -230,7 +169,7 @@ export class Provider {
     async notifyTransaction(hash: string, action: 'COMMIT' | 'VERIFY'): Promise<TransactionReceipt> {
         if (this.transport.subscriptionsSupported()) {
             return await new Promise((resolve) => {
-                const subscribe = this.transport.subscribe('tx_subscribe', [this.chainId, hash, action], 'tx_unsubscribe', (resp) => {
+                const subscribe = this.transport.subscribe('tx_subscribe', [hash, action], 'tx_unsubscribe', (resp) => {
                     subscribe
                         .then((sub) => sub.unsubscribe())
                         .catch((err) => console.log(`WebSocket connection closed with reason: ${err}`));
@@ -258,7 +197,7 @@ export class Provider {
         address: Address,
         tokenLike: TokenLike,
     ): Promise<Fee> {
-        const transactionFee = await this.transport.request('get_tx_fee', [this.chainId, txType, address.toString(), tokenLike]);
+        const transactionFee = await this.transport.request('get_tx_fee', [txType, address.toString(), tokenLike]);
         return {
             feeType: transactionFee.feeType,
             gasTxAmount: BigNumber.from(transactionFee.gasTxAmount),
@@ -273,14 +212,13 @@ export class Provider {
         txTypes: ('Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee)[],
         addresses: Address[],
         tokenLike: TokenLike,
-        chainId?: string
     ): Promise<BigNumber> {
-        const batchFee = await this.transport.request('get_txs_batch_fee_in_wei', [(chainId || this.chainId), txTypes, addresses, tokenLike]);
+        const batchFee = await this.transport.request('get_txs_batch_fee_in_wei', [txTypes, addresses, tokenLike]);
         return BigNumber.from(batchFee.totalFee);
     }
 
-    async getTokenPrice(tokenLike: TokenLike, chainId?: string): Promise<number> {
-        const tokenPrice = await this.transport.request('get_token_price', [(chainId || this.chainId), tokenLike]);
+    async getTokenPrice(tokenLike: TokenLike): Promise<number> {
+        const tokenPrice = await this.transport.request('get_token_price', [tokenLike]);
         return parseFloat(tokenPrice);
     }
 
