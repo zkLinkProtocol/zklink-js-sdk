@@ -31,6 +31,8 @@ export class Signer {
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
     transferSignBytes(transfer: {
+        fromSubAccountId: number;
+        toSubAccountId: number;
         accountId: number;
         fromChainId: number;
         toChainId: number;
@@ -52,6 +54,8 @@ export class Signer {
     }
 
     async signSyncTransfer(transfer: {
+        fromSubAccountId: number;
+        toSubAccountId: number;
         accountId: number;
         from: Address;
         to: Address;
@@ -289,6 +293,7 @@ export class Signer {
      */
     withdrawSignBytes(withdraw: {
         chainId: number;
+        subAccountId: number;
         accountId: number;
         from: Address;
         ethAddress: string;
@@ -312,6 +317,7 @@ export class Signer {
 
     async signSyncWithdraw(withdraw: {
         chainId: number;
+        subAccountId: number;
         accountId: number;
         from: Address;
         ethAddress: string;

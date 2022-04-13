@@ -11,6 +11,7 @@ describe('order', () => {
   it('serializeOrder', () => {
     const serialized = serializeOrder({
       type: 'Order',
+      subAccountId: 1,
       accountId: 1,
       slotId: 0,
       nonce: 0,
@@ -23,14 +24,14 @@ describe('order', () => {
       validUntil: 9007199254740991
     })
     expect(serialized).eql(new Uint8Array([
-      255,   0,   0,   0,   1,   0,   0, 0, 0, 0,  0,
-        1,   0,   2,   0,   0,   0,   0, 0, 0, 0, 13,
-      224, 182, 179, 167, 100,   0,   0, 1, 0, 0,  0,
-        1,  64,   0,   0,   0,   0,   0, 0, 0, 0,  0,
-       31, 255, 255, 255, 255, 255, 255
+      255,   0,   0,   0,   1,   1,   0,   0, 0, 0, 0,
+        0,   1,   0,   2,   0,   0,   0,   0, 0, 0, 0,
+       13, 224, 182, 179, 167, 100,   0,   0, 1, 0, 0,
+        0,   1,  64,   0,   0,   0,   0,   0, 0, 0, 0,
+        0,  31, 255, 255, 255, 255, 255, 255
     ]))
     
-    expect(Buffer.from(serialized).toString('hex')).eq('ff00000001000000000000010002000000000000000de0b6b3a76400000100000001400000000000000000001fffffffffffff')
+    expect(Buffer.from(serialized).toString('hex')).eq('ff0000000101000000000000010002000000000000000de0b6b3a76400000100000001400000000000000000001fffffffffffff')
 
   })
 
@@ -40,6 +41,7 @@ describe('order', () => {
 
     const signedTransaction = await wallet.signSyncOrder({
       accountId: 4,
+      subAccountId: 4,
       slotId: 0,
       nonce: 0,
       basedTokenId: 3,
@@ -51,7 +53,7 @@ describe('order', () => {
 
     expect(signedTransaction.ethereumSignature.signature).eq('0x915d197bad1a7d6c3e840fd62607df97b007f9faa3843639342b62348170e3d700d0cc333d00630de65830d3028abcc81f4f2dc9caf71bcea5a31cc42dd9c2db1c')
     expect(signedTransaction.tx.signature.pubKey).eq('0dd4f603531bd78bbecd005d9e7cc62a794dcfadceffe03e269fbb6b72e9c724')
-    expect(signedTransaction.tx.signature.signature).eq('67a4e2fde7e30ff6e82b0059613838a8f038bdae245a6f3da223b4ea042d140d5e4e00439f351aeab2f8e727f97cb9256eada19b51975b390bd9f389b5503203')
+    expect(signedTransaction.tx.signature.signature).eq('b1aec8a083f02895c3dbcb1bc549f44750cce361a366124ea8ad2f1b1eaa299eec5f947598bc540ebd72cbc116b91cf372d89b00b525d885af46e241b52e4803')
   });
 
   it('signature order 1', async function () {
@@ -60,6 +62,7 @@ describe('order', () => {
     expect(await wallet.signer.pubKeyHash()).eq('sync:772d51f4755bcb6254530e0f95e7fcdb03dbea06')
     const signedTransaction = await wallet.signSyncOrder({
       accountId: 4,
+      subAccountId: 4,
       slotId: 0,
       nonce: 0,
       basedTokenId: 3,
@@ -70,7 +73,7 @@ describe('order', () => {
     } as any)
     expect(signedTransaction.tx.signature).eql({
       pubKey: 'dad5e08206f93ce40baeecc3d456c4bef90fb66fd28c260fa8c510df0bcd69aa',
-      signature: 'a4edf6cadde6225f5ca6e250c395a922471d31e41b6866d5af69b32e96d0ce1b51bdcc7dfd248dfcd45cfeaa453bb54c8dd1a2409edef6a44735e764daca2801'
+      signature: '5ee06ebec1fbf974c6a62878a8fc0db41faa357aefc3f5011c3cc7a81a58ed1eeb78345ebc3bdf91ac65187f6b24efac9e192d24c345ae72f8d03d5ebb412102'
     })
   });
   // it('signature order 2', async function () {

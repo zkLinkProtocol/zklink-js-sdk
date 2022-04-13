@@ -162,6 +162,8 @@ export class Wallet {
     }
 
     async getTransfer(transfer: {
+        fromSubAccountId: number;
+        toSubAccountId: number;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -182,6 +184,8 @@ export class Wallet {
         const tokenId = transfer.tokenId
 
         const transactionData = {
+            fromSubAccountId: transfer.fromSubAccountId,
+            toSubAccountId: transfer.toSubAccountId,
             accountId: transfer.accountId || this.accountId,
             from: this.address(),
             to: transfer.to,
@@ -198,6 +202,8 @@ export class Wallet {
     }
 
     async signSyncTransfer(transfer: {
+        fromSubAccountId: number;
+        toSubAccountId: number;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -329,6 +335,8 @@ export class Wallet {
     // That's why we want the users to be explicit about fees in multitransfers.
     async syncMultiTransfer(
         transfers: {
+            fromSubAccountId: number;
+            toSubAccountId: number;
             to: Address;
             token: TokenLike;
             tokenId: number;
@@ -361,6 +369,8 @@ export class Wallet {
             nextNonce += 1;
 
             const tx: Transfer = await this.getTransfer({
+                fromSubAccountId: transfer.fromSubAccountId,
+                toSubAccountId: transfer.toSubAccountId,
                 to: transfer.to,
                 token: transfer.token,
                 tokenId: transfer.tokenId,
@@ -1025,6 +1035,7 @@ export class Wallet {
 
     async getWithdrawFromSyncToEthereum(withdraw: {
         chainId: number;
+        subAccountId: number;
         ethAddress: string;
         token: TokenLike;
         tokenId: number;
@@ -1042,10 +1053,10 @@ export class Wallet {
             throw new Error('ZKSync signer is required for sending zksync transactions.');
         }
         await this.setRequiredAccountIdFromServer('Withdraw funds');
-
         const tokenId = withdraw.tokenId;
         const transactionData = {
             chainId: withdraw.chainId,
+            subAccountId: withdraw.subAccountId,
             accountId: withdraw.accountId || this.accountId,
             from: this.address(),
             ethAddress: withdraw.ethAddress,
@@ -1065,6 +1076,7 @@ export class Wallet {
 
     async signWithdrawFromSyncToEthereum(withdraw: {
         chainId: number;
+        subAccountId: number;
         ethAddress: string;
         token: TokenLike;
         tokenId: number;
@@ -1112,6 +1124,8 @@ export class Wallet {
     }
 
     async withdrawFromSyncToEthereum(withdraw: {
+        chainId: number;
+        subAccountId: number;
         ethAddress: string;
         token: TokenLike;
         amount: BigNumberish;
@@ -1491,6 +1505,7 @@ export class Wallet {
 
 
     async depositToSyncFromEthereum(deposit: {
+        subAccountId: number;
         depositTo: Address;
         token: TokenLike;
         amount: BigNumberish;
@@ -1505,7 +1520,7 @@ export class Wallet {
 
         if (isTokenETH(deposit.token)) {
             try {
-                ethTransaction = await mainZkSyncContract.depositETH(deposit.depositTo, {
+                ethTransaction = await mainZkSyncContract.depositETH(deposit.subAccountId, deposit.depositTo, {
                     value: BigNumber.from(deposit.amount),
                     gasLimit: BigNumber.from(ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT),
                     // gasPrice,
@@ -1531,6 +1546,7 @@ export class Wallet {
                 }
             }
             const args = [
+                deposit.subAccountId,
                 tokenAddress,
                 deposit.amount,
                 deposit.depositTo,

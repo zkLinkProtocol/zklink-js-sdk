@@ -17,7 +17,6 @@ describe('serialize', function () {
   })
 
   it('serializeFeeAmount', () => {
-
-    console.log(serializeAmountPacked(parseEther('10000'))) 
+    expect(serializeAmountPacked(parseEther('10000'))).eql(new Uint8Array([ 74, 129, 124, 128, 12 ]))
   })
 })

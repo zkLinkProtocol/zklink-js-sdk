@@ -96,6 +96,8 @@ export interface Signature {
 export interface Transfer {
     type: 'Transfer';
     accountId: number;
+    fromSubAccountId: number;
+    toSubAccountId: number;
     from: Address;
     to: Address;
     token: number;
@@ -240,6 +242,7 @@ export interface Swap {
 export interface Withdraw {
     type: 'Withdraw';
     chainId: number;
+    subAccountId: number;
     accountId: number;
     from: Address;
     to: Address;
@@ -390,6 +393,7 @@ export interface BatchFee {
 export interface Order {
     type: 'Order';
     accountId: number;
+    subAccountId: number;
     slotId: number;
     nonce: number;
     basedTokenId: TokenId;

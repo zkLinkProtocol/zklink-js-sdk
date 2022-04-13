@@ -533,6 +533,10 @@ export function serializeAccountId(accountId: number): Uint8Array {
     return numberToBytesBE(accountId, 4);
 }
 
+export function serializeSubAccountId(subAccountId: number): Uint8Array {
+    return numberToBytesBE(subAccountId, 1);
+}
+
 export function serializeTokenId(tokenId: number): Uint8Array {
     if (tokenId < 0) {
         throw new Error('Negative tokenId');
@@ -583,6 +587,7 @@ export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
     const type = new Uint8Array([3]);
     const chainId = serializeChainId(withdraw.chainId)
     const accountId = serializeAccountId(withdraw.accountId);
+    const subAccountId = serializeSubAccountId(withdraw.subAccountId)
     const accountBytes = serializeAddress(withdraw.from);
     const ethAddressBytes = serializeAddress(withdraw.to);
     const tokenIdBytes = serializeTokenId(withdraw.token);
@@ -598,6 +603,7 @@ export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
         type,
         chainId,
         accountId,
+        subAccountId,
         accountBytes,
         ethAddressBytes,
         tokenIdBytes,
@@ -614,6 +620,8 @@ export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
 
 export function serializeTransfer(transfer: Transfer): Uint8Array {
     const type = new Uint8Array([5]); // tx type
+    const fromSubAccountId = serializeSubAccountId(transfer.fromSubAccountId);
+    const toSubAccountId = serializeSubAccountId(transfer.toSubAccountId);
     const accountId = serializeAccountId(transfer.accountId);
     const from = serializeAddress(transfer.from);
     const to = serializeAddress(transfer.to);
@@ -624,7 +632,7 @@ export function serializeTransfer(transfer: Transfer): Uint8Array {
     const validFrom = serializeTimestamp(transfer.validFrom);
     const validUntil = serializeTimestamp(transfer.validUntil);
     const tsBytes = numberToBytesBE(transfer.ts, 4);
-    return ethers.utils.concat([type, accountId, from, to, token, amount, fee, nonce, validFrom, validUntil, tsBytes]);
+    return ethers.utils.concat([type, fromSubAccountId, toSubAccountId, accountId, from, to, token, amount, fee, nonce, validFrom, validUntil, tsBytes]);
 }
 
 export function serializeSwap(transfer: Swap): Uint8Array {
@@ -774,6 +782,7 @@ export function serializeForcedExit(forcedExit: ForcedExit): Uint8Array {
 export function serializeOrder(order: Order): Uint8Array {
     const type = new Uint8Array([255]);
     const accountIdBytes = serializeAccountId(order.accountId);
+    const subAccountIdBytes = serializeSubAccountId(order.subAccountId);
     const slotBytes = numberToBytesBE(order.slotId, 1);
     const nonceBytes = serializeNonce(order.nonce);
     const basedTokenIdBytes = serializeTokenId(order.basedTokenId);
@@ -786,6 +795,7 @@ export function serializeOrder(order: Order): Uint8Array {
     return ethers.utils.concat([
         type,
         accountIdBytes,
+        subAccountIdBytes,
         slotBytes,
         nonceBytes,
         basedTokenIdBytes,
