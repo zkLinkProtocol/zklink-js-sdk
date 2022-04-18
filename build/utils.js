@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.serializeFeeRatio = exports.serializeChainId = exports.serializeNonce = exports.serializeFeePacked = exports.serializeAmountFull = exports.serializeAmountPacked = exports.serializeTokenId = exports.serializeAccountId = exports.serializeAddress = exports.getEthSignatureType = exports.verifyERC1271Signature = exports.signMessagePersonalAPI = exports.getSignedBytesFromMessage = exports.getChangePubkeyLegacyMessage = exports.getChangePubkeyMessage = exports.TokenSet = exports.isTokenETH = exports.sleep = exports.buffer2bitsBE = exports.isTransactionFeePackable = exports.closestGreaterOrEqPackableTransactionFee = exports.closestPackableTransactionFee = exports.isTransactionAmountPackable = exports.closestGreaterOrEqPackableTransactionAmount = exports.closestPackableTransactionAmount = exports.packFeeChecked = exports.packAmountChecked = exports.reverseBits = exports.integerToFloatUp = exports.integerToFloat = exports.bitsIntoBytesInBEOrder = exports.floatToInteger = exports.TOTAL_CHAIN_NUM = exports.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ERC20_APPROVE_TRESHOLD = exports.MAX_ERC20_APPROVE_AMOUNT = exports.ERC20_DEPOSIT_GAS_LIMIT = exports.MULTICALL_INTERFACE = exports.IEIP1271_INTERFACE = exports.SYNC_GOV_CONTRACT_INTERFACE = exports.ZKL_CONTRACT_INTERFACE = exports.SYNC_EXIT_CONTRACT_INTERFACE = exports.SYNC_MAIN_CONTRACT_INTERFACE = exports.IERC20_INTERFACE = exports.MAX_UNONCE = exports.MIN_UNONCE = exports.MAX_TIMESTAMP = void 0;
-exports.getTimestamp = exports.chainsCompletion = exports.getFastSwapUNonce = exports.getRandom = exports.getTxHash = exports.getPendingBalance = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.parseHexWithPrefix = exports.bigintToBytesBE = exports.numberToBytesBE = exports.serializeTx = exports.serializeOrder = exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeRemoveLiquidity = exports.serializeCurveSwap = exports.serializeCurveRemoveLiquidity = exports.serializeCurveAddLiquidity = exports.serializeAddLiquidity = exports.serializeSwap = exports.serializeTransfer = exports.serializeWithdraw = exports.serializeTimestamp = exports.serializeFastWithdraw = void 0;
+exports.serializeChainId = exports.serializeNonce = exports.serializeFeePacked = exports.serializeAmountFull = exports.serializeAmountPacked = exports.serializeTokenId = exports.serializeSubAccountId = exports.serializeAccountId = exports.serializeAddress = exports.getEthSignatureType = exports.verifyERC1271Signature = exports.signMessagePersonalAPI = exports.getSignedBytesFromMessage = exports.getChangePubkeyLegacyMessage = exports.getChangePubkeyMessage = exports.TokenSet = exports.isTokenETH = exports.sleep = exports.buffer2bitsBE = exports.isTransactionFeePackable = exports.closestGreaterOrEqPackableTransactionFee = exports.closestPackableTransactionFee = exports.isTransactionAmountPackable = exports.closestGreaterOrEqPackableTransactionAmount = exports.closestPackableTransactionAmount = exports.packFeeChecked = exports.packAmountChecked = exports.reverseBits = exports.integerToFloatUp = exports.integerToFloat = exports.bitsIntoBytesInBEOrder = exports.floatToInteger = exports.TOTAL_CHAIN_NUM = exports.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ERC20_APPROVE_TRESHOLD = exports.MAX_ERC20_APPROVE_AMOUNT = exports.ERC20_DEPOSIT_GAS_LIMIT = exports.MULTICALL_INTERFACE = exports.IEIP1271_INTERFACE = exports.SYNC_GOV_CONTRACT_INTERFACE = exports.ZKL_CONTRACT_INTERFACE = exports.SYNC_EXIT_CONTRACT_INTERFACE = exports.SYNC_MAIN_CONTRACT_INTERFACE = exports.IERC20_INTERFACE = exports.MAX_UNONCE = exports.MIN_UNONCE = exports.MAX_TIMESTAMP = void 0;
+exports.getTimestamp = exports.chainsCompletion = exports.getFastSwapUNonce = exports.getRandom = exports.getTxHash = exports.getPendingBalance = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.parseHexWithPrefix = exports.bigintToBytesBE = exports.numberToBytesBE = exports.serializeTx = exports.serializeOrder = exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeRemoveLiquidity = exports.serializeCurveRemoveLiquidity = exports.serializeCurveSwap = exports.serializeCurveAddLiquidity = exports.serializeTransfer = exports.serializeWithdraw = exports.serializeTimestamp = exports.serializeFastWithdraw = exports.serializeFeeRatio = void 0;
 const ethers_1 = require("ethers");
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
 const MAX_NUMBER_OF_TOKENS = 65535;
@@ -451,6 +451,10 @@ function serializeAccountId(accountId) {
     return numberToBytesBE(accountId, 4);
 }
 exports.serializeAccountId = serializeAccountId;
+function serializeSubAccountId(subAccountId) {
+    return numberToBytesBE(subAccountId, 1);
+}
+exports.serializeSubAccountId = serializeSubAccountId;
 function serializeTokenId(tokenId) {
     if (tokenId < 0) {
         throw new Error('Negative tokenId');
@@ -504,6 +508,7 @@ function serializeWithdraw(withdraw) {
     const type = new Uint8Array([3]);
     const chainId = serializeChainId(withdraw.chainId);
     const accountId = serializeAccountId(withdraw.accountId);
+    const subAccountId = serializeSubAccountId(withdraw.subAccountId);
     const accountBytes = serializeAddress(withdraw.from);
     const ethAddressBytes = serializeAddress(withdraw.to);
     const tokenIdBytes = serializeTokenId(withdraw.token);
@@ -519,6 +524,7 @@ function serializeWithdraw(withdraw) {
         type,
         chainId,
         accountId,
+        subAccountId,
         accountBytes,
         ethAddressBytes,
         tokenIdBytes,
@@ -534,7 +540,9 @@ function serializeWithdraw(withdraw) {
 }
 exports.serializeWithdraw = serializeWithdraw;
 function serializeTransfer(transfer) {
-    const type = new Uint8Array([5]); // tx type
+    const type = new Uint8Array([4]); // tx type
+    const fromSubAccountId = serializeSubAccountId(transfer.fromSubAccountId);
+    const toSubAccountId = serializeSubAccountId(transfer.toSubAccountId);
     const accountId = serializeAccountId(transfer.accountId);
     const from = serializeAddress(transfer.from);
     const to = serializeAddress(transfer.to);
@@ -545,50 +553,11 @@ function serializeTransfer(transfer) {
     const validFrom = serializeTimestamp(transfer.validFrom);
     const validUntil = serializeTimestamp(transfer.validUntil);
     const tsBytes = numberToBytesBE(transfer.ts, 4);
-    return ethers_1.ethers.utils.concat([type, accountId, from, to, token, amount, fee, nonce, validFrom, validUntil, tsBytes]);
+    return ethers_1.ethers.utils.concat([type, fromSubAccountId, toSubAccountId, accountId, from, to, token, amount, fee, nonce, validFrom, validUntil, tsBytes]);
 }
 exports.serializeTransfer = serializeTransfer;
-function serializeSwap(transfer) {
-    const type = new Uint8Array([11]); // tx type
-    const fromChain = serializeChainId(transfer.fromChain);
-    const toChain = serializeChainId(transfer.toChain);
-    // const accountId = serializeAccountId(transfer.accountId);
-    const account = serializeAddress(transfer.account);
-    const pairAddress = serializeAddress(transfer.pairAddress);
-    const tokenIn = serializeTokenId(transfer.tokenIn);
-    const tokenOut = serializeTokenId(transfer.tokenOut);
-    const amountIn = serializeAmountPacked(transfer.amountIn);
-    const amountOut = serializeAmountPacked(transfer.amountOut);
-    const amountOutMin = serializeAmountPacked(transfer.amountOutMin);
-    const fee0 = serializeFeePacked(transfer.fee0);
-    const fee1 = serializeFeePacked(transfer.fee1);
-    const nonce = serializeNonce(transfer.nonce);
-    const validFrom = serializeTimestamp(transfer.validFrom);
-    const validUntil = serializeTimestamp(transfer.validUntil);
-    return ethers_1.ethers.utils.concat([type, fromChain, toChain, account, pairAddress, tokenIn, tokenOut, amountIn, amountOutMin, fee0, fee1, nonce, validFrom, validUntil]);
-}
-exports.serializeSwap = serializeSwap;
-function serializeAddLiquidity(transfer) {
-    const type = new Uint8Array([9]); // tx type
-    // const accountId = serializeAccountId(transfer.accountId);
-    const account = serializeAddress(transfer.account);
-    const pairAccount = serializeAddress(transfer.pairAccount);
-    const token0 = serializeTokenId(transfer.token0);
-    const token1 = serializeTokenId(transfer.token1);
-    const fromChainId = serializeChainId(transfer.fromChainId);
-    const toChainId = serializeChainId(transfer.toChainId);
-    const amount0 = serializeAmountPacked(transfer.amount0);
-    const amount1 = serializeAmountPacked(transfer.amount1);
-    const amount0Min = serializeAmountPacked(transfer.amount0Min);
-    const amount1Min = serializeAmountPacked(transfer.amount1Min);
-    const nonce = serializeNonce(transfer.nonce);
-    const validFrom = serializeTimestamp(transfer.validFrom);
-    const validUntil = serializeTimestamp(transfer.validUntil);
-    return ethers_1.ethers.utils.concat([type, fromChainId, toChainId, account, token0, token1, pairAccount, amount0, amount1, amount0Min, amount1Min, nonce, validFrom, validUntil]);
-}
-exports.serializeAddLiquidity = serializeAddLiquidity;
 function serializeCurveAddLiquidity(payload) {
-    const type = new Uint8Array([9]);
+    const type = new Uint8Array([8]);
     const account = serializeAddress(payload.account);
     const tokens = chainsCompletion(payload.tokens, exports.TOTAL_CHAIN_NUM, 0).map(tokenId => serializeTokenId(tokenId));
     const amounts = chainsCompletion(payload.amounts, exports.TOTAL_CHAIN_NUM, '0').map(amount => serializeAmountPacked(amount));
@@ -602,23 +571,8 @@ function serializeCurveAddLiquidity(payload) {
     return ethers_1.ethers.utils.concat([type, account, ...tokens, ...amounts, minLpQuantity, feeToken, feeAmount, nonce, validFrom, validUntil, tsBytes]);
 }
 exports.serializeCurveAddLiquidity = serializeCurveAddLiquidity;
-function serializeCurveRemoveLiquidity(payload) {
-    const type = new Uint8Array([11]);
-    const account = serializeAddress(payload.account);
-    const tokens = chainsCompletion(payload.tokens, exports.TOTAL_CHAIN_NUM, 0).map(tokenId => serializeTokenId(tokenId));
-    const minAmounts = chainsCompletion(payload.minAmounts, exports.TOTAL_CHAIN_NUM, '0').map(amount => serializeAmountPacked(amount));
-    const lpQuantity = serializeAmountPacked(payload.lpQuantity);
-    const feeToken = serializeTokenId(payload.feeToken);
-    const feeAmount = serializeFeePacked(payload.fee);
-    const nonce = serializeNonce(payload.nonce);
-    const validFrom = serializeTimestamp(payload.validFrom);
-    const validUntil = serializeTimestamp(payload.validUntil);
-    const tsBytes = numberToBytesBE(payload.ts, 4);
-    return ethers_1.ethers.utils.concat([type, account, ...tokens, ...minAmounts, lpQuantity, feeToken, feeAmount, nonce, validFrom, validUntil, tsBytes]);
-}
-exports.serializeCurveRemoveLiquidity = serializeCurveRemoveLiquidity;
 function serializeCurveSwap(payload) {
-    const type = new Uint8Array([10]);
+    const type = new Uint8Array([9]);
     const account = serializeAddress(payload.account);
     const pairAddress = serializeAddress(payload.pairAddress);
     const tokenIn = serializeTokenId(payload.tokenIn);
@@ -633,6 +587,21 @@ function serializeCurveSwap(payload) {
     return ethers_1.ethers.utils.concat([type, account, pairAddress, tokenIn, tokenOut, amountIn, amountOutMin, feeAmount, nonce, validFrom, validUntil, tsBytes]);
 }
 exports.serializeCurveSwap = serializeCurveSwap;
+function serializeCurveRemoveLiquidity(payload) {
+    const type = new Uint8Array([10]);
+    const account = serializeAddress(payload.account);
+    const tokens = chainsCompletion(payload.tokens, exports.TOTAL_CHAIN_NUM, 0).map(tokenId => serializeTokenId(tokenId));
+    const minAmounts = chainsCompletion(payload.minAmounts, exports.TOTAL_CHAIN_NUM, '0').map(amount => serializeAmountPacked(amount));
+    const lpQuantity = serializeAmountPacked(payload.lpQuantity);
+    const feeToken = serializeTokenId(payload.feeToken);
+    const feeAmount = serializeFeePacked(payload.fee);
+    const nonce = serializeNonce(payload.nonce);
+    const validFrom = serializeTimestamp(payload.validFrom);
+    const validUntil = serializeTimestamp(payload.validUntil);
+    const tsBytes = numberToBytesBE(payload.ts, 4);
+    return ethers_1.ethers.utils.concat([type, account, ...tokens, ...minAmounts, lpQuantity, feeToken, feeAmount, nonce, validFrom, validUntil, tsBytes]);
+}
+exports.serializeCurveRemoveLiquidity = serializeCurveRemoveLiquidity;
 function serializeRemoveLiquidity(transfer) {
     const type = new Uint8Array([10]); // tx type
     const fromChainId = serializeChainId(transfer.fromChainId);
@@ -654,7 +623,7 @@ function serializeRemoveLiquidity(transfer) {
 }
 exports.serializeRemoveLiquidity = serializeRemoveLiquidity;
 function serializeChangePubKey(changePubKey) {
-    const type = new Uint8Array([7]);
+    const type = new Uint8Array([6]);
     const accountBytes = serializeAddress(changePubKey.account);
     const pubKeyHashBytes = serializeAddress(changePubKey.newPkHash);
     const tokenIdBytes = serializeTokenId(changePubKey.feeToken);
@@ -700,6 +669,7 @@ exports.serializeForcedExit = serializeForcedExit;
 function serializeOrder(order) {
     const type = new Uint8Array([255]);
     const accountIdBytes = serializeAccountId(order.accountId);
+    const subAccountIdBytes = serializeSubAccountId(order.subAccountId);
     const slotBytes = numberToBytesBE(order.slotId, 1);
     const nonceBytes = serializeNonce(order.nonce);
     const basedTokenIdBytes = serializeTokenId(order.basedTokenId);
@@ -712,6 +682,7 @@ function serializeOrder(order) {
     return ethers_1.ethers.utils.concat([
         type,
         accountIdBytes,
+        subAccountIdBytes,
         slotBytes,
         nonceBytes,
         basedTokenIdBytes,
@@ -800,9 +771,10 @@ function getEthereumBalance(ethProvider, syncProvider, address, token) {
     });
 }
 exports.getEthereumBalance = getEthereumBalance;
-function getPendingBalance(ethProvider, syncProvider, address, token) {
+function getPendingBalance(ethProvider, syncProvider, address, token, linkChainId) {
     return __awaiter(this, void 0, void 0, function* () {
-        const zksyncContract = new ethers_1.Contract(syncProvider.contractAddress.mainContract, exports.SYNC_MAIN_CONTRACT_INTERFACE, ethProvider);
+        const contractAddress = yield syncProvider.getContractAddress(linkChainId);
+        const zksyncContract = new ethers_1.Contract(contractAddress.mainContract, exports.SYNC_MAIN_CONTRACT_INTERFACE, ethProvider);
         const tokenAddress = syncProvider.tokenSet.resolveTokenAddress(token);
         return zksyncContract.getPendingBalance(address, tokenAddress);
     });

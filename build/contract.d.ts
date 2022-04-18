@@ -8,11 +8,11 @@ export declare class LinkContract {
     constructor(provider: Provider, ethSigner: ethers.Signer);
     connect(provider: Provider): this;
     static fromEthSigner(provider: Provider, ethSigner: ethers.Signer): LinkContract;
-    getMainContract(): Contract;
-    getExitContract(): Contract;
+    getMainContract(linkChainId: number): Promise<Contract>;
+    getExitContract(linkChainId: number): Promise<Contract>;
     getZKLContract(contractAddress: any): Contract;
-    isERC20DepositsApproved(tokenAddress: Address, accountAddress: Address, erc20ApproveThreshold?: BigNumber): Promise<boolean>;
-    approveERC20TokenDeposits(tokenAddress: Address, max_erc20_approve_amount?: BigNumber): Promise<ContractTransaction>;
+    isERC20DepositsApproved(tokenAddress: Address, accountAddress: Address, linkChainId: number, erc20ApproveThreshold?: BigNumber): Promise<boolean>;
+    approveERC20TokenDeposits(tokenAddress: Address, linkChainId: number, max_erc20_approve_amount?: BigNumber): Promise<ContractTransaction>;
     bridge(bridge: {
         to: Address;
         toChainId: number;
@@ -38,20 +38,24 @@ export declare class LinkContract {
     getPendingBalance(pending: {
         account: Address;
         tokenAddress: Address;
+        linkChainId: number;
     }): Promise<BigNumber>;
     getPendingBalances(pending: {
         account: Address;
         tokenAddresses: Address[];
+        linkChainId: number;
     }): Promise<BigNumber[]>;
     withdrawPendingBalance(withdraw: {
         account: Address;
         tokenAddress: Address;
         amount: BigNumberish;
+        linkChainId: number;
     }): Promise<ETHOperation>;
     withdrawMultiplePendingBalance(withdraw: {
         account: Address;
         tokenAddresses: Address[];
         amounts: BigNumberish[];
+        linkChainId: number;
     }): Promise<ETHOperation>;
     private modifyEthersError;
 }

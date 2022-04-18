@@ -5,11 +5,12 @@ import { MULTICALL_INTERFACE } from './utils';
 
 declare module './wallet' {
     interface Wallet {
-        withdrawPendingBalance(from: Address, token: TokenLike, amount?: BigNumberish): Promise<ContractTransaction>;
+        withdrawPendingBalance(from: Address, token: TokenLike, linkChainId: number, amount?: BigNumberish): Promise<ContractTransaction>;
         withdrawPendingBalances(
             addresses: Address[],
             tokens: TokenLike[],
             multicallParams: MulticallParams,
+            linkChainId: number,
             amounts?: BigNumberish[]
         ): Promise<ContractTransaction>;
     }
@@ -51,11 +52,12 @@ Wallet.prototype.withdrawPendingBalance = async function (
     this: Wallet,
     from: Address,
     token: TokenLike,
+    linkChainId: number,
     amount?: BigNumberish
 ): Promise<ContractTransaction> {
     checkEthProvider(this.ethSigner);
 
-    const zksyncContract = this.getZkSyncMainContract();
+    const zksyncContract = await this.getZkSyncMainContract(linkChainId);
 
     const gasPrice = await this.ethSigner.getGasPrice();
 
@@ -73,6 +75,7 @@ Wallet.prototype.withdrawPendingBalances = async function (
     addresses: Address[],
     tokens: TokenLike[],
     multicallParams: MulticallParams,
+    linkChainId: number,
     amounts?: BigNumberish[]
 ): Promise<ContractTransaction> {
     checkEthProvider(this.ethSigner);
@@ -83,7 +86,7 @@ Wallet.prototype.withdrawPendingBalances = async function (
 
     const multicallAddress = multicallParams.address || getMulticallAddressByNetwork(multicallParams.network);
 
-    const zksyncContract = this.getZkSyncMainContract();
+    const zksyncContract = await this.getZkSyncMainContract(linkChainId);
     const gasPrice = await this.ethSigner.getGasPrice();
 
     const tokensAddresses = tokens.map((token) => this.provider.tokenSet.resolveTokenAddress(token));

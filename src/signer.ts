@@ -27,6 +27,16 @@ export class Signer {
         return await privateKeyToPubKeyHash(this.#privateKey);
     }
 
+    async getPublicKey() {
+        const wallet = new ethers.Wallet(this.#privateKey)
+        return wallet.publicKey
+    }
+
+    async signMessage(message: string) {
+        const wallet = new ethers.Wallet(this.#privateKey)
+        return await wallet.signMessage(message)
+    }
+
     /**
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
@@ -79,121 +89,6 @@ export class Signer {
             ...tx,
             amount: BigNumber.from(transfer.amount).toString(),
             fee: BigNumber.from(transfer.fee).toString(),
-            signature
-        };
-    }
-
-
-    async signSyncSwap(transfer: {
-        fromChain: number,
-        toChain: number,
-        accountId: number,
-        account: Address,  // this.address()
-        tokenIdIn: number,
-        tokenIdOut: number,
-        amountIn: BigNumberish,
-        amountOut: BigNumberish,
-        amountOutMin: BigNumberish,
-        fee0: BigNumberish,
-        fee1: BigNumberish,
-        pairAddress: Address,
-        
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Promise<Swap> {
-        const tx: Swap = {
-            ...transfer,
-            type: 'Swap',
-            tokenIn: transfer.tokenIdIn,
-            tokenOut: transfer.tokenIdOut,
-        };
-        const msgBytes = utils.serializeSwap(tx);
-        const signature = await signTransactionBytes(this.#privateKey, msgBytes);
-
-        return {
-            ...tx,
-            amountIn: BigNumber.from(transfer.amountIn).toString(),
-            amountOut: BigNumber.from(transfer.amountOut).toString(),
-            amountOutMin: BigNumber.from(transfer.amountOutMin).toString(),
-            fee0: BigNumber.from(transfer.fee0).toString(),
-            fee1: BigNumber.from(transfer.fee1).toString(),
-            signature
-        };
-    }
-
-    async signSyncRemoveLiquidity(transfer: {
-        fromChainId: number;
-        toChainId: number;
-        minAmount1: BigNumberish,
-        minAmount2: BigNumberish,
-        tokenId1: number,
-        tokenId2: number,
-        lpTokenId: number,
-        fee1: BigNumberish,
-        fee2: BigNumberish,
-        from: Address;
-        pairAddress: Address,
-        lpQuantity: BigNumberish;
-        accountId: number,
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Promise<RemoveLiquidity> {
-        const tx: RemoveLiquidity = {
-            ...transfer,
-            type: 'RemoveLiquidity',
-            token1: transfer.tokenId1,
-            token2: transfer.tokenId2,
-            lpToken: transfer.lpTokenId,
-        };
-        const msgBytes = utils.serializeRemoveLiquidity(tx);
-        const signature = await signTransactionBytes(this.#privateKey, msgBytes);
-
-        return {
-            ...tx,
-            minAmount1: BigNumber.from(transfer.minAmount1).toString(),
-            minAmount2: BigNumber.from(transfer.minAmount2).toString(),
-            fee1: BigNumber.from(transfer.fee1).toString(),
-            fee2: BigNumber.from(transfer.fee2).toString(),
-            lpQuantity: BigNumber.from(transfer.lpQuantity).toString(),
-            signature
-        };
-    }
-
-    async signSyncAddLiquidity(transfer: {
-        accountId: number;
-        account: Address;
-        fromChainId: number;
-        toChainId: number;
-        tokenId0: number;
-        tokenId1: number;
-        amount0: BigNumberish;
-        amount1: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
-        pairAccount: Address;
-        // fee1: BigNumberish;
-        // fee2: BigNumberish;
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Promise<AddLiquidity> {
-        const tx: AddLiquidity = {
-            ...transfer,
-            type: 'AddLiq',
-            token0: transfer.tokenId0,
-            token1: transfer.tokenId1,
-        };
-        const msgBytes = utils.serializeAddLiquidity(tx);
-        const signature = await signTransactionBytes(this.#privateKey, msgBytes);
-
-        return {
-            ...tx,
-            amount0: BigNumber.from(transfer.amount0).toString(),
-            amount1: BigNumber.from(transfer.amount1).toString(),
-            amount0Min: BigNumber.from(transfer.amount0Min).toString(),
-            amount1Min: BigNumber.from(transfer.amount1Min).toString(),
             signature
         };
     }

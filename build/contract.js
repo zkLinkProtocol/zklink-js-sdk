@@ -27,23 +27,30 @@ class LinkContract {
     static fromEthSigner(provider, ethSigner) {
         return new LinkContract(provider, ethSigner);
     }
-    getMainContract() {
-        return new ethers_1.ethers.Contract(this.provider.contractAddress.mainContract, utils_1.SYNC_MAIN_CONTRACT_INTERFACE, this.ethSigner);
+    getMainContract(linkChainId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const contractAddress = yield this.provider.getContractAddress(linkChainId);
+            return new ethers_1.ethers.Contract(contractAddress.mainContract, utils_1.SYNC_MAIN_CONTRACT_INTERFACE, this.ethSigner);
+        });
     }
-    getExitContract() {
-        return new ethers_1.ethers.Contract(this.provider.contractAddress.mainContract, utils_1.SYNC_EXIT_CONTRACT_INTERFACE, this.ethSigner);
+    getExitContract(linkChainId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const contractAddress = yield this.provider.getContractAddress(linkChainId);
+            return new ethers_1.ethers.Contract(contractAddress.mainContract, utils_1.SYNC_EXIT_CONTRACT_INTERFACE, this.ethSigner);
+        });
     }
     getZKLContract(contractAddress) {
         return new ethers_1.ethers.Contract(contractAddress, utils_1.ZKL_CONTRACT_INTERFACE, this.ethSigner);
     }
-    isERC20DepositsApproved(tokenAddress, accountAddress, erc20ApproveThreshold = utils_1.ERC20_APPROVE_TRESHOLD) {
+    isERC20DepositsApproved(tokenAddress, accountAddress, linkChainId, erc20ApproveThreshold = utils_1.ERC20_APPROVE_TRESHOLD) {
         return __awaiter(this, void 0, void 0, function* () {
             if ((0, utils_1.isTokenETH)(tokenAddress)) {
                 throw Error('ETH token does not need approval.');
             }
             const erc20contract = new ethers_1.Contract(tokenAddress, utils_1.IERC20_INTERFACE, this.ethSigner);
+            const contractAddress = yield this.provider.getContractAddress(linkChainId);
             try {
-                const currentAllowance = yield erc20contract.allowance(accountAddress, this.provider.contractAddress.mainContract);
+                const currentAllowance = yield erc20contract.allowance(accountAddress, contractAddress.mainContract);
                 return ethers_1.BigNumber.from(currentAllowance).gte(erc20ApproveThreshold);
             }
             catch (e) {
@@ -51,14 +58,15 @@ class LinkContract {
             }
         });
     }
-    approveERC20TokenDeposits(tokenAddress, max_erc20_approve_amount = utils_1.MAX_ERC20_APPROVE_AMOUNT) {
+    approveERC20TokenDeposits(tokenAddress, linkChainId, max_erc20_approve_amount = utils_1.MAX_ERC20_APPROVE_AMOUNT) {
         return __awaiter(this, void 0, void 0, function* () {
             if ((0, utils_1.isTokenETH)(tokenAddress)) {
                 throw Error('ETH token does not need approval.');
             }
             const erc20contract = new ethers_1.Contract(tokenAddress, utils_1.IERC20_INTERFACE, this.ethSigner);
+            const contractAddress = yield this.provider.getContractAddress(linkChainId);
             try {
-                return erc20contract.approve(this.provider.contractAddress.mainContract, max_erc20_approve_amount);
+                return erc20contract.approve(contractAddress.mainContract, max_erc20_approve_amount);
             }
             catch (e) {
                 this.modifyEthersError(e);
@@ -102,7 +110,7 @@ class LinkContract {
     }
     fastSwap(swap) {
         return __awaiter(this, void 0, void 0, function* () {
-            const mainContract = this.getMainContract();
+            const mainContract = yield this.getMainContract(swap.fromChainId);
             let ethTransaction;
             let uNonce = (0, utils_1.getFastSwapUNonce)();
             if (!uNonce) {
@@ -161,28 +169,28 @@ class LinkContract {
     }
     getPendingBalance(pending) {
         return __awaiter(this, void 0, void 0, function* () {
-            const exitContract = this.getExitContract();
+            const exitContract = yield this.getExitContract(pending.linkChainId);
             const balance = yield exitContract.getPendingBalance(pending.account, pending.tokenAddress);
             return ethers_1.BigNumber.from(balance);
         });
     }
     getPendingBalances(pending) {
         return __awaiter(this, void 0, void 0, function* () {
-            const exitContract = this.getExitContract();
+            const exitContract = yield this.getExitContract(pending.linkChainId);
             const balances = yield exitContract.getPendingBalances(pending.account, pending.tokenAddresses);
             return balances;
         });
     }
     withdrawPendingBalance(withdraw) {
         return __awaiter(this, void 0, void 0, function* () {
-            const exitContract = this.getExitContract();
+            const exitContract = yield this.getExitContract(withdraw.linkChainId);
             const ethTransaction = yield exitContract.withdrawPendingBalance(withdraw.account, withdraw.tokenAddress, ethers_1.BigNumber.from(withdraw.amount));
             return new wallet_1.ETHOperation(ethTransaction, this.provider);
         });
     }
     withdrawMultiplePendingBalance(withdraw) {
         return __awaiter(this, void 0, void 0, function* () {
-            const exitContract = this.getExitContract();
+            const exitContract = yield this.getExitContract(withdraw.linkChainId);
             const ethTransaction = yield exitContract.withdrawMultiplePendingBalance(withdraw.account, withdraw.tokenAddresses, withdraw.amounts);
             return new wallet_1.ETHOperation(ethTransaction, this.provider);
         });

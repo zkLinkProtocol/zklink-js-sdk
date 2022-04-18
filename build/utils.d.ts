@@ -1,6 +1,6 @@
 import { utils, ethers, BigNumber, BigNumberish } from 'ethers';
 import { Provider } from '.';
-import { PubKeyHash, TokenAddress, TokenLike, Tokens, TokenSymbol, EthSignerType, Address, Transfer, ForcedExit, ChangePubKey, Withdraw, CloseAccount, AddLiquidity, RemoveLiquidity, Swap, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order } from './types';
+import { PubKeyHash, TokenAddress, TokenLike, Tokens, TokenSymbol, EthSignerType, Address, Transfer, ForcedExit, ChangePubKey, Withdraw, CloseAccount, RemoveLiquidity, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order } from './types';
 export declare const MAX_TIMESTAMP = 4294967295;
 export declare const MIN_UNONCE = 1;
 export declare const MAX_UNONCE = 4294967295;
@@ -67,6 +67,7 @@ export declare function verifyERC1271Signature(address: string, message: Uint8Ar
 export declare function getEthSignatureType(_provider: ethers.providers.Provider, message: string, signature: string, address: string): Promise<EthSignerType>;
 export declare function serializeAddress(address: Address | PubKeyHash): Uint8Array;
 export declare function serializeAccountId(accountId: number): Uint8Array;
+export declare function serializeSubAccountId(subAccountId: number): Uint8Array;
 export declare function serializeTokenId(tokenId: number): Uint8Array;
 export declare function serializeAmountPacked(amount: BigNumberish): Uint8Array;
 export declare function serializeAmountFull(amount: BigNumberish): Uint8Array;
@@ -78,11 +79,9 @@ export declare function serializeFastWithdraw(fastWithdraw: number): Uint8Array;
 export declare function serializeTimestamp(time: number): Uint8Array;
 export declare function serializeWithdraw(withdraw: Withdraw): Uint8Array;
 export declare function serializeTransfer(transfer: Transfer): Uint8Array;
-export declare function serializeSwap(transfer: Swap): Uint8Array;
-export declare function serializeAddLiquidity(transfer: AddLiquidity): Uint8Array;
 export declare function serializeCurveAddLiquidity(payload: CurveAddLiquidity): Uint8Array;
-export declare function serializeCurveRemoveLiquidity(payload: CurveRemoveLiquidity): Uint8Array;
 export declare function serializeCurveSwap(payload: CurveSwap): Uint8Array;
+export declare function serializeCurveRemoveLiquidity(payload: CurveRemoveLiquidity): Uint8Array;
 export declare function serializeRemoveLiquidity(transfer: RemoveLiquidity): Uint8Array;
 export declare function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array;
 export declare function serializeForcedExit(forcedExit: ForcedExit): Uint8Array;
@@ -104,7 +103,7 @@ export declare function getCREATE2AddressAndSalt(syncPubkeyHash: string, create2
     address: string;
 };
 export declare function getEthereumBalance(ethProvider: ethers.providers.Provider, syncProvider: Provider, address: Address, token: TokenLike): Promise<BigNumber>;
-export declare function getPendingBalance(ethProvider: ethers.providers.Provider, syncProvider: Provider, address: Address, token: TokenLike): Promise<BigNumberish>;
+export declare function getPendingBalance(ethProvider: ethers.providers.Provider, syncProvider: Provider, address: Address, token: TokenLike, linkChainId: number): Promise<BigNumberish>;
 export declare function getTxHash(tx: Transfer | Withdraw | ChangePubKey | ForcedExit | CloseAccount): string;
 export declare function getRandom(min: number, max: number): number;
 export declare function getFastSwapUNonce(): number;

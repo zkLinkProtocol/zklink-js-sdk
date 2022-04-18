@@ -9,83 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ETHProxy = exports.Provider = exports.getDefaultProvider = void 0;
+exports.ETHProxy = exports.Provider = void 0;
 const transport_1 = require("./transport");
 const ethers_1 = require("ethers");
 const utils_1 = require("./utils");
 const logger_1 = require("@ethersproject/logger");
 const EthersErrorCode = logger_1.ErrorCode;
-function getDefaultProvider(network, transport = 'HTTP') {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (transport === 'WS') {
-            console.warn('Websocket support will be removed in future. Use HTTP transport instead.');
-        }
-        if (network === 'localhost') {
-            if (transport === 'WS') {
-                return yield Provider.newWebsocketProvider('ws://127.0.0.1:3031');
-            }
-            else if (transport === 'HTTP') {
-                return yield Provider.newHttpProvider('http://127.0.0.1:3030');
-            }
-        }
-        else if (network === 'ropsten') {
-            if (transport === 'WS') {
-                return yield Provider.newWebsocketProvider('wss://ropsten-api.zksync.io/jsrpc-ws');
-            }
-            else if (transport === 'HTTP') {
-                return yield Provider.newHttpProvider('https://ropsten-api.zksync.io/jsrpc');
-            }
-        }
-        else if (network === 'rinkeby') {
-            if (transport === 'WS') {
-                return yield Provider.newWebsocketProvider('wss://rinkeby-api.zksync.io/jsrpc-ws');
-            }
-            else if (transport === 'HTTP') {
-                return yield Provider.newHttpProvider('https://rinkeby-api.zksync.io/jsrpc');
-            }
-        }
-        else if (network === 'ropsten-beta') {
-            if (transport === 'WS') {
-                return yield Provider.newWebsocketProvider('wss://ropsten-beta-api.zksync.io/jsrpc-ws');
-            }
-            else if (transport === 'HTTP') {
-                return yield Provider.newHttpProvider('https://ropsten-beta-api.zksync.io/jsrpc');
-            }
-        }
-        else if (network === 'rinkeby-beta') {
-            if (transport === 'WS') {
-                return yield Provider.newWebsocketProvider('wss://rinkeby-beta-api.zksync.io/jsrpc-ws');
-            }
-            else if (transport === 'HTTP') {
-                return yield Provider.newHttpProvider('https://rinkeby-beta-api.zksync.io/jsrpc');
-            }
-        }
-        else if (network === 'mainnet') {
-            if (transport === 'WS') {
-                return yield Provider.newWebsocketProvider('wss://api.zksync.io/jsrpc-ws');
-            }
-            else if (transport === 'HTTP') {
-                return yield Provider.newHttpProvider('https://api.zksync.io/jsrpc');
-            }
-        }
-        else {
-            throw new Error(`Ethereum network ${network} is not supported`);
-        }
-    });
-}
-exports.getDefaultProvider = getDefaultProvider;
 class Provider {
     constructor(transport) {
         this.transport = transport;
+        this.contractAddress = [];
         // For HTTP provider
         this.pollIntervalMilliSecs = 500;
-    }
-    setChainId(chainId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.chainId = Number(chainId);
-            this.contractAddress = yield this.getContractAddress();
-            this.tokenSet = new utils_1.TokenSet(yield this.getTokens());
-        });
     }
     /**
      * @deprecated Websocket support will be removed in future. Use HTTP transport instead.
@@ -94,22 +29,17 @@ class Provider {
         return __awaiter(this, void 0, void 0, function* () {
             const transport = yield transport_1.WSTransport.connect(address);
             const provider = new Provider(transport);
-            provider.contractAddress = yield provider.getContractAddress();
             provider.tokenSet = new utils_1.TokenSet(yield provider.getTokens());
             return provider;
         });
     }
-    static newHttpProvider(address = 'http://127.0.0.1:3030', chainId, pollIntervalMilliSecs) {
+    static newHttpProvider(address = 'http://127.0.0.1:3030', pollIntervalMilliSecs) {
         return __awaiter(this, void 0, void 0, function* () {
             const transport = new transport_1.HTTPTransport(address);
             const provider = new Provider(transport);
             if (pollIntervalMilliSecs) {
                 provider.pollIntervalMilliSecs = pollIntervalMilliSecs;
             }
-            if (chainId !== undefined) {
-                provider.setChainId(chainId);
-            }
-            provider.contractAddress = yield provider.getContractAddress();
             provider.tokenSet = new utils_1.TokenSet(yield provider.getTokens());
             return provider;
         });
@@ -118,14 +48,10 @@ class Provider {
      * Provides some hardcoded values the `Provider` responsible for
      * without communicating with the network
      */
-    static newMockProvider(network, ethPrivateKey, getTokens, chainId) {
+    static newMockProvider(network, ethPrivateKey, getTokens) {
         return __awaiter(this, void 0, void 0, function* () {
             const transport = new transport_1.DummyTransport(network, ethPrivateKey, getTokens);
             const provider = new Provider(transport);
-            if (chainId !== undefined) {
-                provider.setChainId(chainId);
-            }
-            provider.contractAddress = yield provider.getContractAddress();
             provider.tokenSet = new utils_1.TokenSet(yield provider.getTokens());
             return provider;
         });
@@ -133,7 +59,7 @@ class Provider {
     // return transaction hash (e.g. sync-tx:dead..beef)
     submitTx({ tx, signature, fastProcessing }) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('tx_submit', [this.chainId, tx, signature, fastProcessing]);
+            return yield this.transport.request('tx_submit', [tx, signature, fastProcessing]);
         });
     }
     // Requests `zkSync` server to execute several transactions together.
@@ -152,17 +78,21 @@ class Provider {
             else {
                 signatures.push(ethSignatures);
             }
-            return yield this.transport.request('submit_txs_batch', [this.chainId, transactions, signatures]);
+            return yield this.transport.request('submit_txs_batch', [transactions, signatures]);
         });
     }
-    getContractAddress() {
+    getContractAddress(linkChainId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('contract_address', [this.chainId]);
+            if (this.contractAddress[linkChainId]) {
+                return this.contractAddress[linkChainId];
+            }
+            this.contractAddress[linkChainId] = yield this.transport.request('contract_address', [linkChainId]);
+            return this.contractAddress[linkChainId];
         });
     }
     getTokens() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('tokens', [this.chainId]);
+            return yield this.transport.request('tokens', []);
         });
     }
     updateTokenSet() {
@@ -173,31 +103,31 @@ class Provider {
     }
     getState(address) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('account_info', [this.chainId, address]);
+            return yield this.transport.request('account_info', [address]);
         });
     }
     // get transaction status by its hash (e.g. 0xdead..beef)
     getTxReceipt(txHash) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('tx_info', [this.chainId, txHash]);
+            return yield this.transport.request('tx_info', [txHash]);
         });
     }
-    getPriorityOpStatus(serialId) {
+    getPriorityOpStatus(linkChainId, serialId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('ethop_info', [this.chainId, serialId]);
+            return yield this.transport.request('ethop_info', [linkChainId, serialId]);
         });
     }
     getConfirmationsForEthOpAmount() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('get_confirmations_for_eth_op_amount', [this.chainId]);
+            return yield this.transport.request('get_confirmations_for_eth_op_amount', []);
         });
     }
     getEthTxForWithdrawal(withdrawal_hash) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('get_eth_tx_for_withdrawal', [this.chainId, withdrawal_hash]);
+            return yield this.transport.request('get_eth_tx_for_withdrawal', [withdrawal_hash]);
         });
     }
-    notifyPriorityOp(serialId, action) {
+    notifyPriorityOp(linkChainId, serialId, action) {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.transport.subscriptionsSupported()) {
                 return yield new Promise((resolve) => {
@@ -211,7 +141,7 @@ class Provider {
             }
             else {
                 while (true) {
-                    const priorOpStatus = yield this.getPriorityOpStatus(serialId);
+                    const priorOpStatus = yield this.getPriorityOpStatus(linkChainId, serialId);
                     const notifyDone = action === 'COMMIT'
                         ? priorOpStatus.block && priorOpStatus.block.committed
                         : priorOpStatus.block && priorOpStatus.block.verified;
@@ -229,7 +159,7 @@ class Provider {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.transport.subscriptionsSupported()) {
                 return yield new Promise((resolve) => {
-                    const subscribe = this.transport.subscribe('tx_subscribe', [this.chainId, hash, action], 'tx_unsubscribe', (resp) => {
+                    const subscribe = this.transport.subscribe('tx_subscribe', [hash, action], 'tx_unsubscribe', (resp) => {
                         subscribe
                             .then((sub) => sub.unsubscribe())
                             .catch((err) => console.log(`WebSocket connection closed with reason: ${err}`));
@@ -255,7 +185,7 @@ class Provider {
     }
     getTransactionFee(txType, address, tokenLike) {
         return __awaiter(this, void 0, void 0, function* () {
-            const transactionFee = yield this.transport.request('get_tx_fee', [this.chainId, txType, address.toString(), tokenLike]);
+            const transactionFee = yield this.transport.request('get_tx_fee', [txType, address.toString(), tokenLike]);
             return {
                 feeType: transactionFee.feeType,
                 gasTxAmount: ethers_1.BigNumber.from(transactionFee.gasTxAmount),
@@ -266,15 +196,15 @@ class Provider {
             };
         });
     }
-    getTransactionsBatchFee(txTypes, addresses, tokenLike, chainId) {
+    getTransactionsBatchFee(txTypes, addresses, tokenLike) {
         return __awaiter(this, void 0, void 0, function* () {
-            const batchFee = yield this.transport.request('get_txs_batch_fee_in_wei', [(chainId || this.chainId), txTypes, addresses, tokenLike]);
+            const batchFee = yield this.transport.request('get_txs_batch_fee_in_wei', [txTypes, addresses, tokenLike]);
             return ethers_1.BigNumber.from(batchFee.totalFee);
         });
     }
-    getTokenPrice(tokenLike, chainId) {
+    getTokenPrice(tokenLike) {
         return __awaiter(this, void 0, void 0, function* () {
-            const tokenPrice = yield this.transport.request('get_token_price', [(chainId || this.chainId), tokenLike]);
+            const tokenPrice = yield this.transport.request('get_token_price', [tokenLike]);
             return parseFloat(tokenPrice);
         });
     }

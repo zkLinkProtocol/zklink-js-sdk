@@ -619,7 +619,7 @@ export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
 }
 
 export function serializeTransfer(transfer: Transfer): Uint8Array {
-    const type = new Uint8Array([5]); // tx type
+    const type = new Uint8Array([4]); // tx type
     const fromSubAccountId = serializeSubAccountId(transfer.fromSubAccountId);
     const toSubAccountId = serializeSubAccountId(transfer.toSubAccountId);
     const accountId = serializeAccountId(transfer.accountId);
@@ -634,46 +634,8 @@ export function serializeTransfer(transfer: Transfer): Uint8Array {
     const tsBytes = numberToBytesBE(transfer.ts, 4);
     return ethers.utils.concat([type, fromSubAccountId, toSubAccountId, accountId, from, to, token, amount, fee, nonce, validFrom, validUntil, tsBytes]);
 }
-
-export function serializeSwap(transfer: Swap): Uint8Array {
-    const type = new Uint8Array([11]); // tx type
-    const fromChain = serializeChainId(transfer.fromChain);
-    const toChain = serializeChainId(transfer.toChain);
-    // const accountId = serializeAccountId(transfer.accountId);
-    const account = serializeAddress(transfer.account);
-    const pairAddress = serializeAddress(transfer.pairAddress);
-    const tokenIn = serializeTokenId(transfer.tokenIn);
-    const tokenOut = serializeTokenId(transfer.tokenOut);
-    const amountIn = serializeAmountPacked(transfer.amountIn);
-    const amountOut = serializeAmountPacked(transfer.amountOut);
-    const amountOutMin = serializeAmountPacked(transfer.amountOutMin);
-    const fee0 = serializeFeePacked(transfer.fee0);
-    const fee1 = serializeFeePacked(transfer.fee1);
-    const nonce = serializeNonce(transfer.nonce);
-    const validFrom = serializeTimestamp(transfer.validFrom);
-    const validUntil = serializeTimestamp(transfer.validUntil);
-    return ethers.utils.concat([type, fromChain, toChain, account, pairAddress, tokenIn, tokenOut, amountIn, amountOutMin, fee0, fee1, nonce, validFrom, validUntil]);
-}
-export function serializeAddLiquidity(transfer: AddLiquidity): Uint8Array {
-    const type = new Uint8Array([9]); // tx type
-    // const accountId = serializeAccountId(transfer.accountId);
-    const account = serializeAddress(transfer.account);
-    const pairAccount = serializeAddress(transfer.pairAccount);
-    const token0 = serializeTokenId(transfer.token0);
-    const token1 = serializeTokenId(transfer.token1);
-    const fromChainId = serializeChainId(transfer.fromChainId);
-    const toChainId = serializeChainId(transfer.toChainId);
-    const amount0 = serializeAmountPacked(transfer.amount0);
-    const amount1 = serializeAmountPacked(transfer.amount1);
-    const amount0Min = serializeAmountPacked(transfer.amount0Min);
-    const amount1Min = serializeAmountPacked(transfer.amount1Min);
-    const nonce = serializeNonce(transfer.nonce);
-    const validFrom = serializeTimestamp(transfer.validFrom);
-    const validUntil = serializeTimestamp(transfer.validUntil);
-    return ethers.utils.concat([type, fromChainId, toChainId, account, token0, token1, pairAccount, amount0, amount1, amount0Min, amount1Min, nonce, validFrom, validUntil]);
-}
 export function serializeCurveAddLiquidity(payload: CurveAddLiquidity): Uint8Array {
-    const type = new Uint8Array([9]);
+    const type = new Uint8Array([8]);
     const account = serializeAddress(payload.account);
     const tokens = chainsCompletion(payload.tokens, TOTAL_CHAIN_NUM, 0).map(tokenId => serializeTokenId(tokenId))
     const amounts = chainsCompletion(payload.amounts, TOTAL_CHAIN_NUM, '0').map(amount => serializeAmountPacked(amount))
@@ -686,22 +648,8 @@ export function serializeCurveAddLiquidity(payload: CurveAddLiquidity): Uint8Arr
     const tsBytes = numberToBytesBE(payload.ts, 4);
     return ethers.utils.concat([type, account, ...tokens, ...amounts, minLpQuantity, feeToken, feeAmount, nonce, validFrom, validUntil, tsBytes]);
 }
-export function serializeCurveRemoveLiquidity(payload: CurveRemoveLiquidity): Uint8Array {
-    const type = new Uint8Array([11]);
-    const account = serializeAddress(payload.account);
-    const tokens = chainsCompletion(payload.tokens, TOTAL_CHAIN_NUM, 0).map(tokenId => serializeTokenId(tokenId))
-    const minAmounts = chainsCompletion(payload.minAmounts, TOTAL_CHAIN_NUM, '0').map(amount => serializeAmountPacked(amount))
-    const lpQuantity = serializeAmountPacked(payload.lpQuantity);
-    const feeToken = serializeTokenId(payload.feeToken);
-    const feeAmount = serializeFeePacked(payload.fee);
-    const nonce = serializeNonce(payload.nonce);
-    const validFrom = serializeTimestamp(payload.validFrom);
-    const validUntil = serializeTimestamp(payload.validUntil);
-    const tsBytes = numberToBytesBE(payload.ts, 4);
-    return ethers.utils.concat([type, account, ...tokens, ...minAmounts, lpQuantity, feeToken, feeAmount, nonce, validFrom, validUntil, tsBytes]);
-}
 export function serializeCurveSwap(payload: CurveSwap): Uint8Array {
-    const type = new Uint8Array([10]);
+    const type = new Uint8Array([9]);
     const account = serializeAddress(payload.account);
     const pairAddress = serializeAddress(payload.pairAddress);
     const tokenIn = serializeTokenId(payload.tokenIn);
@@ -714,6 +662,20 @@ export function serializeCurveSwap(payload: CurveSwap): Uint8Array {
     const validUntil = serializeTimestamp(payload.validUntil);
     const tsBytes = numberToBytesBE(payload.ts, 4);
     return ethers.utils.concat([type, account, pairAddress, tokenIn, tokenOut, amountIn, amountOutMin, feeAmount, nonce, validFrom, validUntil, tsBytes]);
+}
+export function serializeCurveRemoveLiquidity(payload: CurveRemoveLiquidity): Uint8Array {
+    const type = new Uint8Array([10]);
+    const account = serializeAddress(payload.account);
+    const tokens = chainsCompletion(payload.tokens, TOTAL_CHAIN_NUM, 0).map(tokenId => serializeTokenId(tokenId))
+    const minAmounts = chainsCompletion(payload.minAmounts, TOTAL_CHAIN_NUM, '0').map(amount => serializeAmountPacked(amount))
+    const lpQuantity = serializeAmountPacked(payload.lpQuantity);
+    const feeToken = serializeTokenId(payload.feeToken);
+    const feeAmount = serializeFeePacked(payload.fee);
+    const nonce = serializeNonce(payload.nonce);
+    const validFrom = serializeTimestamp(payload.validFrom);
+    const validUntil = serializeTimestamp(payload.validUntil);
+    const tsBytes = numberToBytesBE(payload.ts, 4);
+    return ethers.utils.concat([type, account, ...tokens, ...minAmounts, lpQuantity, feeToken, feeAmount, nonce, validFrom, validUntil, tsBytes]);
 }
 export function serializeRemoveLiquidity(transfer: RemoveLiquidity): Uint8Array {
     const type = new Uint8Array([10]); // tx type
@@ -736,7 +698,7 @@ export function serializeRemoveLiquidity(transfer: RemoveLiquidity): Uint8Array 
 }
 
 export function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array {
-    const type = new Uint8Array([7]);
+    const type = new Uint8Array([6]);
     const accountBytes = serializeAddress(changePubKey.account);
     const pubKeyHashBytes = serializeAddress(changePubKey.newPkHash);
     const tokenIdBytes = serializeTokenId(changePubKey.feeToken);
@@ -909,10 +871,12 @@ export async function getPendingBalance(
     ethProvider: ethers.providers.Provider,
     syncProvider: Provider,
     address: Address,
-    token: TokenLike
+    token: TokenLike,
+    linkChainId: number
 ): Promise<BigNumberish> {
+    const contractAddress = await syncProvider.getContractAddress(linkChainId)
     const zksyncContract = new Contract(
-        syncProvider.contractAddress.mainContract,
+        contractAddress.mainContract,
         SYNC_MAIN_CONTRACT_INTERFACE,
         ethProvider
     );

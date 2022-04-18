@@ -21,7 +21,7 @@ import { ErrorCode } from '@ethersproject/logger';
 const EthersErrorCode = ErrorCode;
 
 export class Provider {
-    contractAddress: ContractAddress;
+    contractAddress: ContractAddress[] = []
     public tokenSet: TokenSet;
 
     // For HTTP provider
@@ -33,17 +33,15 @@ export class Provider {
     /**
      * @deprecated Websocket support will be removed in future. Use HTTP transport instead.
      */
-    static async newWebsocketProvider(address: string, linkChainId: number): Promise<Provider> {
+    static async newWebsocketProvider(address: string): Promise<Provider> {
         const transport = await WSTransport.connect(address);
         const provider = new Provider(transport);
-        provider.contractAddress = await provider.getContractAddress(linkChainId);
-        provider.tokenSet = new TokenSet(await provider.getTokens(linkChainId));
+        provider.tokenSet = new TokenSet(await provider.getTokens());
         return provider;
     }
 
     static async newHttpProvider(
         address: string = 'http://127.0.0.1:3030',
-        linkChainId: number,
         pollIntervalMilliSecs?: number
     ): Promise<Provider> {
         const transport = new HTTPTransport(address);
@@ -51,8 +49,7 @@ export class Provider {
         if (pollIntervalMilliSecs) {
             provider.pollIntervalMilliSecs = pollIntervalMilliSecs;
         }
-        provider.contractAddress = await provider.getContractAddress(linkChainId);
-        provider.tokenSet = new TokenSet(await provider.getTokens(linkChainId));
+        provider.tokenSet = new TokenSet(await provider.getTokens());
         return provider;
     }
 
@@ -60,12 +57,10 @@ export class Provider {
      * Provides some hardcoded values the `Provider` responsible for
      * without communicating with the network
      */
-    static async newMockProvider(network: string, ethPrivateKey: Uint8Array, getTokens: Function, linkChainId: number): Promise<Provider> {
+    static async newMockProvider(network: string, ethPrivateKey: Uint8Array, getTokens: Function): Promise<Provider> {
         const transport = new DummyTransport(network, ethPrivateKey, getTokens);
         const provider = new Provider(transport);
-
-        provider.contractAddress = await provider.getContractAddress(linkChainId);
-        provider.tokenSet = new TokenSet(await provider.getTokens(linkChainId));
+        provider.tokenSet = new TokenSet(await provider.getTokens());
         return provider;
     }
 
@@ -102,15 +97,19 @@ export class Provider {
     }
 
     async getContractAddress(linkChainId: number): Promise<ContractAddress> {
-        return await this.transport.request('contract_address', [linkChainId]);
+        if (this.contractAddress[linkChainId]) {
+            return this.contractAddress[linkChainId]
+        }
+        this.contractAddress[linkChainId] = await this.transport.request('contract_address', [linkChainId]);
+        return this.contractAddress[linkChainId]
     }
 
-    async getTokens(linkChainId: number): Promise<Tokens> {
-        return await this.transport.request('tokens', [linkChainId]);
+    async getTokens(): Promise<Tokens> {
+        return await this.transport.request('tokens', []);
     }
 
-    async updateTokenSet(linkChainId: number): Promise<void> {
-        const updatedTokenSet = new TokenSet(await this.getTokens(linkChainId));
+    async updateTokenSet(): Promise<void> {
+        const updatedTokenSet = new TokenSet(await this.getTokens());
         this.tokenSet = updatedTokenSet;
     }
 

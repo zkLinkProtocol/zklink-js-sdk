@@ -1,13 +1,17 @@
 import { BigNumberish, ethers } from 'ethers';
-import { Address, EthSignerType, PubKeyHash, Transfer, Withdraw, ForcedExit, ChangePubKey, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, AddLiquidity, RemoveLiquidity, Swap, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order } from './types';
+import { Address, EthSignerType, PubKeyHash, Transfer, Withdraw, ForcedExit, ChangePubKey, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order } from './types';
 export declare class Signer {
     #private;
     private constructor();
     pubKeyHash(): Promise<PubKeyHash>;
+    getPublicKey(): Promise<string>;
+    signMessage(message: string): Promise<string>;
     /**
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
     transferSignBytes(transfer: {
+        fromSubAccountId: number;
+        toSubAccountId: number;
         accountId: number;
         fromChainId: number;
         toChainId: number;
@@ -22,6 +26,8 @@ export declare class Signer {
         validUntil: number;
     }): Uint8Array;
     signSyncTransfer(transfer: {
+        fromSubAccountId: number;
+        toSubAccountId: number;
         accountId: number;
         from: Address;
         to: Address;
@@ -33,57 +39,6 @@ export declare class Signer {
         validFrom: number;
         validUntil: number;
     }): Promise<Transfer>;
-    signSyncSwap(transfer: {
-        fromChain: number;
-        toChain: number;
-        accountId: number;
-        account: Address;
-        tokenIdIn: number;
-        tokenIdOut: number;
-        amountIn: BigNumberish;
-        amountOut: BigNumberish;
-        amountOutMin: BigNumberish;
-        fee0: BigNumberish;
-        fee1: BigNumberish;
-        pairAddress: Address;
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Promise<Swap>;
-    signSyncRemoveLiquidity(transfer: {
-        fromChainId: number;
-        toChainId: number;
-        minAmount1: BigNumberish;
-        minAmount2: BigNumberish;
-        tokenId1: number;
-        tokenId2: number;
-        lpTokenId: number;
-        fee1: BigNumberish;
-        fee2: BigNumberish;
-        from: Address;
-        pairAddress: Address;
-        lpQuantity: BigNumberish;
-        accountId: number;
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Promise<RemoveLiquidity>;
-    signSyncAddLiquidity(transfer: {
-        accountId: number;
-        account: Address;
-        fromChainId: number;
-        toChainId: number;
-        tokenId0: number;
-        tokenId1: number;
-        amount0: BigNumberish;
-        amount1: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
-        pairAccount: Address;
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Promise<AddLiquidity>;
     signSyncCurveAddLiquidity(payload: CurveAddLiquidity & {
         chainId: string;
         nonce: number;
@@ -111,6 +66,7 @@ export declare class Signer {
      */
     withdrawSignBytes(withdraw: {
         chainId: number;
+        subAccountId: number;
         accountId: number;
         from: Address;
         ethAddress: string;
@@ -126,6 +82,7 @@ export declare class Signer {
     }): Uint8Array;
     signSyncWithdraw(withdraw: {
         chainId: number;
+        subAccountId: number;
         accountId: number;
         from: Address;
         ethAddress: string;

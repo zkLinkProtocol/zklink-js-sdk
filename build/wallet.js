@@ -94,6 +94,8 @@ class Wallet {
             yield this.setRequiredAccountIdFromServer('Transfer funds');
             const tokenId = transfer.tokenId;
             const transactionData = {
+                fromSubAccountId: transfer.fromSubAccountId,
+                toSubAccountId: transfer.toSubAccountId,
                 accountId: transfer.accountId || this.accountId,
                 from: this.address(),
                 to: transfer.to,
@@ -143,11 +145,10 @@ class Wallet {
                 throw new Error('ZKSync signer is required for sending zksync transactions.');
             }
             yield this.setRequiredAccountIdFromServer('perform a Forced Exit');
-            const tokenId = this.provider.tokenSet.resolveTokenId(forcedExit.token);
             const transactionData = {
                 initiatorAccountId: this.accountId,
                 target: forcedExit.target,
-                tokenId,
+                tokenId: forcedExit.tokenId,
                 fee: forcedExit.fee,
                 nonce: forcedExit.nonce,
                 validFrom: forcedExit.validFrom || 0,
@@ -219,6 +220,8 @@ class Wallet {
                 const nonce = nextNonce;
                 nextNonce += 1;
                 const tx = yield this.getTransfer({
+                    fromSubAccountId: transfer.fromSubAccountId,
+                    toSubAccountId: transfer.toSubAccountId,
                     to: transfer.to,
                     token: transfer.token,
                     tokenId: transfer.tokenId,
@@ -250,248 +253,6 @@ class Wallet {
                 transfer.fee = fullFee.totalFee;
             }
             const signedTransferTransaction = yield this.signSyncTransfer(transfer);
-            return submitSignedTransaction(signedTransferTransaction, this.provider);
-        });
-    }
-    getSwap(transfer) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.signer) {
-                throw new Error('ZKSync signer is required for sending zksync transactions.');
-            }
-            yield this.setRequiredAccountIdFromServer('Transfer funds');
-            const tokenIdIn = transfer.tokenIdIn;
-            const tokenIdOut = transfer.tokenIdOut;
-            const transactionData = {
-                fromChain: transfer.fromChain,
-                toChain: transfer.toChain,
-                accountId: transfer.accountId,
-                account: this.address(),
-                tokenIdIn,
-                tokenIdOut,
-                amountIn: transfer.amountIn,
-                amountOut: transfer.amountOut,
-                amountOutMin: transfer.amountOutMin,
-                fee0: transfer.fee0,
-                fee1: transfer.fee1,
-                pairAddress: transfer.pairAddress,
-                nonce: transfer.nonce,
-                validFrom: transfer.validFrom,
-                validUntil: transfer.validUntil
-            };
-            return this.signer.signSyncSwap(transactionData);
-        });
-    }
-    signSyncSwap(transfer) {
-        return __awaiter(this, void 0, void 0, function* () {
-            transfer.validFrom = transfer.validFrom || 0;
-            transfer.validUntil = transfer.validUntil || utils_1.MAX_TIMESTAMP;
-            transfer.accountId = yield this.getAccountId();
-            const signedTransferTransaction = yield this.getSwap(transfer);
-            const stringAmountIn = ethers_1.BigNumber.from(transfer.amountIn).isZero()
-                ? null
-                : ethers_1.utils.formatEther(transfer.amountIn);
-            const stringAmountOut = ethers_1.BigNumber.from(transfer.amountOut).isZero()
-                ? null
-                : ethers_1.utils.formatEther(transfer.amountOut);
-            const stringAmountOutMin = ethers_1.BigNumber.from(transfer.amountOutMin).isZero()
-                ? null
-                : ethers_1.utils.formatEther(transfer.amountOutMin);
-            const stringFee0 = ethers_1.BigNumber.from(transfer.fee0).isZero()
-                ? null
-                : ethers_1.utils.formatEther(transfer.fee0);
-            const stringFee1 = ethers_1.BigNumber.from(transfer.fee1).isZero()
-                ? null
-                : ethers_1.utils.formatEther(transfer.fee1);
-            const stringTokenIn = transfer.tokenIn;
-            const stringTokenOut = transfer.tokenOut;
-            const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
-                ? null
-                : yield this.ethMessageSigner.ethSignSwap({
-                    stringAmountIn,
-                    stringAmountOut,
-                    stringAmountOutMin,
-                    stringFee0,
-                    stringFee1,
-                    stringTokenIn,
-                    stringTokenOut,
-                    pairAddress: transfer.pairAddress,
-                    nonce: transfer.nonce,
-                    accountId: transfer.accountId
-                });
-            return {
-                tx: signedTransferTransaction,
-                ethereumSignature
-            };
-        });
-    }
-    syncSwap(transfer) {
-        return __awaiter(this, void 0, void 0, function* () {
-            transfer.nonce = transfer.nonce != null ? yield this.getNonce(transfer.nonce) : yield this.getNonce();
-            // if (transfer.fee == null) {
-            //     const fullFee = await this.provider.getTransactionFee('Transfer', transfer.to, transfer.token);
-            //     transfer.fee = fullFee.totalFee;
-            // }
-            const signedTransferTransaction = yield this.signSyncSwap(transfer);
-            return submitSignedTransaction(signedTransferTransaction, this.provider);
-        });
-    }
-    getRemoveLiquidity(transfer) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.signer) {
-                throw new Error('ZKSync signer is required for sending zksync transactions.');
-            }
-            yield this.setRequiredAccountIdFromServer('Transfer funds');
-            const tokenId1 = transfer.tokenId1;
-            const tokenId2 = transfer.tokenId2;
-            const lpTokenId = transfer.lpTokenId;
-            const transactionData = {
-                accountId: transfer.accountId,
-                pairAddress: transfer.pairAddress,
-                fromChainId: transfer.fromChainId,
-                toChainId: transfer.toChainId,
-                lpQuantity: transfer.lpQuantity,
-                from: this.address(),
-                tokenId1,
-                tokenId2,
-                lpTokenId,
-                fee1: transfer.fee1,
-                fee2: transfer.fee2,
-                minAmount1: transfer.minAmount1,
-                minAmount2: transfer.minAmount2,
-                nonce: transfer.nonce,
-                validFrom: transfer.validFrom,
-                validUntil: transfer.validUntil
-            };
-            return this.signer.signSyncRemoveLiquidity(transactionData);
-        });
-    }
-    signSyncRemoveLiquidity(transfer) {
-        return __awaiter(this, void 0, void 0, function* () {
-            transfer.validFrom = transfer.validFrom || 0;
-            transfer.validUntil = transfer.validUntil || utils_1.MAX_TIMESTAMP;
-            transfer.accountId = yield this.getAccountId();
-            const signedTransferTransaction = yield this.getRemoveLiquidity(transfer);
-            const stringAmount0 = ethers_1.BigNumber.from(transfer.minAmount1).isZero()
-                ? null
-                : ethers_1.utils.formatEther(transfer.minAmount1);
-            const stringAmount1 = ethers_1.BigNumber.from(transfer.minAmount2).isZero()
-                ? null
-                : ethers_1.utils.formatEther(transfer.minAmount2);
-            const stringLpQuantity = ethers_1.BigNumber.from(transfer.lpQuantity).isZero()
-                ? null
-                : ethers_1.utils.formatEther(transfer.lpQuantity);
-            const stringTokenIn = transfer.token1;
-            const stringTokenOut = transfer.token2;
-            const stringTokenLp = transfer.lpToken;
-            const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
-                ? null
-                : yield this.ethMessageSigner.ethSignRemoveLiquidity({
-                    stringAmount0,
-                    stringAmount1,
-                    stringTokenIn,
-                    stringTokenOut,
-                    stringTokenLp,
-                    // stringToken0,
-                    // stringToken1,
-                    stringLpQuantity,
-                    pairAddress: transfer.pairAddress,
-                    fee1: transfer.fee1,
-                    fee2: transfer.fee2,
-                    nonce: transfer.nonce,
-                    accountId: transfer.accountId
-                });
-            return {
-                tx: signedTransferTransaction,
-                ethereumSignature
-            };
-        });
-    }
-    syncRemoveLiquidity(transfer) {
-        return __awaiter(this, void 0, void 0, function* () {
-            transfer.nonce = transfer.nonce != null ? yield this.getNonce(transfer.nonce) : yield this.getNonce();
-            if (transfer.fee1 == null) {
-                // const fullFee = await this.provider.getTransactionFee('Transfer', transfer.pairAddress, transfer.token);
-                // transfer.fee1 = fullFee.totalFee;
-            }
-            if (transfer.fee2 == null) {
-                // const fullFee = await this.provider.getTransactionFee('Transfer', transfer.pairAddress, transfer.token);
-                // transfer.fee1 = fullFee.totalFee;
-            }
-            const signedTransferTransaction = yield this.signSyncRemoveLiquidity(transfer);
-            return submitSignedTransaction(signedTransferTransaction, this.provider);
-        });
-    }
-    getAddLiquidity(transfer) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.signer) {
-                throw new Error('ZKSync signer is required for sending zksync transactions.');
-            }
-            yield this.setRequiredAccountIdFromServer('Transfer funds');
-            const tokenId0 = transfer.tokenId0;
-            const tokenId1 = transfer.tokenId1;
-            const transactionData = {
-                accountId: transfer.accountId,
-                account: this.address(),
-                fromChainId: transfer.fromChainId,
-                toChainId: transfer.toChainId,
-                tokenId0,
-                tokenId1,
-                amount0: transfer.amount0,
-                amount1: transfer.amount1,
-                amount0Min: transfer.amount0Min,
-                amount1Min: transfer.amount1Min,
-                pairAccount: transfer.pairAccount,
-                nonce: transfer.nonce,
-                validFrom: transfer.validFrom,
-                validUntil: transfer.validUntil
-            };
-            return this.signer.signSyncAddLiquidity(transactionData);
-        });
-    }
-    signSyncAddLiquidity(transfer) {
-        return __awaiter(this, void 0, void 0, function* () {
-            transfer.validFrom = transfer.validFrom || 0;
-            transfer.validUntil = transfer.validUntil || utils_1.MAX_TIMESTAMP;
-            transfer.accountId = yield this.getAccountId();
-            const signedTransferTransaction = yield this.getAddLiquidity(transfer);
-            const stringAmount0 = ethers_1.BigNumber.from(transfer.amount0).isZero()
-                ? null
-                : ethers_1.utils.formatEther(transfer.amount0);
-            const stringAmount0Min = ethers_1.BigNumber.from(transfer.amount0Min).isZero()
-                ? null
-                : ethers_1.utils.formatEther(transfer.amount0Min);
-            const stringAmount1 = ethers_1.BigNumber.from(transfer.amount1).isZero()
-                ? null
-                : ethers_1.utils.formatEther(transfer.amount1);
-            const stringAmount1Min = ethers_1.BigNumber.from(transfer.amount1Min).isZero()
-                ? null
-                : ethers_1.utils.formatEther(transfer.amount1Min);
-            const stringToken0 = transfer.token0;
-            const stringToken1 = transfer.token1;
-            const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
-                ? null
-                : yield this.ethMessageSigner.ethSignAddLiquidity({
-                    stringAmount0,
-                    stringAmount1,
-                    stringAmount0Min,
-                    stringAmount1Min,
-                    stringToken0,
-                    stringToken1,
-                    account: transfer.account,
-                    nonce: transfer.nonce,
-                    accountId: transfer.accountId,
-                    pairAccount: transfer.pairAccount,
-                });
-            return {
-                tx: signedTransferTransaction,
-                ethereumSignature
-            };
-        });
-    }
-    syncAddLiquidity(transfer) {
-        return __awaiter(this, void 0, void 0, function* () {
-            transfer.nonce = transfer.nonce != null ? yield this.getNonce(transfer.nonce) : yield this.getNonce();
-            const signedTransferTransaction = yield this.signSyncAddLiquidity(transfer);
             return submitSignedTransaction(signedTransferTransaction, this.provider);
         });
     }
@@ -660,6 +421,7 @@ class Wallet {
             const tokenId = withdraw.tokenId;
             const transactionData = {
                 chainId: withdraw.chainId,
+                subAccountId: withdraw.subAccountId,
                 accountId: withdraw.accountId || this.accountId,
                 from: this.address(),
                 ethAddress: withdraw.ethAddress,
@@ -892,9 +654,9 @@ class Wallet {
             target: forcedExit.target
         });
     }
-    isOnchainAuthSigningKeySet(nonce = 'committed') {
+    isOnchainAuthSigningKeySet(linkChainId, nonce = 'committed') {
         return __awaiter(this, void 0, void 0, function* () {
-            const mainZkSyncContract = this.getZkSyncMainContract();
+            const mainZkSyncContract = yield this.getZkSyncMainContract(linkChainId);
             const numNonce = yield this.getNonce(nonce);
             try {
                 const onchainAuthFact = yield mainZkSyncContract.authFacts(this.address(), numNonce);
@@ -905,7 +667,7 @@ class Wallet {
             }
         });
     }
-    onchainAuthSigningKey(nonce = 'committed', ethTxOptions) {
+    onchainAuthSigningKey(linkChainId, nonce = 'committed', ethTxOptions) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
                 throw new Error('ZKSync signer is required for current pubkey calculation.');
@@ -916,7 +678,7 @@ class Wallet {
                 throw new Error('Current PubKeyHash is the same as new');
             }
             const numNonce = yield this.getNonce(nonce);
-            const mainZkSyncContract = this.getZkSyncMainContract();
+            const mainZkSyncContract = yield this.getZkSyncMainContract(linkChainId);
             try {
                 return mainZkSyncContract.setAuthPubkeyHash(newPubKeyHash.replace('sync:', '0x'), numNonce, Object.assign({ gasLimit: ethers_1.BigNumber.from('200000') }, ethTxOptions));
             }
@@ -977,15 +739,15 @@ class Wallet {
             }
         });
     }
-    isERC20DepositsApproved(token, erc20ApproveThreshold = utils_1.ERC20_APPROVE_TRESHOLD) {
+    isERC20DepositsApproved(token, linkChainId, erc20ApproveThreshold = utils_1.ERC20_APPROVE_TRESHOLD) {
         return __awaiter(this, void 0, void 0, function* () {
             if ((0, utils_1.isTokenETH)(token)) {
                 throw Error('ETH token does not need approval.');
             }
-            const tokenAddress = this.provider.tokenSet.resolveTokenAddress(token);
-            const erc20contract = new ethers_1.Contract(tokenAddress, utils_1.IERC20_INTERFACE, this.ethSigner);
+            const erc20contract = new ethers_1.Contract(token, utils_1.IERC20_INTERFACE, this.ethSigner);
+            const contractAddress = yield this.provider.getContractAddress(linkChainId);
             try {
-                const currentAllowance = yield erc20contract.allowance(this.address(), this.provider.contractAddress.mainContract);
+                const currentAllowance = yield erc20contract.allowance(this.address(), contractAddress.mainContract);
                 return ethers_1.BigNumber.from(currentAllowance).gte(erc20ApproveThreshold);
             }
             catch (e) {
@@ -993,15 +755,15 @@ class Wallet {
             }
         });
     }
-    approveERC20TokenDeposits(token, max_erc20_approve_amount = utils_1.MAX_ERC20_APPROVE_AMOUNT) {
+    approveERC20TokenDeposits(token, linkChainId, max_erc20_approve_amount = utils_1.MAX_ERC20_APPROVE_AMOUNT) {
         return __awaiter(this, void 0, void 0, function* () {
             if ((0, utils_1.isTokenETH)(token)) {
                 throw Error('ETH token does not need approval.');
             }
-            const tokenAddress = this.provider.tokenSet.resolveTokenAddress(token);
-            const erc20contract = new ethers_1.Contract(tokenAddress, utils_1.IERC20_INTERFACE, this.ethSigner);
+            const erc20contract = new ethers_1.Contract(token, utils_1.IERC20_INTERFACE, this.ethSigner);
+            const contractAddress = yield this.provider.getContractAddress(linkChainId);
             try {
-                return erc20contract.approve(this.provider.contractAddress.mainContract, max_erc20_approve_amount);
+                return erc20contract.approve(contractAddress.mainContract, max_erc20_approve_amount);
             }
             catch (e) {
                 this.modifyEthersError(e);
@@ -1011,24 +773,24 @@ class Wallet {
     depositToSyncFromEthereum(deposit) {
         return __awaiter(this, void 0, void 0, function* () {
             const gasPrice = yield this.ethSigner.provider.getGasPrice();
-            const mainZkSyncContract = this.getZkSyncMainContract();
+            const contractAddress = yield this.provider.getContractAddress(deposit.linkChainId);
+            const mainZkSyncContract = yield this.getZkSyncMainContract(deposit.linkChainId);
             let ethTransaction;
             if ((0, utils_1.isTokenETH)(deposit.token)) {
                 try {
-                    ethTransaction = yield mainZkSyncContract.depositETH(deposit.depositTo, Object.assign({ value: ethers_1.BigNumber.from(deposit.amount), gasLimit: ethers_1.BigNumber.from(utils_1.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT) }, deposit.ethTxOptions));
+                    ethTransaction = yield mainZkSyncContract.depositETH(deposit.depositTo, deposit.subAccountId, Object.assign({ value: ethers_1.BigNumber.from(deposit.amount), gasLimit: ethers_1.BigNumber.from(utils_1.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT) }, deposit.ethTxOptions));
                 }
                 catch (e) {
                     this.modifyEthersError(e);
                 }
             }
             else {
-                const tokenAddress = this.provider.tokenSet.resolveTokenAddress(deposit.token);
                 // ERC20 token deposit
-                const erc20contract = new ethers_1.Contract(tokenAddress, utils_1.IERC20_INTERFACE, this.ethSigner);
+                const erc20contract = new ethers_1.Contract(deposit.token, utils_1.IERC20_INTERFACE, this.ethSigner);
                 let nonce;
                 if (deposit.approveDepositAmountForERC20) {
                     try {
-                        const approveTx = yield erc20contract.approve(this.provider.contractAddress.mainContract, deposit.amount);
+                        const approveTx = yield erc20contract.approve(contractAddress.mainContract, deposit.amount);
                         nonce = approveTx.nonce + 1;
                     }
                     catch (e) {
@@ -1036,9 +798,10 @@ class Wallet {
                     }
                 }
                 const args = [
-                    tokenAddress,
+                    deposit.token,
                     deposit.amount,
                     deposit.depositTo,
+                    deposit.subAccountId,
                     Object.assign({ nonce }, deposit.ethTxOptions)
                 ];
                 // We set gas limit only if user does not set it using ethTxOptions.
@@ -1081,10 +844,9 @@ class Wallet {
                 }
                 accountId = accountState.id;
             }
-            const mainZkSyncContract = this.getZkSyncMainContract();
-            const tokenAddress = this.provider.tokenSet.resolveTokenAddress(withdraw.token);
+            const mainZkSyncContract = yield this.getZkSyncMainContract(withdraw.linkChainId);
             try {
-                const ethTransaction = yield mainZkSyncContract.requestFullExit(accountId, tokenAddress, Object.assign({ gasLimit: ethers_1.BigNumber.from('500000'), gasPrice }, withdraw.ethTxOptions));
+                const ethTransaction = yield mainZkSyncContract.requestFullExit(accountId, withdraw.token, Object.assign({ gasLimit: ethers_1.BigNumber.from('500000'), gasPrice }, withdraw.ethTxOptions));
                 return new ETHOperation(ethTransaction, this.provider);
             }
             catch (e) {
@@ -1092,8 +854,11 @@ class Wallet {
             }
         });
     }
-    getZkSyncMainContract() {
-        return new ethers_1.ethers.Contract(this.provider.contractAddress.mainContract, utils_1.SYNC_MAIN_CONTRACT_INTERFACE, this.ethSigner);
+    getZkSyncMainContract(linkChainId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const contractAddress = yield this.provider.getContractAddress(linkChainId);
+            return new ethers_1.ethers.Contract(contractAddress.mainContract, utils_1.SYNC_MAIN_CONTRACT_INTERFACE, this.ethSigner);
+        });
     }
     modifyEthersError(error) {
         if (this.ethSigner instanceof ethers_1.ethers.providers.JsonRpcSigner) {
@@ -1153,13 +918,13 @@ class ETHOperation {
             return txReceipt;
         });
     }
-    awaitReceipt() {
+    awaitReceipt(linkChainId) {
         return __awaiter(this, void 0, void 0, function* () {
             this.throwErrorIfFailedState();
             yield this.awaitEthereumTxCommit();
             if (this.state !== 'Mined')
                 return;
-            const receipt = yield this.zkSyncProvider.notifyPriorityOp(this.priorityOpId.toNumber(), 'COMMIT');
+            const receipt = yield this.zkSyncProvider.notifyPriorityOp(linkChainId, this.priorityOpId.toNumber(), 'COMMIT');
             if (!receipt.executed) {
                 this.setErrorState(new ZKSyncTxError('Priority operation failed', receipt));
                 this.throwErrorIfFailedState();
@@ -1168,12 +933,12 @@ class ETHOperation {
             return receipt;
         });
     }
-    awaitVerifyReceipt() {
+    awaitVerifyReceipt(linkChainId) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.awaitReceipt();
+            yield this.awaitReceipt(linkChainId);
             if (this.state !== 'Committed')
                 return;
-            const receipt = yield this.zkSyncProvider.notifyPriorityOp(this.priorityOpId.toNumber(), 'VERIFY');
+            const receipt = yield this.zkSyncProvider.notifyPriorityOp(linkChainId, this.priorityOpId.toNumber(), 'VERIFY');
             this.state = 'Verified';
             return receipt;
         });

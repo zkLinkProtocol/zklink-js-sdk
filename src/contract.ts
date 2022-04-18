@@ -3,27 +3,11 @@ import {
     BigNumberish,
     Contract,
     ContractTransaction,
-    ethers,
-    constants,
-    utils
-} from 'ethers';
+    ethers} from 'ethers';
 import { Provider } from './provider';
 import { 
-    AccountState,
     Address,
-    ChangePubKeyFee,
-    ContractAddress,
-    Fee,
-    LegacyChangePubKeyFee,
-    Network,
-    PriorityOperationReceipt,
-    TokenAddress,
-    TokenSymbol,
-    TokenLike,
-    Tokens,
-    TransactionReceipt,
-    TxEthSignature
-} from './types';
+    TokenAddress} from './types';
 import {
     ERC20_APPROVE_TRESHOLD,
     ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT,
@@ -32,16 +16,12 @@ import {
     IERC20_INTERFACE,
     isTokenETH,
     MAX_ERC20_APPROVE_AMOUNT,
-    sleep,
-    SYNC_GOV_CONTRACT_INTERFACE,
     SYNC_MAIN_CONTRACT_INTERFACE,
     SYNC_EXIT_CONTRACT_INTERFACE,
-    TokenSet,
     ZKL_CONTRACT_INTERFACE,
 } from './utils';
 import { ETHOperation } from './wallet';
 import { ErrorCode } from '@ethersproject/logger';
-import { parseEther } from 'ethers/lib/utils';
 
 const EthersErrorCode = ErrorCode;
 
@@ -57,17 +37,19 @@ export class LinkContract {
         return new LinkContract(provider, ethSigner);
     }
 
-    getMainContract() {
+    async getMainContract(linkChainId: number) {
+        const contractAddress = await this.provider.getContractAddress(linkChainId)
         return new ethers.Contract(
-            this.provider.contractAddress.mainContract,
+            contractAddress.mainContract,
             SYNC_MAIN_CONTRACT_INTERFACE,
             this.ethSigner
         );
     }
 
-    getExitContract() {
+    async getExitContract(linkChainId: number) {
+        const contractAddress = await this.provider.getContractAddress(linkChainId)
         return new ethers.Contract(
-            this.provider.contractAddress.mainContract,
+            contractAddress.mainContract,
             SYNC_EXIT_CONTRACT_INTERFACE,
             this.ethSigner
         );
@@ -84,6 +66,7 @@ export class LinkContract {
     async isERC20DepositsApproved(
         tokenAddress: Address,
         accountAddress: Address,
+        linkChainId: number,
         erc20ApproveThreshold: BigNumber = ERC20_APPROVE_TRESHOLD
     ): Promise<boolean> {
         if (isTokenETH(tokenAddress)) {
@@ -94,10 +77,11 @@ export class LinkContract {
             IERC20_INTERFACE,
             this.ethSigner
         );
+        const contractAddress = await this.provider.getContractAddress(linkChainId)
         try {
             const currentAllowance = await erc20contract.allowance(
                 accountAddress,
-                this.provider.contractAddress.mainContract
+                contractAddress.mainContract
             );
             return BigNumber.from(currentAllowance).gte(erc20ApproveThreshold);
         } catch (e) {
@@ -107,6 +91,7 @@ export class LinkContract {
 
     async approveERC20TokenDeposits(
         tokenAddress: Address,
+        linkChainId: number,
         max_erc20_approve_amount: BigNumber = MAX_ERC20_APPROVE_AMOUNT
     ): Promise<ContractTransaction> {
         if (isTokenETH(tokenAddress)) {
@@ -117,10 +102,11 @@ export class LinkContract {
             IERC20_INTERFACE,
             this.ethSigner
         );
+        const contractAddress = await this.provider.getContractAddress(linkChainId)
 
         try {
             return erc20contract.approve(
-            this.provider.contractAddress.mainContract,
+            contractAddress.mainContract,
             max_erc20_approve_amount
             );
         } catch (e) {
@@ -195,7 +181,7 @@ export class LinkContract {
         approveDepositAmountForERC20?: boolean;
     }): Promise<ETHOperation> {
 
-        const mainContract = this.getMainContract();
+        const mainContract = await this.getMainContract(swap.fromChainId);
 
         let ethTransaction;
         let uNonce: number = getFastSwapUNonce();
@@ -268,16 +254,18 @@ export class LinkContract {
     async getPendingBalance(pending: {
         account: Address,
         tokenAddress: Address,
+        linkChainId: number
     }): Promise<BigNumber> {
-        const exitContract = this.getExitContract();
+        const exitContract = await this.getExitContract(pending.linkChainId);
         const balance = await exitContract.getPendingBalance(pending.account, pending.tokenAddress)
         return BigNumber.from(balance)
     }
     async getPendingBalances(pending: {
         account: Address,
         tokenAddresses: Address[],
+        linkChainId: number
     }): Promise<BigNumber[]> {
-        const exitContract = this.getExitContract();
+        const exitContract = await this.getExitContract(pending.linkChainId);
         const balances = await exitContract.getPendingBalances(pending.account, pending.tokenAddresses)
         return balances
     }
@@ -286,8 +274,9 @@ export class LinkContract {
         account: Address,
         tokenAddress: Address,
         amount: BigNumberish,
+        linkChainId: number
     }): Promise<ETHOperation> {
-        const exitContract = this.getExitContract();
+        const exitContract = await this.getExitContract(withdraw.linkChainId);
         const ethTransaction = await exitContract.withdrawPendingBalance(withdraw.account, withdraw.tokenAddress, BigNumber.from(withdraw.amount))
         return new ETHOperation(ethTransaction, this.provider);
     }
@@ -296,8 +285,9 @@ export class LinkContract {
         account: Address,
         tokenAddresses: Address[],
         amounts: BigNumberish[],
+        linkChainId: number
     }): Promise<ETHOperation> {
-        const exitContract = this.getExitContract();
+        const exitContract = await this.getExitContract(withdraw.linkChainId);
         const ethTransaction = await exitContract.withdrawMultiplePendingBalance(withdraw.account, withdraw.tokenAddresses, withdraw.amounts)
         return new ETHOperation(ethTransaction, this.provider);
     }
