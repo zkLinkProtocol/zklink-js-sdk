@@ -752,7 +752,6 @@ export class Wallet {
         nonce: number;
         accountId?: number,
         ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
-        ethSignature?: string;
         ts: number;
         validFrom: number;
         validUntil: number;
@@ -775,7 +774,6 @@ export class Wallet {
             fee: BigNumber.from(changePubKey.fee).toString(),
             ts: changePubKey.ts,
             ethAuthData: changePubKey.ethAuthData,
-            ethSignature: changePubKey.ethSignature,
             validFrom: changePubKey.validFrom,
             validUntil: changePubKey.validUntil
         });
@@ -834,7 +832,7 @@ export class Wallet {
             throw new Error('Unsupported SetSigningKey type');
         }
 
-        const changePubkeyTxUnsigned = Object.assign(changePubKey, { ethAuthData, ethSignature });
+        const changePubkeyTxUnsigned = Object.assign(changePubKey, { ethAuthData });
         changePubkeyTxUnsigned.validFrom = changePubKey.validFrom || 0;
         changePubkeyTxUnsigned.validUntil = changePubKey.validUntil || MAX_TIMESTAMP;
         const changePubKeyTx = await this.getChangePubKey(changePubkeyTxUnsigned as any);

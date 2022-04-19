@@ -319,7 +319,6 @@ export class Signer {
         ts: number;
         nonce: number;
         ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
-        ethSignature?: string;
         validFrom: number;
         validUntil: number;
     }): Promise<ChangePubKey> {
