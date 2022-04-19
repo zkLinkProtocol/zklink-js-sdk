@@ -506,7 +506,6 @@ class Wallet {
                 fee: ethers_1.BigNumber.from(changePubKey.fee).toString(),
                 ts: changePubKey.ts,
                 ethAuthData: changePubKey.ethAuthData,
-                ethSignature: changePubKey.ethSignature,
                 validFrom: changePubKey.validFrom,
                 validUntil: changePubKey.validUntil
             });
@@ -552,7 +551,7 @@ class Wallet {
             else {
                 throw new Error('Unsupported SetSigningKey type');
             }
-            const changePubkeyTxUnsigned = Object.assign(changePubKey, { ethAuthData, ethSignature });
+            const changePubkeyTxUnsigned = Object.assign(changePubKey, { ethAuthData });
             changePubkeyTxUnsigned.validFrom = changePubKey.validFrom || 0;
             changePubkeyTxUnsigned.validUntil = changePubKey.validUntil || utils_1.MAX_TIMESTAMP;
             const changePubKeyTx = yield this.getChangePubKey(changePubkeyTxUnsigned);
