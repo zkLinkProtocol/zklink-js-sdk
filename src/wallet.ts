@@ -49,14 +49,8 @@ import {
     MAX_TIMESTAMP,
     getEthereumBalance,
     ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT,
-    getChangePubkeyLegacyMessage,
-    ERC20_DEPOSIT_GAS_LIMIT,
-    ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT,
-    ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT,
-    getFastSwapUNonce,
     getTimestamp
 } from './utils';
-import { randomBytes } from 'ethers/lib/utils';
 
 const EthersErrorCode = ErrorCode;
 
@@ -836,10 +830,6 @@ export class Wallet {
             } else {
                 throw new Error('CREATE2 wallet authentication is only available for CREATE2 wallets');
             }
-        } else if (changePubKey.ethAuthType === 'ECDSALegacyMessage') {
-            await this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSALegacyMessage.');
-            const changePubKeyMessage = getChangePubkeyLegacyMessage(newPubKeyHash, changePubKey.nonce, changePubKey.accountId || this.accountId);
-            ethSignature = (await this.getEthMessageSignature(changePubKeyMessage)).signature;
         } else {
             throw new Error('Unsupported SetSigningKey type');
         }
@@ -864,26 +854,6 @@ export class Wallet {
     }): Promise<Transaction> {
         changePubKey.nonce =
             changePubKey.nonce != null ? await this.getNonce(changePubKey.nonce) : await this.getNonce();
-
-        if (changePubKey.fee == null) {
-            changePubKey.fee = 0;
-
-            if (changePubKey.ethAuthType === 'ECDSALegacyMessage') {
-                const feeType = {
-                    ChangePubKey: {
-                        onchainPubkeyAuth: true
-                    }
-                };
-                const fullFee = await this.provider.getTransactionFee(feeType, this.address(), changePubKey.feeToken);
-                changePubKey.fee = fullFee.totalFee;
-            } else {
-                const feeType = {
-                    ChangePubKey: changePubKey.ethAuthType
-                };
-                const fullFee = await this.provider.getTransactionFee(feeType, this.address(), changePubKey.feeToken);
-                changePubKey.fee = fullFee.totalFee;
-            }
-        }
 
         const txData = await this.signSetSigningKey(changePubKey as any);
 

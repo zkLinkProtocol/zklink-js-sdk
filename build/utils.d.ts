@@ -60,7 +60,6 @@ export declare class TokenSet {
     resolveTokenSymbol(tokenLike: TokenOrId): TokenSymbol;
 }
 export declare function getChangePubkeyMessage(pubKeyHash: PubKeyHash, nonce: number, accountId: number, batchHash?: string): Uint8Array;
-export declare function getChangePubkeyLegacyMessage(pubKeyHash: PubKeyHash, nonce: number, accountId: number): Uint8Array;
 export declare function getSignedBytesFromMessage(message: utils.BytesLike | string, addPrefix: boolean): Uint8Array;
 export declare function signMessagePersonalAPI(signer: ethers.Signer, message: Uint8Array): Promise<string>;
 export declare function verifyERC1271Signature(address: string, message: Uint8Array, signature: string, signerOrProvider: ethers.Signer | ethers.providers.Provider): Promise<boolean>;

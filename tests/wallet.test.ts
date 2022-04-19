@@ -1,16 +1,13 @@
-import { parseEther } from 'ethers/lib/utils';
 import { expect } from 'chai';
 import { BigNumber, ethers } from 'ethers';
 import { Wallet } from '../src/wallet';
 
 import { Provider } from '../src/provider';
-import { closestPackableTransactionAmount } from '../src';
-import { rescueHashOrders } from '../src/crypto';
 
 export async function getWallet(ethPrivateKey: Uint8Array, network: string): Promise<Wallet> {
   const ethWallet = new ethers.Wallet(ethPrivateKey);
   const tokens = []
-  const mockProvider = await Provider.newMockProvider(network, ethPrivateKey, () => [...tokens], 1);
+  const mockProvider = await Provider.newMockProvider(network, ethPrivateKey, () => [...tokens]);
   const wallet = await Wallet.fromEthSigner(ethWallet, mockProvider);
   return wallet;
 }

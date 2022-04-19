@@ -549,11 +549,6 @@ class Wallet {
                     throw new Error('CREATE2 wallet authentication is only available for CREATE2 wallets');
                 }
             }
-            else if (changePubKey.ethAuthType === 'ECDSALegacyMessage') {
-                yield this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSALegacyMessage.');
-                const changePubKeyMessage = (0, utils_1.getChangePubkeyLegacyMessage)(newPubKeyHash, changePubKey.nonce, changePubKey.accountId || this.accountId);
-                ethSignature = (yield this.getEthMessageSignature(changePubKeyMessage)).signature;
-            }
             else {
                 throw new Error('Unsupported SetSigningKey type');
             }
@@ -570,25 +565,6 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             changePubKey.nonce =
                 changePubKey.nonce != null ? yield this.getNonce(changePubKey.nonce) : yield this.getNonce();
-            if (changePubKey.fee == null) {
-                changePubKey.fee = 0;
-                if (changePubKey.ethAuthType === 'ECDSALegacyMessage') {
-                    const feeType = {
-                        ChangePubKey: {
-                            onchainPubkeyAuth: true
-                        }
-                    };
-                    const fullFee = yield this.provider.getTransactionFee(feeType, this.address(), changePubKey.feeToken);
-                    changePubKey.fee = fullFee.totalFee;
-                }
-                else {
-                    const feeType = {
-                        ChangePubKey: changePubKey.ethAuthType
-                    };
-                    const fullFee = yield this.provider.getTransactionFee(feeType, this.address(), changePubKey.feeToken);
-                    changePubKey.fee = fullFee.totalFee;
-                }
-            }
             const txData = yield this.signSetSigningKey(changePubKey);
             const currentPubKeyHash = yield this.getCurrentPubKeyHash();
             if (currentPubKeyHash === txData.tx.newPkHash) {
