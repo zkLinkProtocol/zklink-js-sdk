@@ -576,7 +576,7 @@ export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
     const accountId = serializeAccountId(withdraw.accountId);
     const subAccountId = serializeSubAccountId(withdraw.subAccountId)
     const accountBytes = serializeAddress(withdraw.from);
-    const ethAddressBytes = serializeAddress(withdraw.to);
+    const toBytes = serializeAddress(withdraw.to);
     const tokenIdBytes = serializeTokenId(withdraw.token);
     const amountBytes = serializeAmountFull(withdraw.amount);
     const feeBytes = serializeFeePacked(withdraw.fee);
@@ -585,14 +585,13 @@ export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
     const withdrawFeeRatioBytes = serializeFeeRatio(withdraw.withdrawFeeRatio);
     const validFrom = serializeTimestamp(withdraw.validFrom);
     const validUntil = serializeTimestamp(withdraw.validUntil);
-    const tsBytes = numberToBytesBE(withdraw.ts, 4);
     return ethers.utils.concat([
         type,
         chainId,
         accountId,
         subAccountId,
         accountBytes,
-        ethAddressBytes,
+        toBytes,
         tokenIdBytes,
         amountBytes,
         feeBytes,
@@ -600,8 +599,7 @@ export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
         fastWithdrawBytes,
         withdrawFeeRatioBytes,
         validFrom,
-        validUntil,
-        tsBytes
+        validUntil
     ]);
 }
 

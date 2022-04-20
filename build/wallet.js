@@ -424,7 +424,7 @@ class Wallet {
                 subAccountId: withdraw.subAccountId,
                 accountId: withdraw.accountId || this.accountId,
                 from: this.address(),
-                ethAddress: withdraw.ethAddress,
+                to: withdraw.to,
                 tokenId,
                 amount: withdraw.amount,
                 withdrawFeeRatio: withdraw.withdrawFeeRatio,
@@ -458,7 +458,7 @@ class Wallet {
                     stringAmount,
                     stringFee,
                     stringToken,
-                    ethAddress: withdraw.ethAddress,
+                    to: withdraw.to,
                     nonce: withdraw.nonce,
                     accountId: withdraw.accountId || this.accountId
                 });
@@ -471,10 +471,10 @@ class Wallet {
     withdrawFromSyncToEthereum(withdraw) {
         return __awaiter(this, void 0, void 0, function* () {
             withdraw.nonce = withdraw.nonce != null ? yield this.getNonce(withdraw.nonce) : yield this.getNonce();
-            if (withdraw.fee == null) {
-                const fullFee = yield this.provider.getTransactionFee('Withdraw', withdraw.ethAddress, withdraw.token);
-                withdraw.fee = fullFee.totalFee;
-            }
+            // if (withdraw.fee == null) {
+            //     const fullFee = await this.provider.getTransactionFee('Withdraw', withdraw.ethAddress, withdraw.token);
+            //     withdraw.fee = fullFee.totalFee;
+            // }
             const signedWithdrawTransaction = yield this.signWithdrawFromSyncToEthereum(withdraw);
             return submitSignedTransaction(signedWithdrawTransaction, this.provider, withdraw.fastProcessing);
         });
@@ -604,7 +604,7 @@ class Wallet {
             stringAmount,
             stringFee,
             stringToken,
-            ethAddress: withdraw.ethAddress
+            to: withdraw.to
         });
     }
     getChangePubKeyEthMessagePart(changePubKey) {

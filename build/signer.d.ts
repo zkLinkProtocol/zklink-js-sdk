@@ -85,7 +85,7 @@ export declare class Signer {
         subAccountId: number;
         accountId: number;
         from: Address;
-        ethAddress: string;
+        to: string;
         tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;

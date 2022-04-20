@@ -215,7 +215,7 @@ export class Signer {
         subAccountId: number;
         accountId: number;
         from: Address;
-        ethAddress: string;
+        to: string;
         tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
@@ -229,12 +229,10 @@ export class Signer {
         const tx: Withdraw = {
             ...withdraw,
             type: 'Withdraw',
-            to: withdraw.ethAddress,
             token: withdraw.tokenId
         };
         const msgBytes = utils.serializeWithdraw(tx);
         const signature = await signTransactionBytes(this.#privateKey, msgBytes);
-
         return {
             ...tx,
             amount: BigNumber.from(withdraw.amount).toString(),

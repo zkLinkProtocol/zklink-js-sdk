@@ -6,7 +6,7 @@ describe('Provider tests', function () {
     it('Update token set', async function () {
         const key = new Uint8Array(new Array(32).fill(5));
 
-        const provider = await Provider.newMockProvider('mainnet', key, () => tokens, 1);
+        const provider = await Provider.newMockProvider('mainnet', key, () => tokens);
 
         // for (const token of tokens) {
         //     const resolvedToken = {

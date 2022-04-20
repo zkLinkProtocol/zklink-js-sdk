@@ -161,7 +161,7 @@ export declare class Wallet {
     getWithdrawFromSyncToEthereum(withdraw: {
         chainId: number;
         subAccountId: number;
-        ethAddress: string;
+        to: string;
         token: TokenLike;
         tokenId: number;
         amount: BigNumberish;
@@ -177,7 +177,7 @@ export declare class Wallet {
     signWithdrawFromSyncToEthereum(withdraw: {
         chainId: number;
         subAccountId: number;
-        ethAddress: string;
+        to: string;
         token: TokenLike;
         tokenId: number;
         amount: BigNumberish;
@@ -193,7 +193,7 @@ export declare class Wallet {
     withdrawFromSyncToEthereum(withdraw: {
         chainId: number;
         subAccountId: number;
-        ethAddress: string;
+        to: string;
         token: TokenLike;
         amount: BigNumberish;
         withdrawFeeRatio: number;
@@ -241,7 +241,7 @@ export declare class Wallet {
         fee: BigNumberish;
     }): string;
     getWithdrawEthMessagePart(withdraw: {
-        ethAddress: string;
+        to: string;
         token: TokenLike;
         amount: BigNumberish;
         fee: BigNumberish;

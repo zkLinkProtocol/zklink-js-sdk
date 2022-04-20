@@ -212,7 +212,7 @@ export declare class EthMessageSigner {
         stringAmount: string;
         stringToken: string;
         stringFee: string;
-        ethAddress: string;
+        to: string;
         nonce: number;
         accountId: number;
     }): string;
@@ -226,14 +226,12 @@ export declare class EthMessageSigner {
         stringAmount: string;
         stringToken: string;
         stringFee: string;
-        ethAddress?: string;
         to?: string;
     }): string;
     getWithdrawEthMessagePart(tx: {
         stringAmount: string;
         stringToken: string;
         stringFee: string;
-        ethAddress?: string;
         to?: string;
     }): string;
     getChangePubKeyEthMessagePart(changePubKey: {
@@ -250,7 +248,7 @@ export declare class EthMessageSigner {
         stringAmount: string;
         stringToken: string;
         stringFee: string;
-        ethAddress: string;
+        to: string;
         nonce: number;
         accountId: number;
     }): Promise<TxEthSignature>;

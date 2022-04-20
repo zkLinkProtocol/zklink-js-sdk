@@ -624,7 +624,7 @@ export class Wallet {
     async getWithdrawFromSyncToEthereum(withdraw: {
         chainId: number;
         subAccountId: number;
-        ethAddress: string;
+        to: string;
         token: TokenLike;
         tokenId: number;
         amount: BigNumberish;
@@ -647,7 +647,7 @@ export class Wallet {
             subAccountId: withdraw.subAccountId,
             accountId: withdraw.accountId || this.accountId,
             from: this.address(),
-            ethAddress: withdraw.ethAddress,
+            to: withdraw.to,
             tokenId,
             amount: withdraw.amount,
             withdrawFeeRatio: withdraw.withdrawFeeRatio,
@@ -658,14 +658,13 @@ export class Wallet {
             validFrom: withdraw.validFrom,
             validUntil: withdraw.validUntil
         };
-
         return await this.signer.signSyncWithdraw(transactionData);
     }
 
     async signWithdrawFromSyncToEthereum(withdraw: {
         chainId: number;
         subAccountId: number;
-        ethAddress: string;
+        to: string;
         token: TokenLike;
         tokenId: number;
         amount: BigNumberish;
@@ -690,7 +689,6 @@ export class Wallet {
         const stringFee = BigNumber.from(withdraw.fee).isZero()
             ? null
             : utils.formatEther(withdraw.fee)
-        
             
         const stringToken = withdraw.token
         const ethereumSignature =
@@ -700,7 +698,7 @@ export class Wallet {
                       stringAmount,
                       stringFee,
                       stringToken,
-                      ethAddress: withdraw.ethAddress,
+                      to: withdraw.to,
                       nonce: withdraw.nonce,
                       accountId: withdraw.accountId || this.accountId
                   });
@@ -714,7 +712,7 @@ export class Wallet {
     async withdrawFromSyncToEthereum(withdraw: {
         chainId: number;
         subAccountId: number;
-        ethAddress: string;
+        to: string;
         token: TokenLike;
         amount: BigNumberish;
         withdrawFeeRatio: number;
@@ -727,10 +725,10 @@ export class Wallet {
     }): Promise<Transaction> {
         withdraw.nonce = withdraw.nonce != null ? await this.getNonce(withdraw.nonce) : await this.getNonce();
 
-        if (withdraw.fee == null) {
-            const fullFee = await this.provider.getTransactionFee('Withdraw', withdraw.ethAddress, withdraw.token);
-            withdraw.fee = fullFee.totalFee;
-        }
+        // if (withdraw.fee == null) {
+        //     const fullFee = await this.provider.getTransactionFee('Withdraw', withdraw.ethAddress, withdraw.token);
+        //     withdraw.fee = fullFee.totalFee;
+        // }
 
         const signedWithdrawTransaction = await this.signWithdrawFromSyncToEthereum(withdraw as any);
 
@@ -890,7 +888,7 @@ export class Wallet {
     }
 
     getWithdrawEthMessagePart(withdraw: {
-        ethAddress: string;
+        to: string;
         token: TokenLike;
         amount: BigNumberish;
         fee: BigNumberish;
@@ -906,7 +904,7 @@ export class Wallet {
             stringAmount,
             stringFee,
             stringToken,
-            ethAddress: withdraw.ethAddress
+            to: withdraw.to
         });
     }
 

@@ -251,9 +251,9 @@ class EthMessageSigner {
     }
     getTransferEthMessagePart(tx) {
         let txType, to;
-        if (tx.ethAddress != undefined) {
+        if (tx.to != undefined) {
             txType = 'Withdraw';
-            to = tx.ethAddress;
+            to = tx.to;
         }
         else if (tx.to != undefined) {
             txType = 'Transfer';

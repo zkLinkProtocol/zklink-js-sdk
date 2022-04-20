@@ -120,7 +120,7 @@ class Signer {
     }
     signSyncWithdraw(withdraw) {
         return __awaiter(this, void 0, void 0, function* () {
-            const tx = Object.assign(Object.assign({}, withdraw), { type: 'Withdraw', to: withdraw.ethAddress, token: withdraw.tokenId });
+            const tx = Object.assign(Object.assign({}, withdraw), { type: 'Withdraw', token: withdraw.tokenId });
             const msgBytes = utils.serializeWithdraw(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
             return Object.assign(Object.assign({}, tx), { amount: ethers_1.BigNumber.from(withdraw.amount).toString(), fee: ethers_1.BigNumber.from(withdraw.fee).toString(), signature });

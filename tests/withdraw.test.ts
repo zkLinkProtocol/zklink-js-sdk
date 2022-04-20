@@ -41,13 +41,12 @@ describe('withdraw', () => {
     const wallet = await getWallet('0x14075e10e53a752ed31bfd4bfa867402b308b791cba8c6ef22d72faab8adff34' as any, 'rinkeby');
     expect(wallet.address()).eq('0x3498F456645270eE003441df82C718b56c0e6666', 'Wallet address does not match');
   
-    const signedTransaction = await wallet.signWithdrawFromSyncToEthereum({
+    const transaction = await wallet.signWithdrawFromSyncToEthereum({
       chainId: 3,
       accountId: 1,
       subAccountId: 1,
       amount: BigNumber.from('99995900000000000000'),
       to: "0x3d809e414ba4893709c85f242ba3617481bc4126",
-      fastProcessing: false,
       fastWithdraw: 1,
       fee: BigNumber.from('4100000000000000'),
       nonce: 85,
@@ -58,7 +57,7 @@ describe('withdraw', () => {
       validUntil: 4294967295,
       withdrawFeeRatio: 50
     } as any)
-    expect(signedTransaction.tx.signature.signature).eq('9f52531352a1e65595e5fcfcb1fa209d2fb7c3559bd3baf1ede990bf7914a597de248f55525156cedc009a63c5ad83c61ed62081c9193e594b299abf2257f600')
+    expect(transaction.tx.signature.signature).eq('3b995556b9e938297aa76ddf7303a9a34e5e550cac0f7ed8439be840a60be8895dc247fc3019eeccf750754ab404aca5de2be709f542b27e65a9d26075a8d505')
 
   });
 

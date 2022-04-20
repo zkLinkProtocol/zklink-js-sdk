@@ -423,7 +423,7 @@ export class EthMessageSigner {
         stringAmount: string;
         stringToken: string;
         stringFee: string;
-        ethAddress: string;
+        to: string;
         nonce: number;
         accountId: number;
     }): string {
@@ -451,13 +451,12 @@ export class EthMessageSigner {
         stringAmount: string;
         stringToken: string;
         stringFee: string;
-        ethAddress?: string;
         to?: string;
     }): string {
         let txType: string, to: string;
-        if (tx.ethAddress != undefined) {
+        if (tx.to != undefined) {
             txType = 'Withdraw';
-            to = tx.ethAddress;
+            to = tx.to;
         } else if (tx.to != undefined) {
             txType = 'Transfer';
             to = tx.to;
@@ -482,7 +481,6 @@ export class EthMessageSigner {
         stringAmount: string;
         stringToken: string;
         stringFee: string;
-        ethAddress?: string;
         to?: string;
     }): string {
         return this.getTransferEthMessagePart(tx);
@@ -513,7 +511,7 @@ export class EthMessageSigner {
         stringAmount: string;
         stringToken: string;
         stringFee: string;
-        ethAddress: string;
+        to: string;
         nonce: number;
         accountId: number;
     }): Promise<TxEthSignature> {
