@@ -293,7 +293,8 @@ class TokenSet {
                     return token;
                 }
             }
-            else if (token.symbol.toLocaleLowerCase() === tokenLike.toLocaleLowerCase()) {
+            else if (token.address.map(a => a.toLowerCase()).includes(tokenLike.toLowerCase()) ||
+                token.symbol.toLocaleLowerCase() === tokenLike.toLocaleLowerCase()) {
                 return token;
             }
         }

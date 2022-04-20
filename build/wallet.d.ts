@@ -56,7 +56,6 @@ export declare class Wallet {
         subAccountId: number;
         target: Address;
         token: TokenLike;
-        tokenId: TokenId;
         fee: BigNumberish;
         nonce: number;
         validFrom?: number;
@@ -67,7 +66,6 @@ export declare class Wallet {
         subAccountId: number;
         target: Address;
         token: TokenLike;
-        tokenId: TokenId;
         tokenSymbol: TokenSymbol;
         fee: BigNumberish;
         nonce: number;
@@ -88,7 +86,7 @@ export declare class Wallet {
         fromSubAccountId: number;
         toSubAccountId: number;
         to: Address;
-        token: TokenLike;
+        token: TokenSymbol;
         tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
@@ -99,8 +97,8 @@ export declare class Wallet {
         validUntil?: number;
     }[]): Promise<Transaction[]>;
     syncTransfer(transfer: {
-        fromChainId: number;
-        toChainId: number;
+        fromSubAccountId: number;
+        toSubAccountId: number;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -242,7 +240,7 @@ export declare class Wallet {
     }): Promise<Transaction>;
     getTransferEthMessagePart(transfer: {
         to: Address;
-        token: TokenLike;
+        token: TokenSymbol;
         amount: BigNumberish;
         fee: BigNumberish;
     }): string;

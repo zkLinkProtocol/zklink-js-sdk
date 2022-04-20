@@ -97,14 +97,13 @@ class Wallet {
                 throw new Error('ZKSync signer is required for sending zksync transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
-            const tokenId = transfer.tokenId;
             const transactionData = {
                 fromSubAccountId: transfer.fromSubAccountId,
                 toSubAccountId: transfer.toSubAccountId,
                 accountId: transfer.accountId || this.accountId,
                 from: this.address(),
                 to: transfer.to,
-                tokenId,
+                tokenId: transfer.tokenId,
                 amount: transfer.amount,
                 fee: transfer.fee,
                 ts: transfer.ts,
@@ -150,12 +149,13 @@ class Wallet {
                 throw new Error('ZKSync signer is required for sending zksync transactions.');
             }
             yield this.setRequiredAccountIdFromServer('perform a Forced Exit');
+            const tokenId = this.provider.tokenSet.resolveTokenId(forcedExit.token);
             const transactionData = {
                 chainId: forcedExit.chainId,
                 subAccountId: forcedExit.subAccountId,
                 initiatorAccountId: this.accountId,
                 target: forcedExit.target,
-                tokenId: forcedExit.tokenId,
+                tokenId,
                 fee: forcedExit.fee,
                 nonce: forcedExit.nonce,
                 validFrom: forcedExit.validFrom || 0,
@@ -597,7 +597,7 @@ class Wallet {
             stringFee,
             stringToken,
             to: transfer.to
-        });
+        }, 'transfer');
     }
     getWithdrawEthMessagePart(withdraw) {
         const stringAmount = ethers_1.BigNumber.from(withdraw.amount).isZero()

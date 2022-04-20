@@ -24,9 +24,6 @@ import {
     ChangePubKeyECDSA,
     ChangePubKeyCREATE2,
     Create2Data,
-    RemoveLiquidity,
-    AddLiquidity,
-    Swap,
     CurveAddLiquidity,
     ChainId,
     TokenId,
@@ -179,15 +176,13 @@ export class Wallet {
 
         await this.setRequiredAccountIdFromServer('Transfer funds');
 
-        const tokenId = transfer.tokenId
-
         const transactionData = {
             fromSubAccountId: transfer.fromSubAccountId,
             toSubAccountId: transfer.toSubAccountId,
             accountId: transfer.accountId || this.accountId,
             from: this.address(),
             to: transfer.to,
-            tokenId,
+            tokenId: transfer.tokenId,
             amount: transfer.amount,
             fee: transfer.fee,
             ts: transfer.ts,
@@ -229,13 +224,13 @@ export class Wallet {
             this.ethSigner instanceof Create2WalletSigner
                 ? null
                 : await this.ethMessageSigner.ethSignTransfer({
-                      stringAmount,
-                      stringFee,
-                      stringToken,
-                      to: transfer.to,
-                      nonce: transfer.nonce,
-                      accountId: transfer.accountId || this.accountId
-                  });
+                    stringAmount,
+                    stringFee,
+                    stringToken,
+                    to: transfer.to,
+                    nonce: transfer.nonce,
+                    accountId: transfer.accountId || this.accountId
+                });
         return {
             tx: signedTransferTransaction,
             ethereumSignature
@@ -247,7 +242,6 @@ export class Wallet {
         subAccountId: number;
         target: Address;
         token: TokenLike;
-        tokenId: TokenId;
         fee: BigNumberish;
         nonce: number;
         validFrom?: number;
@@ -257,13 +251,13 @@ export class Wallet {
             throw new Error('ZKSync signer is required for sending zksync transactions.');
         }
         await this.setRequiredAccountIdFromServer('perform a Forced Exit');
-
+        const tokenId = this.provider.tokenSet.resolveTokenId(forcedExit.token)
         const transactionData = {
             chainId: forcedExit.chainId,
             subAccountId: forcedExit.subAccountId,
             initiatorAccountId: this.accountId,
             target: forcedExit.target,
-            tokenId: forcedExit.tokenId,
+            tokenId,
             fee: forcedExit.fee,
             nonce: forcedExit.nonce,
             validFrom: forcedExit.validFrom || 0,
@@ -278,7 +272,6 @@ export class Wallet {
         subAccountId: number;
         target: Address;
         token: TokenLike;
-        tokenId: TokenId;
         tokenSymbol: TokenSymbol;
         fee: BigNumberish;
         nonce: number;
@@ -345,7 +338,7 @@ export class Wallet {
             fromSubAccountId: number;
             toSubAccountId: number;
             to: Address;
-            token: TokenLike;
+            token: TokenSymbol;
             tokenId: number;
             amount: BigNumberish;
             fee: BigNumberish;
@@ -406,8 +399,8 @@ export class Wallet {
     }
 
     async syncTransfer(transfer: {
-        fromChainId: number;
-        toChainId: number;
+        fromSubAccountId: number;
+        toSubAccountId: number;
         to: Address;
         token: TokenLike;
         tokenId: number;
@@ -878,7 +871,7 @@ export class Wallet {
     // transaction.
     getTransferEthMessagePart(transfer: {
         to: Address;
-        token: TokenLike;
+        token: TokenSymbol;
         amount: BigNumberish;
         fee: BigNumberish;
     }): string {
@@ -894,7 +887,7 @@ export class Wallet {
             stringFee,
             stringToken,
             to: transfer.to
-        });
+        }, 'transfer');
     }
 
     getWithdrawEthMessagePart(withdraw: {

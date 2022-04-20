@@ -13,7 +13,7 @@ import {
     ChangePubKey,
     Withdraw,
     CloseAccount,
-    AddLiquidity, RemoveLiquidity, Swap, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order, ChainId
+    CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order, ChainId
 } from './types';
 
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
@@ -345,6 +345,7 @@ export class TokenSet {
                     return token;
                 }
             } else if (
+                token.address.map(a => a.toLowerCase()).includes(tokenLike.toLowerCase()) ||
                 token.symbol.toLocaleLowerCase() === tokenLike.toLocaleLowerCase()
             ) {
                 return token;

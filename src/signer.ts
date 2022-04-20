@@ -13,7 +13,7 @@ import {
     ChangePubKeyECDSA,
     ChangePubKeyCREATE2,
     Create2Data,
-    AddLiquidity, RemoveLiquidity, Swap, ChainId, TokenId, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order
+    ChainId, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order
 } from './types';
 
 export class Signer {

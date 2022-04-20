@@ -227,7 +227,7 @@ export declare class EthMessageSigner {
         stringToken: string;
         stringFee: string;
         to?: string;
-    }): string;
+    }, type: 'transfer' | 'withdraw'): string;
     getWithdrawEthMessagePart(tx: {
         stringAmount: string;
         stringToken: string;

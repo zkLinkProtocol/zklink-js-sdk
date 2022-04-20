@@ -33,7 +33,7 @@ class EthMessageSigner {
         });
     }
     getTransferEthSignMessage(transfer) {
-        let humanReadableTxInfo = this.getTransferEthMessagePart(transfer);
+        let humanReadableTxInfo = this.getTransferEthMessagePart(transfer, 'transfer');
         if (humanReadableTxInfo.length != 0) {
             humanReadableTxInfo += '\n';
         }
@@ -249,22 +249,20 @@ class EthMessageSigner {
         humanReadableTxInfo += `\nNonce: ${forcedExit.nonce}`;
         return humanReadableTxInfo;
     }
-    getTransferEthMessagePart(tx) {
-        let txType, to;
-        if (tx.to != undefined) {
+    getTransferEthMessagePart(tx, type) {
+        let txType;
+        if (type == 'withdraw') {
             txType = 'Withdraw';
-            to = tx.to;
         }
-        else if (tx.to != undefined) {
+        else if (type == 'transfer') {
             txType = 'Transfer';
-            to = tx.to;
         }
         else {
-            throw new Error('Either to or ethAddress field must be present');
+            throw new Error('Ether to or ethAddress field must be present');
         }
         let message = '';
         if (tx.stringAmount != null) {
-            message += `${txType} ${tx.stringAmount} ${tx.stringToken} to: ${to.toLowerCase()}`;
+            message += `${txType} ${tx.stringAmount} ${tx.stringToken} to: ${tx.to.toLowerCase()}`;
         }
         if (tx.stringFee != null) {
             if (message.length != 0) {
@@ -275,7 +273,7 @@ class EthMessageSigner {
         return message;
     }
     getWithdrawEthMessagePart(tx) {
-        return this.getTransferEthMessagePart(tx);
+        return this.getTransferEthMessagePart(tx, 'withdraw');
     }
     getChangePubKeyEthMessagePart(changePubKey) {
         let message = '';

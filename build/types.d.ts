@@ -84,24 +84,6 @@ export interface Transfer {
     validFrom: number;
     validUntil: number;
 }
-export interface AddLiquidity {
-    type: 'AddLiq';
-    fromChainId: number;
-    toChainId: number;
-    account: Address;
-    accountId: number;
-    amount0: BigNumberish;
-    amount1: BigNumberish;
-    amount0Min: BigNumberish;
-    amount1Min: BigNumberish;
-    nonce: number;
-    token0: number;
-    token1: number;
-    pairAccount: Address;
-    signature?: Signature;
-    validFrom: number;
-    validUntil: number;
-}
 export interface CurveAddLiquidity {
     type: 'L2CurveAddLiq';
     account: Address;
@@ -150,45 +132,6 @@ export interface CurveSwap {
     adminFee: BigNumberish;
     ts?: number;
     nonce: number;
-    signature?: Signature;
-    validFrom: number;
-    validUntil: number;
-}
-export interface RemoveLiquidity {
-    type: 'RemoveLiquidity';
-    fromChainId: number;
-    toChainId: number;
-    accountId: number;
-    token1: number;
-    token2: number;
-    lpToken: number;
-    fee1: BigNumberish;
-    fee2: BigNumberish;
-    from: Address;
-    lpQuantity: BigNumberish;
-    minAmount1: BigNumberish;
-    minAmount2: BigNumberish;
-    pairAddress: Address;
-    nonce: number;
-    signature?: Signature;
-    validFrom: number;
-    validUntil: number;
-}
-export interface Swap {
-    type: 'Swap';
-    fromChain: number;
-    toChain: number;
-    account: Address;
-    accountId: number;
-    amountIn: BigNumberish;
-    amountOut: BigNumberish;
-    amountOutMin: BigNumberish;
-    fee0: BigNumberish;
-    fee1: BigNumberish;
-    nonce: number;
-    pairAddress: Address;
-    tokenIn: number;
-    tokenOut: number;
     signature?: Signature;
     validFrom: number;
     validUntil: number;
@@ -262,7 +205,7 @@ export interface CloseAccount {
     signature: Signature;
 }
 export interface SignedTransaction {
-    tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit | AddLiquidity | RemoveLiquidity | Swap | CurveAddLiquidity | CurveRemoveLiquidity | CurveSwap | Order;
+    tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit | CurveAddLiquidity | CurveRemoveLiquidity | CurveSwap | Order;
     ethereumSignature?: TxEthSignature;
 }
 export interface BlockInfo {

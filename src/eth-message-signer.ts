@@ -31,7 +31,7 @@ export class EthMessageSigner {
         nonce: number;
         accountId: number;
     }): string {
-        let humanReadableTxInfo = this.getTransferEthMessagePart(transfer);
+        let humanReadableTxInfo = this.getTransferEthMessagePart(transfer, 'transfer');
         if (humanReadableTxInfo.length != 0) {
             humanReadableTxInfo += '\n';
         }
@@ -452,21 +452,19 @@ export class EthMessageSigner {
         stringToken: string;
         stringFee: string;
         to?: string;
-    }): string {
-        let txType: string, to: string;
-        if (tx.to != undefined) {
+    }, type: 'transfer' | 'withdraw'): string {
+        let txType: string;
+        if (type == 'withdraw') {
             txType = 'Withdraw';
-            to = tx.to;
-        } else if (tx.to != undefined) {
+        } else if (type == 'transfer') {
             txType = 'Transfer';
-            to = tx.to;
         } else {
-            throw new Error('Either to or ethAddress field must be present');
+            throw new Error('Ether to or ethAddress field must be present');
         }
 
         let message = '';
         if (tx.stringAmount != null) {
-            message += `${txType} ${tx.stringAmount} ${tx.stringToken} to: ${to.toLowerCase()}`;
+            message += `${txType} ${tx.stringAmount} ${tx.stringToken} to: ${tx.to.toLowerCase()}`;
         }
         if (tx.stringFee != null) {
             if (message.length != 0) {
@@ -483,7 +481,7 @@ export class EthMessageSigner {
         stringFee: string;
         to?: string;
     }): string {
-        return this.getTransferEthMessagePart(tx);
+        return this.getTransferEthMessagePart(tx, 'withdraw');
     }
 
     getChangePubKeyEthMessagePart(changePubKey: {

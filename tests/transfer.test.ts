@@ -11,25 +11,17 @@ describe('transfer', () => {
   it('transfer signature', async function () {
     const wallet = await getWallet('0x14075e10e53a752ed31bfd4bfa867402b308b791cba8c6ef22d72faab8adff34' as any, 'rinkeby');
     expect(wallet.address()).eq('0x3498F456645270eE003441df82C718b56c0e6666', 'Wallet address does not match');
-    const signedTransaction = await wallet.signSyncTransfer({
+    const transaction = await wallet.syncTransfer({
       fromSubAccountId: 6,
       toSubAccountId: 6,
-      accountId: 6,
-      amount: BigNumber.from('998000000000000000'),
-      chainId: "3",
-      fee: BigNumber.from('2000000000000000'),
-      fromChainId: 3,
-      nonce: 1,
       to: "0x3498F456645270eE003441df82C718b56c0e6666",
-      toChainId: 3,
       token: "USDT",
       tokenId: 2,
-      ts: 1645007804,
-      validFrom: 0,
-      validUntil: 4294967295
+      amount: BigNumber.from('1000000000000000000'),
+      fee: BigNumber.from('10000000000')
     } as any)
 
-    expect(signedTransaction.tx.signature.signature).eq('9f52531352a1e65595e5fcfcb1fa209d2fb7c3559bd3baf1ede990bf7914a597de248f55525156cedc009a63c5ad83c61ed62081c9193e594b299abf2257f600')
+    expect(transaction.txData.ethereumSignature.signature).eq('0x4a47b294d2f9f56cb54a266e197bd8827164bcbd6f529ac8ee983e2d07a54c177ea2e2515780829e7db47db7e187c32598568a8d51a12dd4678564cf4484ebbf1c')
 
   });
 
