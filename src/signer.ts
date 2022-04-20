@@ -187,7 +187,7 @@ export class Signer {
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
     withdrawSignBytes(withdraw: {
-        chainId: number;
+        toChainId: number;
         subAccountId: number;
         accountId: number;
         from: Address;
@@ -211,7 +211,7 @@ export class Signer {
     }
 
     async signSyncWithdraw(withdraw: {
-        chainId: number;
+        toChainId: number;
         subAccountId: number;
         accountId: number;
         from: Address;
@@ -245,6 +245,8 @@ export class Signer {
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
     forcedExitSignBytes(forcedExit: {
+        chainId: ChainId;
+        subAccountId: number;
         initiatorAccountId: number;
         target: Address;
         tokenId: number;
@@ -261,6 +263,8 @@ export class Signer {
     }
 
     async signSyncForcedExit(forcedExit: {
+        chainId: ChainId;
+        subAccountId: number;
         initiatorAccountId: number;
         target: Address;
         tokenId: number;

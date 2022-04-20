@@ -243,6 +243,8 @@ export class Wallet {
     }
 
     async getForcedExit(forcedExit: {
+        chainId: ChainId;
+        subAccountId: number;
         target: Address;
         token: TokenLike;
         tokenId: TokenId;
@@ -257,6 +259,8 @@ export class Wallet {
         await this.setRequiredAccountIdFromServer('perform a Forced Exit');
 
         const transactionData = {
+            chainId: forcedExit.chainId,
+            subAccountId: forcedExit.subAccountId,
             initiatorAccountId: this.accountId,
             target: forcedExit.target,
             tokenId: forcedExit.tokenId,
@@ -270,6 +274,8 @@ export class Wallet {
     }
 
     async signSyncForcedExit(forcedExit: {
+        chainId: ChainId;
+        subAccountId: number;
         target: Address;
         token: TokenLike;
         tokenId: TokenId;
@@ -303,6 +309,8 @@ export class Wallet {
 
     async syncForcedExit(forcedExit: {
         target: Address;
+        chainId: ChainId;
+        subAccountId: number;
         token: TokenLike;
         fee?: BigNumberish;
         nonce?: Nonce;
@@ -624,7 +632,7 @@ export class Wallet {
     }
 
     async getWithdrawFromSyncToEthereum(withdraw: {
-        chainId: number;
+        toChainId: number;
         subAccountId: number;
         to: string;
         token: TokenLike;
@@ -645,7 +653,7 @@ export class Wallet {
         await this.setRequiredAccountIdFromServer('Withdraw funds');
         const tokenId = withdraw.tokenId;
         const transactionData = {
-            chainId: withdraw.chainId,
+            toChainId: withdraw.toChainId,
             subAccountId: withdraw.subAccountId,
             accountId: withdraw.accountId || this.accountId,
             from: this.address(),
@@ -664,7 +672,7 @@ export class Wallet {
     }
 
     async signWithdrawFromSyncToEthereum(withdraw: {
-        chainId: number;
+        toChainId: number;
         subAccountId: number;
         to: string;
         token: TokenLike;
@@ -712,7 +720,7 @@ export class Wallet {
     }
 
     async withdrawFromSyncToEthereum(withdraw: {
-        chainId: number;
+        toChainId: number;
         subAccountId: number;
         to: string;
         token: TokenLike;
@@ -1021,9 +1029,9 @@ export class Wallet {
         return BigNumber.from(balance);
     }
 
-    async getEthereumBalance(token: TokenLike): Promise<BigNumber> {
+    async getEthereumBalance(token: TokenLike, linkChainId: ChainId): Promise<BigNumber> {
         try {
-            return getEthereumBalance(this.ethSigner.provider, this.provider, this.cachedAddress, token);
+            return getEthereumBalance(this.ethSigner.provider, this.provider, this.cachedAddress, token, linkChainId);
         } catch (e) {
             this.modifyEthersError(e);
         }
@@ -1150,7 +1158,8 @@ export class Wallet {
     }
 
     async emergencyWithdraw(withdraw: {
-        token: TokenLike;
+        tokenId: TokenId;
+        subAccountId: number;
         linkChainId: number;
         accountId?: number;
         ethTxOptions?: ethers.providers.TransactionRequest;
@@ -1173,7 +1182,7 @@ export class Wallet {
         const mainZkSyncContract = await this.getZkSyncMainContract(withdraw.linkChainId);
 
         try {
-            const ethTransaction = await mainZkSyncContract.requestFullExit(accountId, withdraw.token, {
+            const ethTransaction = await mainZkSyncContract.requestFullExit(accountId, withdraw.subAccountId, withdraw.tokenId, {
                 gasLimit: BigNumber.from('500000'),
                 gasPrice,
                 ...withdraw.ethTxOptions

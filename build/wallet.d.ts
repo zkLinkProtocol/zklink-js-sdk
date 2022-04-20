@@ -3,7 +3,7 @@ import { EthMessageSigner } from './eth-message-signer';
 import { Provider } from './provider';
 import { Signer } from './signer';
 import { BatchBuilder } from './batch-builder';
-import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKey, EthSignerType, SignedTransaction, Transfer, TxEthSignature, ForcedExit, Withdraw, ChangePubkeyTypes, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, CurveAddLiquidity, TokenId, CurveRemoveLiquidity, CurveSwap, Order, TokenSymbol, TokenAddress } from './types';
+import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKey, EthSignerType, SignedTransaction, Transfer, TxEthSignature, ForcedExit, Withdraw, ChangePubkeyTypes, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, CurveAddLiquidity, ChainId, TokenId, CurveRemoveLiquidity, CurveSwap, Order, TokenSymbol, TokenAddress } from './types';
 export declare class ZKSyncTxError extends Error {
     value: PriorityOperationReceipt | TransactionReceipt;
     constructor(message: string, value: PriorityOperationReceipt | TransactionReceipt);
@@ -52,6 +52,8 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<SignedTransaction>;
     getForcedExit(forcedExit: {
+        chainId: ChainId;
+        subAccountId: number;
         target: Address;
         token: TokenLike;
         tokenId: TokenId;
@@ -61,6 +63,8 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<ForcedExit>;
     signSyncForcedExit(forcedExit: {
+        chainId: ChainId;
+        subAccountId: number;
         target: Address;
         token: TokenLike;
         tokenId: TokenId;
@@ -72,6 +76,8 @@ export declare class Wallet {
     }): Promise<SignedTransaction>;
     syncForcedExit(forcedExit: {
         target: Address;
+        chainId: ChainId;
+        subAccountId: number;
         token: TokenLike;
         fee?: BigNumberish;
         nonce?: Nonce;
@@ -159,7 +165,7 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<SignedTransaction>;
     getWithdrawFromSyncToEthereum(withdraw: {
-        chainId: number;
+        toChainId: number;
         subAccountId: number;
         to: string;
         token: TokenLike;
@@ -175,7 +181,7 @@ export declare class Wallet {
         validUntil: number;
     }): Promise<Withdraw>;
     signWithdrawFromSyncToEthereum(withdraw: {
-        chainId: number;
+        toChainId: number;
         subAccountId: number;
         to: string;
         token: TokenLike;
@@ -191,7 +197,7 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<SignedTransaction>;
     withdrawFromSyncToEthereum(withdraw: {
-        chainId: number;
+        toChainId: number;
         subAccountId: number;
         to: string;
         token: TokenLike;
@@ -265,7 +271,7 @@ export declare class Wallet {
     address(): Address;
     getAccountState(): Promise<AccountState>;
     getBalance(token: TokenLike, type?: 'committed' | 'verified'): Promise<BigNumber>;
-    getEthereumBalance(token: TokenLike): Promise<BigNumber>;
+    getEthereumBalance(token: TokenLike, linkChainId: ChainId): Promise<BigNumber>;
     isERC20DepositsApproved(token: TokenLike, linkChainId: number, erc20ApproveThreshold?: BigNumber): Promise<boolean>;
     approveERC20TokenDeposits(token: TokenLike, linkChainId: number, max_erc20_approve_amount?: BigNumber): Promise<ContractTransaction>;
     depositToSyncFromEthereum(deposit: {
@@ -278,7 +284,8 @@ export declare class Wallet {
         approveDepositAmountForERC20?: boolean;
     }): Promise<ETHOperation>;
     emergencyWithdraw(withdraw: {
-        token: TokenLike;
+        tokenId: TokenId;
+        subAccountId: number;
         linkChainId: number;
         accountId?: number;
         ethTxOptions?: ethers.providers.TransactionRequest;

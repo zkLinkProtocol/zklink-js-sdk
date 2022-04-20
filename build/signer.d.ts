@@ -1,5 +1,5 @@
 import { BigNumberish, ethers } from 'ethers';
-import { Address, EthSignerType, PubKeyHash, Transfer, Withdraw, ForcedExit, ChangePubKey, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order } from './types';
+import { Address, EthSignerType, PubKeyHash, Transfer, Withdraw, ForcedExit, ChangePubKey, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, ChainId, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order } from './types';
 export declare class Signer {
     #private;
     private constructor();
@@ -65,7 +65,7 @@ export declare class Signer {
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
     withdrawSignBytes(withdraw: {
-        chainId: number;
+        toChainId: number;
         subAccountId: number;
         accountId: number;
         from: Address;
@@ -81,7 +81,7 @@ export declare class Signer {
         validUntil: number;
     }): Uint8Array;
     signSyncWithdraw(withdraw: {
-        chainId: number;
+        toChainId: number;
         subAccountId: number;
         accountId: number;
         from: Address;
@@ -100,6 +100,8 @@ export declare class Signer {
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
     forcedExitSignBytes(forcedExit: {
+        chainId: ChainId;
+        subAccountId: number;
         initiatorAccountId: number;
         target: Address;
         tokenId: number;
@@ -109,6 +111,8 @@ export declare class Signer {
         validUntil: number;
     }): Uint8Array;
     signSyncForcedExit(forcedExit: {
+        chainId: ChainId;
+        subAccountId: number;
         initiatorAccountId: number;
         target: Address;
         tokenId: number;

@@ -33,12 +33,12 @@ function getMulticallAddressByNetwork(network) {
             throw new Error('There is no default multicall contract address for this network');
     }
 }
-wallet_1.Wallet.prototype.withdrawPendingBalance = function (from, token, linkChainId, amount) {
+wallet_1.Wallet.prototype.withdrawPendingBalance = function (from, token, chainId, amount) {
     return __awaiter(this, void 0, void 0, function* () {
         checkEthProvider(this.ethSigner);
-        const zksyncContract = yield this.getZkSyncMainContract(linkChainId);
+        const zksyncContract = yield this.getZkSyncMainContract(chainId);
         const gasPrice = yield this.ethSigner.getGasPrice();
-        const tokenAddress = this.provider.tokenSet.resolveTokenAddress(token);
+        const tokenAddress = this.provider.tokenSet.resolveTokenAddress(token, chainId);
         const withdrawAmount = amount ? amount : yield zksyncContract.getPendingBalance(from, tokenAddress);
         return zksyncContract.withdrawPendingBalance(from, tokenAddress, withdrawAmount, {
             gasLimit: ethers_1.BigNumber.from('200000'),
@@ -55,7 +55,7 @@ wallet_1.Wallet.prototype.withdrawPendingBalances = function (addresses, tokens,
         const multicallAddress = multicallParams.address || getMulticallAddressByNetwork(multicallParams.network);
         const zksyncContract = yield this.getZkSyncMainContract(linkChainId);
         const gasPrice = yield this.ethSigner.getGasPrice();
-        const tokensAddresses = tokens.map((token) => this.provider.tokenSet.resolveTokenAddress(token));
+        const tokensAddresses = tokens.map((token) => this.provider.tokenSet.resolveTokenAddress(token, linkChainId));
         if (!amounts) {
             const pendingWithdrawalsPromises = addresses.map((address, i) => zksyncContract.getPendingBalance(address, tokensAddresses[i]));
             amounts = yield Promise.all(pendingWithdrawalsPromises);

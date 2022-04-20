@@ -1,6 +1,6 @@
 import { BigNumberish, ethers, Contract, BigNumber, ContractTransaction } from 'ethers';
 import { Wallet } from './wallet';
-import { Address, TokenLike, Network } from './types';
+import { Address, TokenLike, Network, ChainId } from './types';
 import { MULTICALL_INTERFACE } from './utils';
 
 declare module './wallet' {
@@ -52,16 +52,13 @@ Wallet.prototype.withdrawPendingBalance = async function (
     this: Wallet,
     from: Address,
     token: TokenLike,
-    linkChainId: number,
+    chainId: ChainId,
     amount?: BigNumberish
 ): Promise<ContractTransaction> {
     checkEthProvider(this.ethSigner);
-
-    const zksyncContract = await this.getZkSyncMainContract(linkChainId);
-
+    const zksyncContract = await this.getZkSyncMainContract(chainId);
     const gasPrice = await this.ethSigner.getGasPrice();
-
-    const tokenAddress = this.provider.tokenSet.resolveTokenAddress(token);
+    const tokenAddress = this.provider.tokenSet.resolveTokenAddress(token, chainId);
     const withdrawAmount = amount ? amount : await zksyncContract.getPendingBalance(from, tokenAddress);
 
     return zksyncContract.withdrawPendingBalance(from, tokenAddress, withdrawAmount, {
@@ -75,7 +72,7 @@ Wallet.prototype.withdrawPendingBalances = async function (
     addresses: Address[],
     tokens: TokenLike[],
     multicallParams: MulticallParams,
-    linkChainId: number,
+    linkChainId: ChainId,
     amounts?: BigNumberish[]
 ): Promise<ContractTransaction> {
     checkEthProvider(this.ethSigner);
@@ -89,7 +86,7 @@ Wallet.prototype.withdrawPendingBalances = async function (
     const zksyncContract = await this.getZkSyncMainContract(linkChainId);
     const gasPrice = await this.ethSigner.getGasPrice();
 
-    const tokensAddresses = tokens.map((token) => this.provider.tokenSet.resolveTokenAddress(token));
+    const tokensAddresses = tokens.map((token) => this.provider.tokenSet.resolveTokenAddress(token, linkChainId));
 
     if (!amounts) {
         const pendingWithdrawalsPromises = addresses.map((address, i) =>

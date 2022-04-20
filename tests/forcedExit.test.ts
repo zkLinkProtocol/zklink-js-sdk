@@ -1,28 +1,22 @@
 import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { describe } from "mocha";
-import { serializeOrder, serializeWithdraw } from "../src/utils";
+import { serializeForcedExit, serializeOrder, serializeWithdraw } from "../src/utils";
 import { getWallet } from "./wallet.test";
 
 
 describe('withdraw', () => {
   it('serializeWithdraw', () => {
-    const serialized = serializeWithdraw({
-      toChainId: 3,
-      subAccountId: 1,
-      accountId: 1,
-      from: '0x3498F456645270eE003441df82C718b56c0e6666',
-      to: '0x3d809e414ba4893709c85f242ba3617481bc4126',
-      tokenId: 2,
-      amount: BigNumber.from('99995900000000000000'),
-      withdrawFeeRatio: 50,
-      fastWithdraw: 1,
+    const serialized = serializeForcedExit({
+      type: 'ForcedExit',
+      chainId: 1,
+      subAccountId: 0,
+      initiatorAccountId: 1,
+      target: '0x3498F456645270eE003441df82C718b56c0e6666',
       fee: BigNumber.from('4100000000000000'),
-      ts: 1649749979,
       nonce: 85,
       validFrom: 0,
       validUntil: 4294967295,
-      type: 'Withdraw',
       token: 2
     })
     expect(serialized).eql(new Uint8Array([
@@ -42,7 +36,7 @@ describe('withdraw', () => {
     expect(wallet.address()).eq('0x3498F456645270eE003441df82C718b56c0e6666', 'Wallet address does not match');
   
     const transaction = await wallet.signWithdrawFromSyncToEthereum({
-      toChainId: 3,
+      chainId: 3,
       accountId: 1,
       subAccountId: 1,
       amount: BigNumber.from('99995900000000000000'),

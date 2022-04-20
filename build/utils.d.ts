@@ -1,6 +1,6 @@
 import { utils, ethers, BigNumber, BigNumberish } from 'ethers';
 import { Provider } from '.';
-import { PubKeyHash, TokenAddress, TokenLike, Tokens, TokenSymbol, EthSignerType, Address, Transfer, ForcedExit, ChangePubKey, Withdraw, CloseAccount, RemoveLiquidity, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order } from './types';
+import { PubKeyHash, TokenAddress, TokenLike, Tokens, TokenSymbol, EthSignerType, Address, Transfer, ForcedExit, ChangePubKey, Withdraw, CloseAccount, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order, ChainId } from './types';
 export declare const MAX_TIMESTAMP = 4294967295;
 export declare const MIN_UNONCE = 1;
 export declare const MAX_UNONCE = 4294967295;
@@ -56,7 +56,7 @@ export declare class TokenSet {
     parseToken(tokenLike: TokenOrId, amount: string): BigNumber;
     resolveTokenDecimals(tokenLike: TokenOrId): number;
     resolveTokenId(tokenLike: TokenOrId): number;
-    resolveTokenAddress(tokenLike: TokenOrId): TokenAddress;
+    resolveTokenAddress(tokenLike: TokenOrId, chainId: ChainId): TokenAddress;
     resolveTokenSymbol(tokenLike: TokenOrId): TokenSymbol;
 }
 export declare function getChangePubkeyMessage(pubKeyHash: PubKeyHash, nonce: number, accountId: number, batchHash?: string): Uint8Array;
@@ -81,7 +81,6 @@ export declare function serializeTransfer(transfer: Transfer): Uint8Array;
 export declare function serializeCurveAddLiquidity(payload: CurveAddLiquidity): Uint8Array;
 export declare function serializeCurveSwap(payload: CurveSwap): Uint8Array;
 export declare function serializeCurveRemoveLiquidity(payload: CurveRemoveLiquidity): Uint8Array;
-export declare function serializeRemoveLiquidity(transfer: RemoveLiquidity): Uint8Array;
 export declare function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array;
 export declare function serializeForcedExit(forcedExit: ForcedExit): Uint8Array;
 export declare function serializeOrder(order: Order): Uint8Array;
@@ -101,8 +100,8 @@ export declare function getCREATE2AddressAndSalt(syncPubkeyHash: string, create2
     salt: string;
     address: string;
 };
-export declare function getEthereumBalance(ethProvider: ethers.providers.Provider, syncProvider: Provider, address: Address, token: TokenLike): Promise<BigNumber>;
-export declare function getPendingBalance(ethProvider: ethers.providers.Provider, syncProvider: Provider, address: Address, token: TokenLike, linkChainId: number): Promise<BigNumberish>;
+export declare function getEthereumBalance(ethProvider: ethers.providers.Provider, syncProvider: Provider, address: Address, token: TokenLike, chainId: ChainId): Promise<BigNumber>;
+export declare function getPendingBalance(ethProvider: ethers.providers.Provider, syncProvider: Provider, address: Address, token: TokenLike, chainId: ChainId): Promise<BigNumberish>;
 export declare function getTxHash(tx: Transfer | Withdraw | ChangePubKey | ForcedExit | CloseAccount): string;
 export declare function getRandom(min: number, max: number): number;
 export declare function getFastSwapUNonce(): number;

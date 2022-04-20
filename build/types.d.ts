@@ -195,7 +195,7 @@ export interface Swap {
 }
 export interface Withdraw {
     type: 'Withdraw';
-    chainId: number;
+    toChainId: number;
     subAccountId: number;
     accountId: number;
     from: Address;
@@ -214,6 +214,8 @@ export interface Withdraw {
 }
 export interface ForcedExit {
     type: 'ForcedExit';
+    chainId: ChainId;
+    subAccountId: number;
     initiatorAccountId: number;
     target: Address;
     token: number;
@@ -284,7 +286,8 @@ export interface ContractAddress {
 }
 export interface Tokens {
     [token: string]: {
-        address: string;
+        chains: number[];
+        address: string[];
         id: number;
         symbol: string;
         decimals: number;

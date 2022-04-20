@@ -151,6 +151,8 @@ class Wallet {
             }
             yield this.setRequiredAccountIdFromServer('perform a Forced Exit');
             const transactionData = {
+                chainId: forcedExit.chainId,
+                subAccountId: forcedExit.subAccountId,
                 initiatorAccountId: this.accountId,
                 target: forcedExit.target,
                 tokenId: forcedExit.tokenId,
@@ -425,7 +427,7 @@ class Wallet {
             yield this.setRequiredAccountIdFromServer('Withdraw funds');
             const tokenId = withdraw.tokenId;
             const transactionData = {
-                chainId: withdraw.chainId,
+                toChainId: withdraw.toChainId,
                 subAccountId: withdraw.subAccountId,
                 accountId: withdraw.accountId || this.accountId,
                 from: this.address(),
@@ -709,10 +711,10 @@ class Wallet {
             return ethers_1.BigNumber.from(balance);
         });
     }
-    getEthereumBalance(token) {
+    getEthereumBalance(token, linkChainId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return (0, utils_1.getEthereumBalance)(this.ethSigner.provider, this.provider, this.cachedAddress, token);
+                return (0, utils_1.getEthereumBalance)(this.ethSigner.provider, this.provider, this.cachedAddress, token, linkChainId);
             }
             catch (e) {
                 this.modifyEthersError(e);
@@ -826,7 +828,7 @@ class Wallet {
             }
             const mainZkSyncContract = yield this.getZkSyncMainContract(withdraw.linkChainId);
             try {
-                const ethTransaction = yield mainZkSyncContract.requestFullExit(accountId, withdraw.token, Object.assign({ gasLimit: ethers_1.BigNumber.from('500000'), gasPrice }, withdraw.ethTxOptions));
+                const ethTransaction = yield mainZkSyncContract.requestFullExit(accountId, withdraw.subAccountId, withdraw.tokenId, Object.assign({ gasLimit: ethers_1.BigNumber.from('500000'), gasPrice }, withdraw.ethTxOptions));
                 return new ETHOperation(ethTransaction, this.provider);
             }
             catch (e) {

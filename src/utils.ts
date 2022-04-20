@@ -13,7 +13,7 @@ import {
     ChangePubKey,
     Withdraw,
     CloseAccount,
-    AddLiquidity, RemoveLiquidity, Swap, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order
+    AddLiquidity, RemoveLiquidity, Swap, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order, ChainId
 } from './types';
 
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
@@ -345,7 +345,6 @@ export class TokenSet {
                     return token;
                 }
             } else if (
-                token.address.toLocaleLowerCase() === tokenLike.toLocaleLowerCase() ||
                 token.symbol.toLocaleLowerCase() === tokenLike.toLocaleLowerCase()
             ) {
                 return token;
@@ -383,8 +382,9 @@ export class TokenSet {
         return this.resolveTokenObject(tokenLike).id;
     }
 
-    public resolveTokenAddress(tokenLike: TokenOrId): TokenAddress {
-        return this.resolveTokenObject(tokenLike).address;
+    public resolveTokenAddress(tokenLike: TokenOrId, chainId: ChainId): TokenAddress {
+        const index = this.resolveTokenObject(tokenLike).chains.findIndex(c => c === chainId)
+        return this.resolveTokenObject(tokenLike).address[index];
     }
 
     public resolveTokenSymbol(tokenLike: TokenOrId): TokenSymbol {
@@ -572,7 +572,7 @@ export function serializeTimestamp(time: number): Uint8Array {
 
 export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
     const type = new Uint8Array([3]);
-    const chainId = serializeChainId(withdraw.chainId)
+    const toChainId = serializeChainId(withdraw.toChainId)
     const accountId = serializeAccountId(withdraw.accountId);
     const subAccountId = serializeSubAccountId(withdraw.subAccountId)
     const accountBytes = serializeAddress(withdraw.from);
@@ -587,7 +587,7 @@ export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
     const validUntil = serializeTimestamp(withdraw.validUntil);
     return ethers.utils.concat([
         type,
-        chainId,
+        toChainId,
         accountId,
         subAccountId,
         accountBytes,
@@ -662,25 +662,6 @@ export function serializeCurveRemoveLiquidity(payload: CurveRemoveLiquidity): Ui
     const tsBytes = numberToBytesBE(payload.ts, 4);
     return ethers.utils.concat([type, account, ...tokens, ...minAmounts, lpQuantity, feeToken, feeAmount, nonce, validFrom, validUntil, tsBytes]);
 }
-export function serializeRemoveLiquidity(transfer: RemoveLiquidity): Uint8Array {
-    const type = new Uint8Array([10]); // tx type
-    const fromChainId = serializeChainId(transfer.fromChainId);
-    const toChainId = serializeChainId(transfer.toChainId);
-    const from = serializeAddress(transfer.from);
-    const pairAddress = serializeAddress(transfer.pairAddress);
-    const minAmount1 = serializeAmountPacked(transfer.minAmount1);
-    const minAmount2 = serializeAmountPacked(transfer.minAmount2);
-    const lpQuantity = serializeAmountPacked(transfer.lpQuantity);
-    const tokenIn = serializeTokenId(transfer.token1);
-    const tokenOut = serializeTokenId(transfer.token2);
-    const tokenLp = serializeTokenId(transfer.lpToken);
-    const fee1 = serializeFeePacked(transfer.fee1);
-    const fee2 = serializeFeePacked(transfer.fee2);
-    const nonce = serializeNonce(transfer.nonce);
-    const validFrom = serializeTimestamp(transfer.validFrom);
-    const validUntil = serializeTimestamp(transfer.validUntil);
-    return ethers.utils.concat([type, fromChainId, toChainId, from, pairAddress, tokenLp, tokenIn, tokenOut, lpQuantity, minAmount1, minAmount2, fee1, fee2, nonce, validFrom, validUntil]);
-}
 
 export function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array {
     const type = new Uint8Array([6]);
@@ -706,8 +687,10 @@ export function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array {
 }
 
 export function serializeForcedExit(forcedExit: ForcedExit): Uint8Array {
-    const type = new Uint8Array([8]);
+    const type = new Uint8Array([7]);
+    const chainIdBytes = serializeChainId(forcedExit.chainId)
     const initiatorAccountIdBytes = serializeAccountId(forcedExit.initiatorAccountId);
+    const subAccountIdBytes = serializeSubAccountId(forcedExit.subAccountId)
     const targetBytes = serializeAddress(forcedExit.target);
     const tokenIdBytes = serializeTokenId(forcedExit.token);
     const feeBytes = serializeFeePacked(forcedExit.fee);
@@ -716,7 +699,9 @@ export function serializeForcedExit(forcedExit: ForcedExit): Uint8Array {
     const validUntil = serializeTimestamp(forcedExit.validUntil);
     return ethers.utils.concat([
         type,
+        chainIdBytes,
         initiatorAccountIdBytes,
+        subAccountIdBytes,
         targetBytes,
         tokenIdBytes,
         feeBytes,
@@ -835,14 +820,15 @@ export async function getEthereumBalance(
     ethProvider: ethers.providers.Provider,
     syncProvider: Provider,
     address: Address,
-    token: TokenLike
+    token: TokenLike,
+    chainId: ChainId
 ): Promise<BigNumber> {
     let balance: BigNumber;
     if (isTokenETH(token)) {
         balance = await ethProvider.getBalance(address);
     } else {
         const erc20contract = new Contract(
-            syncProvider.tokenSet.resolveTokenAddress(token),
+            syncProvider.tokenSet.resolveTokenAddress(token, chainId),
             IERC20_INTERFACE,
             ethProvider
         );
@@ -857,16 +843,16 @@ export async function getPendingBalance(
     syncProvider: Provider,
     address: Address,
     token: TokenLike,
-    linkChainId: number
+    chainId: ChainId
 ): Promise<BigNumberish> {
-    const contractAddress = await syncProvider.getContractAddress(linkChainId)
+    const contractAddress = await syncProvider.getContractAddress(chainId)
     const zksyncContract = new Contract(
         contractAddress.mainContract,
         SYNC_MAIN_CONTRACT_INTERFACE,
         ethProvider
     );
 
-    const tokenAddress = syncProvider.tokenSet.resolveTokenAddress(token);
+    const tokenAddress = syncProvider.tokenSet.resolveTokenAddress(token, chainId);
 
     return zksyncContract.getPendingBalance(address, tokenAddress);
 }
