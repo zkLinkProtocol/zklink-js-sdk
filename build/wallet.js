@@ -38,6 +38,7 @@ class Wallet {
         return this;
     }
     static fromEthSigner(ethWallet, provider, signer, accountId, ethSignerType) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             if (signer == null) {
                 const signerResult = yield signer_1.Signer.fromETHSignature(ethWallet);
@@ -47,8 +48,12 @@ class Wallet {
             else if (ethSignerType == null) {
                 throw new Error('If you passed signer, you must also pass ethSignerType.');
             }
+            const address = yield ethWallet.getAddress();
+            if (accountId === undefined) {
+                accountId = (_a = (yield provider.getState(address))) === null || _a === void 0 ? void 0 : _a.id;
+            }
             const ethMessageSigner = new eth_message_signer_1.EthMessageSigner(ethWallet, ethSignerType);
-            const wallet = new Wallet(ethWallet, ethMessageSigner, yield ethWallet.getAddress(), signer, accountId, ethSignerType);
+            const wallet = new Wallet(ethWallet, ethMessageSigner, address, signer, accountId, ethSignerType);
             wallet.connect(provider);
             return wallet;
         });
@@ -940,7 +945,8 @@ class Transaction {
             this.throwErrorIfFailedState();
             if (this.state !== 'Sent')
                 return;
-            const receipt = yield this.sidechainProvider.notifyTransaction(this.txHash, 'COMMIT');
+            const hash = Array.isArray(this.txHash) ? this.txHash[0] : this.txHash;
+            const receipt = yield this.sidechainProvider.notifyTransaction(hash, 'COMMIT');
             if (!receipt.success) {
                 this.setErrorState(new ZKSyncTxError(`zkLink transaction failed: ${receipt.failReason}`, receipt));
                 this.throwErrorIfFailedState();
@@ -952,7 +958,8 @@ class Transaction {
     awaitVerifyReceipt() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.awaitReceipt();
-            const receipt = yield this.sidechainProvider.notifyTransaction(this.txHash, 'VERIFY');
+            const hash = Array.isArray(this.txHash) ? this.txHash[0] : this.txHash;
+            const receipt = yield this.sidechainProvider.notifyTransaction(hash, 'VERIFY');
             this.state = 'Verified';
             return receipt;
         });

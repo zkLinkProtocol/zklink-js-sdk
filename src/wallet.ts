@@ -91,17 +91,19 @@ export class Wallet {
         } else if (ethSignerType == null) {
             throw new Error('If you passed signer, you must also pass ethSignerType.');
         }
-
+        const address = await ethWallet.getAddress()
+        if (accountId === undefined) {
+            accountId = (await provider.getState(address))?.id
+        }
         const ethMessageSigner = new EthMessageSigner(ethWallet, ethSignerType);
         const wallet = new Wallet(
             ethWallet,
             ethMessageSigner,
-            await ethWallet.getAddress(),
+            address,
             signer,
             accountId,
             ethSignerType
         );
-
         wallet.connect(provider);
         return wallet;
     }
@@ -1299,8 +1301,8 @@ export class Transaction {
         this.throwErrorIfFailedState();
 
         if (this.state !== 'Sent') return;
-
-        const receipt = await this.sidechainProvider.notifyTransaction(this.txHash, 'COMMIT');
+        const hash = Array.isArray(this.txHash) ? this.txHash[0] : this.txHash
+        const receipt = await this.sidechainProvider.notifyTransaction(hash, 'COMMIT');
 
         if (!receipt.success) {
             this.setErrorState(new ZKSyncTxError(`zkLink transaction failed: ${receipt.failReason}`, receipt));
@@ -1313,7 +1315,8 @@ export class Transaction {
 
     async awaitVerifyReceipt(): Promise<TransactionReceipt> {
         await this.awaitReceipt();
-        const receipt = await this.sidechainProvider.notifyTransaction(this.txHash, 'VERIFY');
+        const hash = Array.isArray(this.txHash) ? this.txHash[0] : this.txHash
+        const receipt = await this.sidechainProvider.notifyTransaction(hash, 'VERIFY');
 
         this.state = 'Verified';
         return receipt;
