@@ -605,11 +605,11 @@ export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
 
 export function serializeTransfer(transfer: Transfer): Uint8Array {
     const type = new Uint8Array([4]); // tx type
-    const fromSubAccountId = serializeSubAccountId(transfer.fromSubAccountId);
-    const toSubAccountId = serializeSubAccountId(transfer.toSubAccountId);
     const accountId = serializeAccountId(transfer.accountId);
     const from = serializeAddress(transfer.from);
+    const fromSubAccountId = serializeSubAccountId(transfer.fromSubAccountId);
     const to = serializeAddress(transfer.to);
+    const toSubAccountId = serializeSubAccountId(transfer.toSubAccountId);
     const token = serializeTokenId(transfer.token);
     const amount = serializeAmountPacked(transfer.amount);
     const fee = serializeFeePacked(transfer.fee);
@@ -617,7 +617,7 @@ export function serializeTransfer(transfer: Transfer): Uint8Array {
     const validFrom = serializeTimestamp(transfer.validFrom);
     const validUntil = serializeTimestamp(transfer.validUntil);
     const tsBytes = numberToBytesBE(transfer.ts, 4);
-    return ethers.utils.concat([type, fromSubAccountId, toSubAccountId, accountId, from, to, token, amount, fee, nonce, validFrom, validUntil, tsBytes]);
+    return ethers.utils.concat([type, accountId, from, fromSubAccountId, to, toSubAccountId, token, amount, fee, nonce, validFrom, validUntil, tsBytes]);
 }
 export function serializeCurveAddLiquidity(payload: CurveAddLiquidity): Uint8Array {
     const type = new Uint8Array([8]);

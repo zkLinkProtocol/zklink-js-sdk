@@ -527,11 +527,11 @@ function serializeWithdraw(withdraw) {
 exports.serializeWithdraw = serializeWithdraw;
 function serializeTransfer(transfer) {
     const type = new Uint8Array([4]); // tx type
-    const fromSubAccountId = serializeSubAccountId(transfer.fromSubAccountId);
-    const toSubAccountId = serializeSubAccountId(transfer.toSubAccountId);
     const accountId = serializeAccountId(transfer.accountId);
     const from = serializeAddress(transfer.from);
+    const fromSubAccountId = serializeSubAccountId(transfer.fromSubAccountId);
     const to = serializeAddress(transfer.to);
+    const toSubAccountId = serializeSubAccountId(transfer.toSubAccountId);
     const token = serializeTokenId(transfer.token);
     const amount = serializeAmountPacked(transfer.amount);
     const fee = serializeFeePacked(transfer.fee);
@@ -539,7 +539,7 @@ function serializeTransfer(transfer) {
     const validFrom = serializeTimestamp(transfer.validFrom);
     const validUntil = serializeTimestamp(transfer.validUntil);
     const tsBytes = numberToBytesBE(transfer.ts, 4);
-    return ethers_1.ethers.utils.concat([type, fromSubAccountId, toSubAccountId, accountId, from, to, token, amount, fee, nonce, validFrom, validUntil, tsBytes]);
+    return ethers_1.ethers.utils.concat([type, accountId, from, fromSubAccountId, to, toSubAccountId, token, amount, fee, nonce, validFrom, validUntil, tsBytes]);
 }
 exports.serializeTransfer = serializeTransfer;
 function serializeCurveAddLiquidity(payload) {
