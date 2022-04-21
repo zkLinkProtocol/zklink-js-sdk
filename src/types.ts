@@ -43,20 +43,24 @@ export interface AccountState {
     id?: number;
     depositing: {
         balances: {
-            // Token are indexed by their symbol (e.g. "ETH")
-            [token: string]: {
-                // Sum of pending deposits for the token.
-                amount: BigNumberish;
-                // Value denoting the block number when the funds are expected
-                // to be received by zkSync network.
-                expectedAcceptBlock: number;
-            };
+            [subAccountId: number]: {
+                // Token are indexed by their symbol (e.g. "ETH")
+                [token: string]: {
+                    // Sum of pending deposits for the token.
+                    amount: BigNumberish;
+                    // Value denoting the block number when the funds are expected
+                    // to be received by zkSync network.
+                    expectedAcceptBlock: number;
+                };
+            }
         };
     };
     committed: {
         balances: {
-            // Token are indexed by their symbol (e.g. "ETH")
-            [token: string]: BigNumberish;
+            [subAccountId: number]: {
+                // Token are indexed by their symbol (e.g. "ETH")
+                [token: string]: BigNumberish;
+            }
         };
         nonce: number;
         pubKeyHash: PubKeyHash;
@@ -68,8 +72,10 @@ export interface AccountState {
     };
     verified: {
         balances: {
-            // Token are indexed by their symbol (e.g. "ETH")
-            [token: string]: BigNumberish;
+            [subAccountId: number]: {
+                // Token are indexed by their symbol (e.g. "ETH")
+                [token: string]: BigNumberish;
+            }
         };
         nonce: number;
         pubKeyHash: PubKeyHash;

@@ -264,7 +264,8 @@ export declare class Wallet {
     getAccountId(): Promise<number | undefined>;
     address(): Address;
     getAccountState(): Promise<AccountState>;
-    getBalance(token: TokenLike, type?: 'committed' | 'verified'): Promise<BigNumber>;
+    getSubAccountState(subAccountId: number): Promise<AccountState>;
+    getBalance(token: TokenLike, subAccountId: number, type?: 'committed' | 'verified'): Promise<BigNumber>;
     getEthereumBalance(token: TokenLike, linkChainId: ChainId): Promise<BigNumber>;
     isERC20DepositsApproved(token: TokenLike, linkChainId: number, erc20ApproveThreshold?: BigNumber): Promise<boolean>;
     approveERC20TokenDeposits(token: TokenLike, linkChainId: number, max_erc20_approve_amount?: BigNumber): Promise<ContractTransaction>;

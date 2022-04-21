@@ -697,16 +697,21 @@ class Wallet {
             return this.provider.getState(this.address());
         });
     }
-    getBalance(token, type = 'committed') {
+    getSubAccountState(subAccountId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.provider.getSubAccountState(this.address(), subAccountId);
+        });
+    }
+    getBalance(token, subAccountId, type = 'committed') {
         return __awaiter(this, void 0, void 0, function* () {
             const accountState = yield this.getAccountState();
             const tokenSymbol = this.provider.tokenSet.resolveTokenSymbol(token);
             let balance;
             if (type === 'committed') {
-                balance = accountState.committed.balances[tokenSymbol] || '0';
+                balance = accountState.committed.balances[subAccountId][tokenSymbol] || '0';
             }
             else {
-                balance = accountState.verified.balances[tokenSymbol] || '0';
+                balance = accountState.verified.balances[subAccountId][tokenSymbol] || '0';
             }
             return ethers_1.BigNumber.from(balance);
         });

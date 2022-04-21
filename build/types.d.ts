@@ -30,15 +30,19 @@ export interface AccountState {
     id?: number;
     depositing: {
         balances: {
-            [token: string]: {
-                amount: BigNumberish;
-                expectedAcceptBlock: number;
+            [subAccountId: number]: {
+                [token: string]: {
+                    amount: BigNumberish;
+                    expectedAcceptBlock: number;
+                };
             };
         };
     };
     committed: {
         balances: {
-            [token: string]: BigNumberish;
+            [subAccountId: number]: {
+                [token: string]: BigNumberish;
+            };
         };
         nonce: number;
         pubKeyHash: PubKeyHash;
@@ -49,7 +53,9 @@ export interface AccountState {
     };
     verified: {
         balances: {
-            [token: string]: BigNumberish;
+            [subAccountId: number]: {
+                [token: string]: BigNumberish;
+            };
         };
         nonce: number;
         pubKeyHash: PubKeyHash;

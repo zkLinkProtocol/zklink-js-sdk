@@ -1006,14 +1006,18 @@ export class Wallet {
         return this.provider.getState(this.address());
     }
 
-    async getBalance(token: TokenLike, type: 'committed' | 'verified' = 'committed'): Promise<BigNumber> {
+    async getSubAccountState(subAccountId: number): Promise<AccountState> {
+        return this.provider.getSubAccountState(this.address(), subAccountId)
+    }
+
+    async getBalance(token: TokenLike, subAccountId: number, type: 'committed' | 'verified' = 'committed'): Promise<BigNumber> {
         const accountState = await this.getAccountState();
         const tokenSymbol = this.provider.tokenSet.resolveTokenSymbol(token);
         let balance: BigNumberish;
         if (type === 'committed') {
-            balance = accountState.committed.balances[tokenSymbol] || '0';
+            balance = accountState.committed.balances[subAccountId][tokenSymbol] || '0';
         } else {
-            balance = accountState.verified.balances[tokenSymbol] || '0';
+            balance = accountState.verified.balances[subAccountId][tokenSymbol] || '0';
         }
         return BigNumber.from(balance);
     }
