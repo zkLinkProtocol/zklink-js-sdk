@@ -191,17 +191,15 @@ export class DummyTransport extends AbstractJSONRPCTransport {
             const tokensList = this.getTokens();
             const tokens = {};
 
-            let id = 1;
             for (const tokenItem of tokensList.slice(0, 3)) {
                 const token = {
+                    chains: tokenItem.chains,
                     address: tokenItem.address,
-                    id: id,
+                    id: tokenItem.id,
                     symbol: tokenItem.symbol,
                     decimals: tokenItem.decimals
                 };
-
                 tokens[tokenItem.symbol] = token;
-                id++;
             }
 
             return tokens;
@@ -232,6 +230,11 @@ export class DummyTransport extends AbstractJSONRPCTransport {
                     pubKeyHash: ''
                 }
             };
+        }
+        if (method == 'tx_submit') {
+            return [
+                "sync-tx:0d162d589577dc3fdeffb8270feb53da7415b2a82249954c40ced41ae7e2270d"
+            ]
         }
 
         if (method == 'get_zksync_version') {

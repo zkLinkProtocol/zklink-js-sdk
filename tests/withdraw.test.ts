@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { describe } from "mocha";
 import { serializeOrder, serializeWithdraw } from "../src/utils";
-import { getWallet } from "./wallet.test";
+import { getTestWallet } from "./wallet.test";
 
 
 describe('withdraw', () => {
@@ -38,8 +38,7 @@ describe('withdraw', () => {
   })
 
   it('withdrawFromSyncToEthereum', async function () {
-    const wallet = await getWallet('0x14075e10e53a752ed31bfd4bfa867402b308b791cba8c6ef22d72faab8adff34' as any, 'rinkeby');
-    expect(wallet.address()).eq('0x3498F456645270eE003441df82C718b56c0e6666', 'Wallet address does not match');
+    const wallet = await getTestWallet()
   
     const transaction = await wallet.withdrawFromSyncToEthereum({
       toChainId: 3,
@@ -51,13 +50,13 @@ describe('withdraw', () => {
       fee: BigNumber.from('4100000000000000'),
       nonce: 85,
       token: "USDT",
-      tokenId: 2,
       ts: 1649749979,
       validFrom: 0,
       validUntil: 4294967295,
       withdrawFeeRatio: 50
     } as any)
-    expect(transaction.txData.ethereumSignature.signature).eq('0xe9c8fe51d57c8e9e692984e99c172f1555f4b425291c9990e8ff7e08fb40b2763661791c2ac2d8d5cc2fc02b4b76306649d0ba0f353238d816003acf1cce45291c')
+    expect(transaction.txData.ethereumSignature.signature).to.eq('0x52ffffa004c4b9d2bd425bfd5c94a9e0c787be20102baae8f578daaefb0296412dcea35fe60f833537ad0ed3a9b37ffad3ba1c8947f6b01fc3016adc67d33ec31c')
+    expect(transaction.txData.tx.signature.signature).to.eq('b51dd7a9b70977f4d92f847009f93c9299b0a3428fe43f76907d55881d6057ae9fbece85794aec72c6626a94840b30eceaba48369b74432951006d19aae6db05')
 
   });
 

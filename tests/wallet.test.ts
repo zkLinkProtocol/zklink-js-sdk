@@ -1,26 +1,31 @@
 import { expect } from 'chai';
 import { BigNumber, ethers } from 'ethers';
 import { Wallet } from '../src/wallet';
+import { getTestProvider } from './provider.test';
 
-import { Provider } from '../src/provider';
-
-export async function getWallet(ethPrivateKey: Uint8Array, network: string): Promise<Wallet> {
-  const ethWallet = new ethers.Wallet(ethPrivateKey);
-  const tokens = [{
-    
-  }]
-  const mockProvider = await Provider.newMockProvider(network, ethPrivateKey, () => [...tokens]);
+export async function getTestWallet(ethPrivateKey?: Uint8Array, network: string = 'mainnet'): Promise<Wallet> {
+  const key = ethPrivateKey || new Uint8Array(new Array(32).fill(5));
+  const ethWallet = new ethers.Wallet(key);
+  const mockProvider = await getTestProvider()
   const wallet = await Wallet.fromEthSigner(ethWallet, mockProvider);
   return wallet;
+}
+export async function getWalletFromPrivateKey() {
+  return await getTestWallet('0x14075e10e53a752ed31bfd4bfa867402b308b791cba8c6ef22d72faab8adff34' as any, 'rinkeby');
 }
 describe('Wallet with mock provider', function () {
 
   it('Wallet has valid address', async function () {
     const key = new Uint8Array(new Array(32).fill(5));
-    const wallet = await getWallet(key, 'mainnet');
+    const wallet = await getTestWallet(key, 'mainnet');
     expect(wallet.address()).eq('0xd09Ad14080d4b257a819a4f579b8485Be88f086c', 'Wallet address does not match');
     expect(await wallet.signer.pubKeyHash()).eq('sync:05ded0fbbe3c269ed1a8d17b3a9f973ad78be767')
   });
+
+  it('Test Wallet', async function() {
+    const wallet = await getWalletFromPrivateKey()
+    expect(wallet.address()).eq('0x3498F456645270eE003441df82C718b56c0e6666', 'Wallet address does not match');
+  })
 
 //     it("Wallet's account info has the same address as the wallet itself", async function () {
 //         const key = new Uint8Array(new Array(32).fill(10));

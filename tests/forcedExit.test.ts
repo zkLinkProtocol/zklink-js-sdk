@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { describe } from "mocha";
 import { serializeForcedExit, serializeOrder, serializeWithdraw } from "../src/utils";
-import { getWallet } from "./wallet.test";
+import { getTestWallet } from "./wallet.test";
 
 
 describe('forcedExit', () => {
@@ -30,18 +30,16 @@ describe('forcedExit', () => {
   })
 
   it('syncForcedExit', async function () {
-    const wallet = await getWallet('0x14075e10e53a752ed31bfd4bfa867402b308b791cba8c6ef22d72faab8adff34' as any, 'rinkeby');
-    expect(wallet.address()).eq('0x3498F456645270eE003441df82C718b56c0e6666', 'Wallet address does not match');
+    const wallet = await getTestWallet()
   
-    const transaction = await wallet.signSyncForcedExit({
+    const transaction = await wallet.syncForcedExit({
       chainId: 1,
       subAccountId: 0,
       target: '0x3498F456645270eE003441df82C718b56c0e6666',
       token: 'USDT',
       fee: BigNumber.from(parseEther('0.001'))
     } as any)
-    console.log(transaction);
-    // expect(transaction.signature.signature).eq('3b995556b9e938297aa76ddf7303a9a34e5e550cac0f7ed8439be840a60be8895dc247fc3019eeccf750754ab404aca5de2be709f542b27e65a9d26075a8d505')
+    expect(transaction.txData.tx.signature.signature).eq('96a3199a1a0d1e5238ae33cb23b01f36d7f9abf65fe059e1ceea520ebcbc88a7871ed28c47da962e84e90f52dcf69c182e136ffff92fc49a64a4f65423dd0400')
 
   });
 

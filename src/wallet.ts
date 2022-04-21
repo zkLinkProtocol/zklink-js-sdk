@@ -161,7 +161,6 @@ export class Wallet {
         toSubAccountId: number;
         to: Address;
         token: TokenLike;
-        tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
         accountId: number;
@@ -176,13 +175,14 @@ export class Wallet {
 
         await this.setRequiredAccountIdFromServer('Transfer funds');
 
+        const tokenId = this.provider.tokenSet.resolveTokenId(transfer.token)
         const transactionData = {
             fromSubAccountId: transfer.fromSubAccountId,
             toSubAccountId: transfer.toSubAccountId,
             accountId: transfer.accountId || this.accountId,
             from: this.address(),
             to: transfer.to,
-            tokenId: transfer.tokenId,
+            tokenId,
             amount: transfer.amount,
             fee: transfer.fee,
             ts: transfer.ts,
@@ -199,7 +199,6 @@ export class Wallet {
         toSubAccountId: number;
         to: Address;
         token: TokenLike;
-        tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
         accountId: number;
@@ -219,7 +218,7 @@ export class Wallet {
         const stringFee = BigNumber.from(transfer.fee).isZero()
             ? null
             : utils.formatEther(transfer.fee);
-        const stringToken = transfer.token
+        const stringToken = this.provider.tokenSet.resolveTokenSymbol(transfer.token)
         const ethereumSignature =
             this.ethSigner instanceof Create2WalletSigner
                 ? null
@@ -339,7 +338,6 @@ export class Wallet {
             toSubAccountId: number;
             to: Address;
             token: TokenSymbol;
-            tokenId: number;
             amount: BigNumberish;
             fee: BigNumberish;
             accountId?: number;
@@ -373,7 +371,6 @@ export class Wallet {
                 toSubAccountId: transfer.toSubAccountId,
                 to: transfer.to,
                 token: transfer.token,
-                tokenId: transfer.tokenId,
                 amount: transfer.amount,
                 fee: transfer.fee,
                 accountId: transfer.accountId,
@@ -403,8 +400,8 @@ export class Wallet {
         toSubAccountId: number;
         to: Address;
         token: TokenLike;
-        tokenId: number;
         amount: BigNumberish;
+        ts?: number;
         fee?: BigNumberish;
         accountId?: number;
         nonce?: Nonce;
@@ -629,7 +626,6 @@ export class Wallet {
         subAccountId: number;
         to: string;
         token: TokenLike;
-        tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
         withdrawFeeRatio: number;
@@ -644,7 +640,7 @@ export class Wallet {
             throw new Error('ZKSync signer is required for sending zksync transactions.');
         }
         await this.setRequiredAccountIdFromServer('Withdraw funds');
-        const tokenId = withdraw.tokenId;
+        const tokenId = this.provider.tokenSet.resolveTokenId(withdraw.token)
         const transactionData = {
             toChainId: withdraw.toChainId,
             subAccountId: withdraw.subAccountId,
@@ -669,7 +665,6 @@ export class Wallet {
         subAccountId: number;
         to: string;
         token: TokenLike;
-        tokenId: number;
         amount: BigNumberish;
         fee: BigNumberish;
         withdrawFeeRatio: number;
@@ -720,6 +715,7 @@ export class Wallet {
         amount: BigNumberish;
         withdrawFeeRatio: number;
         fastWithdraw: number;
+        ts?: number;
         fee?: BigNumberish;
         nonce?: Nonce;
         fastProcessing?: boolean;
