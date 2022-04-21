@@ -251,6 +251,7 @@ export class Signer {
         target: Address;
         tokenId: number;
         fee: BigNumberish;
+        ts: number;
         nonce: number;
         validFrom: number;
         validUntil: number;
@@ -269,6 +270,7 @@ export class Signer {
         target: Address;
         tokenId: number;
         fee: BigNumberish;
+        ts: number;
         nonce: number;
         validFrom: number;
         validUntil: number;

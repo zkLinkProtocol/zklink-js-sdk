@@ -168,6 +168,7 @@ export interface ForcedExit {
     target: Address;
     token: number;
     fee: BigNumberish;
+    ts: number;
     nonce: number;
     signature?: Signature;
     validFrom: number;

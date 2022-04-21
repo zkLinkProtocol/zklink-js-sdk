@@ -242,6 +242,7 @@ export class Wallet {
         target: Address;
         token: TokenLike;
         fee: BigNumberish;
+        ts: number;
         nonce: number;
         validFrom?: number;
         validUntil?: number;
@@ -258,6 +259,7 @@ export class Wallet {
             target: forcedExit.target,
             tokenId,
             fee: forcedExit.fee,
+            ts: forcedExit.ts,
             nonce: forcedExit.nonce,
             validFrom: forcedExit.validFrom || 0,
             validUntil: forcedExit.validUntil || MAX_TIMESTAMP
@@ -273,11 +275,13 @@ export class Wallet {
         token: TokenLike;
         tokenSymbol: TokenSymbol;
         fee: BigNumberish;
+        ts?: number;
         nonce: number;
         validFrom?: number;
         validUntil?: number;
     }): Promise<SignedTransaction> {
-        const signedForcedExitTransaction = await this.getForcedExit(forcedExit);
+        forcedExit.ts = forcedExit.ts || getTimestamp()
+        const signedForcedExitTransaction = await this.getForcedExit(forcedExit as any);
 
         const stringFee = BigNumber.from(forcedExit.fee).isZero()
             ? null
@@ -304,6 +308,7 @@ export class Wallet {
         chainId: ChainId;
         subAccountId: number;
         token: TokenLike;
+        ts?: number;
         fee?: BigNumberish;
         nonce?: Nonce;
         validFrom?: number;

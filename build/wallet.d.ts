@@ -55,6 +55,7 @@ export declare class Wallet {
         target: Address;
         token: TokenLike;
         fee: BigNumberish;
+        ts: number;
         nonce: number;
         validFrom?: number;
         validUntil?: number;
@@ -66,6 +67,7 @@ export declare class Wallet {
         token: TokenLike;
         tokenSymbol: TokenSymbol;
         fee: BigNumberish;
+        ts?: number;
         nonce: number;
         validFrom?: number;
         validUntil?: number;
@@ -75,6 +77,7 @@ export declare class Wallet {
         chainId: ChainId;
         subAccountId: number;
         token: TokenLike;
+        ts?: number;
         fee?: BigNumberish;
         nonce?: Nonce;
         validFrom?: number;

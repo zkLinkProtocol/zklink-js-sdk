@@ -698,6 +698,7 @@ export function serializeForcedExit(forcedExit: ForcedExit): Uint8Array {
     const nonceBytes = serializeNonce(forcedExit.nonce);
     const validFrom = serializeTimestamp(forcedExit.validFrom);
     const validUntil = serializeTimestamp(forcedExit.validUntil);
+    const tsBytes = numberToBytesBE(forcedExit.ts, 4);
     return ethers.utils.concat([
         type,
         chainIdBytes,
@@ -708,7 +709,8 @@ export function serializeForcedExit(forcedExit: ForcedExit): Uint8Array {
         feeBytes,
         nonceBytes,
         validFrom,
-        validUntil
+        validUntil,
+        tsBytes
     ]);
 }
 

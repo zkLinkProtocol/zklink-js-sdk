@@ -158,6 +158,7 @@ class Wallet {
                 target: forcedExit.target,
                 tokenId,
                 fee: forcedExit.fee,
+                ts: forcedExit.ts,
                 nonce: forcedExit.nonce,
                 validFrom: forcedExit.validFrom || 0,
                 validUntil: forcedExit.validUntil || utils_1.MAX_TIMESTAMP
@@ -167,6 +168,7 @@ class Wallet {
     }
     signSyncForcedExit(forcedExit) {
         return __awaiter(this, void 0, void 0, function* () {
+            forcedExit.ts = forcedExit.ts || (0, utils_1.getTimestamp)();
             const signedForcedExitTransaction = yield this.getForcedExit(forcedExit);
             const stringFee = ethers_1.BigNumber.from(forcedExit.fee).isZero()
                 ? null
