@@ -106,6 +106,11 @@ class Provider {
             return yield this.transport.request('account_info', [address]);
         });
     }
+    getSubAccountState(address, subAccountId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.transport.request('sub_account_info', [address, subAccountId]);
+        });
+    }
     // get transaction status by its hash (e.g. 0xdead..beef)
     getTxReceipt(txHash) {
         return __awaiter(this, void 0, void 0, function* () {

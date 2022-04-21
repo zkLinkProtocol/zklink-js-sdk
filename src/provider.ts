@@ -117,6 +117,10 @@ export class Provider {
         return await this.transport.request('account_info', [address]);
     }
 
+    async getSubAccountState(address: Address, subAccountId: number): Promise<AccountState> {
+        return await this.transport.request('sub_account_info', [address, subAccountId]);
+    }
+
     // get transaction status by its hash (e.g. 0xdead..beef)
     async getTxReceipt(txHash: string): Promise<TransactionReceipt> {
         return await this.transport.request('tx_info', [txHash]);

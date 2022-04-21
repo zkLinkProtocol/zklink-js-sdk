@@ -97,13 +97,14 @@ class Wallet {
                 throw new Error('ZKSync signer is required for sending zksync transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
+            const tokenId = this.provider.tokenSet.resolveTokenId(transfer.token);
             const transactionData = {
                 fromSubAccountId: transfer.fromSubAccountId,
                 toSubAccountId: transfer.toSubAccountId,
                 accountId: transfer.accountId || this.accountId,
                 from: this.address(),
                 to: transfer.to,
-                tokenId: transfer.tokenId,
+                tokenId,
                 amount: transfer.amount,
                 fee: transfer.fee,
                 ts: transfer.ts,
@@ -126,7 +127,7 @@ class Wallet {
             const stringFee = ethers_1.BigNumber.from(transfer.fee).isZero()
                 ? null
                 : ethers_1.utils.formatEther(transfer.fee);
-            const stringToken = transfer.token;
+            const stringToken = this.provider.tokenSet.resolveTokenSymbol(transfer.token);
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
                 : yield this.ethMessageSigner.ethSignTransfer({
@@ -231,7 +232,6 @@ class Wallet {
                     toSubAccountId: transfer.toSubAccountId,
                     to: transfer.to,
                     token: transfer.token,
-                    tokenId: transfer.tokenId,
                     amount: transfer.amount,
                     fee: transfer.fee,
                     accountId: transfer.accountId,
@@ -425,7 +425,7 @@ class Wallet {
                 throw new Error('ZKSync signer is required for sending zksync transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Withdraw funds');
-            const tokenId = withdraw.tokenId;
+            const tokenId = this.provider.tokenSet.resolveTokenId(withdraw.token);
             const transactionData = {
                 toChainId: withdraw.toChainId,
                 subAccountId: withdraw.subAccountId,
