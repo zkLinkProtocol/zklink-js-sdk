@@ -689,7 +689,7 @@ export function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array {
 
 export function serializeForcedExit(forcedExit: ForcedExit): Uint8Array {
     const type = new Uint8Array([7]);
-    const chainIdBytes = serializeChainId(forcedExit.chainId)
+    const toChainIdBytes = serializeChainId(forcedExit.toChainId)
     const initiatorAccountIdBytes = serializeAccountId(forcedExit.initiatorAccountId);
     const subAccountIdBytes = serializeSubAccountId(forcedExit.subAccountId)
     const targetBytes = serializeAddress(forcedExit.target);
@@ -701,7 +701,7 @@ export function serializeForcedExit(forcedExit: ForcedExit): Uint8Array {
     const tsBytes = numberToBytesBE(forcedExit.ts, 4);
     return ethers.utils.concat([
         type,
-        chainIdBytes,
+        toChainIdBytes,
         initiatorAccountIdBytes,
         subAccountIdBytes,
         targetBytes,

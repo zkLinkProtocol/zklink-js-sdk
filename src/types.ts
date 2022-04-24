@@ -204,7 +204,7 @@ export interface Withdraw {
 
 export interface ForcedExit {
     type: 'ForcedExit';
-    chainId: ChainId;
+    toChainId: ChainId;
     subAccountId: number;
     initiatorAccountId: number;
     target: Address;

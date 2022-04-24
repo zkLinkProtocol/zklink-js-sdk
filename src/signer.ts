@@ -245,7 +245,7 @@ export class Signer {
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
     forcedExitSignBytes(forcedExit: {
-        chainId: ChainId;
+        toChainId: ChainId;
         subAccountId: number;
         initiatorAccountId: number;
         target: Address;
@@ -264,7 +264,7 @@ export class Signer {
     }
 
     async signSyncForcedExit(forcedExit: {
-        chainId: ChainId;
+        toChainId: ChainId;
         subAccountId: number;
         initiatorAccountId: number;
         target: Address;

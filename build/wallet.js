@@ -152,7 +152,7 @@ class Wallet {
             yield this.setRequiredAccountIdFromServer('perform a Forced Exit');
             const tokenId = this.provider.tokenSet.resolveTokenId(forcedExit.token);
             const transactionData = {
-                chainId: forcedExit.chainId,
+                toChainId: forcedExit.toChainId,
                 subAccountId: forcedExit.subAccountId,
                 initiatorAccountId: this.accountId,
                 target: forcedExit.target,

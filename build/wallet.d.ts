@@ -50,7 +50,7 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<SignedTransaction>;
     getForcedExit(forcedExit: {
-        chainId: ChainId;
+        toChainId: ChainId;
         subAccountId: number;
         target: Address;
         token: TokenLike;
@@ -61,7 +61,7 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<ForcedExit>;
     signSyncForcedExit(forcedExit: {
-        chainId: ChainId;
+        toChainId: ChainId;
         subAccountId: number;
         target: Address;
         token: TokenLike;
@@ -74,7 +74,7 @@ export declare class Wallet {
     }): Promise<SignedTransaction>;
     syncForcedExit(forcedExit: {
         target: Address;
-        chainId: ChainId;
+        toChainId: ChainId;
         subAccountId: number;
         token: TokenLike;
         ts?: number;

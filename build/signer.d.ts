@@ -100,7 +100,7 @@ export declare class Signer {
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
     forcedExitSignBytes(forcedExit: {
-        chainId: ChainId;
+        toChainId: ChainId;
         subAccountId: number;
         initiatorAccountId: number;
         target: Address;
@@ -112,7 +112,7 @@ export declare class Signer {
         validUntil: number;
     }): Uint8Array;
     signSyncForcedExit(forcedExit: {
-        chainId: ChainId;
+        toChainId: ChainId;
         subAccountId: number;
         initiatorAccountId: number;
         target: Address;

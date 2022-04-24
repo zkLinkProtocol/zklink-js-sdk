@@ -10,7 +10,7 @@ describe('forcedExit', () => {
   it('serializeForcedExit', () => {
     const serialized = serializeForcedExit({
       type: 'ForcedExit',
-      chainId: 1,
+      toChainId: 1,
       subAccountId: 0,
       initiatorAccountId: 1,
       target: '0x3498F456645270eE003441df82C718b56c0e6666',
@@ -34,7 +34,7 @@ describe('forcedExit', () => {
     const wallet = await getTestWallet()
   
     const transaction = await wallet.syncForcedExit({
-      chainId: 1,
+      toChainId: 1,
       subAccountId: 0,
       target: '0x3498F456645270eE003441df82C718b56c0e6666',
       token: 'USDT',

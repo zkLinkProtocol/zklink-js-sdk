@@ -237,7 +237,7 @@ export class Wallet {
     }
 
     async getForcedExit(forcedExit: {
-        chainId: ChainId;
+        toChainId: ChainId;
         subAccountId: number;
         target: Address;
         token: TokenLike;
@@ -253,7 +253,7 @@ export class Wallet {
         await this.setRequiredAccountIdFromServer('perform a Forced Exit');
         const tokenId = this.provider.tokenSet.resolveTokenId(forcedExit.token)
         const transactionData = {
-            chainId: forcedExit.chainId,
+            toChainId: forcedExit.toChainId,
             subAccountId: forcedExit.subAccountId,
             initiatorAccountId: this.accountId,
             target: forcedExit.target,
@@ -269,7 +269,7 @@ export class Wallet {
     }
 
     async signSyncForcedExit(forcedExit: {
-        chainId: ChainId;
+        toChainId: ChainId;
         subAccountId: number;
         target: Address;
         token: TokenLike;
@@ -305,7 +305,7 @@ export class Wallet {
 
     async syncForcedExit(forcedExit: {
         target: Address;
-        chainId: ChainId;
+        toChainId: ChainId;
         subAccountId: number;
         token: TokenLike;
         ts?: number;
