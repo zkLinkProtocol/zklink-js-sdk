@@ -28,7 +28,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadZkSyncCrypto = exports.rescueHashOrders = exports.privateKeyToPubKeyHash = exports.signTransactionBytes = exports.privateKeyFromSeed = void 0;
+exports.loadZkSyncCrypto = exports.rescueHashOrders = exports.privateKeyToPubKeyHash = exports.privateKeyToPubKey = exports.signTransactionBytes = exports.privateKeyFromSeed = void 0;
 const zks = __importStar(require("zksync-crypto"));
 const ethers_1 = require("ethers");
 /**
@@ -64,6 +64,14 @@ function signTransactionBytes(privKey, bytes) {
     });
 }
 exports.signTransactionBytes = signTransactionBytes;
+function privateKeyToPubKey(privateKey) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield loadZkSyncCrypto();
+        const _zks = asmJs || zks;
+        return ethers_1.utils.hexlify(_zks.private_key_to_pubkey(privateKey));
+    });
+}
+exports.privateKeyToPubKey = privateKeyToPubKey;
 function privateKeyToPubKeyHash(privateKey) {
     return __awaiter(this, void 0, void 0, function* () {
         yield loadZkSyncCrypto();

@@ -1,4 +1,4 @@
-import { privateKeyFromSeed, signTransactionBytes, privateKeyToPubKeyHash } from './crypto';
+import { privateKeyFromSeed, signTransactionBytes, privateKeyToPubKeyHash, privateKeyToPubKey } from './crypto';
 import { BigNumber, BigNumberish, ethers } from 'ethers';
 import * as utils from './utils';
 import {
@@ -27,14 +27,8 @@ export class Signer {
         return await privateKeyToPubKeyHash(this.#privateKey);
     }
 
-    async getPublicKey() {
-        const wallet = new ethers.Wallet(this.#privateKey)
-        return wallet.publicKey
-    }
-
-    async signMessage(message: string) {
-        const wallet = new ethers.Wallet(this.#privateKey)
-        return await wallet.signMessage(message)
+    async pubKey(): Promise<string> {
+        return await privateKeyToPubKey(this.#privateKey)
     }
 
     async signTransactionBytes(bytes: Uint8Array) {

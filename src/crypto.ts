@@ -35,6 +35,13 @@ export async function signTransactionBytes(privKey: Uint8Array, bytes: Uint8Arra
     };
 }
 
+export async function privateKeyToPubKey(privateKey: Uint8Array): Promise<string> {
+    await loadZkSyncCrypto();
+
+    const _zks = asmJs || zks;
+    return utils.hexlify(_zks.private_key_to_pubkey(privateKey))
+}
+
 export async function privateKeyToPubKeyHash(privateKey: Uint8Array): Promise<string> {
     await loadZkSyncCrypto();
 

@@ -54,16 +54,9 @@ class Signer {
             return yield (0, crypto_1.privateKeyToPubKeyHash)(__classPrivateFieldGet(this, _Signer_privateKey, "f"));
         });
     }
-    getPublicKey() {
+    pubKey() {
         return __awaiter(this, void 0, void 0, function* () {
-            const wallet = new ethers_1.ethers.Wallet(__classPrivateFieldGet(this, _Signer_privateKey, "f"));
-            return wallet.publicKey;
-        });
-    }
-    signMessage(message) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const wallet = new ethers_1.ethers.Wallet(__classPrivateFieldGet(this, _Signer_privateKey, "f"));
-            return yield wallet.signMessage(message);
+            return yield (0, crypto_1.privateKeyToPubKey)(__classPrivateFieldGet(this, _Signer_privateKey, "f"));
         });
     }
     signTransactionBytes(bytes) {
