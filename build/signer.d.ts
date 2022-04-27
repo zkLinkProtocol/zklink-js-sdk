@@ -6,6 +6,7 @@ export declare class Signer {
     pubKeyHash(): Promise<PubKeyHash>;
     getPublicKey(): Promise<string>;
     signMessage(message: string): Promise<string>;
+    signTransactionBytes(bytes: Uint8Array): Promise<import("./types").Signature>;
     /**
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */

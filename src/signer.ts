@@ -37,6 +37,10 @@ export class Signer {
         return await wallet.signMessage(message)
     }
 
+    async signTransactionBytes(bytes: Uint8Array) {
+        return await signTransactionBytes(this.#privateKey, bytes)
+    }
+
     /**
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */

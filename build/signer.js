@@ -66,6 +66,11 @@ class Signer {
             return yield wallet.signMessage(message);
         });
     }
+    signTransactionBytes(bytes) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), bytes);
+        });
+    }
     /**
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
