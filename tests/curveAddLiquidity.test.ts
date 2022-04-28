@@ -1,6 +1,11 @@
-import { BigNumber } from "@ethersproject/bignumber"
-import { expect } from "chai"
-import { numberToBytesBE, serializeCurveAddLiquidity, serializeOrder, serializeTimestamp } from "../src/utils"
+import { BigNumber } from '@ethersproject/bignumber'
+import { expect } from 'chai'
+import {
+  numberToBytesBE,
+  serializeCurveAddLiquidity,
+  serializeOrder,
+  serializeTimestamp,
+} from '../src/utils'
 
 describe('curve add liquidity', () => {
   it('serializeCurveAddLiquidity', () => {
@@ -29,7 +34,4 @@ describe('curve add liquidity', () => {
     //     0,   0, 255, 255, 255, 255,   0,   0,   0,   0
     // ]))
   })
-
-
-  
 })

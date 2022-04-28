@@ -20,7 +20,7 @@
 
 //     // const transaction = syncWallet.depositToSyncFromEthereum({
 //     //   depositTo: account.address,
-//     //   token: 
+//     //   token:
 //     // })
 
 //   })

@@ -1,10 +1,10 @@
-import { expect } from 'chai';
-import { BigNumber, constants, ethers } from 'ethers';
-import { parseEther } from 'ethers/lib/utils';
-import { Wallet } from '../src';
-import { getFastSwapUNonce, MAX_UNONCE } from '../src/utils';
-import { Provider } from './../src/provider';
-import account from './accounts/main';
+import { expect } from 'chai'
+import { BigNumber, constants, ethers } from 'ethers'
+import { parseEther } from 'ethers/lib/utils'
+import { Wallet } from '../src'
+import { getFastSwapUNonce, MAX_UNONCE } from '../src/utils'
+import { Provider } from './../src/provider'
+import account from './accounts/main'
 const tokens = require('./tokens/0.json')
 
 describe('fast swap', () => {
@@ -13,14 +13,11 @@ describe('fast swap', () => {
   //   chainId: 5,
   // })
   // const web3Wallet = new ethers.Wallet(account.privateKey, web3Provider)
-
   // it('getFastSwapUNonce', async () => {
   //   const unonce = getFastSwapUNonce()
   //   expect(unonce).lessThan(MAX_UNONCE + 1)
   //   expect(unonce).greaterThan(0)
-    
   // })
-
   // it('fastSwapAccepts', async () => {
   //   const syncProvider = await Provider.newHttpProvider('http://39.98.119.16:30000/rpc', '3');
   //   const unonce = getFastSwapUNonce()
@@ -35,7 +32,6 @@ describe('fast swap', () => {
   //   console.log('accepts address', r);
   //   expect(r).to.eq(constants.AddressZero)
   // })
-
   // it('fastSwapUNonce', async () => {
   //   const syncProvider = await Provider.newHttpProvider('http://39.98.119.16:30000/rpc', '3');
   //   const r = await syncProvider.fastSwapUNonce({
@@ -44,17 +40,13 @@ describe('fast swap', () => {
   //     amount: parseEther('1'),
   //     withdrawFee: 100,
   //     ethSigner: web3Wallet,
-      
   //   })
   //   console.log('uNonce', r);
   //   expect(r).lessThan(MAX_UNONCE + 1)
   //   expect(r).greaterThan(0)
-
   // })
-
   // it('fastSwapUNonce', async () => {
   //   const syncProvider = await Provider.newHttpProvider('http://39.98.119.16:30000/rpc', '3');
-
   //   // const payload = {
   //   //   fromChainId: 0,
   //   //   toChainId: 1,
@@ -75,11 +67,9 @@ describe('fast swap', () => {
   //   //   amount: parseEther('1'),
   //   //   withdrawFee: 100,
   //   //   ethSigner: web3Wallet,
-      
   //   // })
   //   // console.log('uNonce', r);
   //   // expect(r).lessThan(MAX_UNONCE + 1)
   //   // expect(r).greaterThan(0)
-
   // })
 })

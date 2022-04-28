@@ -1,20 +1,23 @@
 [
   {
-    "id":1,
+    "id": 1,
     "chains": [1],
     "address": ["0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"],
-    "symbol":"ETH",
-    "decimals":18,
-    "stable":false,
-    "fast_withdraw":false
+    "symbol": "ETH",
+    "decimals": 18,
+    "stable": false,
+    "fast_withdraw": false
   },
   {
-    "id":2,
-    "chains": [1,2],
-    "address": ["0xDDdddddddddddddddddddddddddddddddddddddd", "0xFFffffffffffffffffffffffffffffffffffffff"],
-    "symbol":"USDT",
-    "decimals":18,
-    "stable":false,
-    "fast_withdraw":false
+    "id": 2,
+    "chains": [1, 2],
+    "address": [
+      "0xDDdddddddddddddddddddddddddddddddddddddd",
+      "0xFFffffffffffffffffffffffffffffffffffffff"
+    ],
+    "symbol": "USDT",
+    "decimals": 18,
+    "stable": false,
+    "fast_withdraw": false
   }
 ]
