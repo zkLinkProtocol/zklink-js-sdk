@@ -52,6 +52,36 @@ export class EthMessageSigner {
         return await this.getEthMessageSignature(message);
     }
 
+    getOrderMatchingEthSignMessage(matching: {
+        stringFeeToken: string;
+        stringFee: string;
+        nonce: number;
+    }): string {
+        let humanReadableTxInfo = this.getOrderMatchingEthMessagePart(matching);
+        if (humanReadableTxInfo.length != 0) {
+            humanReadableTxInfo += '\n';
+        }
+        humanReadableTxInfo += `Nonce: ${matching.nonce}`;
+
+        return humanReadableTxInfo;
+    }
+
+    async ethSignOrderMatching(matching: {
+        stringFeeToken: string;
+        stringFee: string;
+        nonce: number;
+    }): Promise<TxEthSignature> {
+        const message = this.getOrderMatchingEthSignMessage(matching);
+        return await this.getEthMessageSignature(message);
+    }
+
+    getOrderMatchingEthMessagePart(tx: {
+        stringFeeToken: string;
+        stringFee: string;
+    }): string {
+        let message = `OrderMatching fee: ${tx.stringFee} ${tx.stringFeeToken}`;
+        return message;
+    }
 
     getSwapEthMessagePart(tx: {
         stringAmountIn: string,

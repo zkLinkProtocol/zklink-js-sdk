@@ -260,7 +260,7 @@ export interface CloseAccount {
 }
 
 export interface SignedTransaction {
-    tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit | CurveAddLiquidity | CurveRemoveLiquidity | CurveSwap | Order;
+    tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit | CurveAddLiquidity | CurveRemoveLiquidity | CurveSwap | Order | OrderMatching;
     ethereumSignature?: TxEthSignature;
 }
 
@@ -353,4 +353,18 @@ export interface Order {
     signature?: Signature;
     ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
     ethSignature?: string;
+}
+
+export interface OrderMatching {
+    type: 'OrderMatching';
+    accountId: number;
+    account: Address;
+    taker: Order;
+    maker: Order;
+    fee: BigNumberish;
+    feeToken: number;
+    nonce: number;
+    signature?: Signature;
+    validFrom: number;
+    validUntil: number;
 }

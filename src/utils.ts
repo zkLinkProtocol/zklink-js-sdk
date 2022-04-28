@@ -1,4 +1,5 @@
 import { utils, constants, ethers, BigNumber, BigNumberish, Contract } from 'ethers';
+import { rescueHashOrders } from 'zksync-crypto';
 import { Provider } from '.';
 import {
     PubKeyHash,
@@ -13,7 +14,7 @@ import {
     ChangePubKey,
     Withdraw,
     CloseAccount,
-    CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order, ChainId
+    CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order, ChainId, OrderMatching
 } from './types';
 
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
@@ -740,6 +741,31 @@ export function serializeOrder(order: Order): Uint8Array {
         amountBytes,
         validFrom,
         validUntil
+    ]);
+}
+
+export async function serializeOrderMatching(matching: OrderMatching): Promise<Uint8Array> {
+
+    const makerBytes = serializeOrder(matching.maker)
+    const takerBytes = serializeOrder(matching.taker)
+    const ordersBytes = new Uint8Array(178)
+    ordersBytes.fill(0)
+    ordersBytes.set([...makerBytes, ...takerBytes], 0)
+
+    const ordersHash = await rescueHashOrders(ordersBytes)
+    
+    const type = new Uint8Array([11]);
+    const accountIdBytes = serializeAccountId(matching.accountId);
+    const accountBytes = serializeAddress(matching.account);
+    const feeTokenBytes = serializeTokenId(matching.feeToken);
+    const feeBytes = serializeFeePacked(matching.fee);
+    return ethers.utils.concat([
+        type,
+        accountIdBytes,
+        accountBytes,
+        ordersHash,
+        feeTokenBytes,
+        feeBytes
     ]);
 }
 

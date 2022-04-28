@@ -3,12 +3,12 @@ import { BigNumber } from "ethers";
 import { parseEther } from "ethers/lib/utils";
 import { describe } from "mocha";
 import { closestPackableTransactionAmount, serializeOrder } from "../src/utils";
-import { getTestWallet } from "./wallet.test";
+import { getTestWallet, getWalletFromPrivateKey } from "./wallet.test";
 
 
-describe('order', () => {
+describe('Order', () => {
 
-  it('serializeOrder', () => {
+  it('serialize', () => {
     const serialized = serializeOrder({
       type: 'Order',
       subAccountId: 1,
@@ -35,23 +35,23 @@ describe('order', () => {
 
   })
 
-  it('signature order', async function () {
-    const wallet = await getTestWallet()
+  it('signature', async function () {
+    const wallet = await getWalletFromPrivateKey()
     const signedTransaction = await wallet.signSyncOrder({
-      accountId: 4,
-      subAccountId: 4,
+      accountId: 13,
+      subAccountId: 1,
       slotId: 0,
       nonce: 0,
       basedTokenId: 3,
-      quoteTokenId: 2,
+      quoteTokenId: 4,
       isSell: 0,
-      amount: closestPackableTransactionAmount(parseEther('1')),
+      amount: closestPackableTransactionAmount(parseEther('2')),
       price: parseEther('1')
     } as any)
 
-    expect(signedTransaction.ethereumSignature.signature).eq('0x1efd9e668351d47d5b20c446a2cdd0840dfee67e3a32fd1a7f7d7eb71784fa045b2e482c8fa9462c4df6351caa9a874fd2180301754cf7954c001c78341b28171c')
-    expect(signedTransaction.tx.signature.pubKey).eq('167850be112e16a992d27c6119e05ec8aee2b45446b79b1c969a48352d626aa5')
-    expect(signedTransaction.tx.signature.signature).eq('3bb0235fe8c1e22380d82ac40316b86c4744fca7a92a13996b13c734b70fdc06381d653dfcbcb33369957ec4719cd1e848805c9b9e7781b4208715abd1ae0805')
+    // expect(signedTransaction.ethereumSignature.signature).eq('0x1efd9e668351d47d5b20c446a2cdd0840dfee67e3a32fd1a7f7d7eb71784fa045b2e482c8fa9462c4df6351caa9a874fd2180301754cf7954c001c78341b28171c')
+    expect(signedTransaction.tx.signature.pubKey).eq("0dd4f603531bd78bbecd005d9e7cc62a794dcfadceffe03e269fbb6b72e9c724")
+    expect(signedTransaction.tx.signature.signature).eq('6823c7911bdbb394569ddb194b70bd85f9fbd4459f09749e6abf0f206d4a708d241e623ca4e9f5f5c22fd059ce136252ad530c91d9a6e20f282668b09599dd03')
   });
 
 })

@@ -3,7 +3,7 @@ import { EthMessageSigner } from './eth-message-signer';
 import { Provider } from './provider';
 import { Signer } from './signer';
 import { BatchBuilder } from './batch-builder';
-import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKey, EthSignerType, SignedTransaction, Transfer, TxEthSignature, ForcedExit, Withdraw, ChangePubkeyTypes, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, CurveAddLiquidity, ChainId, TokenId, CurveRemoveLiquidity, CurveSwap, Order, TokenSymbol, TokenAddress } from './types';
+import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKey, EthSignerType, SignedTransaction, Transfer, TxEthSignature, ForcedExit, Withdraw, ChangePubkeyTypes, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, CurveAddLiquidity, ChainId, TokenId, CurveRemoveLiquidity, CurveSwap, Order, TokenSymbol, TokenAddress, OrderMatching } from './types';
 export declare class ZKSyncTxError extends Error {
     value: PriorityOperationReceipt | TransactionReceipt;
     constructor(message: string, value: PriorityOperationReceipt | TransactionReceipt);
@@ -44,6 +44,29 @@ export declare class Wallet {
         amount: BigNumberish;
         fee: BigNumberish;
         accountId: number;
+        ts?: number;
+        nonce: number;
+        validFrom?: number;
+        validUntil?: number;
+    }): Promise<SignedTransaction>;
+    getOrderMatching(matching: {
+        accountId: number;
+        account: Address;
+        taker: Order;
+        maker: Order;
+        fee: BigNumberish;
+        feeToken: TokenLike;
+        nonce: number;
+        validFrom: number;
+        validUntil: number;
+    }): Promise<OrderMatching>;
+    signSyncOrderMatching(matching: {
+        accountId: number;
+        account: Address;
+        taker: any;
+        maker: any;
+        fee: BigNumberish;
+        feeToken: TokenLike;
         ts?: number;
         nonce: number;
         validFrom?: number;

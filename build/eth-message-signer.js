@@ -46,6 +46,24 @@ class EthMessageSigner {
             return yield this.getEthMessageSignature(message);
         });
     }
+    getOrderMatchingEthSignMessage(matching) {
+        let humanReadableTxInfo = this.getOrderMatchingEthMessagePart(matching);
+        if (humanReadableTxInfo.length != 0) {
+            humanReadableTxInfo += '\n';
+        }
+        humanReadableTxInfo += `Nonce: ${matching.nonce}`;
+        return humanReadableTxInfo;
+    }
+    ethSignOrderMatching(matching) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const message = this.getOrderMatchingEthSignMessage(matching);
+            return yield this.getEthMessageSignature(message);
+        });
+    }
+    getOrderMatchingEthMessagePart(tx) {
+        let message = `OrderMatching fee: ${tx.stringFee} ${tx.stringFeeToken}`;
+        return message;
+    }
     getSwapEthMessagePart(tx) {
         let message = '';
         message += `Swap ${tx.stringAmountIn} to: ${tx.stringAmountOut}`;

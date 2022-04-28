@@ -24,6 +24,20 @@ export declare class EthMessageSigner {
         nonce: number;
         accountId: number;
     }): Promise<TxEthSignature>;
+    getOrderMatchingEthSignMessage(matching: {
+        stringFeeToken: string;
+        stringFee: string;
+        nonce: number;
+    }): string;
+    ethSignOrderMatching(matching: {
+        stringFeeToken: string;
+        stringFee: string;
+        nonce: number;
+    }): Promise<TxEthSignature>;
+    getOrderMatchingEthMessagePart(tx: {
+        stringFeeToken: string;
+        stringFee: string;
+    }): string;
     getSwapEthMessagePart(tx: {
         stringAmountIn: string;
         stringAmountOut: string;

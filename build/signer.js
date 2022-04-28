@@ -59,11 +59,6 @@ class Signer {
             return yield (0, crypto_1.privateKeyToPubKey)(__classPrivateFieldGet(this, _Signer_privateKey, "f"));
         });
     }
-    signTransactionBytes(bytes) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), bytes);
-        });
-    }
     /**
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
@@ -76,6 +71,14 @@ class Signer {
             const msgBytes = utils.serializeTransfer(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
             return Object.assign(Object.assign({}, tx), { amount: ethers_1.BigNumber.from(transfer.amount).toString(), fee: ethers_1.BigNumber.from(transfer.fee).toString(), signature });
+        });
+    }
+    signSyncOrderMatching(matching) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tx = Object.assign(Object.assign({}, matching), { type: 'OrderMatching', feeToken: matching.feeTokenId });
+            const msgBytes = yield utils.serializeOrderMatching(tx);
+            const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
+            return Object.assign(Object.assign({}, tx), { fee: ethers_1.BigNumber.from(matching.fee).toString(), signature });
         });
     }
     signSyncCurveAddLiquidity(payload) {

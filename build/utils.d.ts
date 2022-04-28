@@ -1,6 +1,6 @@
 import { utils, ethers, BigNumber, BigNumberish } from 'ethers';
 import { Provider } from '.';
-import { PubKeyHash, TokenAddress, TokenLike, Tokens, TokenSymbol, EthSignerType, Address, Transfer, ForcedExit, ChangePubKey, Withdraw, CloseAccount, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order, ChainId } from './types';
+import { PubKeyHash, TokenAddress, TokenLike, Tokens, TokenSymbol, EthSignerType, Address, Transfer, ForcedExit, ChangePubKey, Withdraw, CloseAccount, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order, ChainId, OrderMatching } from './types';
 export declare const MAX_TIMESTAMP = 4294967295;
 export declare const MIN_UNONCE = 1;
 export declare const MAX_UNONCE = 4294967295;
@@ -84,6 +84,7 @@ export declare function serializeCurveRemoveLiquidity(payload: CurveRemoveLiquid
 export declare function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array;
 export declare function serializeForcedExit(forcedExit: ForcedExit): Uint8Array;
 export declare function serializeOrder(order: Order): Uint8Array;
+export declare function serializeOrderMatching(matching: OrderMatching): Promise<Uint8Array>;
 /**
  * Encodes the transaction data as the byte sequence according to the zkSync protocol.
  * @param tx A transaction to serialize.

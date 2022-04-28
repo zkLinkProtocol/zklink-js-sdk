@@ -13,7 +13,7 @@ import {
     ChangePubKeyECDSA,
     ChangePubKeyCREATE2,
     Create2Data,
-    ChainId, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order
+    ChainId, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order, OrderMatching
 } from './types';
 
 export class Signer {
@@ -29,10 +29,6 @@ export class Signer {
 
     async pubKey(): Promise<string> {
         return await privateKeyToPubKey(this.#privateKey)
-    }
-
-    async signTransactionBytes(bytes: Uint8Array) {
-        return await signTransactionBytes(this.#privateKey, bytes)
     }
 
     /**
@@ -87,6 +83,32 @@ export class Signer {
             ...tx,
             amount: BigNumber.from(transfer.amount).toString(),
             fee: BigNumber.from(transfer.fee).toString(),
+            signature
+        };
+    }
+
+    async signSyncOrderMatching(matching: {
+        accountId: number;
+        account: Address;
+        taker: Order;
+        maker: Order;
+        fee: BigNumberish;
+        feeTokenId: number;
+        nonce: number;
+        validFrom: number;
+        validUntil: number;
+    }): Promise<OrderMatching> {
+        const tx: OrderMatching = {
+            ...matching,
+            type: 'OrderMatching',
+            feeToken: matching.feeTokenId
+        };
+        const msgBytes = await utils.serializeOrderMatching(tx);
+        const signature = await signTransactionBytes(this.#privateKey, msgBytes);
+
+        return {
+            ...tx,
+            fee: BigNumber.from(matching.fee).toString(),
             signature
         };
     }

@@ -1,11 +1,10 @@
 import { BigNumberish, ethers } from 'ethers';
-import { Address, EthSignerType, PubKeyHash, Transfer, Withdraw, ForcedExit, ChangePubKey, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, ChainId, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order } from './types';
+import { Address, EthSignerType, PubKeyHash, Transfer, Withdraw, ForcedExit, ChangePubKey, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, ChainId, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order, OrderMatching } from './types';
 export declare class Signer {
     #private;
     private constructor();
     pubKeyHash(): Promise<PubKeyHash>;
     pubKey(): Promise<string>;
-    signTransactionBytes(bytes: Uint8Array): Promise<import("./types").Signature>;
     /**
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
@@ -39,6 +38,17 @@ export declare class Signer {
         validFrom: number;
         validUntil: number;
     }): Promise<Transfer>;
+    signSyncOrderMatching(matching: {
+        accountId: number;
+        account: Address;
+        taker: Order;
+        maker: Order;
+        fee: BigNumberish;
+        feeTokenId: number;
+        nonce: number;
+        validFrom: number;
+        validUntil: number;
+    }): Promise<OrderMatching>;
     signSyncCurveAddLiquidity(payload: CurveAddLiquidity & {
         chainId: string;
         nonce: number;

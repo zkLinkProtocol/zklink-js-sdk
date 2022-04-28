@@ -94,7 +94,7 @@ class Wallet {
     getTransfer(transfer) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
-                throw new Error('ZKSync signer is required for sending zksync transactions.');
+                throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
             const tokenId = this.provider.tokenSet.resolveTokenId(transfer.token);
@@ -144,10 +144,53 @@ class Wallet {
             };
         });
     }
+    getOrderMatching(matching) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.signer) {
+                throw new Error('ZKLink signer is required for sending zklink transactions.');
+            }
+            yield this.setRequiredAccountIdFromServer('Transfer funds');
+            const feeTokenId = this.provider.tokenSet.resolveTokenId(matching.feeToken);
+            const transactionData = {
+                accountId: matching.accountId,
+                account: matching.account,
+                taker: matching.taker,
+                maker: matching.maker,
+                fee: matching.fee,
+                feeTokenId: feeTokenId,
+                nonce: matching.nonce,
+                validFrom: matching.validFrom,
+                validUntil: matching.validUntil
+            };
+            return this.signer.signSyncOrderMatching(transactionData);
+        });
+    }
+    signSyncOrderMatching(matching) {
+        return __awaiter(this, void 0, void 0, function* () {
+            matching.validFrom = matching.validFrom || 0;
+            matching.validUntil = matching.validUntil || 9007199254740991;
+            const signedTransferTransaction = yield this.getOrderMatching(matching);
+            const stringFee = ethers_1.BigNumber.from(matching.fee).isZero()
+                ? null
+                : ethers_1.utils.formatEther(matching.fee);
+            const stringFeeToken = this.provider.tokenSet.resolveTokenSymbol(matching.feeToken);
+            const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
+                ? null
+                : yield this.ethMessageSigner.ethSignOrderMatching({
+                    stringFee,
+                    stringFeeToken,
+                    nonce: matching.nonce,
+                });
+            return {
+                tx: signedTransferTransaction,
+                ethereumSignature
+            };
+        });
+    }
     getForcedExit(forcedExit) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
-                throw new Error('ZKSync signer is required for sending zksync transactions.');
+                throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('perform a Forced Exit');
             const tokenId = this.provider.tokenSet.resolveTokenId(forcedExit.token);
@@ -216,7 +259,7 @@ class Wallet {
     syncMultiTransfer(transfers) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
-                throw new Error('ZKSync signer is required for sending zksync transactions.');
+                throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             if (transfers.length == 0)
                 return [];
@@ -268,7 +311,7 @@ class Wallet {
     getCurveAddLiquidity(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
-                throw new Error('ZKSync signer is required for sending zksync transactions.');
+                throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
             payload.account = this.address();
@@ -313,7 +356,7 @@ class Wallet {
     getCurveRemoveLiquidity(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
-                throw new Error('ZKSync signer is required for sending zksync transactions.');
+                throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
             payload.account = this.address();
@@ -355,7 +398,7 @@ class Wallet {
     getCurveSwap(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
-                throw new Error('ZKSync signer is required for sending zksync transactions.');
+                throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
             payload.accountId = yield this.getAccountId();
@@ -402,7 +445,7 @@ class Wallet {
     getOrder(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
-                throw new Error('ZKSync signer is required for sending zksync transactions.');
+                throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             return this.signer.signSyncOrder(payload);
         });
@@ -424,7 +467,7 @@ class Wallet {
     getWithdrawFromSyncToEthereum(withdraw) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
-                throw new Error('ZKSync signer is required for sending zksync transactions.');
+                throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Withdraw funds');
             const tokenId = this.provider.tokenSet.resolveTokenId(withdraw.token);
@@ -491,7 +534,7 @@ class Wallet {
     isSigningKeySet() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
-                throw new Error('ZKSync signer is required for current pubkey calculation.');
+                throw new Error('ZKLink signer is required for current pubkey calculation.');
             }
             const currentPubKeyHash = yield this.getCurrentPubKeyHash();
             const signerPubKeyHash = yield this.signer.pubKeyHash();
@@ -501,7 +544,7 @@ class Wallet {
     getChangePubKey(changePubKey) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
-                throw new Error('ZKSync signer is required for current pubkey calculation.');
+                throw new Error('ZKLink signer is required for current pubkey calculation.');
             }
             let feeTokenId = 0;
             const newPkHash = yield this.signer.pubKeyHash();
@@ -654,7 +697,7 @@ class Wallet {
     onchainAuthSigningKey(linkChainId, nonce = 'committed', ethTxOptions) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
-                throw new Error('ZKSync signer is required for current pubkey calculation.');
+                throw new Error('ZKLink signer is required for current pubkey calculation.');
             }
             const currentPubKeyHash = yield this.getCurrentPubKeyHash();
             const newPubKeyHash = yield this.signer.pubKeyHash();
@@ -870,7 +913,7 @@ class Wallet {
             if (this.accountId === undefined) {
                 const accountIdFromServer = yield this.getAccountId();
                 if (accountIdFromServer == null) {
-                    // throw new Error(`Failed to ${actionName}: Account does not exist in the zkLink network`);
+                    throw new Error(`Failed to ${actionName}: Account does not exist in the zkLink network`);
                 }
                 else {
                     this.accountId = accountIdFromServer;

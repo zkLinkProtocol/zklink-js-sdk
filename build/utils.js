@@ -10,8 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.serializeFeeRatio = exports.serializeChainId = exports.serializeNonce = exports.serializeFeePacked = exports.serializeAmountFull = exports.serializeAmountPacked = exports.serializeTokenId = exports.serializeSubAccountId = exports.serializeAccountId = exports.serializeAddress = exports.getEthSignatureType = exports.verifyERC1271Signature = exports.signMessagePersonalAPI = exports.getSignedBytesFromMessage = exports.getChangePubkeyMessage = exports.TokenSet = exports.isTokenETH = exports.sleep = exports.buffer2bitsBE = exports.isTransactionFeePackable = exports.closestGreaterOrEqPackableTransactionFee = exports.closestPackableTransactionFee = exports.isTransactionAmountPackable = exports.closestGreaterOrEqPackableTransactionAmount = exports.closestPackableTransactionAmount = exports.packFeeChecked = exports.packAmountChecked = exports.reverseBits = exports.integerToFloatUp = exports.integerToFloat = exports.bitsIntoBytesInBEOrder = exports.floatToInteger = exports.TOTAL_CHAIN_NUM = exports.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ERC20_APPROVE_TRESHOLD = exports.MAX_ERC20_APPROVE_AMOUNT = exports.ERC20_DEPOSIT_GAS_LIMIT = exports.MULTICALL_INTERFACE = exports.IEIP1271_INTERFACE = exports.SYNC_GOV_CONTRACT_INTERFACE = exports.ZKL_CONTRACT_INTERFACE = exports.SYNC_EXIT_CONTRACT_INTERFACE = exports.SYNC_MAIN_CONTRACT_INTERFACE = exports.IERC20_INTERFACE = exports.MAX_UNONCE = exports.MIN_UNONCE = exports.MAX_TIMESTAMP = void 0;
-exports.getTimestamp = exports.chainsCompletion = exports.getFastSwapUNonce = exports.getRandom = exports.getTxHash = exports.getPendingBalance = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.parseHexWithPrefix = exports.bigintToBytesBE = exports.numberToBytesBE = exports.serializeTx = exports.serializeOrder = exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeCurveRemoveLiquidity = exports.serializeCurveSwap = exports.serializeCurveAddLiquidity = exports.serializeTransfer = exports.serializeWithdraw = exports.serializeTimestamp = exports.serializeFastWithdraw = void 0;
+exports.getTimestamp = exports.chainsCompletion = exports.getFastSwapUNonce = exports.getRandom = exports.getTxHash = exports.getPendingBalance = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.parseHexWithPrefix = exports.bigintToBytesBE = exports.numberToBytesBE = exports.serializeTx = exports.serializeOrderMatching = exports.serializeOrder = exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeCurveRemoveLiquidity = exports.serializeCurveSwap = exports.serializeCurveAddLiquidity = exports.serializeTransfer = exports.serializeWithdraw = exports.serializeTimestamp = exports.serializeFastWithdraw = void 0;
 const ethers_1 = require("ethers");
+const zksync_crypto_1 = require("zksync-crypto");
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
 const MAX_NUMBER_OF_TOKENS = 65535;
 // Max number of accounts for the current version, it is determined by the zkSync circuit implementation.
@@ -668,6 +669,30 @@ function serializeOrder(order) {
     ]);
 }
 exports.serializeOrder = serializeOrder;
+function serializeOrderMatching(matching) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const makerBytes = serializeOrder(matching.maker);
+        const takerBytes = serializeOrder(matching.taker);
+        const ordersBytes = new Uint8Array(178);
+        ordersBytes.fill(0);
+        ordersBytes.set([...makerBytes, ...takerBytes], 0);
+        const ordersHash = yield (0, zksync_crypto_1.rescueHashOrders)(ordersBytes);
+        const type = new Uint8Array([11]);
+        const accountIdBytes = serializeAccountId(matching.accountId);
+        const accountBytes = serializeAddress(matching.account);
+        const feeTokenBytes = serializeTokenId(matching.feeToken);
+        const feeBytes = serializeFeePacked(matching.fee);
+        return ethers_1.ethers.utils.concat([
+            type,
+            accountIdBytes,
+            accountBytes,
+            ordersHash,
+            feeTokenBytes,
+            feeBytes
+        ]);
+    });
+}
+exports.serializeOrderMatching = serializeOrderMatching;
 /**
  * Encodes the transaction data as the byte sequence according to the zkSync protocol.
  * @param tx A transaction to serialize.
