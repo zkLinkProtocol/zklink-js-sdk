@@ -78,7 +78,7 @@ class Signer {
             const tx = Object.assign(Object.assign({}, matching), { type: 'OrderMatching', feeToken: matching.feeTokenId });
             const msgBytes = yield utils.serializeOrderMatching(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
-            return Object.assign(Object.assign({}, tx), { fee: ethers_1.BigNumber.from(matching.fee).toString(), signature });
+            return Object.assign(Object.assign({}, tx), { maker: Object.assign(Object.assign({}, tx.maker), { is_sell: tx.maker.isSell, slot_id: tx.maker.slotId, account_id: tx.maker.accountId, base_token_id: tx.maker.basedTokenId, quote_token_id: tx.maker.quoteTokenId, sub_account_id: tx.maker.subAccountId }), taker: Object.assign(Object.assign({}, tx.taker), { is_sell: tx.taker.isSell, slot_id: tx.taker.slotId, account_id: tx.taker.accountId, base_token_id: tx.taker.basedTokenId, quote_token_id: tx.taker.quoteTokenId, sub_account_id: tx.taker.subAccountId }), fee: ethers_1.BigNumber.from(matching.fee).toString(), signature });
         });
     }
     signSyncCurveAddLiquidity(payload) {
@@ -86,7 +86,7 @@ class Signer {
             const tx = Object.assign(Object.assign({}, payload), { type: 'L2CurveAddLiq' });
             const msgBytes = utils.serializeCurveAddLiquidity(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
-            return Object.assign(Object.assign({}, tx), { amounts: payload.amounts.map(amount => ethers_1.BigNumber.from(amount).toString()), collectFees: payload.collectFees.map(fee => ethers_1.BigNumber.from(fee).toString()), fee: ethers_1.BigNumber.from(payload.fee).toString(), lpQuantity: ethers_1.BigNumber.from(payload.lpQuantity).toString(), minLpQuantity: ethers_1.BigNumber.from(payload.minLpQuantity).toString(), signature });
+            return Object.assign(Object.assign({}, tx), { amounts: payload.amounts.map((amount) => ethers_1.BigNumber.from(amount).toString()), collectFees: payload.collectFees.map((fee) => ethers_1.BigNumber.from(fee).toString()), fee: ethers_1.BigNumber.from(payload.fee).toString(), lpQuantity: ethers_1.BigNumber.from(payload.lpQuantity).toString(), minLpQuantity: ethers_1.BigNumber.from(payload.minLpQuantity).toString(), signature });
         });
     }
     signSyncCurveRemoveLiquidity(payload) {
@@ -94,7 +94,7 @@ class Signer {
             const tx = Object.assign(Object.assign({}, payload), { type: 'L2CurveRemoveLiquidity' });
             const msgBytes = utils.serializeCurveRemoveLiquidity(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
-            return Object.assign(Object.assign({}, tx), { amounts: payload.amounts.map(amount => ethers_1.BigNumber.from(amount).toString()), minAmounts: payload.minAmounts.map(amount => ethers_1.BigNumber.from(amount).toString()), fee: ethers_1.BigNumber.from(payload.fee).toString(), curveFee: ethers_1.BigNumber.from(payload.curveFee).toString(), lpQuantity: ethers_1.BigNumber.from(payload.lpQuantity).toString(), signature });
+            return Object.assign(Object.assign({}, tx), { amounts: payload.amounts.map((amount) => ethers_1.BigNumber.from(amount).toString()), minAmounts: payload.minAmounts.map((amount) => ethers_1.BigNumber.from(amount).toString()), fee: ethers_1.BigNumber.from(payload.fee).toString(), curveFee: ethers_1.BigNumber.from(payload.curveFee).toString(), lpQuantity: ethers_1.BigNumber.from(payload.lpQuantity).toString(), signature });
         });
     }
     signSyncCurveSwap(payload) {
@@ -188,7 +188,7 @@ class Create2WalletSigner extends ethers_1.ethers.Signer {
         Object.defineProperty(this, 'provider', {
             enumerable: true,
             value: provider,
-            writable: false
+            writable: false,
         });
         const create2Info = utils.getCREATE2AddressAndSalt(zkSyncPubkeyHash, create2WalletData);
         this.address = create2Info.address;
