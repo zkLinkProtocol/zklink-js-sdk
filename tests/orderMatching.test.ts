@@ -97,9 +97,7 @@ describe('OrderMatching', () => {
       maker: order0.tx,
       taker: order1.tx,
     } as any)
-    console.log(signedTransaction.tx, signedTransaction.ethereumSignature)
-    // expect(signedTransaction.ethereumSignature.signature).eq('0x073c5819f823ff5081c308a4ec96398d3df25a73704d1fd4e5cd7de350b2c16602c0d1a1f01037ae0d664b88d277b9b330ed9344b796f13214fe1f73a65d2b4a1c')
-    // expect(signedTransaction.tx.signature.pubKey).eq("0dd4f603531bd78bbecd005d9e7cc62a794dcfadceffe03e269fbb6b72e9c724")
-    // expect(signedTransaction.tx.signature.signature).eq('07708b0d80e25857852299289dd14329946eabff770dc5b114e7bb9f26b1d2237385f2bedc4b52d30fb0a29e8beb56186529a7a4fd1d7a9ec806d86f13912203')
+    expect(signedTransaction.ethereumSignature.signature).to.not.empty
+    expect(signedTransaction.tx.signature.signature).to.not.empty
   })
 })
