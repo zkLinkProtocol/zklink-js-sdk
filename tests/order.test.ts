@@ -102,49 +102,29 @@ describe('Order', () => {
     )
   })
 
-  // it('signature', async function () {
-  //   const wallet = await getWalletFromPrivateKey()
-  //   const order0 = await wallet.signSyncOrder({
-  //     type: 'Order',
-  //     subAccountId: 1,
-  //     accountId: 1,
-  //     slotId: 0,
-  //     nonce: 0,
-  //     basedTokenId: 1,
-  //     quoteTokenId: 2,
-  //     price: BigNumber.from('1'),
-  //     amount: BigNumber.from('5'),
-  //     isSell: 0,
-  //     validFrom: 0,
-  //     validUntil: 9007199254740991,
-  //   })
-  //   const order1 = await wallet.signSyncOrder({
-  //     type: 'Order',
-  //     subAccountId: 1,
-  //     accountId: 1,
-  //     slotId: 1,
-  //     nonce: 0,
-  //     basedTokenId: 1,
-  //     quoteTokenId: 2,
-  //     price: BigNumber.from('1'),
-  //     amount: BigNumber.from('5'),
-  //     isSell: 1,
-  //     validFrom: 0,
-  //     validUntil: 9007199254740991,
-  //   })
-  //   const signedTransaction = await wallet.signSyncOrderMatching({
-  //     type: 'OrderMatching',
-  //     accountId: 1,
-  //     account: '0x3498F456645270eE003441df82C718b56c0e6666',
-  //     fee: BigNumber.from('0'),
-  //     feeToken: 1,
-  //     nonce: 0,
-  //     validFrom: 0,
-  //     validUntil: 9007199254740991,
-  //     maker: order0.tx,
-  //     taker: order1.tx,
-  //   } as any)
-  //   expect(signedTransaction.ethereumSignature.signature).to.not.empty
-  //   expect(signedTransaction.tx.signature.signature).to.not.empty
-  // })
+  it('signature', async function () {
+    const wallet = await getWalletFromPrivateKey()
+    const maker = await wallet.signSyncOrder(orderMaker as any)
+    const taker = await wallet.signSyncOrder(orderTaker as any)
+    const signedTransaction = await wallet.signSyncOrderMatching({
+      type: 'OrderMatching',
+      accountId: 1,
+      account: '0x3498F456645270eE003441df82C718b56c0e6666',
+      fee: BigNumber.from('0'),
+      feeToken: 1,
+      nonce: 0,
+      expectBaseAmount: BigNumber.from('50000000000000'),
+      expectQuoteAmount: BigNumber.from('10000000000000'),
+      validFrom: 0,
+      validUntil: 9007199254740991,
+      maker: maker.tx,
+      taker: taker.tx,
+    } as any)
+    const { tx } = signedTransaction as any
+    expect(tx.expectBaseAmount).to.eq('50000000000000')
+    expect(tx.expectQuoteAmount).to.eq('10000000000000')
+    expect(tx.maker.fee_ratio).to.eq(100)
+    expect(signedTransaction.ethereumSignature.signature).to.not.empty
+    expect(tx.signature.signature).to.not.empty
+  })
 })

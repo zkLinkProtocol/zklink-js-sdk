@@ -141,6 +141,8 @@ export class Signer {
         fee_ratio: tx.taker.feeRatio,
       },
       fee: BigNumber.from(matching.fee).toString(),
+      expectBaseAmount: BigNumber.from(matching.expectBaseAmount).toString(),
+      expectQuoteAmount: BigNumber.from(matching.expectQuoteAmount).toString(),
       signature,
     } as any
   }
