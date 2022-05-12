@@ -699,7 +699,7 @@ function serializeOrder(order) {
     const subAccountIdBytes = serializeSubAccountId(order.subAccountId);
     const slotBytes = numberToBytesBE(order.slotId, 1);
     const nonceBytes = serializeNonce(order.nonce);
-    const basedTokenIdBytes = serializeTokenId(order.basedTokenId);
+    const baseTokenIdBytes = serializeTokenId(order.baseTokenId);
     const quoteTokenIdBytes = serializeTokenId(order.quoteTokenId);
     const priceBytes = bigintToBytesBE(ethers_1.BigNumber.from(order.price).toBigInt(), 15);
     const isSellBytes = numberToBytesBE(order.isSell, 1);
@@ -713,7 +713,7 @@ function serializeOrder(order) {
         subAccountIdBytes,
         slotBytes,
         nonceBytes,
-        basedTokenIdBytes,
+        baseTokenIdBytes,
         quoteTokenIdBytes,
         priceBytes,
         isSellBytes,

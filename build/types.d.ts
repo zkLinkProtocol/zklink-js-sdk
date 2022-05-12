@@ -267,7 +267,7 @@ export interface Order {
     subAccountId: number;
     slotId: number;
     nonce: number;
-    basedTokenId: TokenId;
+    baseTokenId: TokenId;
     quoteTokenId: TokenId;
     amount: BigNumberish;
     price: BigNumberish;

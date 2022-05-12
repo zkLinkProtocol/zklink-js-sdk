@@ -812,7 +812,7 @@ export function serializeOrder(order: Order): Uint8Array {
   const subAccountIdBytes = serializeSubAccountId(order.subAccountId)
   const slotBytes = numberToBytesBE(order.slotId, 1)
   const nonceBytes = serializeNonce(order.nonce)
-  const basedTokenIdBytes = serializeTokenId(order.basedTokenId)
+  const baseTokenIdBytes = serializeTokenId(order.baseTokenId)
   const quoteTokenIdBytes = serializeTokenId(order.quoteTokenId)
   const priceBytes = bigintToBytesBE(BigNumber.from(order.price).toBigInt(), 15)
   const isSellBytes = numberToBytesBE(order.isSell, 1)
@@ -826,7 +826,7 @@ export function serializeOrder(order: Order): Uint8Array {
     subAccountIdBytes,
     slotBytes,
     nonceBytes,
-    basedTokenIdBytes,
+    baseTokenIdBytes,
     quoteTokenIdBytes,
     priceBytes,
     isSellBytes,
