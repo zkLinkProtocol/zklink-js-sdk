@@ -77,7 +77,7 @@ class HTTPTransport extends AbstractJSONRPCTransport {
                 id: 1,
                 jsonrpc: '2.0',
                 method,
-                params
+                params,
             };
             const response = yield axios_1.default.post(this.address, request).then((resp) => {
                 return resp.data;
@@ -110,7 +110,7 @@ class WSTransport extends AbstractJSONRPCTransport {
             packMessage: (data) => JSON.stringify(data),
             unpackMessage: (data) => JSON.parse(data),
             attachRequestId: (data, requestId) => Object.assign({ id: requestId }, data),
-            extractRequestId: (data) => data && data.id
+            extractRequestId: (data) => data && data.id,
         });
         this.subscriptionCallback = new Map();
         // Call all subscription callbacks
@@ -146,7 +146,7 @@ class WSTransport extends AbstractJSONRPCTransport {
                 const unsubRep = yield this.ws.sendRequest({
                     jsonrpc: '2.0',
                     method: unsubMethod,
-                    params: [subId]
+                    params: [subId],
                 });
                 if (unsubRep.error) {
                     throw new JRPCError(`Unsubscribe failed: ${subId}, ${JSON.stringify(unsubRep.error)}`, unsubRep.error);
@@ -165,7 +165,7 @@ class WSTransport extends AbstractJSONRPCTransport {
             const request = {
                 jsonrpc: '2.0',
                 method,
-                params
+                params,
             };
             const response = yield this.ws.sendRequest(request, { requestId: 1 });
             if ('result' in response) {
@@ -207,7 +207,7 @@ class DummyTransport extends AbstractJSONRPCTransport {
                     // The HEX-encoded sequence of bytes [0..20) provided as the `mainContract`.
                     mainContract: '0x000102030405060708090a0b0c0d0e0f10111213',
                     //  The `govContract` is not used in tests and it is simply an empty string.
-                    govContract: ''
+                    govContract: '',
                 };
             }
             if (method == 'tokens') {
@@ -219,7 +219,7 @@ class DummyTransport extends AbstractJSONRPCTransport {
                         address: tokenItem.address,
                         id: tokenItem.id,
                         symbol: tokenItem.symbol,
-                        decimals: tokenItem.decimals
+                        decimals: tokenItem.decimals,
                     };
                     tokens[tokenItem.symbol] = token;
                 }
@@ -237,31 +237,29 @@ class DummyTransport extends AbstractJSONRPCTransport {
                     depositing: {},
                     committed: {
                         balances: {
-                            DAI: ethers_1.BigNumber.from(12345)
+                            DAI: ethers_1.BigNumber.from(12345),
                         },
                         nonce: 0,
-                        pubKeyHash: yield this.getPubKeyHash()
+                        pubKeyHash: yield this.getPubKeyHash(),
                     },
                     verified: {
                         balances: {
-                            USDC: ethers_1.BigNumber.from(98765)
+                            USDC: ethers_1.BigNumber.from(98765),
                         },
                         nonce: 0,
-                        pubKeyHash: ''
-                    }
+                        pubKeyHash: '',
+                    },
                 };
             }
             if (method == 'tx_submit') {
-                return [
-                    "sync-tx:0d162d589577dc3fdeffb8270feb53da7415b2a82249954c40ced41ae7e2270d"
-                ];
+                return ['sync-tx:0d162d589577dc3fdeffb8270feb53da7415b2a82249954c40ced41ae7e2270d'];
             }
             if (method == 'get_zksync_version') {
                 return 'contracts-4';
             }
             return {
                 method,
-                params
+                params,
             };
         });
     }

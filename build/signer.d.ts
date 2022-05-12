@@ -43,6 +43,8 @@ export declare class Signer {
         account: Address;
         taker: Order;
         maker: Order;
+        expectBaseAmount: BigNumberish;
+        expectQuoteAmount: BigNumberish;
         fee: BigNumberish;
         feeTokenId: number;
         nonce: number;

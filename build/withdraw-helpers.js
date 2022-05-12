@@ -39,10 +39,12 @@ wallet_1.Wallet.prototype.withdrawPendingBalance = function (from, token, chainI
         const zksyncContract = yield this.getZkSyncMainContract(chainId);
         const gasPrice = yield this.ethSigner.getGasPrice();
         const tokenAddress = this.provider.tokenSet.resolveTokenAddress(token, chainId);
-        const withdrawAmount = amount ? amount : yield zksyncContract.getPendingBalance(from, tokenAddress);
+        const withdrawAmount = amount
+            ? amount
+            : yield zksyncContract.getPendingBalance(from, tokenAddress);
         return zksyncContract.withdrawPendingBalance(from, tokenAddress, withdrawAmount, {
             gasLimit: ethers_1.BigNumber.from('200000'),
-            gasPrice
+            gasPrice,
         });
     });
 };
@@ -67,14 +69,14 @@ wallet_1.Wallet.prototype.withdrawPendingBalances = function (addresses, tokens,
             const callData = zksyncContract.interface.encodeFunctionData('withdrawPendingBalance', [
                 address,
                 tokensAddresses[i],
-                amounts[i]
+                amounts[i],
             ]);
             return [zksyncContract.address, callData];
         });
         const multicallContract = new ethers_1.Contract(multicallAddress, utils_1.MULTICALL_INTERFACE, this.ethSigner);
         return multicallContract.aggregate(calls, {
             gasLimit: multicallParams.gasLimit || ethers_1.BigNumber.from('300000'),
-            gasPrice
+            gasPrice,
         });
     });
 };

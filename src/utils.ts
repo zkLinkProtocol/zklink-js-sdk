@@ -816,6 +816,7 @@ export function serializeOrder(order: Order): Uint8Array {
   const quoteTokenIdBytes = serializeTokenId(order.quoteTokenId)
   const priceBytes = bigintToBytesBE(BigNumber.from(order.price).toBigInt(), 15)
   const isSellBytes = numberToBytesBE(order.isSell, 1)
+  const feeRatioBytes = numberToBytesBE(order.feeRatio, 1)
   const amountBytes = serializeAmountPacked(order.amount)
   const validFrom = numberToBytesBE(order.validFrom, 8)
   const validUntil = bigintToBytesBE(BigNumber.from(String(order.validUntil)).toBigInt(), 8)
@@ -829,6 +830,7 @@ export function serializeOrder(order: Order): Uint8Array {
     quoteTokenIdBytes,
     priceBytes,
     isSellBytes,
+    feeRatioBytes,
     amountBytes,
     validFrom,
     validUntil,
@@ -849,6 +851,14 @@ export async function serializeOrderMatching(matching: OrderMatching): Promise<U
   const accountBytes = serializeAddress(matching.account)
   const feeTokenBytes = serializeTokenId(matching.feeToken)
   const feeBytes = serializeFeePacked(matching.fee)
+  const expectBaseAmountBytes = bigintToBytesBE(
+    BigNumber.from(matching.expectBaseAmount).toBigInt(),
+    16
+  )
+  const expectQuoteAmountBytes = bigintToBytesBE(
+    BigNumber.from(matching.expectQuoteAmount).toBigInt(),
+    16
+  )
   return ethers.utils.concat([
     type,
     accountIdBytes,
@@ -856,6 +866,8 @@ export async function serializeOrderMatching(matching: OrderMatching): Promise<U
     ordersHash,
     feeTokenBytes,
     feeBytes,
+    expectBaseAmountBytes,
+    expectQuoteAmountBytes,
   ])
 }
 

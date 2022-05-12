@@ -57,7 +57,7 @@ class Provider {
         });
     }
     // return transaction hash (e.g. sync-tx:dead..beef)
-    submitTx({ tx, signature, fastProcessing }) {
+    submitTx({ tx, signature, fastProcessing, }) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.transport.request('tx_submit', [tx, signature, fastProcessing]);
         });
@@ -86,7 +86,9 @@ class Provider {
             if (this.contractAddress[linkChainId]) {
                 return this.contractAddress[linkChainId];
             }
-            this.contractAddress[linkChainId] = yield this.transport.request('contract_address', [linkChainId]);
+            this.contractAddress[linkChainId] = yield this.transport.request('contract_address', [
+                linkChainId,
+            ]);
             return this.contractAddress[linkChainId];
         });
     }
@@ -176,8 +178,10 @@ class Provider {
                 while (true) {
                     const transactionStatus = yield this.getTxReceipt(hash);
                     const notifyDone = action == 'COMMIT'
-                        ? transactionStatus.failReason || transactionStatus.block && transactionStatus.block.committed
-                        : transactionStatus.failReason || transactionStatus.block && transactionStatus.block.verified;
+                        ? transactionStatus.failReason ||
+                            (transactionStatus.block && transactionStatus.block.committed)
+                        : transactionStatus.failReason ||
+                            (transactionStatus.block && transactionStatus.block.verified);
                     if (notifyDone) {
                         return transactionStatus;
                     }
@@ -190,20 +194,28 @@ class Provider {
     }
     getTransactionFee(txType, address, tokenLike) {
         return __awaiter(this, void 0, void 0, function* () {
-            const transactionFee = yield this.transport.request('get_tx_fee', [txType, address.toString(), tokenLike]);
+            const transactionFee = yield this.transport.request('get_tx_fee', [
+                txType,
+                address.toString(),
+                tokenLike,
+            ]);
             return {
                 feeType: transactionFee.feeType,
                 gasTxAmount: ethers_1.BigNumber.from(transactionFee.gasTxAmount),
                 gasPriceWei: ethers_1.BigNumber.from(transactionFee.gasPriceWei),
                 gasFee: ethers_1.BigNumber.from(transactionFee.gasFee),
                 zkpFee: ethers_1.BigNumber.from(transactionFee.zkpFee),
-                totalFee: ethers_1.BigNumber.from(transactionFee.totalFee)
+                totalFee: ethers_1.BigNumber.from(transactionFee.totalFee),
             };
         });
     }
     getTransactionsBatchFee(txTypes, addresses, tokenLike) {
         return __awaiter(this, void 0, void 0, function* () {
-            const batchFee = yield this.transport.request('get_txs_batch_fee_in_wei', [txTypes, addresses, tokenLike]);
+            const batchFee = yield this.transport.request('get_txs_batch_fee_in_wei', [
+                txTypes,
+                addresses,
+                tokenLike,
+            ]);
             return ethers_1.BigNumber.from(batchFee.totalFee);
         });
     }

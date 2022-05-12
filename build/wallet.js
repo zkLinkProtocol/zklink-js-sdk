@@ -63,7 +63,7 @@ class Wallet {
             const create2Signer = new signer_1.Create2WalletSigner(yield syncSigner.pubKeyHash(), create2Data);
             return yield Wallet.fromEthSigner(create2Signer, provider, syncSigner, accountId, {
                 verificationMethod: 'ERC-1271',
-                isSignedMsgPrefixed: true
+                isSignedMsgPrefixed: true,
             });
         });
     }
@@ -83,8 +83,10 @@ class Wallet {
             const signedBytes = (0, utils_1.getSignedBytesFromMessage)(message, !this.ethSignerType.isSignedMsgPrefixed);
             const signature = yield (0, utils_1.signMessagePersonalAPI)(this.ethSigner, signedBytes);
             return {
-                type: this.ethSignerType.verificationMethod === 'ECDSA' ? 'EthereumSignature' : 'EIP1271Signature',
-                signature
+                type: this.ethSignerType.verificationMethod === 'ECDSA'
+                    ? 'EthereumSignature'
+                    : 'EIP1271Signature',
+                signature,
             };
         });
     }
@@ -110,7 +112,7 @@ class Wallet {
                 ts: transfer.ts,
                 nonce: transfer.nonce,
                 validFrom: transfer.validFrom,
-                validUntil: transfer.validUntil
+                validUntil: transfer.validUntil,
             };
             return this.signer.signSyncTransfer(transactionData);
         });
@@ -124,9 +126,7 @@ class Wallet {
             const stringAmount = ethers_1.BigNumber.from(transfer.amount).isZero()
                 ? null
                 : ethers_1.utils.formatEther(transfer.amount);
-            const stringFee = ethers_1.BigNumber.from(transfer.fee).isZero()
-                ? null
-                : ethers_1.utils.formatEther(transfer.fee);
+            const stringFee = ethers_1.BigNumber.from(transfer.fee).isZero() ? null : ethers_1.utils.formatEther(transfer.fee);
             const stringToken = this.provider.tokenSet.resolveTokenSymbol(transfer.token);
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
@@ -136,11 +136,11 @@ class Wallet {
                     stringToken,
                     to: transfer.to,
                     nonce: transfer.nonce,
-                    accountId: transfer.accountId || this.accountId
+                    accountId: transfer.accountId || this.accountId,
                 });
             return {
                 tx: signedTransferTransaction,
-                ethereumSignature
+                ethereumSignature,
             };
         });
     }
@@ -156,11 +156,13 @@ class Wallet {
                 account: matching.account,
                 taker: matching.taker,
                 maker: matching.maker,
+                expectBaseAmount: matching.expectBaseAmount,
+                expectQuoteAmount: matching.expectQuoteAmount,
                 fee: matching.fee,
                 feeTokenId: feeTokenId,
                 nonce: matching.nonce,
                 validFrom: matching.validFrom,
-                validUntil: matching.validUntil
+                validUntil: matching.validUntil,
             };
             return this.signer.signSyncOrderMatching(transactionData);
         });
@@ -170,9 +172,7 @@ class Wallet {
             matching.validFrom = matching.validFrom || 0;
             matching.validUntil = matching.validUntil || 9007199254740991;
             const signedTransferTransaction = yield this.getOrderMatching(matching);
-            const stringFee = ethers_1.BigNumber.from(matching.fee).isZero()
-                ? null
-                : ethers_1.utils.formatEther(matching.fee);
+            const stringFee = ethers_1.BigNumber.from(matching.fee).isZero() ? null : ethers_1.utils.formatEther(matching.fee);
             const stringFeeToken = this.provider.tokenSet.resolveTokenSymbol(matching.feeToken);
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
@@ -183,7 +183,7 @@ class Wallet {
                 });
             return {
                 tx: signedTransferTransaction,
-                ethereumSignature
+                ethereumSignature,
             };
         });
     }
@@ -204,7 +204,7 @@ class Wallet {
                 ts: forcedExit.ts,
                 nonce: forcedExit.nonce,
                 validFrom: forcedExit.validFrom || 0,
-                validUntil: forcedExit.validUntil || utils_1.MAX_TIMESTAMP
+                validUntil: forcedExit.validUntil || utils_1.MAX_TIMESTAMP,
             };
             return yield this.signer.signSyncForcedExit(transactionData);
         });
@@ -223,17 +223,18 @@ class Wallet {
                     stringToken,
                     stringFee,
                     target: forcedExit.target,
-                    nonce: forcedExit.nonce
+                    nonce: forcedExit.nonce,
                 });
             return {
                 tx: signedForcedExitTransaction,
-                ethereumSignature
+                ethereumSignature,
             };
         });
     }
     syncForcedExit(forcedExit) {
         return __awaiter(this, void 0, void 0, function* () {
-            forcedExit.nonce = forcedExit.nonce != null ? yield this.getNonce(forcedExit.nonce) : yield this.getNonce();
+            forcedExit.nonce =
+                forcedExit.nonce != null ? yield this.getNonce(forcedExit.nonce) : yield this.getNonce();
             if (forcedExit.fee == null) {
                 // Fee for forced exit is defined by `Withdraw` transaction type (as it's essentially just a forced withdraw).
                 const fullFee = yield this.provider.getTransactionFee('Withdraw', forcedExit.target, forcedExit.token);
@@ -283,7 +284,7 @@ class Wallet {
                     ts: transfer.ts,
                     nonce,
                     validFrom: transfer.validFrom || 0,
-                    validUntil: transfer.validUntil || utils_1.MAX_TIMESTAMP
+                    validUntil: transfer.validUntil || utils_1.MAX_TIMESTAMP,
                 });
                 messages.push(this.getTransferEthMessagePart(transfer));
                 batch.push({ tx, signature: null });
@@ -299,7 +300,8 @@ class Wallet {
     }
     syncTransfer(transfer) {
         return __awaiter(this, void 0, void 0, function* () {
-            transfer.nonce = transfer.nonce != null ? yield this.getNonce(transfer.nonce) : yield this.getNonce();
+            transfer.nonce =
+                transfer.nonce != null ? yield this.getNonce(transfer.nonce) : yield this.getNonce();
             if (transfer.fee == null) {
                 const fullFee = yield this.provider.getTransactionFee('Transfer', transfer.to, transfer.token);
                 transfer.fee = fullFee.totalFee;
@@ -326,9 +328,7 @@ class Wallet {
             const signedTransferTransaction = yield this.getCurveAddLiquidity(payload);
             console.log(signedTransferTransaction);
             const stringAmounts = payload.amounts.map((amount) => {
-                return ethers_1.BigNumber.from(amount).isZero()
-                    ? null
-                    : ethers_1.utils.formatEther(amount);
+                return ethers_1.BigNumber.from(amount).isZero() ? null : ethers_1.utils.formatEther(amount);
             });
             console.log(stringAmounts);
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
@@ -342,13 +342,14 @@ class Wallet {
             console.log(ethereumSignature);
             return {
                 tx: signedTransferTransaction,
-                ethereumSignature
+                ethereumSignature,
             };
         });
     }
     syncCurveAddLiquidity(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            payload.nonce = payload.nonce != null ? yield this.getNonce(payload.nonce) : yield this.getNonce();
+            payload.nonce =
+                payload.nonce != null ? yield this.getNonce(payload.nonce) : yield this.getNonce();
             const signedTransferTransaction = yield this.signSyncCurveAddLiquidity(payload);
             return submitSignedTransaction(signedTransferTransaction, this.provider);
         });
@@ -370,9 +371,7 @@ class Wallet {
             payload.ts = payload.ts || (0, utils_1.getTimestamp)();
             const signedTransferTransaction = yield this.getCurveRemoveLiquidity(payload);
             const stringAmounts = payload.amounts.map((amount) => {
-                return ethers_1.BigNumber.from(amount).isZero()
-                    ? null
-                    : ethers_1.utils.formatEther(amount);
+                return ethers_1.BigNumber.from(amount).isZero() ? null : ethers_1.utils.formatEther(amount);
             });
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
@@ -384,13 +383,14 @@ class Wallet {
                 });
             return {
                 tx: signedTransferTransaction,
-                ethereumSignature
+                ethereumSignature,
             };
         });
     }
     syncCurveRemoveLiquidity(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            payload.nonce = payload.nonce != null ? yield this.getNonce(payload.nonce) : yield this.getNonce();
+            payload.nonce =
+                payload.nonce != null ? yield this.getNonce(payload.nonce) : yield this.getNonce();
             const signedTransferTransaction = yield this.signSyncCurveRemoveLiquidity(payload);
             return submitSignedTransaction(signedTransferTransaction, this.provider);
         });
@@ -431,13 +431,14 @@ class Wallet {
                 });
             return {
                 tx: signedTransferTransaction,
-                ethereumSignature
+                ethereumSignature,
             };
         });
     }
     syncCurveSwap(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            payload.nonce = payload.nonce != null ? yield this.getNonce(payload.nonce) : yield this.getNonce();
+            payload.nonce =
+                payload.nonce != null ? yield this.getNonce(payload.nonce) : yield this.getNonce();
             const signedTransferTransaction = yield this.signSyncCurveSwap(payload);
             return submitSignedTransaction(signedTransferTransaction, this.provider);
         });
@@ -460,7 +461,7 @@ class Wallet {
                 : yield this.ethMessageSigner.ethSignOrder(payload);
             return {
                 tx: signedTransferTransaction,
-                ethereumSignature
+                ethereumSignature,
             };
         });
     }
@@ -485,7 +486,7 @@ class Wallet {
                 ts: withdraw.ts,
                 nonce: withdraw.nonce,
                 validFrom: withdraw.validFrom,
-                validUntil: withdraw.validUntil
+                validUntil: withdraw.validUntil,
             };
             return yield this.signer.signSyncWithdraw(transactionData);
         });
@@ -500,9 +501,7 @@ class Wallet {
             const stringAmount = ethers_1.BigNumber.from(withdraw.amount).isZero()
                 ? null
                 : ethers_1.utils.formatEther(withdraw.amount);
-            const stringFee = ethers_1.BigNumber.from(withdraw.fee).isZero()
-                ? null
-                : ethers_1.utils.formatEther(withdraw.fee);
+            const stringFee = ethers_1.BigNumber.from(withdraw.fee).isZero() ? null : ethers_1.utils.formatEther(withdraw.fee);
             const stringToken = withdraw.token;
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
@@ -512,17 +511,18 @@ class Wallet {
                     stringToken,
                     to: withdraw.to,
                     nonce: withdraw.nonce,
-                    accountId: withdraw.accountId || this.accountId
+                    accountId: withdraw.accountId || this.accountId,
                 });
             return {
                 tx: signedWithdrawTransaction,
-                ethereumSignature
+                ethereumSignature,
             };
         });
     }
     withdrawFromSyncToEthereum(withdraw) {
         return __awaiter(this, void 0, void 0, function* () {
-            withdraw.nonce = withdraw.nonce != null ? yield this.getNonce(withdraw.nonce) : yield this.getNonce();
+            withdraw.nonce =
+                withdraw.nonce != null ? yield this.getNonce(withdraw.nonce) : yield this.getNonce();
             // if (withdraw.fee == null) {
             //     const fullFee = await this.provider.getTransactionFee('Withdraw', withdraw.ethAddress, withdraw.token);
             //     withdraw.fee = fullFee.totalFee;
@@ -559,7 +559,7 @@ class Wallet {
                 ts: changePubKey.ts,
                 ethAuthData: changePubKey.ethAuthData,
                 validFrom: changePubKey.validFrom,
-                validUntil: changePubKey.validUntil
+                validUntil: changePubKey.validUntil,
             });
             return changePubKeyTx;
         });
@@ -573,17 +573,17 @@ class Wallet {
             let ethSignature;
             if (changePubKey.ethAuthType === 'Onchain') {
                 ethAuthData = {
-                    type: 'Onchain'
+                    type: 'Onchain',
                 };
             }
             else if (changePubKey.ethAuthType === 'ECDSA') {
                 yield this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSA.');
-                const changePubKeyMessage = (0, utils_1.getChangePubkeyMessage)(newPubKeyHash, changePubKey.nonce, (changePubKey.accountId || this.accountId), changePubKey.batchHash);
+                const changePubKeyMessage = (0, utils_1.getChangePubkeyMessage)(newPubKeyHash, changePubKey.nonce, changePubKey.accountId || this.accountId, changePubKey.batchHash);
                 const ethSignature = (yield this.getEthMessageSignature(changePubKeyMessage)).signature;
                 ethAuthData = {
                     type: 'ECDSA',
                     ethSignature,
-                    batchHash: changePubKey.batchHash
+                    batchHash: changePubKey.batchHash,
                 };
             }
             else if (changePubKey.ethAuthType === 'CREATE2') {
@@ -593,7 +593,7 @@ class Wallet {
                         type: 'CREATE2',
                         creatorAddress: create2data.creatorAddress,
                         saltArg: create2data.saltArg,
-                        codeHash: create2data.codeHash
+                        codeHash: create2data.codeHash,
                     };
                 }
                 else {
@@ -608,7 +608,7 @@ class Wallet {
             changePubkeyTxUnsigned.validUntil = changePubKey.validUntil || utils_1.MAX_TIMESTAMP;
             const changePubKeyTx = yield this.getChangePubKey(changePubkeyTxUnsigned);
             return {
-                tx: changePubKeyTx
+                tx: changePubKeyTx,
             };
         });
     }
@@ -641,7 +641,7 @@ class Wallet {
             stringAmount,
             stringFee,
             stringToken,
-            to: transfer.to
+            to: transfer.to,
         }, 'transfer');
     }
     getWithdrawEthMessagePart(withdraw) {
@@ -656,7 +656,7 @@ class Wallet {
             stringAmount,
             stringFee,
             stringToken,
-            to: withdraw.to
+            to: withdraw.to,
         });
     }
     getChangePubKeyEthMessagePart(changePubKey) {
@@ -667,7 +667,7 @@ class Wallet {
         return this.ethMessageSigner.getChangePubKeyEthMessagePart({
             pubKeyHash: changePubKey.pubKeyHash,
             stringToken,
-            stringFee
+            stringFee,
         });
     }
     getForcedExitEthMessagePart(forcedExit) {
@@ -678,7 +678,7 @@ class Wallet {
         return this.ethMessageSigner.getForcedExitEthMessagePart({
             stringToken,
             stringFee,
-            target: forcedExit.target
+            target: forcedExit.target,
         });
     }
     isOnchainAuthSigningKeySet(linkChainId, nonce = 'committed') {
@@ -687,7 +687,7 @@ class Wallet {
             const numNonce = yield this.getNonce(nonce);
             try {
                 const onchainAuthFact = yield mainZkSyncContract.authFacts(this.address(), numNonce);
-                return onchainAuthFact !== '0x0000000000000000000000000000000000000000000000000000000000000000';
+                return (onchainAuthFact !== '0x0000000000000000000000000000000000000000000000000000000000000000');
             }
             catch (e) {
                 this.modifyEthersError(e);
@@ -834,7 +834,7 @@ class Wallet {
                     deposit.amount,
                     deposit.depositTo,
                     deposit.subAccountId,
-                    Object.assign({ nonce }, deposit.ethTxOptions)
+                    Object.assign({ nonce }, deposit.ethTxOptions),
                 ];
                 // We set gas limit only if user does not set it using ethTxOptions.
                 const txRequest = args[args.length - 1];
@@ -842,7 +842,9 @@ class Wallet {
                     try {
                         const gasEstimate = yield mainZkSyncContract.estimateGas.depositERC20(...args).then((estimate) => estimate, () => ethers_1.BigNumber.from('0'));
                         let recommendedGasLimit = utils_1.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT;
-                        txRequest.gasLimit = gasEstimate.gte(recommendedGasLimit) ? gasEstimate : recommendedGasLimit;
+                        txRequest.gasLimit = gasEstimate.gte(recommendedGasLimit)
+                            ? gasEstimate
+                            : recommendedGasLimit;
                         args[args.length - 1] = txRequest;
                     }
                     catch (e) {
@@ -899,7 +901,7 @@ class Wallet {
                 EthersErrorCode.NONCE_EXPIRED,
                 EthersErrorCode.INSUFFICIENT_FUNDS,
                 EthersErrorCode.REPLACEMENT_UNDERPRICED,
-                EthersErrorCode.UNPREDICTABLE_GAS_LIMIT
+                EthersErrorCode.UNPREDICTABLE_GAS_LIMIT,
             ];
             if (!correct_errors.includes(error.code)) {
                 // This is an error which we don't expect
@@ -1031,7 +1033,7 @@ function submitSignedTransaction(signedTx, provider, fastProcessing) {
         const transactionHash = yield provider.submitTx({
             tx: signedTx.tx,
             signature: signedTx.ethereumSignature,
-            fastProcessing
+            fastProcessing,
         });
         return new Transaction(signedTx, transactionHash, provider);
     });

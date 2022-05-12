@@ -102,6 +102,8 @@ export class Signer {
     account: Address
     taker: Order
     maker: Order
+    expectBaseAmount: BigNumberish
+    expectQuoteAmount: BigNumberish
     fee: BigNumberish
     feeTokenId: number
     nonce: number
@@ -126,6 +128,7 @@ export class Signer {
         base_token_id: tx.maker.basedTokenId,
         quote_token_id: tx.maker.quoteTokenId,
         sub_account_id: tx.maker.subAccountId,
+        fee_ratio: tx.maker.feeRatio,
       },
       taker: {
         ...tx.taker,
@@ -135,6 +138,7 @@ export class Signer {
         base_token_id: tx.taker.basedTokenId,
         quote_token_id: tx.taker.quoteTokenId,
         sub_account_id: tx.taker.subAccountId,
+        fee_ratio: tx.taker.feeRatio,
       },
       fee: BigNumber.from(matching.fee).toString(),
       signature,

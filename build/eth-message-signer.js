@@ -27,8 +27,10 @@ class EthMessageSigner {
             const signedBytes = (0, utils_1.getSignedBytesFromMessage)(message, !this.ethSignerType.isSignedMsgPrefixed);
             const signature = yield (0, utils_1.signMessagePersonalAPI)(this.ethSigner, signedBytes);
             return {
-                type: this.ethSignerType.verificationMethod === 'ECDSA' ? 'EthereumSignature' : 'EIP1271Signature',
-                signature
+                type: this.ethSignerType.verificationMethod === 'ECDSA'
+                    ? 'EthereumSignature'
+                    : 'EIP1271Signature',
+                signature,
             };
         });
     }
@@ -158,7 +160,9 @@ class EthMessageSigner {
             message += `Add Liquidity`;
         }
         message += '\n';
-        message += `Amount: ${tx.stringAmounts.filter((a) => Number(a) != 0 && Number(a) != NaN).join('-')}`;
+        message += `Amount: ${tx.stringAmounts
+            .filter((a) => Number(a) != 0 && Number(a) != NaN)
+            .join('-')}`;
         return message;
     }
     ethSignCurveRemoveLiquidity(payload) {
@@ -181,7 +185,9 @@ class EthMessageSigner {
             message += `Remove Liquidity`;
         }
         message += '\n';
-        message += `Amount: ${tx.stringAmounts.filter((a) => Number(a) != 0 && Number(a) != NaN).join('-')}`;
+        message += `Amount: ${tx.stringAmounts
+            .filter((a) => Number(a) != 0 && Number(a) != NaN)
+            .join('-')}`;
         return message;
     }
     ethSignCurveSwap(payload) {

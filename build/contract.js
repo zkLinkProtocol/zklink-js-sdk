@@ -83,7 +83,7 @@ class LinkContract {
                 bridge.toChainId,
                 bridge.to,
                 bridge.amount,
-                Object.assign({ value: lzFees }, bridge.ethTxOptions)
+                Object.assign({ value: lzFees }, bridge.ethTxOptions),
             ];
             // We set gas limit only if user does not set it using ethTxOptions.
             const txRequest = args[args.length - 1];
@@ -91,7 +91,9 @@ class LinkContract {
                 try {
                     const gasEstimate = yield zklContract.estimateGas.bridge(...args).then((estimate) => estimate, () => ethers_1.BigNumber.from('0'));
                     let recommendedGasLimit = utils_1.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT;
-                    txRequest.gasLimit = gasEstimate.gte(recommendedGasLimit) ? gasEstimate : recommendedGasLimit;
+                    txRequest.gasLimit = gasEstimate.gte(recommendedGasLimit)
+                        ? gasEstimate
+                        : recommendedGasLimit;
                     args[args.length - 1] = txRequest;
                 }
                 catch (e) {
@@ -142,7 +144,7 @@ class LinkContract {
                     swap.pair,
                     swap.acceptTokenId,
                     swap.acceptAmountOutMin,
-                    Object.assign({ nonce }, swap.ethTxOptions)
+                    Object.assign({ nonce }, swap.ethTxOptions),
                 ];
                 // We set gas limit only if user does not set it using ethTxOptions.
                 const txRequest = args[args.length - 1];
@@ -150,7 +152,9 @@ class LinkContract {
                     try {
                         const gasEstimate = yield mainContract.estimateGas.swapExactTokensForTokens(...args).then((estimate) => estimate, () => ethers_1.BigNumber.from('0'));
                         let recommendedGasLimit = utils_1.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT;
-                        txRequest.gasLimit = gasEstimate.gte(recommendedGasLimit) ? gasEstimate : recommendedGasLimit;
+                        txRequest.gasLimit = gasEstimate.gte(recommendedGasLimit)
+                            ? gasEstimate
+                            : recommendedGasLimit;
                         args[args.length - 1] = txRequest;
                     }
                     catch (e) {

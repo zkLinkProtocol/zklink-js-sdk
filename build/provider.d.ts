@@ -19,7 +19,7 @@ export declare class Provider {
      * without communicating with the network
      */
     static newMockProvider(network: string, ethPrivateKey: Uint8Array, getTokens: Function): Promise<Provider>;
-    submitTx({ tx, signature, fastProcessing }: {
+    submitTx({ tx, signature, fastProcessing, }: {
         tx: any;
         signature?: TxEthSignature;
         fastProcessing?: boolean;

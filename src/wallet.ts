@@ -243,6 +243,8 @@ export class Wallet {
     account: Address
     taker: Order
     maker: Order
+    expectBaseAmount: BigNumberish
+    expectQuoteAmount: BigNumberish
     fee: BigNumberish
     feeToken: TokenLike
     nonce: number
@@ -261,6 +263,8 @@ export class Wallet {
       account: matching.account,
       taker: matching.taker,
       maker: matching.maker,
+      expectBaseAmount: matching.expectBaseAmount,
+      expectQuoteAmount: matching.expectQuoteAmount,
       fee: matching.fee,
       feeTokenId: feeTokenId,
       nonce: matching.nonce,

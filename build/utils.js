@@ -294,7 +294,7 @@ class TokenSet {
                     return token;
                 }
             }
-            else if (token.address.map(a => a.toLowerCase()).includes(tokenLike.toLowerCase()) ||
+            else if (token.address.map((a) => a.toLowerCase()).includes(tokenLike.toLowerCase()) ||
                 token.symbol.toLocaleLowerCase() === tokenLike.toLocaleLowerCase()) {
                 return token;
             }
@@ -324,7 +324,7 @@ class TokenSet {
         return this.resolveTokenObject(tokenLike).id;
     }
     resolveTokenAddress(tokenLike, chainId) {
-        const index = this.resolveTokenObject(tokenLike).chains.findIndex(c => c === chainId);
+        const index = this.resolveTokenObject(tokenLike).chains.findIndex((c) => c === chainId);
         return this.resolveTokenObject(tokenLike).address[index];
     }
     resolveTokenSymbol(tokenLike) {
@@ -345,7 +345,7 @@ function getSignedBytesFromMessage(message, addPrefix) {
     if (addPrefix) {
         messageBytes = ethers_1.utils.concat([
             ethers_1.utils.toUtf8Bytes(`\x19Ethereum Signed Message:\n${messageBytes.length}`),
-            messageBytes
+            messageBytes,
         ]);
     }
     return messageBytes;
@@ -354,7 +354,9 @@ exports.getSignedBytesFromMessage = getSignedBytesFromMessage;
 function signMessagePersonalAPI(signer, message) {
     return __awaiter(this, void 0, void 0, function* () {
         if (signer instanceof ethers_1.ethers.providers.JsonRpcSigner) {
-            return signer.provider.send('personal_sign', [ethers_1.utils.hexlify(message), yield signer.getAddress()]).then((sign) => sign, (err) => {
+            return signer.provider
+                .send('personal_sign', [ethers_1.utils.hexlify(message), yield signer.getAddress()])
+                .then((sign) => sign, (err) => {
                 // We check for method name in the error string because error messages about invalid method name
                 // often contain method name.
                 if (err.message.includes('personal_sign')) {
@@ -389,14 +391,14 @@ function getEthSignatureType(_provider, message, signature, address) {
         if (prefixedECDSASigner.toLowerCase() === address.toLowerCase()) {
             return {
                 verificationMethod: 'ECDSA',
-                isSignedMsgPrefixed: true
+                isSignedMsgPrefixed: true,
             };
         }
         const notPrefixedMsgECDSASigner = ethers_1.utils.recoverAddress(ethers_1.utils.keccak256(messageNoPrefix), signature);
         if (notPrefixedMsgECDSASigner.toLowerCase() === address.toLowerCase()) {
             return {
                 verificationMethod: 'ECDSA',
-                isSignedMsgPrefixed: false
+                isSignedMsgPrefixed: false,
             };
         }
         let isSignedMsgPrefixed = null;
@@ -409,7 +411,7 @@ function getEthSignatureType(_provider, message, signature, address) {
         }
         return {
             verificationMethod: 'ERC-1271',
-            isSignedMsgPrefixed
+            isSignedMsgPrefixed,
         };
     });
 }
@@ -523,7 +525,7 @@ function serializeWithdraw(withdraw) {
         fastWithdrawBytes,
         withdrawFeeRatioBytes,
         validFrom,
-        validUntil
+        validUntil,
     ]);
 }
 exports.serializeWithdraw = serializeWithdraw;
@@ -541,14 +543,28 @@ function serializeTransfer(transfer) {
     const validFrom = serializeTimestamp(transfer.validFrom);
     const validUntil = serializeTimestamp(transfer.validUntil);
     const tsBytes = numberToBytesBE(transfer.ts, 4);
-    return ethers_1.ethers.utils.concat([type, accountId, from, fromSubAccountId, to, toSubAccountId, token, amount, fee, nonce, validFrom, validUntil, tsBytes]);
+    return ethers_1.ethers.utils.concat([
+        type,
+        accountId,
+        from,
+        fromSubAccountId,
+        to,
+        toSubAccountId,
+        token,
+        amount,
+        fee,
+        nonce,
+        validFrom,
+        validUntil,
+        tsBytes,
+    ]);
 }
 exports.serializeTransfer = serializeTransfer;
 function serializeCurveAddLiquidity(payload) {
     const type = new Uint8Array([8]);
     const account = serializeAddress(payload.account);
-    const tokens = chainsCompletion(payload.tokens, exports.TOTAL_CHAIN_NUM, 0).map(tokenId => serializeTokenId(tokenId));
-    const amounts = chainsCompletion(payload.amounts, exports.TOTAL_CHAIN_NUM, '0').map(amount => serializeAmountPacked(amount));
+    const tokens = chainsCompletion(payload.tokens, exports.TOTAL_CHAIN_NUM, 0).map((tokenId) => serializeTokenId(tokenId));
+    const amounts = chainsCompletion(payload.amounts, exports.TOTAL_CHAIN_NUM, '0').map((amount) => serializeAmountPacked(amount));
     const minLpQuantity = serializeAmountPacked(payload.minLpQuantity);
     const feeToken = serializeTokenId(payload.feeToken);
     const feeAmount = serializeFeePacked(payload.fee);
@@ -556,7 +572,19 @@ function serializeCurveAddLiquidity(payload) {
     const validFrom = serializeTimestamp(payload.validFrom);
     const validUntil = serializeTimestamp(payload.validUntil);
     const tsBytes = numberToBytesBE(payload.ts, 4);
-    return ethers_1.ethers.utils.concat([type, account, ...tokens, ...amounts, minLpQuantity, feeToken, feeAmount, nonce, validFrom, validUntil, tsBytes]);
+    return ethers_1.ethers.utils.concat([
+        type,
+        account,
+        ...tokens,
+        ...amounts,
+        minLpQuantity,
+        feeToken,
+        feeAmount,
+        nonce,
+        validFrom,
+        validUntil,
+        tsBytes,
+    ]);
 }
 exports.serializeCurveAddLiquidity = serializeCurveAddLiquidity;
 function serializeCurveSwap(payload) {
@@ -572,14 +600,27 @@ function serializeCurveSwap(payload) {
     const validFrom = serializeTimestamp(payload.validFrom);
     const validUntil = serializeTimestamp(payload.validUntil);
     const tsBytes = numberToBytesBE(payload.ts, 4);
-    return ethers_1.ethers.utils.concat([type, account, pairAddress, tokenIn, tokenOut, amountIn, amountOutMin, feeAmount, nonce, validFrom, validUntil, tsBytes]);
+    return ethers_1.ethers.utils.concat([
+        type,
+        account,
+        pairAddress,
+        tokenIn,
+        tokenOut,
+        amountIn,
+        amountOutMin,
+        feeAmount,
+        nonce,
+        validFrom,
+        validUntil,
+        tsBytes,
+    ]);
 }
 exports.serializeCurveSwap = serializeCurveSwap;
 function serializeCurveRemoveLiquidity(payload) {
     const type = new Uint8Array([10]);
     const account = serializeAddress(payload.account);
-    const tokens = chainsCompletion(payload.tokens, exports.TOTAL_CHAIN_NUM, 0).map(tokenId => serializeTokenId(tokenId));
-    const minAmounts = chainsCompletion(payload.minAmounts, exports.TOTAL_CHAIN_NUM, '0').map(amount => serializeAmountPacked(amount));
+    const tokens = chainsCompletion(payload.tokens, exports.TOTAL_CHAIN_NUM, 0).map((tokenId) => serializeTokenId(tokenId));
+    const minAmounts = chainsCompletion(payload.minAmounts, exports.TOTAL_CHAIN_NUM, '0').map((amount) => serializeAmountPacked(amount));
     const lpQuantity = serializeAmountPacked(payload.lpQuantity);
     const feeToken = serializeTokenId(payload.feeToken);
     const feeAmount = serializeFeePacked(payload.fee);
@@ -587,7 +628,19 @@ function serializeCurveRemoveLiquidity(payload) {
     const validFrom = serializeTimestamp(payload.validFrom);
     const validUntil = serializeTimestamp(payload.validUntil);
     const tsBytes = numberToBytesBE(payload.ts, 4);
-    return ethers_1.ethers.utils.concat([type, account, ...tokens, ...minAmounts, lpQuantity, feeToken, feeAmount, nonce, validFrom, validUntil, tsBytes]);
+    return ethers_1.ethers.utils.concat([
+        type,
+        account,
+        ...tokens,
+        ...minAmounts,
+        lpQuantity,
+        feeToken,
+        feeAmount,
+        nonce,
+        validFrom,
+        validUntil,
+        tsBytes,
+    ]);
 }
 exports.serializeCurveRemoveLiquidity = serializeCurveRemoveLiquidity;
 function serializeChangePubKey(changePubKey) {
@@ -609,7 +662,7 @@ function serializeChangePubKey(changePubKey) {
         nonceBytes,
         validFrom,
         validUntil,
-        tsBytes
+        tsBytes,
     ]);
 }
 exports.serializeChangePubKey = serializeChangePubKey;
@@ -636,7 +689,7 @@ function serializeForcedExit(forcedExit) {
         nonceBytes,
         validFrom,
         validUntil,
-        tsBytes
+        tsBytes,
     ]);
 }
 exports.serializeForcedExit = serializeForcedExit;
@@ -650,6 +703,7 @@ function serializeOrder(order) {
     const quoteTokenIdBytes = serializeTokenId(order.quoteTokenId);
     const priceBytes = bigintToBytesBE(ethers_1.BigNumber.from(order.price).toBigInt(), 15);
     const isSellBytes = numberToBytesBE(order.isSell, 1);
+    const feeRatioBytes = numberToBytesBE(order.feeRatio, 1);
     const amountBytes = serializeAmountPacked(order.amount);
     const validFrom = numberToBytesBE(order.validFrom, 8);
     const validUntil = bigintToBytesBE(ethers_1.BigNumber.from(String(order.validUntil)).toBigInt(), 8);
@@ -663,9 +717,10 @@ function serializeOrder(order) {
         quoteTokenIdBytes,
         priceBytes,
         isSellBytes,
+        feeRatioBytes,
         amountBytes,
         validFrom,
-        validUntil
+        validUntil,
     ]);
 }
 exports.serializeOrder = serializeOrder;
@@ -682,13 +737,17 @@ function serializeOrderMatching(matching) {
         const accountBytes = serializeAddress(matching.account);
         const feeTokenBytes = serializeTokenId(matching.feeToken);
         const feeBytes = serializeFeePacked(matching.fee);
+        const expectBaseAmountBytes = bigintToBytesBE(ethers_1.BigNumber.from(matching.expectBaseAmount).toBigInt(), 16);
+        const expectQuoteAmountBytes = bigintToBytesBE(ethers_1.BigNumber.from(matching.expectQuoteAmount).toBigInt(), 16);
         return ethers_1.ethers.utils.concat([
             type,
             accountIdBytes,
             accountBytes,
             ordersHash,
             feeTokenBytes,
-            feeBytes
+            feeBytes,
+            expectBaseAmountBytes,
+            expectQuoteAmountBytes,
         ]);
     });
 }
@@ -749,7 +808,7 @@ function getCREATE2AddressAndSalt(syncPubkeyHash, create2Data) {
             ethers_1.ethers.utils.arrayify(0xff),
             ethers_1.ethers.utils.arrayify(create2Data.creatorAddress),
             salt,
-            ethers_1.ethers.utils.arrayify(create2Data.codeHash)
+            ethers_1.ethers.utils.arrayify(create2Data.codeHash),
         ]))
             .slice(2 + 12 * 2);
     return { address: address, salt: ethers_1.ethers.utils.hexlify(salt) };
@@ -806,7 +865,7 @@ function chainsCompletion(chains, chainNum, item) {
 }
 exports.chainsCompletion = chainsCompletion;
 function getTimestamp() {
-    let ts = (new Date()).getTime();
+    let ts = new Date().getTime();
     return parseInt(String(ts / 1000));
 }
 exports.getTimestamp = getTimestamp;

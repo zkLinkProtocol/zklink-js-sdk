@@ -272,6 +272,7 @@ export interface Order {
     amount: BigNumberish;
     price: BigNumberish;
     isSell: number;
+    feeRatio: number;
     validFrom: number;
     validUntil: number;
     signature?: Signature;
@@ -284,6 +285,8 @@ export interface OrderMatching {
     account: Address;
     taker: Order;
     maker: Order;
+    expectBaseAmount: BigNumberish;
+    expectQuoteAmount: BigNumberish;
     fee: BigNumberish;
     feeToken: number;
     nonce: number;

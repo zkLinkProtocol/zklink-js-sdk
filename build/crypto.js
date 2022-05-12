@@ -59,7 +59,7 @@ function signTransactionBytes(privKey, bytes) {
         const signature = ethers_1.utils.hexlify(signaturePacked.slice(32)).substr(2);
         return {
             pubKey,
-            signature
+            signature,
         };
     });
 }

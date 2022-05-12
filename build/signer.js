@@ -78,7 +78,7 @@ class Signer {
             const tx = Object.assign(Object.assign({}, matching), { type: 'OrderMatching', feeToken: matching.feeTokenId });
             const msgBytes = yield utils.serializeOrderMatching(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
-            return Object.assign(Object.assign({}, tx), { maker: Object.assign(Object.assign({}, tx.maker), { is_sell: tx.maker.isSell, slot_id: tx.maker.slotId, account_id: tx.maker.accountId, base_token_id: tx.maker.basedTokenId, quote_token_id: tx.maker.quoteTokenId, sub_account_id: tx.maker.subAccountId }), taker: Object.assign(Object.assign({}, tx.taker), { is_sell: tx.taker.isSell, slot_id: tx.taker.slotId, account_id: tx.taker.accountId, base_token_id: tx.taker.basedTokenId, quote_token_id: tx.taker.quoteTokenId, sub_account_id: tx.taker.subAccountId }), fee: ethers_1.BigNumber.from(matching.fee).toString(), signature });
+            return Object.assign(Object.assign({}, tx), { maker: Object.assign(Object.assign({}, tx.maker), { is_sell: tx.maker.isSell, slot_id: tx.maker.slotId, account_id: tx.maker.accountId, base_token_id: tx.maker.basedTokenId, quote_token_id: tx.maker.quoteTokenId, sub_account_id: tx.maker.subAccountId, fee_ratio: tx.maker.feeRatio }), taker: Object.assign(Object.assign({}, tx.taker), { is_sell: tx.taker.isSell, slot_id: tx.taker.slotId, account_id: tx.taker.accountId, base_token_id: tx.taker.basedTokenId, quote_token_id: tx.taker.quoteTokenId, sub_account_id: tx.taker.subAccountId, fee_ratio: tx.taker.feeRatio }), fee: ethers_1.BigNumber.from(matching.fee).toString(), signature });
         });
     }
     signSyncCurveAddLiquidity(payload) {

@@ -56,7 +56,7 @@ class BatchBuilder {
             return {
                 txs,
                 signature,
-                totalFee
+                totalFee,
             };
         });
     }
@@ -73,7 +73,7 @@ class BatchBuilder {
                 this.addTransfer({
                     to: this.wallet.address(),
                     token: feeToken,
-                    amount: 0
+                    amount: 0,
                 });
             }
             const txWithFeeToken = this.txs[this.txs.length - 1];
@@ -90,7 +90,7 @@ class BatchBuilder {
             fee: withdraw.fee || 0,
             nonce: null,
             validFrom: withdraw.validFrom || 0,
-            validUntil: withdraw.validUntil || utils_1.MAX_TIMESTAMP
+            validUntil: withdraw.validUntil || utils_1.MAX_TIMESTAMP,
         };
         const feeType = withdraw.fastProcessing === true ? 'FastWithdraw' : 'Withdraw';
         this.txs.push({
@@ -98,7 +98,7 @@ class BatchBuilder {
             tx: _withdraw,
             feeType: feeType,
             address: _withdraw.ethAddress,
-            token: _withdraw.token
+            token: _withdraw.token,
         });
         return this;
     }
@@ -110,14 +110,14 @@ class BatchBuilder {
             fee: transfer.fee || 0,
             nonce: null,
             validFrom: transfer.validFrom || 0,
-            validUntil: transfer.validUntil || utils_1.MAX_TIMESTAMP
+            validUntil: transfer.validUntil || utils_1.MAX_TIMESTAMP,
         };
         this.txs.push({
             type: 'Transfer',
             tx: _transfer,
             feeType: 'Transfer',
             address: _transfer.to,
-            token: _transfer.token
+            token: _transfer.token,
         });
         return this;
     }
@@ -133,7 +133,7 @@ class BatchBuilder {
                 feeType: null,
                 address: this.wallet.address(),
                 token: null,
-                alreadySigned: true
+                alreadySigned: true,
             });
             return this;
         }
@@ -143,17 +143,17 @@ class BatchBuilder {
             nonce: null,
             ethAuthType: changePubKey.ethAuthType,
             validFrom: changePubKey.validFrom || 0,
-            validUntil: changePubKey.validUntil || utils_1.MAX_TIMESTAMP
+            validUntil: changePubKey.validUntil || utils_1.MAX_TIMESTAMP,
         };
         const feeType = {
-            ChangePubKey: changePubKey.ethAuthType
+            ChangePubKey: changePubKey.ethAuthType,
         };
         this.txs.push({
             type: 'ChangePubKey',
             tx: _changePubKey,
             feeType,
             address: this.wallet.address(),
-            token: _changePubKey.feeToken
+            token: _changePubKey.feeToken,
         });
         return this;
     }
@@ -164,14 +164,14 @@ class BatchBuilder {
             fee: forcedExit.fee || 0,
             nonce: null,
             validFrom: forcedExit.validFrom || 0,
-            validUntil: forcedExit.validUntil || utils_1.MAX_TIMESTAMP
+            validUntil: forcedExit.validUntil || utils_1.MAX_TIMESTAMP,
         };
         this.txs.push({
             type: 'ForcedExit',
             tx: _forcedExit,
             feeType: 'Withdraw',
             address: _forcedExit.target,
-            token: _forcedExit.token
+            token: _forcedExit.token,
         });
         return this;
     }
@@ -210,7 +210,7 @@ class BatchBuilder {
                         messages.push(this.wallet.getChangePubKeyEthMessagePart({
                             pubKeyHash: changePubKey.newPkHash,
                             feeToken: tx.token,
-                            fee: changePubKey.fee
+                            fee: changePubKey.fee,
                         }));
                         processedTxs.push({ tx: changePubKey });
                         break;
@@ -224,7 +224,7 @@ class BatchBuilder {
             messages.push(`Nonce: ${batchNonce}`);
             return {
                 txs: processedTxs,
-                message: messages.filter((part) => part.length != 0).join('\n')
+                message: messages.filter((part) => part.length != 0).join('\n'),
             };
         });
     }
