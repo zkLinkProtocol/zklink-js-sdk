@@ -123,7 +123,18 @@ describe('Order', () => {
     const { tx } = signedTransaction as any
     expect(tx.expectBaseAmount).to.eq('50000000000000')
     expect(tx.expectQuoteAmount).to.eq('10000000000000')
-    expect(tx.maker.fee_ratio).to.eq(100)
+    expect(tx.fee).to.eq('0')
+
+    expect(tx.maker.accountId).to.eq(orderMaker.accountId)
+    expect(tx.maker.feeRatio).to.eq(orderMaker.feeRatio)
+    expect(tx.maker.price).to.eq(orderMaker.price.toString())
+    expect(tx.maker.amount).to.eq(orderMaker.amount.toString())
+
+    expect(tx.taker.accountId).to.eq(orderTaker.accountId)
+    expect(tx.taker.feeRatio).to.eq(orderTaker.feeRatio)
+    expect(tx.taker.price).to.eq(orderTaker.price.toString())
+    expect(tx.taker.amount).to.eq(orderTaker.amount.toString())
+
     expect(signedTransaction.ethereumSignature.signature).to.not.empty
     expect(tx.signature.signature).to.not.empty
   })
