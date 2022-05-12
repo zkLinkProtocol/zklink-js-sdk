@@ -106,6 +106,23 @@ describe('Order', () => {
     const wallet = await getWalletFromPrivateKey()
     const maker = await wallet.signSyncOrder(orderMaker as any)
     const taker = await wallet.signSyncOrder(orderTaker as any)
+    const bytes = await serializeOrderMatching({
+      type: 'OrderMatching',
+      accountId: 1,
+      account: '0x3498F456645270eE003441df82C718b56c0e6666',
+      fee: '0',
+      feeToken: 1,
+      nonce: 0,
+      expectBaseAmount: '50000000000000',
+      expectQuoteAmount: '10000000000000',
+      validFrom: 0,
+      validUntil: 9007199254740991,
+      maker: maker.tx,
+      taker: taker.tx,
+    } as any)
+    expect(Buffer.from(bytes).toString('hex')).to.eq(
+      '0b000000013498f456645270ee003441df82c718b56c0e666602a34fb9efd2c2caa522d1c750913818d830a9031bf74fb6659c14250cc35e00010000000000000000000000002d79883d20000000000000000000000009184e72a000'
+    )
     const signedTransaction = await wallet.signSyncOrderMatching({
       type: 'OrderMatching',
       accountId: 1,
