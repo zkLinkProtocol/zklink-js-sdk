@@ -41,7 +41,7 @@ describe('forcedExit', () => {
       ts: 1649749979,
     } as any)
     expect(transaction.txData.tx.signature.signature).eq(
-      'ef55e1f1452c43ffabc8e9dc9c07018e96a6e73f2e719c52537e73f88fbf3f199f17e1db04e27f98dc46ed51b00e106772dddc57f9b1e1e843ca531b54975401'
+      'f85b3d2dfe42aa94da12cfaf1be01433fcc962fdc3d2b86c52c93a2c0d9793a1e409a2682fd77e41c5f603686a24480f4b4722b63d7da8e74245188d78e40803'
     )
   })
 })

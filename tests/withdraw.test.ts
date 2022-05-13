@@ -56,7 +56,7 @@ describe('withdraw', () => {
       '0x52ffffa004c4b9d2bd425bfd5c94a9e0c787be20102baae8f578daaefb0296412dcea35fe60f833537ad0ed3a9b37ffad3ba1c8947f6b01fc3016adc67d33ec31c'
     )
     expect(transaction.txData.tx.signature.signature).to.eq(
-      'b51dd7a9b70977f4d92f847009f93c9299b0a3428fe43f76907d55881d6057ae9fbece85794aec72c6626a94840b30eceaba48369b74432951006d19aae6db05'
+      'c3c7d2f2b4e2afb886ce08d72c50c0a9e9fcf0f00291645f95acd18bda354badb73e19563030596a82eef410293f7012ab1b40fa73a182677dea918a1e162b04'
     )
   })
 })

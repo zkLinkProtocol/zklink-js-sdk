@@ -15,7 +15,30 @@
       "0xDDdddddddddddddddddddddddddddddddddddddd",
       "0xFFffffffffffffffffffffffffffffffffffffff"
     ],
+    "symbol": "USDC",
+    "decimals": 18,
+    "stable": false,
+    "fast_withdraw": false
+  },
+  {
+    "id": 6,
+    "chains": [1, 2, 3, 4],
+    "address": [
+      "0xe583769738b6dd4e7caf8451050d1948be717679",
+      "0xcdba597900674206504f4b4e2116b224455bbe9b",
+      "0xa689352b7c1cad82864beb1d90679356d3962f4d",
+      "0xe583769738b6dd4e7caf8451050d1948be717679"
+    ],
     "symbol": "USDT",
+    "decimals": 18,
+    "stable": false,
+    "fast_withdraw": false
+  },
+  {
+    "id": 7,
+    "chains": [4],
+    "address": ["0xb809b9b2dc5e93cb863176ea2d565425b03c0540"],
+    "symbol": "BUSD",
     "decimals": 18,
     "stable": false,
     "fast_withdraw": false
