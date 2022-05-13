@@ -79,7 +79,7 @@ describe('Order', () => {
     )
   })
 
-  it('signature', async function () {
+  it('sign sync order', async function () {
     const wallet = await getWalletFromPrivateKey()
     const signedTransaction = await wallet.signSyncOrder({
       accountId: 13,
@@ -102,7 +102,7 @@ describe('Order', () => {
     )
   })
 
-  it('signature', async function () {
+  it('sign sync order matching', async function () {
     const wallet = await getWalletFromPrivateKey()
     const maker = await wallet.signSyncOrder(orderMaker as any)
     const taker = await wallet.signSyncOrder(orderTaker as any)

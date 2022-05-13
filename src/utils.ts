@@ -851,14 +851,8 @@ export async function serializeOrderMatching(matching: OrderMatching): Promise<U
   const accountBytes = serializeAddress(matching.account)
   const feeTokenBytes = serializeTokenId(matching.feeToken)
   const feeBytes = serializeFeePacked(matching.fee)
-  const expectBaseAmountBytes = bigintToBytesBE(
-    BigNumber.from(matching.expectBaseAmount).toBigInt(),
-    16
-  )
-  const expectQuoteAmountBytes = bigintToBytesBE(
-    BigNumber.from(matching.expectQuoteAmount).toBigInt(),
-    16
-  )
+  const expectBaseAmountBytes = serializeAmountFull(matching.expectBaseAmount)
+  const expectQuoteAmountBytes = serializeAmountFull(matching.expectQuoteAmount)
   return ethers.utils.concat([
     type,
     accountIdBytes,
