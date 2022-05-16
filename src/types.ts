@@ -363,7 +363,8 @@ export interface Order {
   amount: BigNumberish
   price: BigNumberish
   isSell: number
-  feeRatio: number
+  feeRatio1: number // be used for make
+  feeRatio2: number // be used for taker
   validFrom: number
   validUntil: number
   signature?: Signature

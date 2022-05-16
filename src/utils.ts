@@ -816,7 +816,8 @@ export function serializeOrder(order: Order): Uint8Array {
   const quoteTokenIdBytes = serializeTokenId(order.quoteTokenId)
   const priceBytes = bigintToBytesBE(BigNumber.from(order.price).toBigInt(), 15)
   const isSellBytes = numberToBytesBE(order.isSell, 1)
-  const feeRatioBytes = numberToBytesBE(order.feeRatio, 1)
+  const feeRatio1Bytes = numberToBytesBE(order.feeRatio1, 1)
+  const feeRatio2Bytes = numberToBytesBE(order.feeRatio2, 1)
   const amountBytes = serializeAmountPacked(order.amount)
   const validFrom = numberToBytesBE(order.validFrom, 8)
   const validUntil = bigintToBytesBE(BigNumber.from(String(order.validUntil)).toBigInt(), 8)
@@ -830,7 +831,8 @@ export function serializeOrder(order: Order): Uint8Array {
     quoteTokenIdBytes,
     priceBytes,
     isSellBytes,
-    feeRatioBytes,
+    feeRatio1Bytes,
+    feeRatio2Bytes,
     amountBytes,
     validFrom,
     validUntil,

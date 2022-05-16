@@ -213,7 +213,7 @@ class DummyTransport extends AbstractJSONRPCTransport {
             if (method == 'tokens') {
                 const tokensList = this.getTokens();
                 const tokens = {};
-                for (const tokenItem of tokensList.slice(0, 3)) {
+                for (const tokenItem of tokensList) {
                     const token = {
                         chains: tokenItem.chains,
                         address: tokenItem.address,
