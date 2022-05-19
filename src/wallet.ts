@@ -718,7 +718,13 @@ export class Wallet {
     const ethereumSignature =
       this.ethSigner instanceof Create2WalletSigner
         ? null
-        : await this.ethMessageSigner.ethSignOrder(payload)
+        : await this.ethMessageSigner.ethSignOrder({
+            ...payload,
+            stringPrice: utils.formatEther(payload.price),
+            stringAmount: utils.formatEther(payload.amount),
+            baseTokenSymbol: this.provider.tokenSet.resolveTokenSymbol(payload.baseTokenId),
+            quoteTokenSymbol: this.provider.tokenSet.resolveTokenSymbol(payload.quoteTokenId),
+          } as any)
     return {
       tx: signedTransferTransaction,
       ethereumSignature,

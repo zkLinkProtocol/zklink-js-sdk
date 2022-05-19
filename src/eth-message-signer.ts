@@ -380,12 +380,26 @@ export class EthMessageSigner {
     return message
   }
 
-  async ethSignOrder(payload: Order): Promise<TxEthSignature> {
+  async ethSignOrder(
+    payload: Order & {
+      stringPrice: string
+      stringAmount: string
+      baseTokenSymbol: string
+      quoteTokenSymbol: string
+    }
+  ): Promise<TxEthSignature> {
     const message = this.getOrderEthSignMessage(payload)
     return await this.getEthMessageSignature(message)
   }
 
-  getOrderEthSignMessage(payload: Order): string {
+  getOrderEthSignMessage(
+    payload: Order & {
+      stringPrice: string
+      stringAmount: string
+      baseTokenSymbol: string
+      quoteTokenSymbol: string
+    }
+  ): string {
     let humanReadableTxInfo = this.getOrderEthMessagePart(payload)
     if (humanReadableTxInfo.length != 0) {
       humanReadableTxInfo += '\n'
@@ -394,9 +408,20 @@ export class EthMessageSigner {
 
     return humanReadableTxInfo
   }
-  getOrderEthMessagePart(tx: Order): string {
+  getOrderEthMessagePart(
+    tx: Order & {
+      stringPrice: string
+      stringAmount: string
+      baseTokenSymbol: string
+      quoteTokenSymbol: string
+    }
+  ): string {
     let message = ''
     message += `Order`
+    message += '\n'
+    message += `${tx.baseTokenSymbol} - ${tx.quoteTokenSymbol}`
+    message += '\n'
+    message += `Price: ${tx.stringPrice}, Amount: ${tx.stringAmount}`
     message += '\n'
     return message
   }

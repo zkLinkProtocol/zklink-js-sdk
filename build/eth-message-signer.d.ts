@@ -197,9 +197,24 @@ export declare class EthMessageSigner {
         nonce: number;
         pairAccount: Address;
     }): string;
-    ethSignOrder(payload: Order): Promise<TxEthSignature>;
-    getOrderEthSignMessage(payload: Order): string;
-    getOrderEthMessagePart(tx: Order): string;
+    ethSignOrder(payload: Order & {
+        stringPrice: string;
+        stringAmount: string;
+        baseTokenSymbol: string;
+        quoteTokenSymbol: string;
+    }): Promise<TxEthSignature>;
+    getOrderEthSignMessage(payload: Order & {
+        stringPrice: string;
+        stringAmount: string;
+        baseTokenSymbol: string;
+        quoteTokenSymbol: string;
+    }): string;
+    getOrderEthMessagePart(tx: Order & {
+        stringPrice: string;
+        stringAmount: string;
+        baseTokenSymbol: string;
+        quoteTokenSymbol: string;
+    }): string;
     getCreatePoolEthMessagePart(tx: {
         token0: string;
         token1: string;

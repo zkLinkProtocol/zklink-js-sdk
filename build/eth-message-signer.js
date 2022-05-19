@@ -233,6 +233,10 @@ class EthMessageSigner {
         let message = '';
         message += `Order`;
         message += '\n';
+        message += `${tx.baseTokenSymbol} - ${tx.quoteTokenSymbol}`;
+        message += '\n';
+        message += `Price: ${tx.stringPrice}, Amount: ${tx.stringAmount}`;
+        message += '\n';
         return message;
     }
     getCreatePoolEthMessagePart(tx) {

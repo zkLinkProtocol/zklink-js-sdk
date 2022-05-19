@@ -458,7 +458,7 @@ class Wallet {
             const signedTransferTransaction = yield this.getOrder(payload);
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
-                : yield this.ethMessageSigner.ethSignOrder(payload);
+                : yield this.ethMessageSigner.ethSignOrder(Object.assign(Object.assign({}, payload), { stringPrice: ethers_1.utils.formatEther(payload.price), stringAmount: ethers_1.utils.formatEther(payload.amount), baseTokenSymbol: this.provider.tokenSet.resolveTokenSymbol(payload.baseTokenId), quoteTokenSymbol: this.provider.tokenSet.resolveTokenSymbol(payload.quoteTokenId) }));
             return {
                 tx: signedTransferTransaction,
                 ethereumSignature,
