@@ -426,7 +426,7 @@ export class EthMessageSigner {
       message += `Order for ${tx.stringAmount} ${tx.quoteTokenSymbol} -> ${tx.baseTokenSymbol}`
     }
     message += '\n'
-    message += `Price: ${tx.stringPrice}, Amount: ${tx.stringAmount}`
+    message += `Price: ${tx.stringPrice}`
     message += '\n'
     message += `Address: ${tx.address}`
     message += '\n'
