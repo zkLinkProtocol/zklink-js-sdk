@@ -720,6 +720,7 @@ export class Wallet {
         ? null
         : await this.ethMessageSigner.ethSignOrder({
             ...payload,
+            address: this.address(),
             stringPrice: utils.formatEther(payload.price),
             stringAmount: utils.formatEther(payload.amount),
             baseTokenSymbol: this.provider.tokenSet.resolveTokenSymbol(payload.baseTokenId),

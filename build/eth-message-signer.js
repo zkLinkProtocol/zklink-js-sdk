@@ -231,11 +231,16 @@ class EthMessageSigner {
     }
     getOrderEthMessagePart(tx) {
         let message = '';
-        message += `Order`;
-        message += '\n';
-        message += `${tx.baseTokenSymbol} - ${tx.quoteTokenSymbol}`;
+        if (tx.isSell) {
+            message += `Order for ${tx.stringAmount} ${tx.baseTokenSymbol} -> ${tx.quoteTokenSymbol}`;
+        }
+        else {
+            message += `Order for ${tx.stringAmount} ${tx.quoteTokenSymbol} -> ${tx.baseTokenSymbol}`;
+        }
         message += '\n';
         message += `Price: ${tx.stringPrice}, Amount: ${tx.stringAmount}`;
+        message += '\n';
+        message += `Address: ${tx.address}`;
         message += '\n';
         return message;
     }
