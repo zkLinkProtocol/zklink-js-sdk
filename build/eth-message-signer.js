@@ -238,7 +238,7 @@ class EthMessageSigner {
             message += `Order for ${tx.stringAmount} ${tx.quoteTokenSymbol} -> ${tx.baseTokenSymbol}`;
         }
         message += '\n';
-        message += `Price: ${tx.stringPrice}`;
+        message += `Price: ${tx.stringPrice} ${tx.quoteTokenSymbol}`;
         message += '\n';
         message += `Address: ${tx.address}`;
         message += '\n';
