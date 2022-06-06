@@ -579,24 +579,24 @@ export class EthMessageSigner {
     return await this.getEthMessageSignature(message)
   }
 
-  getChangePubKeyEthSignMessage(changePubKey: {
-    pubKeyHash: PubKeyHash
-    nonce: number
-    accountId: number
-  }): Uint8Array {
-    return getChangePubkeyMessage(
-      changePubKey.pubKeyHash,
-      changePubKey.nonce,
-      changePubKey.accountId
-    )
-  }
+  // getChangePubKeyEthSignMessage(changePubKey: {
+  //   pubKeyHash: PubKeyHash
+  //   nonce: number
+  //   accountId: number
+  // }): Uint8Array {
+  //   return getChangePubkeyMessage(
+  //     changePubKey.pubKeyHash,
+  //     changePubKey.nonce,
+  //     changePubKey.accountId
+  //   )
+  // }
 
-  async ethSignChangePubKey(changePubKey: {
-    pubKeyHash: PubKeyHash
-    nonce: number
-    accountId: number
-  }): Promise<TxEthSignature> {
-    const message = this.getChangePubKeyEthSignMessage(changePubKey)
-    return await this.getEthMessageSignature(message)
-  }
+  // async ethSignChangePubKey(changePubKey: {
+  //   pubKeyHash: PubKeyHash
+  //   nonce: number
+  //   accountId: number
+  // }): Promise<TxEthSignature> {
+  //   const message = this.getChangePubKeyEthSignMessage(changePubKey)
+  //   return await this.getEthMessageSignature(message)
+  // }
 }

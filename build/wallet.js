@@ -75,6 +75,22 @@ class Wallet {
             return wallet;
         });
     }
+    getEIP712Signature(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.ethSignerType == null) {
+                throw new Error('ethSignerType is unknown');
+            }
+            console.log('signature data', data);
+            const signature = yield (0, utils_1.signMessageEIP712)(this.ethSigner, data);
+            console.log('signature', signature);
+            return {
+                type: this.ethSignerType.verificationMethod === 'ECDSA'
+                    ? 'EthereumSignature'
+                    : 'EIP1271Signature',
+                signature,
+            };
+        });
+    }
     getEthMessageSignature(message) {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.ethSignerType == null) {
@@ -578,8 +594,11 @@ class Wallet {
             }
             else if (changePubKey.ethAuthType === 'ECDSA') {
                 yield this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSA.');
-                const changePubKeyMessage = (0, utils_1.getChangePubkeyMessage)(newPubKeyHash, changePubKey.nonce, changePubKey.accountId || this.accountId, changePubKey.batchHash);
-                const ethSignature = (yield this.getEthMessageSignature(changePubKeyMessage)).signature;
+                let verifyingContract = changePubKey.verifyingContract ||
+                    (yield this.provider.getContractAddress(changePubKey.linkChainId)).mainContract;
+                let chainId = changePubKey.chainId || Number(yield this.ethSigner.getChainId());
+                const changePubKeySignData = (0, utils_1.getChangePubkeyMessage)(newPubKeyHash, changePubKey.nonce, changePubKey.accountId || this.accountId, verifyingContract, changePubKey.domainName || 'ZkLink', changePubKey.version || '1', chainId);
+                const ethSignature = (yield this.getEIP712Signature(changePubKeySignData)).signature;
                 ethAuthData = {
                     type: 'ECDSA',
                     ethSignature,

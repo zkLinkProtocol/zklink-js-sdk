@@ -21,6 +21,7 @@ export declare class Wallet {
     static fromEthSigner(ethWallet: ethers.Signer, provider: Provider, signer?: Signer, accountId?: number, ethSignerType?: EthSignerType): Promise<Wallet>;
     static fromCreate2Data(syncSigner: Signer, provider: Provider, create2Data: Create2Data, accountId?: number): Promise<Wallet>;
     static fromEthSignerNoKeys(ethWallet: ethers.Signer, provider: Provider, accountId?: number, ethSignerType?: EthSignerType): Promise<Wallet>;
+    getEIP712Signature(data: any): Promise<TxEthSignature>;
     getEthMessageSignature(message: ethers.utils.BytesLike): Promise<TxEthSignature>;
     batchBuilder(nonce?: Nonce): BatchBuilder;
     getTransfer(transfer: {
@@ -244,10 +245,15 @@ export declare class Wallet {
         validUntil: number;
     }): Promise<ChangePubKey>;
     signSetSigningKey(changePubKey: {
+        linkChainId: number;
         feeToken: TokenLike;
         fee: BigNumberish;
         nonce: number;
         ethAuthType: ChangePubkeyTypes;
+        verifyingContract?: string;
+        chainId?: number;
+        domainName?: string;
+        version?: string;
         accountId?: number;
         batchHash?: string;
         ts?: number;
@@ -255,8 +261,13 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<SignedTransaction>;
     setSigningKey(changePubKey: {
+        linkChainId: number;
         feeToken: TokenLike;
         ethAuthType: ChangePubkeyTypes;
+        chainId?: number;
+        verifyingContract?: Address;
+        domainName?: string;
+        version?: string;
         fee?: BigNumberish;
         nonce?: Nonce;
         validFrom?: number;

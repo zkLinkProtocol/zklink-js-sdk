@@ -33,6 +33,7 @@ import {
   TokenSymbol,
   TokenAddress,
   OrderMatching,
+  ContractAddress,
 } from './types'
 import {
   ERC20_APPROVE_TRESHOLD,
@@ -48,6 +49,7 @@ import {
   getEthereumBalance,
   ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT,
   getTimestamp,
+  signMessageEIP712,
 } from './utils'
 
 const EthersErrorCode = ErrorCode
@@ -136,6 +138,24 @@ export class Wallet {
     )
     wallet.connect(provider)
     return wallet
+  }
+
+  async getEIP712Signature(data: any): Promise<TxEthSignature> {
+    if (this.ethSignerType == null) {
+      throw new Error('ethSignerType is unknown')
+    }
+
+    console.log('signature data', data)
+    const signature = await signMessageEIP712(this.ethSigner, data)
+    console.log('signature', signature)
+
+    return {
+      type:
+        this.ethSignerType.verificationMethod === 'ECDSA'
+          ? 'EthereumSignature'
+          : 'EIP1271Signature',
+      signature,
+    }
   }
 
   async getEthMessageSignature(message: ethers.utils.BytesLike): Promise<TxEthSignature> {
@@ -893,10 +913,15 @@ export class Wallet {
   }
 
   async signSetSigningKey(changePubKey: {
+    linkChainId: number
     feeToken: TokenLike
     fee: BigNumberish
     nonce: number
     ethAuthType: ChangePubkeyTypes
+    verifyingContract?: string
+    chainId?: number
+    domainName?: string
+    version?: string
     accountId?: number
     batchHash?: string
     ts?: number
@@ -915,13 +940,20 @@ export class Wallet {
       }
     } else if (changePubKey.ethAuthType === 'ECDSA') {
       await this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSA.')
-      const changePubKeyMessage = getChangePubkeyMessage(
+      let verifyingContract =
+        changePubKey.verifyingContract ||
+        (await this.provider.getContractAddress(changePubKey.linkChainId)).mainContract
+      let chainId = changePubKey.chainId || Number(await this.ethSigner.getChainId())
+      const changePubKeySignData = getChangePubkeyMessage(
         newPubKeyHash,
         changePubKey.nonce,
         changePubKey.accountId || this.accountId,
-        changePubKey.batchHash
+        verifyingContract,
+        changePubKey.domainName || 'ZkLink',
+        changePubKey.version || '1',
+        chainId
       )
-      const ethSignature = (await this.getEthMessageSignature(changePubKeyMessage)).signature
+      const ethSignature = (await this.getEIP712Signature(changePubKeySignData)).signature
       ethAuthData = {
         type: 'ECDSA',
         ethSignature,
@@ -954,8 +986,13 @@ export class Wallet {
   }
 
   async setSigningKey(changePubKey: {
+    linkChainId: number
     feeToken: TokenLike
     ethAuthType: ChangePubkeyTypes
+    chainId?: number
+    verifyingContract?: Address
+    domainName?: string
+    version?: string
     fee?: BigNumberish
     nonce?: Nonce
     validFrom?: number

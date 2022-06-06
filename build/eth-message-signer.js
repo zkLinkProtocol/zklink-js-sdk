@@ -329,14 +329,5 @@ class EthMessageSigner {
             return yield this.getEthMessageSignature(message);
         });
     }
-    getChangePubKeyEthSignMessage(changePubKey) {
-        return (0, utils_1.getChangePubkeyMessage)(changePubKey.pubKeyHash, changePubKey.nonce, changePubKey.accountId);
-    }
-    ethSignChangePubKey(changePubKey) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const message = this.getChangePubKeyEthSignMessage(changePubKey);
-            return yield this.getEthMessageSignature(message);
-        });
-    }
 }
 exports.EthMessageSigner = EthMessageSigner;

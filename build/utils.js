@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.serializeFeeRatio = exports.serializeChainId = exports.serializeNonce = exports.serializeFeePacked = exports.serializeAmountFull = exports.serializeAmountPacked = exports.serializeTokenId = exports.serializeSubAccountId = exports.serializeAccountId = exports.serializeAddress = exports.getEthSignatureType = exports.verifyERC1271Signature = exports.signMessagePersonalAPI = exports.getSignedBytesFromMessage = exports.getChangePubkeyMessage = exports.TokenSet = exports.isTokenETH = exports.sleep = exports.buffer2bitsBE = exports.isTransactionFeePackable = exports.closestGreaterOrEqPackableTransactionFee = exports.closestPackableTransactionFee = exports.isTransactionAmountPackable = exports.closestGreaterOrEqPackableTransactionAmount = exports.closestPackableTransactionAmount = exports.packFeeChecked = exports.packAmountChecked = exports.reverseBits = exports.integerToFloatUp = exports.integerToFloat = exports.bitsIntoBytesInBEOrder = exports.floatToInteger = exports.TOTAL_CHAIN_NUM = exports.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ERC20_APPROVE_TRESHOLD = exports.MAX_ERC20_APPROVE_AMOUNT = exports.ERC20_DEPOSIT_GAS_LIMIT = exports.MULTICALL_INTERFACE = exports.IEIP1271_INTERFACE = exports.SYNC_GOV_CONTRACT_INTERFACE = exports.ZKL_CONTRACT_INTERFACE = exports.SYNC_EXIT_CONTRACT_INTERFACE = exports.SYNC_MAIN_CONTRACT_INTERFACE = exports.IERC20_INTERFACE = exports.MAX_UNONCE = exports.MIN_UNONCE = exports.MAX_TIMESTAMP = void 0;
-exports.getTimestamp = exports.chainsCompletion = exports.getFastSwapUNonce = exports.getRandom = exports.getTxHash = exports.getPendingBalance = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.parseHexWithPrefix = exports.bigintToBytesBE = exports.numberToBytesBE = exports.serializeTx = exports.serializeOrderMatching = exports.serializeOrder = exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeCurveRemoveLiquidity = exports.serializeCurveSwap = exports.serializeCurveAddLiquidity = exports.serializeTransfer = exports.serializeWithdraw = exports.serializeTimestamp = exports.serializeFastWithdraw = void 0;
+exports.serializeChainId = exports.serializeNonce = exports.serializeFeePacked = exports.serializeAmountFull = exports.serializeAmountPacked = exports.serializeTokenId = exports.serializeSubAccountId = exports.serializeAccountId = exports.serializeAddress = exports.getEthSignatureType = exports.verifyERC1271Signature = exports.signMessageEIP712 = exports.signMessagePersonalAPI = exports.getSignedBytesFromMessage = exports.getChangePubkeyMessage = exports.TokenSet = exports.isTokenETH = exports.sleep = exports.buffer2bitsBE = exports.isTransactionFeePackable = exports.closestGreaterOrEqPackableTransactionFee = exports.closestPackableTransactionFee = exports.isTransactionAmountPackable = exports.closestGreaterOrEqPackableTransactionAmount = exports.closestPackableTransactionAmount = exports.packFeeChecked = exports.packAmountChecked = exports.reverseBits = exports.integerToFloatUp = exports.integerToFloat = exports.bitsIntoBytesInBEOrder = exports.floatToInteger = exports.TOTAL_CHAIN_NUM = exports.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ERC20_APPROVE_TRESHOLD = exports.MAX_ERC20_APPROVE_AMOUNT = exports.ERC20_DEPOSIT_GAS_LIMIT = exports.MULTICALL_INTERFACE = exports.IEIP1271_INTERFACE = exports.SYNC_GOV_CONTRACT_INTERFACE = exports.ZKL_CONTRACT_INTERFACE = exports.SYNC_EXIT_CONTRACT_INTERFACE = exports.SYNC_MAIN_CONTRACT_INTERFACE = exports.IERC20_INTERFACE = exports.MAX_UNONCE = exports.MIN_UNONCE = exports.MAX_TIMESTAMP = void 0;
+exports.getTimestamp = exports.chainsCompletion = exports.getFastSwapUNonce = exports.getRandom = exports.getTxHash = exports.getPendingBalance = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.parseHexWithPrefix = exports.bigintToBytesBE = exports.numberToBytesBE = exports.serializeTx = exports.serializeOrderMatching = exports.serializeOrder = exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeCurveRemoveLiquidity = exports.serializeCurveSwap = exports.serializeCurveAddLiquidity = exports.serializeTransfer = exports.serializeWithdraw = exports.serializeTimestamp = exports.serializeFastWithdraw = exports.serializeFeeRatio = void 0;
 const ethers_1 = require("ethers");
 const zksync_crypto_1 = require("zksync-crypto");
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
@@ -332,12 +332,43 @@ class TokenSet {
     }
 }
 exports.TokenSet = TokenSet;
-function getChangePubkeyMessage(pubKeyHash, nonce, accountId, batchHash) {
-    const msgBatchHash = batchHash == undefined ? new Uint8Array(32).fill(0) : ethers_1.ethers.utils.arrayify(batchHash);
-    const msgNonce = serializeNonce(nonce);
-    const msgAccId = serializeAccountId(accountId);
-    const msgPubKeyHash = serializeAddress(pubKeyHash);
-    return ethers_1.ethers.utils.concat([msgPubKeyHash, msgNonce, msgAccId, msgBatchHash]);
+function getChangePubkeyMessage(pubKeyHash, nonce, accountId, verifyingContract, domainName, version, chainId) {
+    const domainType = [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+        { name: 'chainId', type: 'uint256' },
+        { name: 'verifyingContract', type: 'address' },
+    ];
+    const ChangePubKey = [
+        { name: 'pubKeyHash', type: 'bytes20' },
+        { name: 'nonce', type: 'uint32' },
+        { name: 'accountId', type: 'uint32' },
+    ];
+    // All properties on a domain are optional
+    const domain = {
+        name: domainName,
+        version,
+        chainId,
+        verifyingContract,
+    };
+    // The named list of all type definitions
+    const types = {
+        EIP712Domain: domainType,
+        ChangePubKey,
+    };
+    // The data to sign
+    const message = {
+        pubKeyHash: pubKeyHash.replace(/^sync:/, '0x'),
+        nonce,
+        accountId,
+    };
+    const data = {
+        types,
+        domain,
+        primaryType: 'ChangePubKey',
+        message,
+    };
+    return data;
 }
 exports.getChangePubkeyMessage = getChangePubkeyMessage;
 function getSignedBytesFromMessage(message, addPrefix) {
@@ -372,6 +403,19 @@ function signMessagePersonalAPI(signer, message) {
     });
 }
 exports.signMessagePersonalAPI = signMessagePersonalAPI;
+function signMessageEIP712(signer, data) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (signer instanceof ethers_1.ethers.providers.JsonRpcSigner) {
+            return signer.provider
+                .send('eth_signTypedData_v3', [yield signer.getAddress(), JSON.stringify(data)])
+                .then((sign) => sign, (err) => {
+                console.log(err);
+                throw err;
+            });
+        }
+    });
+}
+exports.signMessageEIP712 = signMessageEIP712;
 function verifyERC1271Signature(address, message, signature, signerOrProvider) {
     return __awaiter(this, void 0, void 0, function* () {
         const EIP1271_SUCCESS_VALUE = '0x1626ba7e';

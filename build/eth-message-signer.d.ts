@@ -284,14 +284,4 @@ export declare class EthMessageSigner {
         nonce: number;
         accountId: number;
     }): Promise<TxEthSignature>;
-    getChangePubKeyEthSignMessage(changePubKey: {
-        pubKeyHash: PubKeyHash;
-        nonce: number;
-        accountId: number;
-    }): Uint8Array;
-    ethSignChangePubKey(changePubKey: {
-        pubKeyHash: PubKeyHash;
-        nonce: number;
-        accountId: number;
-    }): Promise<TxEthSignature>;
 }

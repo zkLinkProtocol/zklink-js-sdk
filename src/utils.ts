@@ -20,6 +20,7 @@ import {
   Order,
   ChainId,
   OrderMatching,
+  ContractAddress,
 } from './types'
 
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
@@ -412,14 +413,47 @@ export function getChangePubkeyMessage(
   pubKeyHash: PubKeyHash,
   nonce: number,
   accountId: number,
-  batchHash?: string
-): Uint8Array {
-  const msgBatchHash =
-    batchHash == undefined ? new Uint8Array(32).fill(0) : ethers.utils.arrayify(batchHash)
-  const msgNonce = serializeNonce(nonce)
-  const msgAccId = serializeAccountId(accountId)
-  const msgPubKeyHash = serializeAddress(pubKeyHash)
-  return ethers.utils.concat([msgPubKeyHash, msgNonce, msgAccId, msgBatchHash])
+  verifyingContract: string,
+  domainName: string,
+  version: string,
+  chainId: number
+): any {
+  const domainType = [
+    { name: 'name', type: 'string' },
+    { name: 'version', type: 'string' },
+    { name: 'chainId', type: 'uint256' },
+    { name: 'verifyingContract', type: 'address' },
+  ]
+  const ChangePubKey = [
+    { name: 'pubKeyHash', type: 'bytes20' },
+    { name: 'nonce', type: 'uint32' },
+    { name: 'accountId', type: 'uint32' },
+  ]
+  // All properties on a domain are optional
+  const domain = {
+    name: domainName,
+    version,
+    chainId,
+    verifyingContract,
+  }
+  // The named list of all type definitions
+  const types = {
+    EIP712Domain: domainType,
+    ChangePubKey,
+  }
+  // The data to sign
+  const message = {
+    pubKeyHash: pubKeyHash.replace(/^sync:/, '0x'),
+    nonce,
+    accountId,
+  }
+  const data = {
+    types,
+    domain,
+    primaryType: 'ChangePubKey',
+    message,
+  }
+  return data
 }
 
 export function getSignedBytesFromMessage(
@@ -458,6 +492,20 @@ export async function signMessagePersonalAPI(
       )
   } else {
     return signer.signMessage(message)
+  }
+}
+
+export async function signMessageEIP712(signer: ethers.Signer, data: any): Promise<string> {
+  if (signer instanceof ethers.providers.JsonRpcSigner) {
+    return signer.provider
+      .send('eth_signTypedData_v3', [await signer.getAddress(), JSON.stringify(data)])
+      .then(
+        (sign) => sign,
+        (err) => {
+          console.log(err)
+          throw err
+        }
+      )
   }
 }
 
