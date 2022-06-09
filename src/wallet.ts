@@ -145,9 +145,7 @@ export class Wallet {
       throw new Error('ethSignerType is unknown')
     }
 
-    console.log('signature data', data)
     const signature = await signMessageEIP712(this.ethSigner, data)
-    console.log('signature', signature)
 
     return {
       type:

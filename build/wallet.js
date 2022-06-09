@@ -80,9 +80,7 @@ class Wallet {
             if (this.ethSignerType == null) {
                 throw new Error('ethSignerType is unknown');
             }
-            console.log('signature data', data);
             const signature = yield (0, utils_1.signMessageEIP712)(this.ethSigner, data);
-            console.log('signature', signature);
             return {
                 type: this.ethSignerType.verificationMethod === 'ECDSA'
                     ? 'EthereumSignature'
