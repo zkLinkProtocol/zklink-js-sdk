@@ -911,13 +911,12 @@ export class Wallet {
   }
 
   async signSetSigningKey(changePubKey: {
-    linkChainId: number
     feeToken: TokenLike
     fee: BigNumberish
     nonce: number
     ethAuthType: ChangePubkeyTypes
-    verifyingContract?: string
-    chainId?: number
+    verifyingContract: string
+    chainId: number
     domainName?: string
     version?: string
     accountId?: number
@@ -938,18 +937,14 @@ export class Wallet {
       }
     } else if (changePubKey.ethAuthType === 'ECDSA') {
       await this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSA.')
-      let verifyingContract =
-        changePubKey.verifyingContract ||
-        (await this.provider.getContractAddress(changePubKey.linkChainId)).mainContract
-      let chainId = changePubKey.chainId || Number(await this.ethSigner.getChainId())
       const changePubKeySignData = getChangePubkeyMessage(
         newPubKeyHash,
         changePubKey.nonce,
         changePubKey.accountId || this.accountId,
-        verifyingContract,
+        changePubKey.verifyingContract,
         changePubKey.domainName || 'ZkLink',
         changePubKey.version || '1',
-        chainId
+        changePubKey.chainId
       )
       const ethSignature = (await this.getEIP712Signature(changePubKeySignData)).signature
       ethAuthData = {
@@ -984,11 +979,10 @@ export class Wallet {
   }
 
   async setSigningKey(changePubKey: {
-    linkChainId: number
     feeToken: TokenLike
     ethAuthType: ChangePubkeyTypes
-    chainId?: number
-    verifyingContract?: Address
+    chainId: number
+    verifyingContract: Address
     domainName?: string
     version?: string
     fee?: BigNumberish
