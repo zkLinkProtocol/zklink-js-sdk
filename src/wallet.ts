@@ -733,20 +733,9 @@ export class Wallet {
     payload.validUntil = payload.validUntil || 9007199254740991
     const signedTransferTransaction = await this.getOrder(payload as any)
 
-    const ethereumSignature =
-      this.ethSigner instanceof Create2WalletSigner
-        ? null
-        : await this.ethMessageSigner.ethSignOrder({
-            ...payload,
-            address: this.address(),
-            stringPrice: utils.formatEther(payload.price),
-            stringAmount: utils.formatEther(payload.amount),
-            baseTokenSymbol: this.provider.tokenSet.resolveTokenSymbol(payload.baseTokenId),
-            quoteTokenSymbol: this.provider.tokenSet.resolveTokenSymbol(payload.quoteTokenId),
-          } as any)
     return {
       tx: signedTransferTransaction,
-      ethereumSignature,
+      ethereumSignature: null,
     }
   }
 

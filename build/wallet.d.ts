@@ -245,13 +245,12 @@ export declare class Wallet {
         validUntil: number;
     }): Promise<ChangePubKey>;
     signSetSigningKey(changePubKey: {
-        linkChainId: number;
         feeToken: TokenLike;
         fee: BigNumberish;
         nonce: number;
         ethAuthType: ChangePubkeyTypes;
-        verifyingContract?: string;
-        chainId?: number;
+        verifyingContract: string;
+        chainId: number;
         domainName?: string;
         version?: string;
         accountId?: number;
@@ -261,11 +260,10 @@ export declare class Wallet {
         validUntil?: number;
     }): Promise<SignedTransaction>;
     setSigningKey(changePubKey: {
-        linkChainId: number;
         feeToken: TokenLike;
         ethAuthType: ChangePubkeyTypes;
-        chainId?: number;
-        verifyingContract?: Address;
+        chainId: number;
+        verifyingContract: Address;
         domainName?: string;
         version?: string;
         fee?: BigNumberish;

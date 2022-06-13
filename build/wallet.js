@@ -470,12 +470,9 @@ class Wallet {
             payload.validFrom = payload.validFrom || 0;
             payload.validUntil = payload.validUntil || 9007199254740991;
             const signedTransferTransaction = yield this.getOrder(payload);
-            const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
-                ? null
-                : yield this.ethMessageSigner.ethSignOrder(Object.assign(Object.assign({}, payload), { address: this.address(), stringPrice: ethers_1.utils.formatEther(payload.price), stringAmount: ethers_1.utils.formatEther(payload.amount), baseTokenSymbol: this.provider.tokenSet.resolveTokenSymbol(payload.baseTokenId), quoteTokenSymbol: this.provider.tokenSet.resolveTokenSymbol(payload.quoteTokenId) }));
             return {
                 tx: signedTransferTransaction,
-                ethereumSignature,
+                ethereumSignature: null,
             };
         });
     }
@@ -592,10 +589,7 @@ class Wallet {
             }
             else if (changePubKey.ethAuthType === 'ECDSA') {
                 yield this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSA.');
-                let verifyingContract = changePubKey.verifyingContract ||
-                    (yield this.provider.getContractAddress(changePubKey.linkChainId)).mainContract;
-                let chainId = changePubKey.chainId || Number(yield this.ethSigner.getChainId());
-                const changePubKeySignData = (0, utils_1.getChangePubkeyMessage)(newPubKeyHash, changePubKey.nonce, changePubKey.accountId || this.accountId, verifyingContract, changePubKey.domainName || 'ZkLink', changePubKey.version || '1', chainId);
+                const changePubKeySignData = (0, utils_1.getChangePubkeyMessage)(newPubKeyHash, changePubKey.nonce, changePubKey.accountId || this.accountId, changePubKey.verifyingContract, changePubKey.domainName || 'ZkLink', changePubKey.version || '1', changePubKey.chainId);
                 const ethSignature = (yield this.getEIP712Signature(changePubKeySignData)).signature;
                 ethAuthData = {
                     type: 'ECDSA',
