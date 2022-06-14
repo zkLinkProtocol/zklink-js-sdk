@@ -207,13 +207,13 @@ class Wallet {
                 throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('perform a Forced Exit');
-            const tokenId = this.provider.tokenSet.resolveTokenId(forcedExit.token);
             const transactionData = {
                 toChainId: forcedExit.toChainId,
                 subAccountId: forcedExit.subAccountId,
                 initiatorAccountId: this.accountId,
                 target: forcedExit.target,
-                tokenId,
+                sourceToken: this.provider.tokenSet.resolveTokenId(forcedExit.sourceToken),
+                targetToken: this.provider.tokenSet.resolveTokenId(forcedExit.targetToken),
                 fee: forcedExit.fee,
                 ts: forcedExit.ts,
                 nonce: forcedExit.nonce,
@@ -230,7 +230,7 @@ class Wallet {
             const stringFee = ethers_1.BigNumber.from(forcedExit.fee).isZero()
                 ? null
                 : ethers_1.utils.formatEther(forcedExit.fee);
-            const stringToken = this.provider.tokenSet.resolveTokenSymbol(forcedExit.token);
+            const stringToken = this.provider.tokenSet.resolveTokenSymbol(forcedExit.sourceToken);
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
                 : yield this.ethMessageSigner.ethSignForcedExit({
@@ -251,7 +251,7 @@ class Wallet {
                 forcedExit.nonce != null ? yield this.getNonce(forcedExit.nonce) : yield this.getNonce();
             if (forcedExit.fee == null) {
                 // Fee for forced exit is defined by `Withdraw` transaction type (as it's essentially just a forced withdraw).
-                const fullFee = yield this.provider.getTransactionFee('Withdraw', forcedExit.target, forcedExit.token);
+                const fullFee = yield this.provider.getTransactionFee('Withdraw', forcedExit.target, forcedExit.targetToken);
                 forcedExit.fee = fullFee.totalFee;
             }
             const signedForcedExitTransaction = yield this.signSyncForcedExit(forcedExit);
@@ -482,14 +482,14 @@ class Wallet {
                 throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Withdraw funds');
-            const tokenId = this.provider.tokenSet.resolveTokenId(withdraw.token);
             const transactionData = {
                 toChainId: withdraw.toChainId,
                 subAccountId: withdraw.subAccountId,
                 accountId: withdraw.accountId || this.accountId,
                 from: this.address(),
                 to: withdraw.to,
-                tokenId,
+                sourceToken: this.provider.tokenSet.resolveTokenId(withdraw.sourceToken),
+                targetToken: this.provider.tokenSet.resolveTokenId(withdraw.targetToken),
                 amount: withdraw.amount,
                 withdrawFeeRatio: withdraw.withdrawFeeRatio,
                 fastWithdraw: withdraw.fastWithdraw,
@@ -513,7 +513,7 @@ class Wallet {
                 ? null
                 : ethers_1.utils.formatEther(withdraw.amount);
             const stringFee = ethers_1.BigNumber.from(withdraw.fee).isZero() ? null : ethers_1.utils.formatEther(withdraw.fee);
-            const stringToken = withdraw.token;
+            const stringToken = withdraw.sourceToken;
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
                 : yield this.ethMessageSigner.ethSignWithdraw({

@@ -117,11 +117,11 @@ class Signer {
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
     withdrawSignBytes(withdraw) {
-        return utils.serializeWithdraw(Object.assign(Object.assign({}, withdraw), { type: 'Withdraw', to: withdraw.ethAddress, token: withdraw.tokenId }));
+        return utils.serializeWithdraw(Object.assign(Object.assign({}, withdraw), { type: 'Withdraw', to: withdraw.ethAddress, sourceToken: withdraw.sourceToken, targetToken: withdraw.targetToken }));
     }
     signSyncWithdraw(withdraw) {
         return __awaiter(this, void 0, void 0, function* () {
-            const tx = Object.assign(Object.assign({}, withdraw), { type: 'Withdraw', token: withdraw.tokenId });
+            const tx = Object.assign(Object.assign({}, withdraw), { type: 'Withdraw' });
             const msgBytes = utils.serializeWithdraw(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
             return Object.assign(Object.assign({}, tx), { amount: ethers_1.BigNumber.from(withdraw.amount).toString(), fee: ethers_1.BigNumber.from(withdraw.fee).toString(), signature });
@@ -131,11 +131,11 @@ class Signer {
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
     forcedExitSignBytes(forcedExit) {
-        return utils.serializeForcedExit(Object.assign(Object.assign({}, forcedExit), { type: 'ForcedExit', token: forcedExit.tokenId }));
+        return utils.serializeForcedExit(Object.assign(Object.assign({}, forcedExit), { type: 'ForcedExit' }));
     }
     signSyncForcedExit(forcedExit) {
         return __awaiter(this, void 0, void 0, function* () {
-            const tx = Object.assign(Object.assign({}, forcedExit), { type: 'ForcedExit', token: forcedExit.tokenId });
+            const tx = Object.assign(Object.assign({}, forcedExit), { type: 'ForcedExit' });
             const msgBytes = utils.serializeForcedExit(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
             return Object.assign(Object.assign({}, tx), { fee: ethers_1.BigNumber.from(forcedExit.fee).toString(), signature });

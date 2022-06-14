@@ -329,7 +329,8 @@ export class Wallet {
     toChainId: ChainId
     subAccountId: number
     target: Address
-    token: TokenLike
+    sourceToken: TokenLike
+    targetToken: TokenLike
     fee: BigNumberish
     ts: number
     nonce: number
@@ -340,13 +341,13 @@ export class Wallet {
       throw new Error('ZKLink signer is required for sending zklink transactions.')
     }
     await this.setRequiredAccountIdFromServer('perform a Forced Exit')
-    const tokenId = this.provider.tokenSet.resolveTokenId(forcedExit.token)
     const transactionData = {
       toChainId: forcedExit.toChainId,
       subAccountId: forcedExit.subAccountId,
       initiatorAccountId: this.accountId,
       target: forcedExit.target,
-      tokenId,
+      sourceToken: this.provider.tokenSet.resolveTokenId(forcedExit.sourceToken),
+      targetToken: this.provider.tokenSet.resolveTokenId(forcedExit.targetToken),
       fee: forcedExit.fee,
       ts: forcedExit.ts,
       nonce: forcedExit.nonce,
@@ -361,8 +362,8 @@ export class Wallet {
     toChainId: ChainId
     subAccountId: number
     target: Address
-    token: TokenLike
-    tokenSymbol: TokenSymbol
+    sourceToken: TokenLike
+    targetToken: TokenLike
     fee: BigNumberish
     ts?: number
     nonce: number
@@ -375,7 +376,7 @@ export class Wallet {
     const stringFee = BigNumber.from(forcedExit.fee).isZero()
       ? null
       : utils.formatEther(forcedExit.fee)
-    const stringToken = this.provider.tokenSet.resolveTokenSymbol(forcedExit.token)
+    const stringToken = this.provider.tokenSet.resolveTokenSymbol(forcedExit.sourceToken)
     const ethereumSignature =
       this.ethSigner instanceof Create2WalletSigner
         ? null
@@ -396,7 +397,8 @@ export class Wallet {
     target: Address
     toChainId: ChainId
     subAccountId: number
-    token: TokenLike
+    sourceToken: TokenLike
+    targetToken: TokenLike
     ts?: number
     fee?: BigNumberish
     nonce?: Nonce
@@ -410,7 +412,7 @@ export class Wallet {
       const fullFee = await this.provider.getTransactionFee(
         'Withdraw',
         forcedExit.target,
-        forcedExit.token
+        forcedExit.targetToken
       )
       forcedExit.fee = fullFee.totalFee
     }
@@ -743,7 +745,8 @@ export class Wallet {
     toChainId: number
     subAccountId: number
     to: string
-    token: TokenLike
+    sourceToken: TokenLike
+    targetToken: TokenLike
     amount: BigNumberish
     fee: BigNumberish
     withdrawFeeRatio: number
@@ -758,14 +761,14 @@ export class Wallet {
       throw new Error('ZKLink signer is required for sending zklink transactions.')
     }
     await this.setRequiredAccountIdFromServer('Withdraw funds')
-    const tokenId = this.provider.tokenSet.resolveTokenId(withdraw.token)
     const transactionData = {
       toChainId: withdraw.toChainId,
       subAccountId: withdraw.subAccountId,
       accountId: withdraw.accountId || this.accountId,
       from: this.address(),
       to: withdraw.to,
-      tokenId,
+      sourceToken: this.provider.tokenSet.resolveTokenId(withdraw.sourceToken),
+      targetToken: this.provider.tokenSet.resolveTokenId(withdraw.targetToken),
       amount: withdraw.amount,
       withdrawFeeRatio: withdraw.withdrawFeeRatio,
       fastWithdraw: withdraw.fastWithdraw,
@@ -782,7 +785,8 @@ export class Wallet {
     toChainId: number
     subAccountId: number
     to: string
-    token: TokenLike
+    sourceToken: TokenLike
+    targetToken: TokenLike
     amount: BigNumberish
     fee: BigNumberish
     withdrawFeeRatio: number
@@ -804,7 +808,7 @@ export class Wallet {
       : utils.formatEther(withdraw.amount)
     const stringFee = BigNumber.from(withdraw.fee).isZero() ? null : utils.formatEther(withdraw.fee)
 
-    const stringToken = withdraw.token
+    const stringToken = withdraw.sourceToken
     const ethereumSignature =
       this.ethSigner instanceof Create2WalletSigner
         ? null
@@ -827,7 +831,8 @@ export class Wallet {
     toChainId: number
     subAccountId: number
     to: string
-    token: TokenLike
+    sourceToken: TokenLike
+    targetToken: TokenLike
     amount: BigNumberish
     withdrawFeeRatio: number
     fastWithdraw: number

@@ -194,8 +194,8 @@ export interface Withdraw {
   accountId: number
   from: Address
   to: Address
-  token: number
-  tokenId: number
+  sourceToken: number
+  targetToken: number
   amount: BigNumberish
   fee: BigNumberish
   withdrawFeeRatio: number
@@ -213,7 +213,8 @@ export interface ForcedExit {
   subAccountId: number
   initiatorAccountId: number
   target: Address
-  token: number
+  sourceToken: number
+  targetToken: number
   fee: BigNumberish
   ts: number
   nonce: number

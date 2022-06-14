@@ -244,7 +244,8 @@ export class Signer {
     accountId: number
     from: Address
     ethAddress: string
-    tokenId: number
+    sourceToken: number
+    targetToken: number
     amount: BigNumberish
     fee: BigNumberish
     withdrawFeeRatio: number
@@ -258,7 +259,8 @@ export class Signer {
       ...withdraw,
       type: 'Withdraw',
       to: withdraw.ethAddress,
-      token: withdraw.tokenId,
+      sourceToken: withdraw.sourceToken,
+      targetToken: withdraw.targetToken,
     })
   }
 
@@ -268,7 +270,8 @@ export class Signer {
     accountId: number
     from: Address
     to: string
-    tokenId: number
+    sourceToken: number
+    targetToken: number
     amount: BigNumberish
     fee: BigNumberish
     withdrawFeeRatio: number
@@ -281,7 +284,6 @@ export class Signer {
     const tx: Withdraw = {
       ...withdraw,
       type: 'Withdraw',
-      token: withdraw.tokenId,
     }
     const msgBytes = utils.serializeWithdraw(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
@@ -301,7 +303,8 @@ export class Signer {
     subAccountId: number
     initiatorAccountId: number
     target: Address
-    tokenId: number
+    sourceToken: number
+    targetToken: number
     fee: BigNumberish
     ts: number
     nonce: number
@@ -311,7 +314,6 @@ export class Signer {
     return utils.serializeForcedExit({
       ...forcedExit,
       type: 'ForcedExit',
-      token: forcedExit.tokenId,
     })
   }
 
@@ -320,7 +322,8 @@ export class Signer {
     subAccountId: number
     initiatorAccountId: number
     target: Address
-    tokenId: number
+    sourceToken: number
+    targetToken: number
     fee: BigNumberish
     ts: number
     nonce: number
@@ -330,7 +333,6 @@ export class Signer {
     const tx: ForcedExit = {
       ...forcedExit,
       type: 'ForcedExit',
-      token: forcedExit.tokenId,
     }
     const msgBytes = utils.serializeForcedExit(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)

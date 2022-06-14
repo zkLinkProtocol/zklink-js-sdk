@@ -79,7 +79,8 @@ export declare class Wallet {
         toChainId: ChainId;
         subAccountId: number;
         target: Address;
-        token: TokenLike;
+        sourceToken: TokenLike;
+        targetToken: TokenLike;
         fee: BigNumberish;
         ts: number;
         nonce: number;
@@ -90,8 +91,8 @@ export declare class Wallet {
         toChainId: ChainId;
         subAccountId: number;
         target: Address;
-        token: TokenLike;
-        tokenSymbol: TokenSymbol;
+        sourceToken: TokenLike;
+        targetToken: TokenLike;
         fee: BigNumberish;
         ts?: number;
         nonce: number;
@@ -102,7 +103,8 @@ export declare class Wallet {
         target: Address;
         toChainId: ChainId;
         subAccountId: number;
-        token: TokenLike;
+        sourceToken: TokenLike;
+        targetToken: TokenLike;
         ts?: number;
         fee?: BigNumberish;
         nonce?: Nonce;
@@ -192,7 +194,8 @@ export declare class Wallet {
         toChainId: number;
         subAccountId: number;
         to: string;
-        token: TokenLike;
+        sourceToken: TokenLike;
+        targetToken: TokenLike;
         amount: BigNumberish;
         fee: BigNumberish;
         withdrawFeeRatio: number;
@@ -207,7 +210,8 @@ export declare class Wallet {
         toChainId: number;
         subAccountId: number;
         to: string;
-        token: TokenLike;
+        sourceToken: TokenLike;
+        targetToken: TokenLike;
         amount: BigNumberish;
         fee: BigNumberish;
         withdrawFeeRatio: number;
@@ -222,7 +226,8 @@ export declare class Wallet {
         toChainId: number;
         subAccountId: number;
         to: string;
-        token: TokenLike;
+        sourceToken: TokenLike;
+        targetToken: TokenLike;
         amount: BigNumberish;
         withdrawFeeRatio: number;
         fastWithdraw: number;
