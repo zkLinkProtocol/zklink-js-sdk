@@ -495,17 +495,20 @@ export async function signMessagePersonalAPI(
   }
 }
 
-export async function signMessageEIP712(signer: ethers.Signer, data: any): Promise<string> {
+export async function signMessageEIP712(signer: any, data: any): Promise<string> {
   if (signer instanceof ethers.providers.JsonRpcSigner) {
     return signer.provider
       .send('eth_signTypedData_v3', [await signer.getAddress(), JSON.stringify(data)])
       .then(
         (sign) => sign,
         (err) => {
-          console.log(err)
+          console.log('eth_signTypedData_v3', err)
           throw err
         }
       )
+  } else {
+    const { EIP712Domain, ...types } = data.types
+    return signer._signTypedData(data.domain, types, data.message)
   }
 }
 

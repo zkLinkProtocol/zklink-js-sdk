@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.serializeChainId = exports.serializeNonce = exports.serializeFeePacked = exports.serializeAmountFull = exports.serializeAmountPacked = exports.serializeTokenId = exports.serializeSubAccountId = exports.serializeAccountId = exports.serializeAddress = exports.getEthSignatureType = exports.verifyERC1271Signature = exports.signMessageEIP712 = exports.signMessagePersonalAPI = exports.getSignedBytesFromMessage = exports.getChangePubkeyMessage = exports.TokenSet = exports.isTokenETH = exports.sleep = exports.buffer2bitsBE = exports.isTransactionFeePackable = exports.closestGreaterOrEqPackableTransactionFee = exports.closestPackableTransactionFee = exports.isTransactionAmountPackable = exports.closestGreaterOrEqPackableTransactionAmount = exports.closestPackableTransactionAmount = exports.packFeeChecked = exports.packAmountChecked = exports.reverseBits = exports.integerToFloatUp = exports.integerToFloat = exports.bitsIntoBytesInBEOrder = exports.floatToInteger = exports.TOTAL_CHAIN_NUM = exports.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ERC20_APPROVE_TRESHOLD = exports.MAX_ERC20_APPROVE_AMOUNT = exports.ERC20_DEPOSIT_GAS_LIMIT = exports.MULTICALL_INTERFACE = exports.IEIP1271_INTERFACE = exports.SYNC_GOV_CONTRACT_INTERFACE = exports.ZKL_CONTRACT_INTERFACE = exports.SYNC_EXIT_CONTRACT_INTERFACE = exports.SYNC_MAIN_CONTRACT_INTERFACE = exports.IERC20_INTERFACE = exports.MAX_UNONCE = exports.MIN_UNONCE = exports.MAX_TIMESTAMP = void 0;
 exports.getTimestamp = exports.chainsCompletion = exports.getFastSwapUNonce = exports.getRandom = exports.getTxHash = exports.getPendingBalance = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.parseHexWithPrefix = exports.bigintToBytesBE = exports.numberToBytesBE = exports.serializeTx = exports.serializeOrderMatching = exports.serializeOrder = exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeCurveRemoveLiquidity = exports.serializeCurveSwap = exports.serializeCurveAddLiquidity = exports.serializeTransfer = exports.serializeWithdraw = exports.serializeTimestamp = exports.serializeFastWithdraw = exports.serializeFeeRatio = void 0;
@@ -409,9 +420,13 @@ function signMessageEIP712(signer, data) {
             return signer.provider
                 .send('eth_signTypedData_v3', [yield signer.getAddress(), JSON.stringify(data)])
                 .then((sign) => sign, (err) => {
-                console.log(err);
+                console.log('eth_signTypedData_v3', err);
                 throw err;
             });
+        }
+        else {
+            const _a = data.types, { EIP712Domain } = _a, types = __rest(_a, ["EIP712Domain"]);
+            return signer._signTypedData(data.domain, types, data.message);
         }
     });
 }

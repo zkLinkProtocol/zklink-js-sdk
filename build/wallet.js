@@ -764,12 +764,12 @@ class Wallet {
             const tokenSymbol = this.provider.tokenSet.resolveTokenSymbol(token);
             let balance;
             if (type === 'committed') {
-                balance = accountState.committed.balances[subAccountId][tokenSymbol] || '0';
+                balance = accountState.committed.balances[subAccountId][tokenSymbol];
             }
             else {
-                balance = accountState.verified.balances[subAccountId][tokenSymbol] || '0';
+                balance = accountState.verified.balances[subAccountId][tokenSymbol];
             }
-            return ethers_1.BigNumber.from(balance);
+            return balance ? ethers_1.BigNumber.from(balance) : undefined;
         });
     }
     getEthereumBalance(token, linkChainId) {

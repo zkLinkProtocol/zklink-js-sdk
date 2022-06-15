@@ -62,7 +62,7 @@ export declare class TokenSet {
 export declare function getChangePubkeyMessage(pubKeyHash: PubKeyHash, nonce: number, accountId: number, verifyingContract: string, domainName: string, version: string, chainId: number): any;
 export declare function getSignedBytesFromMessage(message: utils.BytesLike | string, addPrefix: boolean): Uint8Array;
 export declare function signMessagePersonalAPI(signer: ethers.Signer, message: Uint8Array): Promise<string>;
-export declare function signMessageEIP712(signer: ethers.Signer, data: any): Promise<string>;
+export declare function signMessageEIP712(signer: any, data: any): Promise<string>;
 export declare function verifyERC1271Signature(address: string, message: Uint8Array, signature: string, signerOrProvider: ethers.Signer | ethers.providers.Provider): Promise<boolean>;
 export declare function getEthSignatureType(_provider: ethers.providers.Provider, message: string, signature: string, address: string): Promise<EthSignerType>;
 export declare function serializeAddress(address: Address | PubKeyHash): Uint8Array;

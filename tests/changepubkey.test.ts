@@ -21,7 +21,7 @@ const PolygonProvider = new JsonRpcProvider('https://matic-mumbai.chainstacklabs
 describe('ChangePubKey', () => {
   it('L2 signature', async function () {
     const wallet = await getWallet()
-    const signedTransaction = await wallet.signSetSigningKey({
+    const signedTransaction: any = await wallet.signSetSigningKey({
       linkChainId: 1,
       feeToken: 0,
       fee: '0',
@@ -34,6 +34,9 @@ describe('ChangePubKey', () => {
       validFrom: 0,
       validUntil: 4294967295,
     } as any)
+    expect(signedTransaction.tx.ethAuthData.ethSignature).eq(
+      '0x704dc27a1d4d6c95ebaed6d3487903cdbd4eb7f82c780f358bd98e4bbdf521182cdcaf1de93e257f4f8ecce65c853770d2619188c157ceb048b6752fc268a4321c'
+    )
     expect(signedTransaction.tx.signature.signature).eq(
       'b668658188d904f89b685a4cd10d11be6cadfcf4818716233a624d2ca8a919ad9f656651c838ce737ab0cd42c2abe3e50340614a855b75e354f18670e8474e05'
     )
