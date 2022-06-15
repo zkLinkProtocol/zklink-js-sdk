@@ -79,8 +79,8 @@ export declare class Wallet {
         toChainId: ChainId;
         subAccountId: number;
         target: Address;
-        sourceToken: TokenLike;
-        targetToken: TokenLike;
+        l2SourceToken: TokenLike;
+        l2TargetToken: TokenLike;
         fee: BigNumberish;
         ts: number;
         nonce: number;
@@ -91,8 +91,8 @@ export declare class Wallet {
         toChainId: ChainId;
         subAccountId: number;
         target: Address;
-        sourceToken: TokenLike;
-        targetToken: TokenLike;
+        l2SourceToken: TokenLike;
+        l2TargetToken: TokenLike;
         fee: BigNumberish;
         ts?: number;
         nonce: number;
@@ -103,8 +103,8 @@ export declare class Wallet {
         target: Address;
         toChainId: ChainId;
         subAccountId: number;
-        sourceToken: TokenLike;
-        targetToken: TokenLike;
+        l2SourceToken: TokenLike;
+        l2TargetToken: TokenLike;
         ts?: number;
         fee?: BigNumberish;
         nonce?: Nonce;
@@ -194,8 +194,8 @@ export declare class Wallet {
         toChainId: number;
         subAccountId: number;
         to: string;
-        sourceToken: TokenLike;
-        targetToken: TokenLike;
+        l2SourceToken: TokenLike;
+        l2TargetToken: TokenLike;
         amount: BigNumberish;
         fee: BigNumberish;
         withdrawFeeRatio: number;
@@ -210,8 +210,8 @@ export declare class Wallet {
         toChainId: number;
         subAccountId: number;
         to: string;
-        sourceToken: TokenLike;
-        targetToken: TokenLike;
+        l2SourceToken: TokenLike;
+        l2TargetToken: TokenLike;
         amount: BigNumberish;
         fee: BigNumberish;
         withdrawFeeRatio: number;
@@ -226,8 +226,8 @@ export declare class Wallet {
         toChainId: number;
         subAccountId: number;
         to: string;
-        sourceToken: TokenLike;
-        targetToken: TokenLike;
+        l2SourceToken: TokenLike;
+        l2TargetToken: TokenLike;
         amount: BigNumberish;
         withdrawFeeRatio: number;
         fastWithdraw: number;

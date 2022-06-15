@@ -117,7 +117,7 @@ class Signer {
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
     withdrawSignBytes(withdraw) {
-        return utils.serializeWithdraw(Object.assign(Object.assign({}, withdraw), { type: 'Withdraw', to: withdraw.ethAddress, sourceToken: withdraw.sourceToken, targetToken: withdraw.targetToken }));
+        return utils.serializeWithdraw(Object.assign(Object.assign({}, withdraw), { type: 'Withdraw', to: withdraw.ethAddress, l2SourceToken: withdraw.l2SourceToken, l2TargetToken: withdraw.l2TargetToken }));
     }
     signSyncWithdraw(withdraw) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -212,8 +212,8 @@ class Wallet {
                 subAccountId: forcedExit.subAccountId,
                 initiatorAccountId: this.accountId,
                 target: forcedExit.target,
-                sourceToken: this.provider.tokenSet.resolveTokenId(forcedExit.sourceToken),
-                targetToken: this.provider.tokenSet.resolveTokenId(forcedExit.targetToken),
+                l2SourceToken: this.provider.tokenSet.resolveTokenId(forcedExit.l2SourceToken),
+                l2TargetToken: this.provider.tokenSet.resolveTokenId(forcedExit.l2TargetToken),
                 fee: forcedExit.fee,
                 ts: forcedExit.ts,
                 nonce: forcedExit.nonce,
@@ -230,7 +230,7 @@ class Wallet {
             const stringFee = ethers_1.BigNumber.from(forcedExit.fee).isZero()
                 ? null
                 : ethers_1.utils.formatEther(forcedExit.fee);
-            const stringToken = this.provider.tokenSet.resolveTokenSymbol(forcedExit.sourceToken);
+            const stringToken = this.provider.tokenSet.resolveTokenSymbol(forcedExit.l2SourceToken);
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
                 : yield this.ethMessageSigner.ethSignForcedExit({
@@ -251,7 +251,7 @@ class Wallet {
                 forcedExit.nonce != null ? yield this.getNonce(forcedExit.nonce) : yield this.getNonce();
             if (forcedExit.fee == null) {
                 // Fee for forced exit is defined by `Withdraw` transaction type (as it's essentially just a forced withdraw).
-                const fullFee = yield this.provider.getTransactionFee('Withdraw', forcedExit.target, forcedExit.targetToken);
+                const fullFee = yield this.provider.getTransactionFee('Withdraw', forcedExit.target, forcedExit.l2TargetToken);
                 forcedExit.fee = fullFee.totalFee;
             }
             const signedForcedExitTransaction = yield this.signSyncForcedExit(forcedExit);
@@ -488,8 +488,8 @@ class Wallet {
                 accountId: withdraw.accountId || this.accountId,
                 from: this.address(),
                 to: withdraw.to,
-                sourceToken: this.provider.tokenSet.resolveTokenId(withdraw.sourceToken),
-                targetToken: this.provider.tokenSet.resolveTokenId(withdraw.targetToken),
+                l2SourceToken: this.provider.tokenSet.resolveTokenId(withdraw.l2SourceToken),
+                l2TargetToken: this.provider.tokenSet.resolveTokenId(withdraw.l2TargetToken),
                 amount: withdraw.amount,
                 withdrawFeeRatio: withdraw.withdrawFeeRatio,
                 fastWithdraw: withdraw.fastWithdraw,
@@ -513,7 +513,7 @@ class Wallet {
                 ? null
                 : ethers_1.utils.formatEther(withdraw.amount);
             const stringFee = ethers_1.BigNumber.from(withdraw.fee).isZero() ? null : ethers_1.utils.formatEther(withdraw.fee);
-            const stringToken = withdraw.sourceToken;
+            const stringToken = withdraw.l2SourceToken;
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
                 : yield this.ethMessageSigner.ethSignWithdraw({

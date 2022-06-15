@@ -244,8 +244,8 @@ export class Signer {
     accountId: number
     from: Address
     ethAddress: string
-    sourceToken: number
-    targetToken: number
+    l2SourceToken: number
+    l2TargetToken: number
     amount: BigNumberish
     fee: BigNumberish
     withdrawFeeRatio: number
@@ -259,8 +259,8 @@ export class Signer {
       ...withdraw,
       type: 'Withdraw',
       to: withdraw.ethAddress,
-      sourceToken: withdraw.sourceToken,
-      targetToken: withdraw.targetToken,
+      l2SourceToken: withdraw.l2SourceToken,
+      l2TargetToken: withdraw.l2TargetToken,
     })
   }
 
@@ -270,8 +270,8 @@ export class Signer {
     accountId: number
     from: Address
     to: string
-    sourceToken: number
-    targetToken: number
+    l2SourceToken: number
+    l2TargetToken: number
     amount: BigNumberish
     fee: BigNumberish
     withdrawFeeRatio: number
@@ -303,8 +303,8 @@ export class Signer {
     subAccountId: number
     initiatorAccountId: number
     target: Address
-    sourceToken: number
-    targetToken: number
+    l2SourceToken: number
+    l2TargetToken: number
     fee: BigNumberish
     ts: number
     nonce: number
@@ -322,8 +322,8 @@ export class Signer {
     subAccountId: number
     initiatorAccountId: number
     target: Address
-    sourceToken: number
-    targetToken: number
+    l2SourceToken: number
+    l2TargetToken: number
     fee: BigNumberish
     ts: number
     nonce: number

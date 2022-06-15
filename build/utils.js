@@ -562,8 +562,8 @@ function serializeWithdraw(withdraw) {
     const subAccountId = serializeSubAccountId(withdraw.subAccountId);
     const accountBytes = serializeAddress(withdraw.from);
     const toBytes = serializeAddress(withdraw.to);
-    const sourceTokenIdBytes = serializeTokenId(withdraw.sourceToken);
-    const targetTokenIdBytes = serializeTokenId(withdraw.targetToken);
+    const l2SourceTokenIdBytes = serializeTokenId(withdraw.l2SourceToken);
+    const l2TargetTokenIdBytes = serializeTokenId(withdraw.l2TargetToken);
     const amountBytes = serializeAmountFull(withdraw.amount);
     const feeBytes = serializeFeePacked(withdraw.fee);
     const nonceBytes = serializeNonce(withdraw.nonce);
@@ -578,8 +578,8 @@ function serializeWithdraw(withdraw) {
         subAccountId,
         accountBytes,
         toBytes,
-        sourceTokenIdBytes,
-        targetTokenIdBytes,
+        l2SourceTokenIdBytes,
+        l2TargetTokenIdBytes,
         amountBytes,
         feeBytes,
         nonceBytes,
@@ -733,8 +733,8 @@ function serializeForcedExit(forcedExit) {
     const initiatorAccountIdBytes = serializeAccountId(forcedExit.initiatorAccountId);
     const subAccountIdBytes = serializeSubAccountId(forcedExit.subAccountId);
     const targetBytes = serializeAddress(forcedExit.target);
-    const sourceTokenIdBytes = serializeTokenId(forcedExit.sourceToken);
-    const targetTokenIdBytes = serializeTokenId(forcedExit.targetToken);
+    const l2SourceTokenIdBytes = serializeTokenId(forcedExit.l2SourceToken);
+    const l2TargetTokenIdBytes = serializeTokenId(forcedExit.l2TargetToken);
     const feeBytes = serializeFeePacked(forcedExit.fee);
     const nonceBytes = serializeNonce(forcedExit.nonce);
     const validFrom = serializeTimestamp(forcedExit.validFrom);
@@ -746,8 +746,8 @@ function serializeForcedExit(forcedExit) {
         initiatorAccountIdBytes,
         subAccountIdBytes,
         targetBytes,
-        sourceTokenIdBytes,
-        targetTokenIdBytes,
+        l2SourceTokenIdBytes,
+        l2TargetTokenIdBytes,
         feeBytes,
         nonceBytes,
         validFrom,
