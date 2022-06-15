@@ -18,7 +18,7 @@ describe('forcedExit', () => {
       validFrom: 0,
       validUntil: 4294967295,
       l2SourceToken: 1,
-      l2TargetToken: 2,
+      l1TargetToken: 2,
       ts: 1649749979,
     })
     expect(Buffer.from(serialized).toString('hex')).eq(
@@ -34,7 +34,7 @@ describe('forcedExit', () => {
       subAccountId: 0,
       target: '0x3498F456645270eE003441df82C718b56c0e6666',
       l2SourceToken: 1,
-      l2TargetToken: 2,
+      l1TargetToken: 2,
       fee: BigNumber.from(parseEther('0.001')),
       ts: 1649749979,
     } as any)

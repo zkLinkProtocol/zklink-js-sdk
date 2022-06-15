@@ -213,7 +213,7 @@ class Wallet {
                 initiatorAccountId: this.accountId,
                 target: forcedExit.target,
                 l2SourceToken: this.provider.tokenSet.resolveTokenId(forcedExit.l2SourceToken),
-                l2TargetToken: this.provider.tokenSet.resolveTokenId(forcedExit.l2TargetToken),
+                l1TargetToken: this.provider.tokenSet.resolveTokenId(forcedExit.l1TargetToken),
                 fee: forcedExit.fee,
                 ts: forcedExit.ts,
                 nonce: forcedExit.nonce,
@@ -251,7 +251,7 @@ class Wallet {
                 forcedExit.nonce != null ? yield this.getNonce(forcedExit.nonce) : yield this.getNonce();
             if (forcedExit.fee == null) {
                 // Fee for forced exit is defined by `Withdraw` transaction type (as it's essentially just a forced withdraw).
-                const fullFee = yield this.provider.getTransactionFee('Withdraw', forcedExit.target, forcedExit.l2TargetToken);
+                const fullFee = yield this.provider.getTransactionFee('Withdraw', forcedExit.target, forcedExit.l1TargetToken);
                 forcedExit.fee = fullFee.totalFee;
             }
             const signedForcedExitTransaction = yield this.signSyncForcedExit(forcedExit);
@@ -489,7 +489,7 @@ class Wallet {
                 from: this.address(),
                 to: withdraw.to,
                 l2SourceToken: this.provider.tokenSet.resolveTokenId(withdraw.l2SourceToken),
-                l2TargetToken: this.provider.tokenSet.resolveTokenId(withdraw.l2TargetToken),
+                l1TargetToken: this.provider.tokenSet.resolveTokenId(withdraw.l1TargetToken),
                 amount: withdraw.amount,
                 withdrawFeeRatio: withdraw.withdrawFeeRatio,
                 fastWithdraw: withdraw.fastWithdraw,

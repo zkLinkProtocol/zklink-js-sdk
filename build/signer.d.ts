@@ -83,7 +83,7 @@ export declare class Signer {
         from: Address;
         ethAddress: string;
         l2SourceToken: number;
-        l2TargetToken: number;
+        l1TargetToken: number;
         amount: BigNumberish;
         fee: BigNumberish;
         withdrawFeeRatio: number;
@@ -100,7 +100,7 @@ export declare class Signer {
         from: Address;
         to: string;
         l2SourceToken: number;
-        l2TargetToken: number;
+        l1TargetToken: number;
         amount: BigNumberish;
         fee: BigNumberish;
         withdrawFeeRatio: number;
@@ -119,7 +119,7 @@ export declare class Signer {
         initiatorAccountId: number;
         target: Address;
         l2SourceToken: number;
-        l2TargetToken: number;
+        l1TargetToken: number;
         fee: BigNumberish;
         ts: number;
         nonce: number;
@@ -132,7 +132,7 @@ export declare class Signer {
         initiatorAccountId: number;
         target: Address;
         l2SourceToken: number;
-        l2TargetToken: number;
+        l1TargetToken: number;
         fee: BigNumberish;
         ts: number;
         nonce: number;

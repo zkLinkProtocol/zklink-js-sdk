@@ -563,7 +563,7 @@ function serializeWithdraw(withdraw) {
     const accountBytes = serializeAddress(withdraw.from);
     const toBytes = serializeAddress(withdraw.to);
     const l2SourceTokenIdBytes = serializeTokenId(withdraw.l2SourceToken);
-    const l2TargetTokenIdBytes = serializeTokenId(withdraw.l2TargetToken);
+    const l1TargetTokenIdBytes = serializeTokenId(withdraw.l1TargetToken);
     const amountBytes = serializeAmountFull(withdraw.amount);
     const feeBytes = serializeFeePacked(withdraw.fee);
     const nonceBytes = serializeNonce(withdraw.nonce);
@@ -579,7 +579,7 @@ function serializeWithdraw(withdraw) {
         accountBytes,
         toBytes,
         l2SourceTokenIdBytes,
-        l2TargetTokenIdBytes,
+        l1TargetTokenIdBytes,
         amountBytes,
         feeBytes,
         nonceBytes,
@@ -734,7 +734,7 @@ function serializeForcedExit(forcedExit) {
     const subAccountIdBytes = serializeSubAccountId(forcedExit.subAccountId);
     const targetBytes = serializeAddress(forcedExit.target);
     const l2SourceTokenIdBytes = serializeTokenId(forcedExit.l2SourceToken);
-    const l2TargetTokenIdBytes = serializeTokenId(forcedExit.l2TargetToken);
+    const l1TargetTokenIdBytes = serializeTokenId(forcedExit.l1TargetToken);
     const feeBytes = serializeFeePacked(forcedExit.fee);
     const nonceBytes = serializeNonce(forcedExit.nonce);
     const validFrom = serializeTimestamp(forcedExit.validFrom);
@@ -747,7 +747,7 @@ function serializeForcedExit(forcedExit) {
         subAccountIdBytes,
         targetBytes,
         l2SourceTokenIdBytes,
-        l2TargetTokenIdBytes,
+        l1TargetTokenIdBytes,
         feeBytes,
         nonceBytes,
         validFrom,

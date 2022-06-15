@@ -330,7 +330,7 @@ export class Wallet {
     subAccountId: number
     target: Address
     l2SourceToken: TokenLike
-    l2TargetToken: TokenLike
+    l1TargetToken: TokenLike
     fee: BigNumberish
     ts: number
     nonce: number
@@ -347,7 +347,7 @@ export class Wallet {
       initiatorAccountId: this.accountId,
       target: forcedExit.target,
       l2SourceToken: this.provider.tokenSet.resolveTokenId(forcedExit.l2SourceToken),
-      l2TargetToken: this.provider.tokenSet.resolveTokenId(forcedExit.l2TargetToken),
+      l1TargetToken: this.provider.tokenSet.resolveTokenId(forcedExit.l1TargetToken),
       fee: forcedExit.fee,
       ts: forcedExit.ts,
       nonce: forcedExit.nonce,
@@ -363,7 +363,7 @@ export class Wallet {
     subAccountId: number
     target: Address
     l2SourceToken: TokenLike
-    l2TargetToken: TokenLike
+    l1TargetToken: TokenLike
     fee: BigNumberish
     ts?: number
     nonce: number
@@ -398,7 +398,7 @@ export class Wallet {
     toChainId: ChainId
     subAccountId: number
     l2SourceToken: TokenLike
-    l2TargetToken: TokenLike
+    l1TargetToken: TokenLike
     ts?: number
     fee?: BigNumberish
     nonce?: Nonce
@@ -412,7 +412,7 @@ export class Wallet {
       const fullFee = await this.provider.getTransactionFee(
         'Withdraw',
         forcedExit.target,
-        forcedExit.l2TargetToken
+        forcedExit.l1TargetToken
       )
       forcedExit.fee = fullFee.totalFee
     }
@@ -746,7 +746,7 @@ export class Wallet {
     subAccountId: number
     to: string
     l2SourceToken: TokenLike
-    l2TargetToken: TokenLike
+    l1TargetToken: TokenLike
     amount: BigNumberish
     fee: BigNumberish
     withdrawFeeRatio: number
@@ -768,7 +768,7 @@ export class Wallet {
       from: this.address(),
       to: withdraw.to,
       l2SourceToken: this.provider.tokenSet.resolveTokenId(withdraw.l2SourceToken),
-      l2TargetToken: this.provider.tokenSet.resolveTokenId(withdraw.l2TargetToken),
+      l1TargetToken: this.provider.tokenSet.resolveTokenId(withdraw.l1TargetToken),
       amount: withdraw.amount,
       withdrawFeeRatio: withdraw.withdrawFeeRatio,
       fastWithdraw: withdraw.fastWithdraw,
@@ -786,7 +786,7 @@ export class Wallet {
     subAccountId: number
     to: string
     l2SourceToken: TokenLike
-    l2TargetToken: TokenLike
+    l1TargetToken: TokenLike
     amount: BigNumberish
     fee: BigNumberish
     withdrawFeeRatio: number
@@ -832,7 +832,7 @@ export class Wallet {
     subAccountId: number
     to: string
     l2SourceToken: TokenLike
-    l2TargetToken: TokenLike
+    l1TargetToken: TokenLike
     amount: BigNumberish
     withdrawFeeRatio: number
     fastWithdraw: number
