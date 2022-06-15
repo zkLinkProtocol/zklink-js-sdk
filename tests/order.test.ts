@@ -7,7 +7,7 @@ import {
   serializeOrder,
   serializeOrderMatching,
 } from '../src/utils'
-import { getTestWallet, getWalletFromPrivateKey } from './wallet.test'
+import { getWallet } from './wallet.test'
 
 const defaultValidFrom = 0
 const defaultValidUntil = 9007199254740991
@@ -85,18 +85,18 @@ describe('Order', () => {
   })
 
   it('sign sync order', async function () {
-    const wallet = await getWalletFromPrivateKey()
+    const wallet = await getWallet()
     const signedTransaction = await wallet.signSyncOrder(orderMaker as any)
     expect(signedTransaction.tx.signature.pubKey).eq(
-      '0dd4f603531bd78bbecd005d9e7cc62a794dcfadceffe03e269fbb6b72e9c724'
+      '167850be112e16a992d27c6119e05ec8aee2b45446b79b1c969a48352d626aa5'
     )
     expect(signedTransaction.tx.signature.signature).eq(
-      '0e1b8df4a234422c3167725b98f591ae7b6ed5563f2d68786c82c966b1ad35a393a3d4a3570a9ebdb5d2dbdc9fc37c66d4d5ce682a2dd236e4073a5f078b9004'
+      '12476f90c581aa971ac4a7c056d4d64360fc346171b5861bd8ff0c71f2878b1e6589484da2488ae040f7e2748a6a6bf8f478c05ece0dad80851b49e921914f00'
     )
   })
 
   it('custom order', async function () {
-    const wallet = await getWalletFromPrivateKey()
+    const wallet = await getWallet()
     const signedTransaction = await wallet.signSyncOrder({
       subAccountId: 1,
       accountId: 5,
@@ -113,7 +113,7 @@ describe('Order', () => {
       validUntil: defaultValidUntil,
     } as any)
     expect(signedTransaction.tx.signature.signature).eq(
-      'e84a62b9dc183b361ef2d81a1d02d91bf88c674fcbf9098772b3da01c3df299d791da8face13cb123ce403c777b45643881f045b3ea0f850a541cd819b93b300'
+      '4bd968c6e0d230d944db951924f6c4f244d757349ffd4bce7dcde84d66246f84fa3454f96f006188bf48bb2b07b0d35929e1fa4831ce0f5ecd55b0c5a90e4605'
     )
   })
 })

@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { BigNumber } from 'ethers'
 import { describe } from 'mocha'
 import { serializeOrder, serializeWithdraw } from '../src/utils'
-import { getTestWallet } from './wallet.test'
+import { getWallet } from './wallet.test'
 
 describe('withdraw', () => {
   it('serializeWithdraw', () => {
@@ -31,7 +31,7 @@ describe('withdraw', () => {
   })
 
   it('withdrawFromSyncToEthereum', async function () {
-    const wallet = await getTestWallet()
+    const wallet = await getWallet()
 
     const transaction = await wallet.withdrawFromSyncToEthereum({
       toChainId: 3,

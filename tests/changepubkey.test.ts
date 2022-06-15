@@ -9,10 +9,10 @@ import {
   serializeOrderMatching,
   signMessageEIP712,
 } from '../src/utils'
-import { getTestWallet, getWalletFromPrivateKey } from './wallet.test'
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { getTestProvider } from './provider.test'
 import { Wallet } from '../src'
+import { getWallet } from './wallet.test'
 
 const PolygonProvider = new JsonRpcProvider('https://matic-mumbai.chainstacklabs.com', {
   name: 'Polygon Testnet',
@@ -20,11 +20,7 @@ const PolygonProvider = new JsonRpcProvider('https://matic-mumbai.chainstacklabs
 })
 describe('ChangePubKey', () => {
   it('L2 signature', async function () {
-    const key = new Uint8Array(new Array(32).fill(5))
-
-    const ethWallet = new ethers.Wallet(key, PolygonProvider)
-    const mockProvider = await getTestProvider()
-    const wallet = await Wallet.fromEthSigner(ethWallet, mockProvider)
+    const wallet = await getWallet()
     const signedTransaction = await wallet.signSetSigningKey({
       linkChainId: 1,
       feeToken: 0,

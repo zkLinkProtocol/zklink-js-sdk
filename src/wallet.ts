@@ -1164,11 +1164,11 @@ export class Wallet {
     const tokenSymbol = this.provider.tokenSet.resolveTokenSymbol(token)
     let balance: BigNumberish
     if (type === 'committed') {
-      balance = accountState.committed.balances[subAccountId][tokenSymbol] || '0'
+      balance = accountState.committed.balances[subAccountId][tokenSymbol]
     } else {
-      balance = accountState.verified.balances[subAccountId][tokenSymbol] || '0'
+      balance = accountState.verified.balances[subAccountId][tokenSymbol]
     }
-    return BigNumber.from(balance)
+    return balance ? BigNumber.from(balance) : undefined
   }
 
   async getEthereumBalance(token: TokenLike, linkChainId: ChainId): Promise<BigNumber> {

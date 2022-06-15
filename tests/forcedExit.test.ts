@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import { BigNumber } from 'ethers'
 import { describe } from 'mocha'
 import { serializeForcedExit, serializeOrder, serializeWithdraw } from '../src/utils'
-import { getTestWallet } from './wallet.test'
+import { getWallet } from './wallet.test'
 
 describe('forcedExit', () => {
   it('serializeForcedExit', () => {
@@ -27,7 +27,7 @@ describe('forcedExit', () => {
   })
 
   it('syncForcedExit', async function () {
-    const wallet = await getTestWallet()
+    const wallet = await getWallet()
 
     const transaction = await wallet.syncForcedExit({
       toChainId: 1,

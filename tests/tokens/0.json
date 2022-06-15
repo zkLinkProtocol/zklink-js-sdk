@@ -42,5 +42,14 @@
     "decimals": 18,
     "stable": false,
     "fast_withdraw": false
+  },
+  {
+    "id": 8,
+    "chains": [1],
+    "address": ["0x6b175474e89094c44da98b954eedeac495271d0f"],
+    "symbol": "DAI",
+    "decimals": 18,
+    "stable": false,
+    "fast_withdraw": false
   }
 ]

@@ -7,14 +7,14 @@ import {
   serializeOrder,
   serializeOrderMatching,
 } from '../src/utils'
-import { getTestWallet, getWalletFromPrivateKey } from './wallet.test'
+import { getWallet } from './wallet.test'
 
 const defaultValidFrom = 0
 const defaultValidUntil = 9007199254740991
 
 describe('matching', () => {
   it('bytes and signature', async function () {
-    const wallet = await getWalletFromPrivateKey()
+    const wallet = await getWallet()
 
     const data = {
       fee: '0',
@@ -29,9 +29,9 @@ describe('matching', () => {
         feeRatio2: 10,
         accountId: 6,
         signature: {
-          pubKey: '0dd4f603531bd78bbecd005d9e7cc62a794dcfadceffe03e269fbb6b72e9c724',
+          pubKey: '167850be112e16a992d27c6119e05ec8aee2b45446b79b1c969a48352d626aa5',
           signature:
-            '4eb9eda2a7f3314dc8260d379c6d3f46429e554b9eeddd36ad9529d502bac5a4eedaf70eb1f76c0afd989cf4a4fb0da80ab9e07de932712e9dba27348861ae00',
+            '885fe56579721af575b77fb66abc49a7e0cee00fc1409fcd856ede10d1a2e894076a26859eafb96353c524fcaa7f4e3f924388dc286c28b26d97f0cf4177f800',
         },
         validFrom: 0,
         validUntil: 9007199254740991,
@@ -50,9 +50,9 @@ describe('matching', () => {
         feeRatio2: 10,
         accountId: 6,
         signature: {
-          pubKey: '0dd4f603531bd78bbecd005d9e7cc62a794dcfadceffe03e269fbb6b72e9c724',
+          pubKey: '167850be112e16a992d27c6119e05ec8aee2b45446b79b1c969a48352d626aa5',
           signature:
-            'e76678aa2ab366f57bd5d1cceea0d7326b5b24a539494544c8dde75b2969882f976f8c2ea15c613d8b117e54bbc52375c2ffc547bb8999931f84c6ee7f572904',
+            '49884e838d4972772516eaafdc264491c56c23688e936852fcff7fd6f20598175a1a604432794db0a33bcf03f59ad3280e6a7ae113646cfb820c1edec6b95201',
         },
         validFrom: 0,
         validUntil: 9007199254740991,
@@ -115,7 +115,7 @@ describe('matching', () => {
     const { tx } = signedTransaction as any
     // wrong l2 signature: 46ab809c4a5beacfd423bb05332e818fb65d4d570939852206565c9a22adad8a3c3b4e69832c93f5b54b317bebcb44292bce5142f4bfa39f1b51a1cadcacae03
     expect(tx.signature.signature).to.eq(
-      '6dbb217bb70055b4530608b331723d0ce00774962c8dd3a837ca634b33d405828ab38de23ccce1633834d8513b2e2f412f83df7e781f6b5456c5a5072dc6e503',
+      'dd9cd5f62605c5b19e5003ae6ddae8e49510386dbfecb42f13aed1eba06764a72c99122f7ee0c66b3b9864dc3939e2e203c8ba549a520f61c81abeb370d0b901',
       'order matching signature is incorrect'
     )
   })
