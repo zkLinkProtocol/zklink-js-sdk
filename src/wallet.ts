@@ -1230,6 +1230,7 @@ export class Wallet {
     token: TokenAddress
     amount: BigNumberish
     linkChainId: number
+    mapping: boolean
     ethTxOptions?: ethers.providers.TransactionRequest
     approveDepositAmountForERC20?: boolean
   }): Promise<ETHOperation> {
@@ -1275,6 +1276,7 @@ export class Wallet {
         deposit.amount,
         deposit.depositTo,
         deposit.subAccountId,
+        deposit.mapping ? true : false,
         {
           nonce,
           // gasPrice,

@@ -317,6 +317,7 @@ export declare class Wallet {
         token: TokenAddress;
         amount: BigNumberish;
         linkChainId: number;
+        mapping: boolean;
         ethTxOptions?: ethers.providers.TransactionRequest;
         approveDepositAmountForERC20?: boolean;
     }): Promise<ETHOperation>;

@@ -845,6 +845,7 @@ class Wallet {
                     deposit.amount,
                     deposit.depositTo,
                     deposit.subAccountId,
+                    deposit.mapping ? true : false,
                     Object.assign({ nonce }, deposit.ethTxOptions),
                 ];
                 // We set gas limit only if user does not set it using ethTxOptions.
