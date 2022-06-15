@@ -17,15 +17,12 @@ describe('forcedExit', () => {
       nonce: 85,
       validFrom: 0,
       validUntil: 4294967295,
-      token: 2,
+      sourceToken: 1,
+      targetToken: 2,
       ts: 1649749979,
     })
-    expect(serialized).eql(
-      new Uint8Array([
-        7, 1, 0, 0, 0, 1, 0, 52, 152, 244, 86, 100, 82, 112, 238, 0, 52, 65, 223, 130, 199, 24, 181,
-        108, 14, 102, 102, 0, 2, 51, 77, 0, 0, 0, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255,
-        255, 255, 98, 85, 47, 219,
-      ])
+    expect(Buffer.from(serialized).toString('hex')).eq(
+      '070100000001003498f456645270ee003441df82c718b56c0e666600010002334d00000055000000000000000000000000ffffffff62552fdb'
     )
   })
 
@@ -36,12 +33,13 @@ describe('forcedExit', () => {
       toChainId: 1,
       subAccountId: 0,
       target: '0x3498F456645270eE003441df82C718b56c0e6666',
-      token: 'USDT',
+      sourceToken: 1,
+      targetToken: 2,
       fee: BigNumber.from(parseEther('0.001')),
       ts: 1649749979,
     } as any)
     expect(transaction.txData.tx.signature.signature).eq(
-      'f85b3d2dfe42aa94da12cfaf1be01433fcc962fdc3d2b86c52c93a2c0d9793a1e409a2682fd77e41c5f603686a24480f4b4722b63d7da8e74245188d78e40803'
+      '6139079a63ffff149e5a15c24897cda0d3681fec4f6328c69030f63fd602cb1769843d974e75afe785787bd221356b8f4eb99c9ef206eff259159d733de7e905'
     )
   })
 })

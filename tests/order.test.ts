@@ -87,9 +87,6 @@ describe('Order', () => {
   it('sign sync order', async function () {
     const wallet = await getWalletFromPrivateKey()
     const signedTransaction = await wallet.signSyncOrder(orderMaker as any)
-    expect(signedTransaction.ethereumSignature.signature).eq(
-      '0x915d197bad1a7d6c3e840fd62607df97b007f9faa3843639342b62348170e3d700d0cc333d00630de65830d3028abcc81f4f2dc9caf71bcea5a31cc42dd9c2db1c'
-    )
     expect(signedTransaction.tx.signature.pubKey).eq(
       '0dd4f603531bd78bbecd005d9e7cc62a794dcfadceffe03e269fbb6b72e9c724'
     )

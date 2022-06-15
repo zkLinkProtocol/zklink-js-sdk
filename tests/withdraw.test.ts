@@ -12,7 +12,8 @@ describe('withdraw', () => {
       accountId: 1,
       from: '0x3498F456645270eE003441df82C718b56c0e6666',
       to: '0x3d809e414ba4893709c85f242ba3617481bc4126',
-      tokenId: 2,
+      sourceToken: 1,
+      targetToken: 2,
       amount: BigNumber.from('99995900000000000000'),
       withdrawFeeRatio: 50,
       fastWithdraw: 1,
@@ -22,15 +23,10 @@ describe('withdraw', () => {
       validFrom: 0,
       validUntil: 4294967295,
       type: 'Withdraw',
-      token: 2,
     })
-    expect(serialized).eql(
-      new Uint8Array([
-        3, 3, 0, 0, 0, 1, 1, 52, 152, 244, 86, 100, 82, 112, 238, 0, 52, 65, 223, 130, 199, 24, 181,
-        108, 14, 102, 102, 61, 128, 158, 65, 75, 164, 137, 55, 9, 200, 95, 36, 43, 163, 97, 116,
-        129, 188, 65, 38, 0, 2, 0, 0, 0, 0, 0, 0, 0, 5, 107, 184, 205, 63, 191, 123, 192, 0, 51, 77,
-        0, 0, 0, 85, 1, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 255,
-      ])
+    expect(Buffer.from(serialized).toString('hex')).eq(
+      '030300000001013498f456645270ee003441df82c718b56c0e66663d809e414ba4893709c85f242ba3617481bc41260001000200000000000000056bb8cd3fbf7bc000334d00000055010032000000000000000000000000ffffffff',
+      'withdraw serialize bytes'
     )
   })
 
@@ -46,17 +42,20 @@ describe('withdraw', () => {
       fastWithdraw: 1,
       fee: BigNumber.from('4100000000000000'),
       nonce: 85,
-      token: 'USDT',
+      sourceToken: 1,
+      targetToken: 2,
       ts: 1649749979,
       validFrom: 0,
       validUntil: 4294967295,
       withdrawFeeRatio: 50,
     } as any)
     expect(transaction.txData.ethereumSignature.signature).to.eq(
-      '0x52ffffa004c4b9d2bd425bfd5c94a9e0c787be20102baae8f578daaefb0296412dcea35fe60f833537ad0ed3a9b37ffad3ba1c8947f6b01fc3016adc67d33ec31c'
+      '0x6cd06b65864161a55fff2375cdbcd346be07019883fc328126b81d537c8f44480cd515487127fdb081e78444d1ddb687468fe3f8378abe8dc636a0c295ad160d1b',
+      'withdraw eth signature is incorrect'
     )
     expect(transaction.txData.tx.signature.signature).to.eq(
-      'c3c7d2f2b4e2afb886ce08d72c50c0a9e9fcf0f00291645f95acd18bda354badb73e19563030596a82eef410293f7012ab1b40fa73a182677dea918a1e162b04'
+      '3d3d73471d35fa6d388da78584a6755805f1321aac577c8e0e9a73452c8bae9c435308dab20a70cf37be75b0f083bd8b7c1fce8bad0f91cb89854db456b92105',
+      'withdraw signature is incorrect'
     )
   })
 })
