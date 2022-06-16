@@ -706,6 +706,7 @@ function serializeCurveRemoveLiquidity(payload) {
 exports.serializeCurveRemoveLiquidity = serializeCurveRemoveLiquidity;
 function serializeChangePubKey(changePubKey) {
     const type = new Uint8Array([6]);
+    const linkChainIdBytes = serializeChainId(changePubKey.linkChainId);
     const accountBytes = serializeAddress(changePubKey.account);
     const pubKeyHashBytes = serializeAddress(changePubKey.newPkHash);
     const tokenIdBytes = serializeTokenId(changePubKey.feeToken);
@@ -716,6 +717,7 @@ function serializeChangePubKey(changePubKey) {
     const tsBytes = numberToBytesBE(changePubKey.ts, 4);
     return ethers_1.ethers.utils.concat([
         type,
+        linkChainIdBytes,
         accountBytes,
         pubKeyHashBytes,
         tokenIdBytes,

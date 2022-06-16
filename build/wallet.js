@@ -563,6 +563,7 @@ class Wallet {
             const changePubKeyTx = yield this.signer.signSyncChangePubKey({
                 accountId: changePubKey.accountId || this.accountId,
                 account: this.address(),
+                linkChainId: changePubKey.linkChainId,
                 newPkHash,
                 nonce: changePubKey.nonce,
                 feeTokenId,

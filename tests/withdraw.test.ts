@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 import { BigNumber } from 'ethers'
+import { sha256 } from 'ethers/lib/utils'
 import { describe } from 'mocha'
 import { serializeOrder, serializeWithdraw } from '../src/utils'
 import { getWallet } from './wallet.test'
@@ -56,6 +57,63 @@ describe('withdraw', () => {
     expect(transaction.txData.tx.signature.signature).to.eq(
       '3d3d73471d35fa6d388da78584a6755805f1321aac577c8e0e9a73452c8bae9c435308dab20a70cf37be75b0f083bd8b7c1fce8bad0f91cb89854db456b92105',
       'withdraw signature is incorrect'
+    )
+  })
+
+  it('serializeWithdraw', async () => {
+    const wallet = await getWallet()
+
+    const transaction = await wallet.withdrawFromSyncToEthereum({
+      toChainId: 1,
+      subAccountId: 0,
+      accountId: 2,
+      from: '0x6ceb6c36cf84334bafc3ae93bdb9d625b67cd8f8',
+      to: '0x0000000000000000000000000000000000000000',
+      l2SourceToken: 1,
+      l1TargetToken: 22,
+      amount: BigNumber.from('0'),
+      withdrawFeeRatio: 1,
+      fastWithdraw: 1,
+      fee: BigNumber.from('0'),
+      ts: 1655193833,
+      nonce: 0,
+      validFrom: 0,
+      validUntil: 4294967295,
+      type: 'Withdraw',
+    } as any)
+
+    const serialized = serializeWithdraw({
+      toChainId: 1,
+      subAccountId: 0,
+      accountId: 2,
+      from: '0x6ceb6c36cf84334bafc3ae93bdb9d625b67cd8f8',
+      to: '0x0000000000000000000000000000000000000000',
+      l2SourceToken: 1,
+      l1TargetToken: 22,
+      amount: BigNumber.from('0'),
+      withdrawFeeRatio: 1,
+      fastWithdraw: 1,
+      fee: BigNumber.from('0'),
+      ts: 1655193833,
+      nonce: 0,
+      validFrom: 0,
+      validUntil: 4294967295,
+      type: 'Withdraw',
+    })
+    expect(serialized).to.eql(
+      new Uint8Array([
+        3, 1, 0, 0, 0, 2, 0, 108, 235, 108, 54, 207, 132, 51, 75, 175, 195, 174, 147, 189, 185, 214,
+        37, 182, 124, 216, 248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+        22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 255,
+      ])
+    )
+    expect(sha256(serialized)).to.eq(
+      '0xb22da80b712a728b2a72217e7bf1cc0de2b26c89dd80d576408d28bfaa64df82'
+    )
+    expect(Buffer.from(serialized).toString('hex')).eq(
+      '030100000002006ceb6c36cf84334bafc3ae93bdb9d625b67cd8f800000000000000000000000000000000000000000001001600000000000000000000000000000000000000000000010001000000000000000000000000ffffffff',
+      'withdraw serialize bytes'
     )
   })
 })

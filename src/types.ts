@@ -244,6 +244,7 @@ export interface ChangePubKeyCREATE2 {
 
 export interface ChangePubKey {
   type: 'ChangePubKey'
+  linkChainId: number
   accountId: number
   account: Address
   newPkHash: PubKeyHash

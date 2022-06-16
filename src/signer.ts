@@ -347,6 +347,7 @@ export class Signer {
    * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
    */
   changePubKeySignBytes(changePubKey: {
+    linkChainId: number
     accountId: number
     account: Address
     newPkHash: PubKeyHash
@@ -369,6 +370,7 @@ export class Signer {
   }
 
   async signSyncChangePubKey(changePubKey: {
+    linkChainId: number
     accountId: number
     account: Address
     newPkHash: PubKeyHash

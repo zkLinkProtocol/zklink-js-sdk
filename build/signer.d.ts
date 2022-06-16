@@ -143,6 +143,7 @@ export declare class Signer {
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
     changePubKeySignBytes(changePubKey: {
+        linkChainId: number;
         accountId: number;
         account: Address;
         newPkHash: PubKeyHash;
@@ -156,6 +157,7 @@ export declare class Signer {
         validUntil: number;
     }): Uint8Array;
     signSyncChangePubKey(changePubKey: {
+        linkChainId: number;
         accountId: number;
         account: Address;
         newPkHash: PubKeyHash;
