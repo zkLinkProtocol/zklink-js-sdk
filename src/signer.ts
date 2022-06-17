@@ -348,6 +348,7 @@ export class Signer {
    */
   changePubKeySignBytes(changePubKey: {
     linkChainId: number
+    chainId: number
     accountId: number
     account: Address
     newPkHash: PubKeyHash
@@ -386,6 +387,7 @@ export class Signer {
       ...changePubKey,
       type: 'ChangePubKey',
       feeToken: changePubKey.feeTokenId,
+      chainId: changePubKey.linkChainId,
     }
     const msgBytes = utils.serializeChangePubKey(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)

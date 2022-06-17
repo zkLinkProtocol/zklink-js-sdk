@@ -144,6 +144,7 @@ export declare class Signer {
      */
     changePubKeySignBytes(changePubKey: {
         linkChainId: number;
+        chainId: number;
         accountId: number;
         account: Address;
         newPkHash: PubKeyHash;
