@@ -1189,45 +1189,6 @@ export class Wallet {
     }
   }
 
-  async isERC20DepositsApproved(
-    token: TokenLike,
-    linkChainId: number,
-    erc20ApproveThreshold: BigNumber = ERC20_APPROVE_TRESHOLD
-  ): Promise<boolean> {
-    if (isTokenETH(token)) {
-      throw Error('ETH token does not need approval.')
-    }
-    const erc20contract = new Contract(token, IERC20_INTERFACE, this.ethSigner)
-    const contractAddress = await this.provider.getContractAddress(linkChainId)
-
-    try {
-      const currentAllowance = await erc20contract.allowance(
-        this.address(),
-        contractAddress.mainContract
-      )
-      return BigNumber.from(currentAllowance).gte(erc20ApproveThreshold)
-    } catch (e) {
-      this.modifyEthersError(e)
-    }
-  }
-
-  async approveERC20TokenDeposits(
-    token: TokenLike,
-    linkChainId: number,
-    max_erc20_approve_amount: BigNumber = MAX_ERC20_APPROVE_AMOUNT
-  ): Promise<ContractTransaction> {
-    if (isTokenETH(token)) {
-      throw Error('ETH token does not need approval.')
-    }
-    const erc20contract = new Contract(token, IERC20_INTERFACE, this.ethSigner)
-    const contractAddress = await this.provider.getContractAddress(linkChainId)
-    try {
-      return erc20contract.approve(contractAddress.mainContract, max_erc20_approve_amount)
-    } catch (e) {
-      this.modifyEthersError(e)
-    }
-  }
-
   async depositToSyncFromEthereum(deposit: {
     subAccountId: number
     depositTo: Address
@@ -1238,8 +1199,6 @@ export class Wallet {
     ethTxOptions?: ethers.providers.TransactionRequest
     approveDepositAmountForERC20?: boolean
   }): Promise<ETHOperation> {
-    const gasPrice = await this.ethSigner.provider.getGasPrice()
-
     const contractAddress = await this.provider.getContractAddress(deposit.linkChainId)
     const mainZkSyncContract = await this.getZkSyncMainContract(deposit.linkChainId)
 
@@ -1253,7 +1212,6 @@ export class Wallet {
           {
             value: BigNumber.from(deposit.amount),
             gasLimit: BigNumber.from(ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT),
-            // gasPrice,
             ...deposit.ethTxOptions,
           }
         )
@@ -1283,7 +1241,6 @@ export class Wallet {
         deposit.mapping ? true : false,
         {
           nonce,
-          // gasPrice,
           ...deposit.ethTxOptions,
         } as ethers.providers.TransactionRequest,
       ]
