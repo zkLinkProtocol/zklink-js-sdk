@@ -660,7 +660,6 @@ export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
   const toChainId = serializeChainId(withdraw.toChainId)
   const accountId = serializeAccountId(withdraw.accountId)
   const subAccountId = serializeSubAccountId(withdraw.subAccountId)
-  const accountBytes = serializeAddress(withdraw.from)
   const toBytes = serializeAddress(withdraw.to)
   const l2SourceTokenIdBytes = serializeTokenId(withdraw.l2SourceToken)
   const l1TargetTokenIdBytes = serializeTokenId(withdraw.l1TargetToken)
@@ -676,7 +675,6 @@ export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
     toChainId,
     accountId,
     subAccountId,
-    accountBytes,
     toBytes,
     l2SourceTokenIdBytes,
     l1TargetTokenIdBytes,

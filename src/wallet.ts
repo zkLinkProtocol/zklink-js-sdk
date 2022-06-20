@@ -1189,6 +1189,21 @@ export class Wallet {
     }
   }
 
+  async estimateGasDeposit(linkChainId: number, args: any[]) {
+    const mainZkSyncContract = await this.getZkSyncMainContract(linkChainId)
+
+    try {
+      const gasEstimate = await mainZkSyncContract.estimateGas.depositERC20(...args).then(
+        (estimate) => estimate,
+        () => BigNumber.from('0')
+      )
+      const recommendedGasLimit = ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT
+      return gasEstimate.gte(recommendedGasLimit) ? gasEstimate : recommendedGasLimit
+    } catch (e) {
+      this.modifyEthersError(e)
+    }
+  }
+
   async depositToSyncFromEthereum(deposit: {
     subAccountId: number
     depositTo: Address
@@ -1249,14 +1264,7 @@ export class Wallet {
       const txRequest = args[args.length - 1] as ethers.providers.TransactionRequest
       if (txRequest.gasLimit == null) {
         try {
-          const gasEstimate = await mainZkSyncContract.estimateGas.depositERC20(...args).then(
-            (estimate) => estimate,
-            () => BigNumber.from('0')
-          )
-          let recommendedGasLimit = ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT
-          txRequest.gasLimit = gasEstimate.gte(recommendedGasLimit)
-            ? gasEstimate
-            : recommendedGasLimit
+          txRequest.gasLimit = await this.estimateGasDeposit(deposit.linkChainId, args)
           args[args.length - 1] = txRequest
         } catch (e) {
           this.modifyEthersError(e)

@@ -783,31 +783,13 @@ class Wallet {
             }
         });
     }
-    isERC20DepositsApproved(token, linkChainId, erc20ApproveThreshold = utils_1.ERC20_APPROVE_TRESHOLD) {
+    estimateGasDeposit(linkChainId, args) {
         return __awaiter(this, void 0, void 0, function* () {
-            if ((0, utils_1.isTokenETH)(token)) {
-                throw Error('ETH token does not need approval.');
-            }
-            const erc20contract = new ethers_1.Contract(token, utils_1.IERC20_INTERFACE, this.ethSigner);
-            const contractAddress = yield this.provider.getContractAddress(linkChainId);
+            const mainZkSyncContract = yield this.getZkSyncMainContract(linkChainId);
             try {
-                const currentAllowance = yield erc20contract.allowance(this.address(), contractAddress.mainContract);
-                return ethers_1.BigNumber.from(currentAllowance).gte(erc20ApproveThreshold);
-            }
-            catch (e) {
-                this.modifyEthersError(e);
-            }
-        });
-    }
-    approveERC20TokenDeposits(token, linkChainId, max_erc20_approve_amount = utils_1.MAX_ERC20_APPROVE_AMOUNT) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if ((0, utils_1.isTokenETH)(token)) {
-                throw Error('ETH token does not need approval.');
-            }
-            const erc20contract = new ethers_1.Contract(token, utils_1.IERC20_INTERFACE, this.ethSigner);
-            const contractAddress = yield this.provider.getContractAddress(linkChainId);
-            try {
-                return erc20contract.approve(contractAddress.mainContract, max_erc20_approve_amount);
+                const gasEstimate = yield mainZkSyncContract.estimateGas.depositERC20(...args).then((estimate) => estimate, () => ethers_1.BigNumber.from('0'));
+                const recommendedGasLimit = utils_1.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT;
+                return gasEstimate.gte(recommendedGasLimit) ? gasEstimate : recommendedGasLimit;
             }
             catch (e) {
                 this.modifyEthersError(e);
@@ -816,7 +798,6 @@ class Wallet {
     }
     depositToSyncFromEthereum(deposit) {
         return __awaiter(this, void 0, void 0, function* () {
-            const gasPrice = yield this.ethSigner.provider.getGasPrice();
             const contractAddress = yield this.provider.getContractAddress(deposit.linkChainId);
             const mainZkSyncContract = yield this.getZkSyncMainContract(deposit.linkChainId);
             let ethTransaction;
@@ -853,11 +834,7 @@ class Wallet {
                 const txRequest = args[args.length - 1];
                 if (txRequest.gasLimit == null) {
                     try {
-                        const gasEstimate = yield mainZkSyncContract.estimateGas.depositERC20(...args).then((estimate) => estimate, () => ethers_1.BigNumber.from('0'));
-                        let recommendedGasLimit = utils_1.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT;
-                        txRequest.gasLimit = gasEstimate.gte(recommendedGasLimit)
-                            ? gasEstimate
-                            : recommendedGasLimit;
+                        txRequest.gasLimit = yield this.estimateGasDeposit(deposit.linkChainId, args);
                         args[args.length - 1] = txRequest;
                     }
                     catch (e) {

@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 import { BigNumber, ethers } from 'ethers'
+import { parseEther } from 'ethers/lib/utils'
 import { Wallet } from '../src/wallet'
 import { getTestProvider } from './provider.test'
 

@@ -26,7 +26,7 @@ describe('withdraw', () => {
       type: 'Withdraw',
     })
     expect(Buffer.from(serialized).toString('hex')).eq(
-      '030300000001013498f456645270ee003441df82c718b56c0e66663d809e414ba4893709c85f242ba3617481bc41260001000200000000000000056bb8cd3fbf7bc000334d00000055010032000000000000000000000000ffffffff',
+      '030300000001013d809e414ba4893709c85f242ba3617481bc41260001000200000000000000056bb8cd3fbf7bc000334d00000055010032000000000000000000000000ffffffff',
       'withdraw serialize bytes'
     )
   })
@@ -55,7 +55,7 @@ describe('withdraw', () => {
       'withdraw eth signature is incorrect'
     )
     expect(transaction.txData.tx.signature.signature).to.eq(
-      '3d3d73471d35fa6d388da78584a6755805f1321aac577c8e0e9a73452c8bae9c435308dab20a70cf37be75b0f083bd8b7c1fce8bad0f91cb89854db456b92105',
+      '2a6ced719f7d06d82a4036d6a040d9351ae2a30f7b1115606cae1cc76f4a6a047024c1755e06545f2041121c9988a541aa976d6260743f36366e5bb0abbb7e04',
       'withdraw signature is incorrect'
     )
   })
@@ -100,19 +100,11 @@ describe('withdraw', () => {
       validUntil: 4294967295,
       type: 'Withdraw',
     })
-    expect(serialized).to.eql(
-      new Uint8Array([
-        3, 1, 0, 0, 0, 2, 0, 108, 235, 108, 54, 207, 132, 51, 75, 175, 195, 174, 147, 189, 185, 214,
-        37, 182, 124, 216, 248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
-        22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 255,
-      ])
-    )
     expect(sha256(serialized)).to.eq(
-      '0xb22da80b712a728b2a72217e7bf1cc0de2b26c89dd80d576408d28bfaa64df82'
+      '0xef1c23c3c05b9329b226b47082aa0f9c0b66ce3b4c004a1c363f6377a575996b'
     )
     expect(Buffer.from(serialized).toString('hex')).eq(
-      '030100000002006ceb6c36cf84334bafc3ae93bdb9d625b67cd8f800000000000000000000000000000000000000000001001600000000000000000000000000000000000000000000010001000000000000000000000000ffffffff',
+      '0301000000020000000000000000000000000000000000000000000001001600000000000000000000000000000000000000000000010001000000000000000000000000ffffffff',
       'withdraw serialize bytes'
     )
   })

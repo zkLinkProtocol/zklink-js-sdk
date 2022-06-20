@@ -312,8 +312,7 @@ export declare class Wallet {
     getSubAccountState(subAccountId: number): Promise<AccountState>;
     getBalance(token: TokenLike, subAccountId: number, type?: 'committed' | 'verified'): Promise<BigNumber>;
     getEthereumBalance(token: TokenLike, linkChainId: ChainId): Promise<BigNumber>;
-    isERC20DepositsApproved(token: TokenLike, linkChainId: number, erc20ApproveThreshold?: BigNumber): Promise<boolean>;
-    approveERC20TokenDeposits(token: TokenLike, linkChainId: number, max_erc20_approve_amount?: BigNumber): Promise<ContractTransaction>;
+    estimateGasDeposit(linkChainId: number, args: any[]): Promise<BigNumber>;
     depositToSyncFromEthereum(deposit: {
         subAccountId: number;
         depositTo: Address;
