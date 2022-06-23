@@ -341,7 +341,11 @@ export function sleep(ms: number) {
 }
 
 export function isTokenETH(token: TokenLike): boolean {
-  return token === 'ETH' || token === constants.AddressZero
+  return (
+    token === 'ETH' ||
+    token === constants.AddressZero ||
+    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase() === token.toLowerCase()
+  )
 }
 
 type TokenOrId = TokenLike | number

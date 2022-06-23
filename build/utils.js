@@ -287,7 +287,9 @@ function sleep(ms) {
 }
 exports.sleep = sleep;
 function isTokenETH(token) {
-    return token === 'ETH' || token === ethers_1.constants.AddressZero;
+    return (token === 'ETH' ||
+        token === ethers_1.constants.AddressZero ||
+        '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase() === token.toLowerCase());
 }
 exports.isTokenETH = isTokenETH;
 class TokenSet {
