@@ -844,6 +844,7 @@ export function serializeForcedExit(forcedExit: ForcedExit): Uint8Array {
   const targetBytes = serializeAddress(forcedExit.target)
   const l2SourceTokenIdBytes = serializeTokenId(forcedExit.l2SourceToken)
   const l1TargetTokenIdBytes = serializeTokenId(forcedExit.l1TargetToken)
+  const feeTokenIdBytes = serializeTokenId(forcedExit.feeToken)
   const feeBytes = serializeFeePacked(forcedExit.fee)
   const nonceBytes = serializeNonce(forcedExit.nonce)
   const validFrom = serializeTimestamp(forcedExit.validFrom)
@@ -857,6 +858,7 @@ export function serializeForcedExit(forcedExit: ForcedExit): Uint8Array {
     targetBytes,
     l2SourceTokenIdBytes,
     l1TargetTokenIdBytes,
+    feeTokenIdBytes,
     feeBytes,
     nonceBytes,
     validFrom,

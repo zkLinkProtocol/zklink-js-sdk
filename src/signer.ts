@@ -305,6 +305,7 @@ export class Signer {
     target: Address
     l2SourceToken: number
     l1TargetToken: number
+    feeToken: number
     fee: BigNumberish
     ts: number
     nonce: number
@@ -324,6 +325,7 @@ export class Signer {
     target: Address
     l2SourceToken: number
     l1TargetToken: number
+    feeToken: number
     fee: BigNumberish
     ts: number
     nonce: number

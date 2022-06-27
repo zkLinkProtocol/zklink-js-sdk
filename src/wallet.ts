@@ -331,6 +331,7 @@ export class Wallet {
     target: Address
     l2SourceToken: TokenLike
     l1TargetToken: TokenLike
+    feeToken: TokenLike
     fee: BigNumberish
     ts: number
     nonce: number
@@ -348,6 +349,7 @@ export class Wallet {
       target: forcedExit.target,
       l2SourceToken: this.provider.tokenSet.resolveTokenId(forcedExit.l2SourceToken),
       l1TargetToken: this.provider.tokenSet.resolveTokenId(forcedExit.l1TargetToken),
+      feeToken: this.provider.tokenSet.resolveTokenId(forcedExit.feeToken),
       fee: forcedExit.fee,
       ts: forcedExit.ts,
       nonce: forcedExit.nonce,
@@ -364,6 +366,7 @@ export class Wallet {
     target: Address
     l2SourceToken: TokenLike
     l1TargetToken: TokenLike
+    feeToken: TokenLike
     fee: BigNumberish
     ts?: number
     nonce: number
@@ -376,7 +379,7 @@ export class Wallet {
     const stringFee = BigNumber.from(forcedExit.fee).isZero()
       ? null
       : utils.formatEther(forcedExit.fee)
-    const stringToken = this.provider.tokenSet.resolveTokenSymbol(forcedExit.l2SourceToken)
+    const stringToken = this.provider.tokenSet.resolveTokenSymbol(forcedExit.feeToken)
     const ethereumSignature =
       this.ethSigner instanceof Create2WalletSigner
         ? null
@@ -399,6 +402,7 @@ export class Wallet {
     subAccountId: number
     l2SourceToken: TokenLike
     l1TargetToken: TokenLike
+    feeToken: TokenLike
     ts?: number
     fee?: BigNumberish
     nonce?: Nonce
@@ -412,7 +416,7 @@ export class Wallet {
       const fullFee = await this.provider.getTransactionFee(
         'Withdraw',
         forcedExit.target,
-        forcedExit.l1TargetToken
+        forcedExit.feeToken
       )
       forcedExit.fee = fullFee.totalFee
     }
