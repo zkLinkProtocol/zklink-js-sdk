@@ -214,6 +214,7 @@ class Wallet {
                 target: forcedExit.target,
                 l2SourceToken: this.provider.tokenSet.resolveTokenId(forcedExit.l2SourceToken),
                 l1TargetToken: this.provider.tokenSet.resolveTokenId(forcedExit.l1TargetToken),
+                feeToken: this.provider.tokenSet.resolveTokenId(forcedExit.feeToken),
                 fee: forcedExit.fee,
                 ts: forcedExit.ts,
                 nonce: forcedExit.nonce,
@@ -230,7 +231,7 @@ class Wallet {
             const stringFee = ethers_1.BigNumber.from(forcedExit.fee).isZero()
                 ? null
                 : ethers_1.utils.formatEther(forcedExit.fee);
-            const stringToken = this.provider.tokenSet.resolveTokenSymbol(forcedExit.l2SourceToken);
+            const stringToken = this.provider.tokenSet.resolveTokenSymbol(forcedExit.feeToken);
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
                 : yield this.ethMessageSigner.ethSignForcedExit({
@@ -251,7 +252,7 @@ class Wallet {
                 forcedExit.nonce != null ? yield this.getNonce(forcedExit.nonce) : yield this.getNonce();
             if (forcedExit.fee == null) {
                 // Fee for forced exit is defined by `Withdraw` transaction type (as it's essentially just a forced withdraw).
-                const fullFee = yield this.provider.getTransactionFee('Withdraw', forcedExit.target, forcedExit.l1TargetToken);
+                const fullFee = yield this.provider.getTransactionFee('Withdraw', forcedExit.target, forcedExit.feeToken);
                 forcedExit.fee = fullFee.totalFee;
             }
             const signedForcedExitTransaction = yield this.signSyncForcedExit(forcedExit);

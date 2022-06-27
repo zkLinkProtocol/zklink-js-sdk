@@ -168,6 +168,7 @@ export interface ForcedExit {
     target: Address;
     l2SourceToken: number;
     l1TargetToken: number;
+    feeToken: number;
     fee: BigNumberish;
     ts: number;
     nonce: number;

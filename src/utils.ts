@@ -674,6 +674,7 @@ export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
   const withdrawFeeRatioBytes = serializeFeeRatio(withdraw.withdrawFeeRatio)
   const validFrom = serializeTimestamp(withdraw.validFrom)
   const validUntil = serializeTimestamp(withdraw.validUntil)
+  const tsBytes = numberToBytesBE(withdraw.ts, 4)
   return ethers.utils.concat([
     type,
     toChainId,
@@ -689,6 +690,7 @@ export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
     withdrawFeeRatioBytes,
     validFrom,
     validUntil,
+    tsBytes,
   ])
 }
 

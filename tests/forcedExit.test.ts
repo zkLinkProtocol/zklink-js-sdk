@@ -13,6 +13,7 @@ describe('forcedExit', () => {
       subAccountId: 0,
       initiatorAccountId: 1,
       target: '0x3498F456645270eE003441df82C718b56c0e6666',
+      feeToken: 0,
       fee: BigNumber.from('4100000000000000'),
       nonce: 85,
       validFrom: 0,
@@ -22,7 +23,7 @@ describe('forcedExit', () => {
       ts: 1649749979,
     })
     expect(Buffer.from(serialized).toString('hex')).eq(
-      '070100000001003498f456645270ee003441df82c718b56c0e666600010002334d00000055000000000000000000000000ffffffff62552fdb'
+      '070100000001003498f456645270ee003441df82c718b56c0e6666000100020000334d00000055000000000000000000000000ffffffff62552fdb'
     )
   })
 
@@ -35,11 +36,12 @@ describe('forcedExit', () => {
       target: '0x3498F456645270eE003441df82C718b56c0e6666',
       l2SourceToken: 1,
       l1TargetToken: 2,
+      feeToken: 2,
       fee: BigNumber.from(parseEther('0.001')),
       ts: 1649749979,
     } as any)
     expect(transaction.txData.tx.signature.signature).eq(
-      '6139079a63ffff149e5a15c24897cda0d3681fec4f6328c69030f63fd602cb1769843d974e75afe785787bd221356b8f4eb99c9ef206eff259159d733de7e905'
+      '8c2a91ef7efd35b0e047fe0fba2867695f391db3dcc375fb12fb2dd9e6b65911f281d381d574793249acf21be4348e665808e972b6b52c9c2cc1774d93582200'
     )
   })
 })

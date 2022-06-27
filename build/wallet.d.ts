@@ -81,6 +81,7 @@ export declare class Wallet {
         target: Address;
         l2SourceToken: TokenLike;
         l1TargetToken: TokenLike;
+        feeToken: TokenLike;
         fee: BigNumberish;
         ts: number;
         nonce: number;
@@ -93,6 +94,7 @@ export declare class Wallet {
         target: Address;
         l2SourceToken: TokenLike;
         l1TargetToken: TokenLike;
+        feeToken: TokenLike;
         fee: BigNumberish;
         ts?: number;
         nonce: number;
@@ -105,6 +107,7 @@ export declare class Wallet {
         subAccountId: number;
         l2SourceToken: TokenLike;
         l1TargetToken: TokenLike;
+        feeToken: TokenLike;
         ts?: number;
         fee?: BigNumberish;
         nonce?: Nonce;
