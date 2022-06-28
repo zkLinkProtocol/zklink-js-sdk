@@ -51,7 +51,7 @@ describe('withdraw', () => {
       withdrawFeeRatio: 50,
     } as any)
     expect(transaction.txData.ethereumSignature.signature).to.eq(
-      '0x6cd06b65864161a55fff2375cdbcd346be07019883fc328126b81d537c8f44480cd515487127fdb081e78444d1ddb687468fe3f8378abe8dc636a0c295ad160d1b',
+      '0xbfe055acee3438a4aa87b51ad3238047907dce479e8835b5dd31631da06edee952b9660273c29b2e4966cd6d6e968676d8ed58b91e329091b7f6a20cff35cc8b1b',
       'withdraw eth signature is incorrect'
     )
     expect(transaction.txData.tx.signature.signature).to.eq(

@@ -40,6 +40,9 @@ describe('forcedExit', () => {
       fee: BigNumber.from(parseEther('0.001')),
       ts: 1649749979,
     } as any)
+    expect(transaction.txData.ethereumSignature.signature).eq(
+      '0x06b33a4c2be90fffa50e977470ae71c221f115545f979bbaae0d185a3aef1a26714b472507f7be1f7c61f2433637946bc8146558d52a86410e1ea9b65095b6941c'
+    )
     expect(transaction.txData.tx.signature.signature).eq(
       '8c2a91ef7efd35b0e047fe0fba2867695f391db3dcc375fb12fb2dd9e6b65911f281d381d574793249acf21be4348e665808e972b6b52c9c2cc1774d93582200'
     )
