@@ -812,7 +812,7 @@ export class Wallet {
       : utils.formatEther(withdraw.amount)
     const stringFee = BigNumber.from(withdraw.fee).isZero() ? null : utils.formatEther(withdraw.fee)
 
-    const stringToken = withdraw.l2SourceToken
+    const stringToken = this.provider.tokenSet.resolveTokenSymbol(withdraw.l1TargetToken)
     const ethereumSignature =
       this.ethSigner instanceof Create2WalletSigner
         ? null

@@ -514,7 +514,7 @@ class Wallet {
                 ? null
                 : ethers_1.utils.formatEther(withdraw.amount);
             const stringFee = ethers_1.BigNumber.from(withdraw.fee).isZero() ? null : ethers_1.utils.formatEther(withdraw.fee);
-            const stringToken = withdraw.l2SourceToken;
+            const stringToken = this.provider.tokenSet.resolveTokenSymbol(withdraw.l1TargetToken);
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
                 : yield this.ethMessageSigner.ethSignWithdraw({
