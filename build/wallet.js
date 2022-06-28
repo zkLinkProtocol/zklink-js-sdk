@@ -231,7 +231,7 @@ class Wallet {
             const stringFee = ethers_1.BigNumber.from(forcedExit.fee).isZero()
                 ? null
                 : ethers_1.utils.formatEther(forcedExit.fee);
-            const stringToken = this.provider.tokenSet.resolveTokenSymbol(forcedExit.feeToken);
+            const stringToken = this.provider.tokenSet.resolveTokenSymbol(forcedExit.l2SourceToken);
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
                 : yield this.ethMessageSigner.ethSignForcedExit({
@@ -514,7 +514,7 @@ class Wallet {
                 ? null
                 : ethers_1.utils.formatEther(withdraw.amount);
             const stringFee = ethers_1.BigNumber.from(withdraw.fee).isZero() ? null : ethers_1.utils.formatEther(withdraw.fee);
-            const stringToken = this.provider.tokenSet.resolveTokenSymbol(withdraw.l1TargetToken);
+            const stringToken = this.provider.tokenSet.resolveTokenSymbol(withdraw.l2SourceToken);
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
                 : yield this.ethMessageSigner.ethSignWithdraw({
