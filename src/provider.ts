@@ -218,12 +218,14 @@ export class Provider {
   async getTransactionFee(
     txType: 'Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee,
     address: Address,
-    tokenLike: TokenLike
+    tokenLike: TokenLike,
+    chainId: number | null // Link chain id, required number in withdraw and forcedId, others null
   ): Promise<Fee> {
     const transactionFee = await this.transport.request('get_tx_fee', [
       txType,
       address.toString(),
       tokenLike,
+      chainId,
     ])
     return {
       feeType: transactionFee.feeType,

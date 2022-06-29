@@ -192,12 +192,14 @@ class Provider {
             }
         });
     }
-    getTransactionFee(txType, address, tokenLike) {
+    getTransactionFee(txType, address, tokenLike, chainId // Link chain id, required number in withdraw and forcedId, others null
+    ) {
         return __awaiter(this, void 0, void 0, function* () {
             const transactionFee = yield this.transport.request('get_tx_fee', [
                 txType,
                 address.toString(),
                 tokenLike,
+                chainId,
             ]);
             return {
                 feeType: transactionFee.feeType,

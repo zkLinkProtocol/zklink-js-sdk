@@ -416,7 +416,8 @@ export class Wallet {
       const fullFee = await this.provider.getTransactionFee(
         'Withdraw',
         forcedExit.target,
-        forcedExit.feeToken
+        forcedExit.feeToken,
+        forcedExit.toChainId
       )
       forcedExit.fee = fullFee.totalFee
     }
@@ -520,7 +521,12 @@ export class Wallet {
       transfer.nonce != null ? await this.getNonce(transfer.nonce) : await this.getNonce()
 
     if (transfer.fee == null) {
-      const fullFee = await this.provider.getTransactionFee('Transfer', transfer.to, transfer.token)
+      const fullFee = await this.provider.getTransactionFee(
+        'Transfer',
+        transfer.to,
+        transfer.token,
+        null
+      )
       transfer.fee = fullFee.totalFee
     }
     const signedTransferTransaction = await this.signSyncTransfer(transfer as any)
@@ -850,10 +856,15 @@ export class Wallet {
     withdraw.nonce =
       withdraw.nonce != null ? await this.getNonce(withdraw.nonce) : await this.getNonce()
 
-    // if (withdraw.fee == null) {
-    //     const fullFee = await this.provider.getTransactionFee('Withdraw', withdraw.ethAddress, withdraw.token);
-    //     withdraw.fee = fullFee.totalFee;
-    // }
+    if (withdraw.fee == null) {
+      const fullFee = await this.provider.getTransactionFee(
+        'Withdraw',
+        withdraw.to,
+        withdraw.l2SourceToken,
+        withdraw.toChainId
+      )
+      withdraw.fee = fullFee.totalFee
+    }
 
     const signedWithdrawTransaction = await this.signWithdrawFromSyncToEthereum(withdraw as any)
 

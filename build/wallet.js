@@ -252,7 +252,7 @@ class Wallet {
                 forcedExit.nonce != null ? yield this.getNonce(forcedExit.nonce) : yield this.getNonce();
             if (forcedExit.fee == null) {
                 // Fee for forced exit is defined by `Withdraw` transaction type (as it's essentially just a forced withdraw).
-                const fullFee = yield this.provider.getTransactionFee('Withdraw', forcedExit.target, forcedExit.feeToken);
+                const fullFee = yield this.provider.getTransactionFee('Withdraw', forcedExit.target, forcedExit.feeToken, forcedExit.toChainId);
                 forcedExit.fee = fullFee.totalFee;
             }
             const signedForcedExitTransaction = yield this.signSyncForcedExit(forcedExit);
@@ -318,7 +318,7 @@ class Wallet {
             transfer.nonce =
                 transfer.nonce != null ? yield this.getNonce(transfer.nonce) : yield this.getNonce();
             if (transfer.fee == null) {
-                const fullFee = yield this.provider.getTransactionFee('Transfer', transfer.to, transfer.token);
+                const fullFee = yield this.provider.getTransactionFee('Transfer', transfer.to, transfer.token, null);
                 transfer.fee = fullFee.totalFee;
             }
             const signedTransferTransaction = yield this.signSyncTransfer(transfer);
@@ -535,10 +535,10 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             withdraw.nonce =
                 withdraw.nonce != null ? yield this.getNonce(withdraw.nonce) : yield this.getNonce();
-            // if (withdraw.fee == null) {
-            //     const fullFee = await this.provider.getTransactionFee('Withdraw', withdraw.ethAddress, withdraw.token);
-            //     withdraw.fee = fullFee.totalFee;
-            // }
+            if (withdraw.fee == null) {
+                const fullFee = yield this.provider.getTransactionFee('Withdraw', withdraw.to, withdraw.l2SourceToken, withdraw.toChainId);
+                withdraw.fee = fullFee.totalFee;
+            }
             const signedWithdrawTransaction = yield this.signWithdrawFromSyncToEthereum(withdraw);
             return submitSignedTransaction(signedWithdrawTransaction, this.provider, withdraw.fastProcessing);
         });

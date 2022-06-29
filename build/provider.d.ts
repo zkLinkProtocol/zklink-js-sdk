@@ -39,7 +39,7 @@ export declare class Provider {
     getEthTxForWithdrawal(withdrawal_hash: string): Promise<string>;
     notifyPriorityOp(linkChainId: number, serialId: number, action: 'COMMIT' | 'VERIFY'): Promise<PriorityOperationReceipt>;
     notifyTransaction(hash: string, action: 'COMMIT' | 'VERIFY'): Promise<TransactionReceipt>;
-    getTransactionFee(txType: 'Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee, address: Address, tokenLike: TokenLike): Promise<Fee>;
+    getTransactionFee(txType: 'Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee, address: Address, tokenLike: TokenLike, chainId: number | null): Promise<Fee>;
     getTransactionsBatchFee(txTypes: ('Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee)[], addresses: Address[], tokenLike: TokenLike): Promise<BigNumber>;
     getTokenPrice(tokenLike: TokenLike): Promise<number>;
     disconnect(): Promise<any>;
