@@ -745,7 +745,8 @@ class Wallet {
     }
     getAccountId() {
         return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.provider.getState(this.address())).id;
+            this.accountId = (yield this.provider.getState(this.address())).id;
+            return this.accountId;
         });
     }
     address() {

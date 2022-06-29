@@ -1160,7 +1160,8 @@ export class Wallet {
   }
 
   async getAccountId(): Promise<number | undefined> {
-    return (await this.provider.getState(this.address())).id
+    this.accountId = (await this.provider.getState(this.address())).id
+    return this.accountId
   }
 
   address(): Address {
