@@ -508,6 +508,7 @@ class Wallet {
             withdraw.validFrom = withdraw.validFrom || 0;
             withdraw.withdrawFeeRatio = withdraw.withdrawFeeRatio || 0;
             withdraw.validUntil = withdraw.validUntil || utils_1.MAX_TIMESTAMP;
+            withdraw.accountId = withdraw.accountId || this.accountId;
             withdraw.ts = withdraw.ts || (0, utils_1.getTimestamp)();
             const signedWithdrawTransaction = yield this.getWithdrawFromSyncToEthereum(withdraw);
             const stringAmount = ethers_1.BigNumber.from(withdraw.amount).isZero()

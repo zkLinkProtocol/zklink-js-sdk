@@ -810,6 +810,7 @@ export class Wallet {
     withdraw.validFrom = withdraw.validFrom || 0
     withdraw.withdrawFeeRatio = withdraw.withdrawFeeRatio || 0
     withdraw.validUntil = withdraw.validUntil || MAX_TIMESTAMP
+    withdraw.accountId = withdraw.accountId || this.accountId
     withdraw.ts = withdraw.ts || getTimestamp()
     const signedWithdrawTransaction = await this.getWithdrawFromSyncToEthereum(withdraw as any)
 
