@@ -71,10 +71,12 @@ export interface AccountState {
     nonce: number
     pubKeyHash: PubKeyHash
     orders: {
-      [slotId: number]: {
-        nonce: number
-        order_hash: string
-        residue: string
+      [subAccountId: number]: {
+        [slotId: number]: {
+          nonce: number
+          order_hash: string
+          residue: string
+        }
       }
     }
   }
