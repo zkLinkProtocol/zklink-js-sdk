@@ -68,6 +68,8 @@ export declare class Wallet {
         account: Address;
         taker: any;
         maker: any;
+        expectBaseAmount: BigNumberish;
+        expectQuoteAmount: BigNumberish;
         fee: BigNumberish;
         feeToken: TokenLike;
         ts?: number;
