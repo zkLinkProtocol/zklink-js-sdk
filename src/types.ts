@@ -345,7 +345,7 @@ export interface Fee {
   // Operation type (amount of chunks in operation differs and impacts the total fee).
   feeType: 'Withdraw' | 'Transfer' | 'TransferToNew' | 'FastWithdraw' | ChangePubKeyFee
   // Amount of gas used by transaction
-  gasTxAmount: BigNumber
+  gasTxAmounts: BigNumber[]
   // Gas price (in wei)
   gasPriceWei: BigNumber
   // Ethereum gas part of fee (in wei)

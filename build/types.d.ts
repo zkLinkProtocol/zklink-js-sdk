@@ -261,7 +261,7 @@ export interface LegacyChangePubKeyFee {
 }
 export interface Fee {
     feeType: 'Withdraw' | 'Transfer' | 'TransferToNew' | 'FastWithdraw' | ChangePubKeyFee;
-    gasTxAmount: BigNumber;
+    gasTxAmounts: BigNumber[];
     gasPriceWei: BigNumber;
     gasFee: BigNumber;
     zkpFee: BigNumber;

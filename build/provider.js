@@ -201,12 +201,9 @@ class Provider {
                 tokenLike,
                 chainId,
             ]);
-            const gasTxAmount = Array.isArray(transactionFee.gasTxAmount)
-                ? transactionFee.gasTxAmount.map((a) => ethers_1.BigNumber.from(a))
-                : ethers_1.BigNumber.from(transactionFee.gasTxAmount);
             return {
                 feeType: transactionFee.feeType,
-                gasTxAmount: gasTxAmount,
+                gasTxAmounts: transactionFee.gasTxAmounts.map((a) => ethers_1.BigNumber.from(a)),
                 gasPriceWei: ethers_1.BigNumber.from(transactionFee.gasPriceWei),
                 gasFee: ethers_1.BigNumber.from(transactionFee.gasFee),
                 zkpFee: ethers_1.BigNumber.from(transactionFee.zkpFee),

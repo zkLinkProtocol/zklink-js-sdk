@@ -227,12 +227,9 @@ export class Provider {
       tokenLike,
       chainId,
     ])
-    const gasTxAmount = Array.isArray(transactionFee.gasTxAmount)
-      ? transactionFee.gasTxAmount.map((a: string) => BigNumber.from(a))
-      : BigNumber.from(transactionFee.gasTxAmount)
     return {
       feeType: transactionFee.feeType,
-      gasTxAmount: gasTxAmount,
+      gasTxAmounts: transactionFee.gasTxAmounts.map((a: string) => BigNumber.from(a)),
       gasPriceWei: BigNumber.from(transactionFee.gasPriceWei),
       gasFee: BigNumber.from(transactionFee.gasFee),
       zkpFee: BigNumber.from(transactionFee.zkpFee),
