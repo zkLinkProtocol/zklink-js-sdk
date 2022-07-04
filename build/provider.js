@@ -203,7 +203,7 @@ class Provider {
             ]);
             return {
                 feeType: transactionFee.feeType,
-                gasTxAmount: ethers_1.BigNumber.from(transactionFee.gasTxAmount),
+                gasTxAmount: ethers_1.BigNumber.from('0'),
                 gasPriceWei: ethers_1.BigNumber.from(transactionFee.gasPriceWei),
                 gasFee: ethers_1.BigNumber.from(transactionFee.gasFee),
                 zkpFee: ethers_1.BigNumber.from(transactionFee.zkpFee),

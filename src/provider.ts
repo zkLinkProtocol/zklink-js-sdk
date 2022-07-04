@@ -229,7 +229,7 @@ export class Provider {
     ])
     return {
       feeType: transactionFee.feeType,
-      gasTxAmount: BigNumber.from(transactionFee.gasTxAmount),
+      gasTxAmount: BigNumber.from('0'), // transactionFee.gasTxAmount
       gasPriceWei: BigNumber.from(transactionFee.gasPriceWei),
       gasFee: BigNumber.from(transactionFee.gasFee),
       zkpFee: BigNumber.from(transactionFee.zkpFee),
