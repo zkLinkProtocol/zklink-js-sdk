@@ -559,7 +559,9 @@ class Wallet {
             if (!this.signer) {
                 throw new Error('ZKLink signer is required for current pubkey calculation.');
             }
-            let feeTokenId = 0;
+            let feeTokenId = changePubKey.feeToken === '' || changePubKey.feeToken === undefined
+                ? 1
+                : this.provider.tokenSet.resolveTokenId(changePubKey.feeToken);
             const newPkHash = yield this.signer.pubKeyHash();
             yield this.setRequiredAccountIdFromServer('Set Signing Key');
             const changePubKeyTx = yield this.signer.signSyncChangePubKey({
