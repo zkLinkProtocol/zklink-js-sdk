@@ -171,7 +171,7 @@ class Signer {
     }
     static fromETHSignature(ethSigner) {
         return __awaiter(this, void 0, void 0, function* () {
-            let message = 'Access zkLink account.\n\nOnly sign this message for a trusted client!';
+            let message = 'Sign this message to create your account.\nNOTE: This application is powered by zkLink’s multi-chain network.\n\nOnly sign this message for a trusted client!';
             const signedBytes = utils.getSignedBytesFromMessage(message, false);
             const signature = yield utils.signMessagePersonalAPI(ethSigner, signedBytes);
             const address = yield ethSigner.getAddress();

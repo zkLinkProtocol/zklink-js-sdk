@@ -412,7 +412,8 @@ export class Signer {
     signer: Signer
     ethSignatureType: EthSignerType
   }> {
-    let message = 'Access zkLink account.\n\nOnly sign this message for a trusted client!'
+    let message =
+      'Sign this message to create your account.\nNOTE: This application is powered by zkLink’s multi-chain network.\n\nOnly sign this message for a trusted client!'
     const signedBytes = utils.getSignedBytesFromMessage(message, false)
     const signature = await utils.signMessagePersonalAPI(ethSigner, signedBytes)
     const address = await ethSigner.getAddress()
