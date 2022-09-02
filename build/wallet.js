@@ -820,7 +820,7 @@ class Wallet {
                 let nonce;
                 if (deposit.approveDepositAmountForERC20) {
                     try {
-                        const approveTx = yield erc20contract.approve(contractAddress.mainContract, deposit.amount);
+                        const approveTx = yield erc20contract.approve(contractAddress.mainContract, utils_1.MAX_ERC20_APPROVE_AMOUNT);
                         nonce = approveTx.nonce + 1;
                     }
                     catch (e) {

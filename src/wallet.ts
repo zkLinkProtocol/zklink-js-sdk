@@ -1263,7 +1263,7 @@ export class Wallet {
         try {
           const approveTx = await erc20contract.approve(
             contractAddress.mainContract,
-            deposit.amount
+            MAX_ERC20_APPROVE_AMOUNT
           )
           nonce = approveTx.nonce + 1
         } catch (e) {
