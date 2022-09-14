@@ -23,7 +23,7 @@ describe('Wallet with mock provider', function () {
       '0xd09Ad14080d4b257a819a4f579b8485Be88f086c',
       'Wallet address does not match'
     )
-    expect(await wallet.signer.pubKeyHash()).eq('sync:05ded0fbbe3c269ed1a8d17b3a9f973ad78be767')
+    expect(await wallet.signer.pubKeyHash()).eq('sync:511494921e9aec60dfd65ce125dec96fe7c07133')
   })
 
   it("Wallet's account info has the same address as the wallet itself", async function () {

@@ -29,9 +29,9 @@ describe('matching', () => {
         feeRatio2: 10,
         accountId: 6,
         signature: {
-          pubKey: '167850be112e16a992d27c6119e05ec8aee2b45446b79b1c969a48352d626aa5',
+          pubKey: '191f5a474b7b8af67e4338c169b16093a8662bd9fd825b88ec97f987e6453e1c',
           signature:
-            '885fe56579721af575b77fb66abc49a7e0cee00fc1409fcd856ede10d1a2e894076a26859eafb96353c524fcaa7f4e3f924388dc286c28b26d97f0cf4177f800',
+            'df557d94e1c6cbafb09afa1582fcbb41c89dd1a93b56aa71af840c34c5d1ee9cf8f9d790202b51defbbd954307b0f98b5f14d944dedfe14bd86eee1ef73f0500',
         },
         validFrom: 0,
         validUntil: 9007199254740991,
@@ -50,9 +50,9 @@ describe('matching', () => {
         feeRatio2: 10,
         accountId: 6,
         signature: {
-          pubKey: '167850be112e16a992d27c6119e05ec8aee2b45446b79b1c969a48352d626aa5',
+          pubKey: '191f5a474b7b8af67e4338c169b16093a8662bd9fd825b88ec97f987e6453e1c',
           signature:
-            '49884e838d4972772516eaafdc264491c56c23688e936852fcff7fd6f20598175a1a604432794db0a33bcf03f59ad3280e6a7ae113646cfb820c1edec6b95201',
+            '95f42b81cd32c1b1ede071db54ac9a436cebac8587712af6a00facd83308380f499528b92acf10e680ba2d5da5dabde243e2727ed6d22a1ca1a3685d12906803',
         },
         validFrom: 0,
         validUntil: 9007199254740991,
@@ -115,7 +115,7 @@ describe('matching', () => {
     const { tx } = signedTransaction as any
     // wrong l2 signature: 46ab809c4a5beacfd423bb05332e818fb65d4d570939852206565c9a22adad8a3c3b4e69832c93f5b54b317bebcb44292bce5142f4bfa39f1b51a1cadcacae03
     expect(tx.signature.signature).to.eq(
-      'dd9cd5f62605c5b19e5003ae6ddae8e49510386dbfecb42f13aed1eba06764a72c99122f7ee0c66b3b9864dc3939e2e203c8ba549a520f61c81abeb370d0b901',
+      'ff270b36263d1209e2f5a3b3ac1947ccac83342adc3dc21cc9c8438081e969062b58dbc5572a80ea6716a1fc38b7e5be9f7260b3709b9ae14e7de995b4f92404',
       'order matching signature is incorrect'
     )
   })

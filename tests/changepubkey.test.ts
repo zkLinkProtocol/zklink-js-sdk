@@ -23,7 +23,7 @@ describe('ChangePubKey', () => {
     const wallet = await getWallet()
     const signedTransaction: any = await wallet.signSetSigningKey({
       linkChainId: 1,
-      feeToken: 0,
+      feeToken: 1,
       fee: '0',
       nonce: 0,
       ethAuthType: 'ECDSA',
@@ -35,10 +35,10 @@ describe('ChangePubKey', () => {
       validUntil: 4294967295,
     } as any)
     expect(signedTransaction.tx.ethAuthData.ethSignature).eq(
-      '0x704dc27a1d4d6c95ebaed6d3487903cdbd4eb7f82c780f358bd98e4bbdf521182cdcaf1de93e257f4f8ecce65c853770d2619188c157ceb048b6752fc268a4321c'
+      '0xb0f0f5ca9d165dd28561e9a084049d53aa95683937aa0c14ddbfa8478e19168f25e1ac75afd71f2ca8a24672a80fa6424408d6333ffdcbafd61725fa18aa6ec51c'
     )
     expect(signedTransaction.tx.signature.signature).eq(
-      '0f2d2e2ec5d0618d3e177a525ba2dc7a28b6c9ad4b8ba830c5706041ee389d2f82eb6df01049dcf1995858cee1f0ef25133724a9c85e80cee7f155095f7f9404'
+      'd23f20cb8a177b179ef026f2bac6f1a1d0d1f36eb9e8a27e74249e4caba6db17125c69e4e0daa82225a148d18309f6575b0c1ae31651463d57472e826fbc3c01'
     )
   })
 })

@@ -88,10 +88,10 @@ describe('Order', () => {
     const wallet = await getWallet()
     const signedTransaction = await wallet.signSyncOrder(orderMaker as any)
     expect(signedTransaction.tx.signature.pubKey).eq(
-      '167850be112e16a992d27c6119e05ec8aee2b45446b79b1c969a48352d626aa5'
+      '191f5a474b7b8af67e4338c169b16093a8662bd9fd825b88ec97f987e6453e1c'
     )
     expect(signedTransaction.tx.signature.signature).eq(
-      '12476f90c581aa971ac4a7c056d4d64360fc346171b5861bd8ff0c71f2878b1e6589484da2488ae040f7e2748a6a6bf8f478c05ece0dad80851b49e921914f00'
+      '614b8dac98751bbf1480711bc8cbbf653d9ee8610212e551ff33c648865670875c300fb3f287b3b1741ce07aabf26545b191e503c9146758e958044d12dbca01'
     )
   })
 
@@ -113,7 +113,7 @@ describe('Order', () => {
       validUntil: defaultValidUntil,
     } as any)
     expect(signedTransaction.tx.signature.signature).eq(
-      '4bd968c6e0d230d944db951924f6c4f244d757349ffd4bce7dcde84d66246f84fa3454f96f006188bf48bb2b07b0d35929e1fa4831ce0f5ecd55b0c5a90e4605'
+      'b58972f7fc8b05491d0a3a8abea88be52ab28715271aba716ebc5d40e06bd418876de1baa20e4115a62d2ff2722e362a6f5152817397df1a9795453ae1719303'
     )
   })
 })

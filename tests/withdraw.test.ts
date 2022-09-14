@@ -55,7 +55,7 @@ describe('withdraw', () => {
       'withdraw eth signature is incorrect'
     )
     expect(transaction.txData.tx.signature.signature).to.eq(
-      '8abae5f85038ff5431712db50690fc142582a62f79bcb8d9a724611a8d66ff06f734c660d0025d4ff312918cff3f8a9695ad6b79dce4948025c2f678b38a2f03',
+      '075844bf1bc1a47572dc355f18c641ad69f38188ab889148c66060ee51050bb0c4027da0e7f42c225dabdec6c5e9889380e887846ce09d1e9db2b862ed528005',
       'withdraw signature is incorrect'
     )
   })
