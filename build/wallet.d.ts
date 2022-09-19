@@ -315,7 +315,7 @@ export declare class Wallet {
     address(): Address;
     getAccountState(): Promise<AccountState>;
     getSubAccountState(subAccountId: number): Promise<AccountState>;
-    getBalance(token: TokenLike, subAccountId: number, type?: 'committed' | 'verified'): Promise<BigNumber>;
+    getBalance(token: TokenLike, subAccountId: number): Promise<BigNumber>;
     getEthereumBalance(token: TokenLike, linkChainId: ChainId): Promise<BigNumber>;
     estimateGasDeposit(linkChainId: number, args: any[]): Promise<BigNumber>;
     depositToSyncFromEthereum(deposit: {

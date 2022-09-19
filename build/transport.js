@@ -235,27 +235,16 @@ class DummyTransport extends AbstractJSONRPCTransport {
                 //  - adds single entry of "DAI" token to the committed balances;
                 //  - adds single entry of "USDC" token to the verified balances.
                 return {
-                    address: params[0],
                     id: 42,
-                    depositing: {},
-                    committed: {
-                        balances: {
-                            0: {
-                                USD: ethers_1.BigNumber.from(12345),
-                            },
+                    address: params[0],
+                    nonce: 0,
+                    pubKeyHash: yield this.getPubKeyHash(),
+                    balances: {
+                        '0': {
+                            '1': ethers_1.BigNumber.from(12345),
                         },
-                        nonce: 0,
-                        pubKeyHash: yield this.getPubKeyHash(),
                     },
-                    verified: {
-                        balances: {
-                            0: {
-                                USD: ethers_1.BigNumber.from(98765),
-                            },
-                        },
-                        nonce: 0,
-                        pubKeyHash: '',
-                    },
+                    orders: {},
                 };
             }
             if (method == 'tx_submit') {

@@ -45,50 +45,24 @@ export interface Create2Data {
 }
 
 export interface AccountState {
-  address: Address
   id?: number
-  depositing: {
-    balances: {
-      [subAccountId: number]: {
-        // Token are indexed by their symbol (e.g. "ETH")
-        [token: string]: {
-          // Sum of pending deposits for the token.
-          amount: BigNumberish
-          // Value denoting the block number when the funds are expected
-          // to be received by zkSync network.
-          expectedAcceptBlock: number
-        }
-      }
+  address: Address
+  nonce: number
+  pubKeyHash: PubKeyHash
+  balances: {
+    [subAccountId: string]: {
+      // Token are indexed by their id (e.g. "1")
+      [tokenId: string]: BigNumberish
     }
   }
-  committed: {
-    balances: {
-      [subAccountId: number]: {
-        // Token are indexed by their symbol (e.g. "ETH")
-        [token: string]: BigNumberish
+  orders: {
+    [subAccountId: string]: {
+      [slotId: string]: {
+        nonce: number
+        orderHash: string
+        residue: string
       }
     }
-    nonce: number
-    pubKeyHash: PubKeyHash
-    orders: {
-      [subAccountId: number]: {
-        [slotId: number]: {
-          nonce: number
-          order_hash: string
-          residue: string
-        }
-      }
-    }
-  }
-  verified: {
-    balances: {
-      [subAccountId: number]: {
-        // Token are indexed by their symbol (e.g. "ETH")
-        [token: string]: BigNumberish
-      }
-    }
-    nonce: number
-    pubKeyHash: PubKeyHash
   }
 }
 

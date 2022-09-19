@@ -41,10 +41,12 @@ describe('forcedExit', () => {
       ts: 1649749979,
     } as any)
     expect(transaction.txData.ethereumSignature.signature).eq(
-      '0x20bd5e4b5c61f064ae61c3281051e5f403d33bedf8272ffb2f420b8f32dbeab35f7a92495ebf0545178f7ede5420a681f3e20ee4d33331768cd142d63d7dd5421b'
+      '0x20bd5e4b5c61f064ae61c3281051e5f403d33bedf8272ffb2f420b8f32dbeab35f7a92495ebf0545178f7ede5420a681f3e20ee4d33331768cd142d63d7dd5421b',
+      'Unexpected ForcedExit ethereum signature'
     )
     expect(transaction.txData.tx.signature.signature).eq(
-      'a156951f90dfc66f0628ebdccf7ac5a21f411f7a888c70f9ae4e084a2c2a8e9b7698cd264d0b46bcbc36ea2606bfb1ed9fc3a4ad52937d755a52a7046b54c900'
+      'a156951f90dfc66f0628ebdccf7ac5a21f411f7a888c70f9ae4e084a2c2a8e9b7698cd264d0b46bcbc36ea2606bfb1ed9fc3a4ad52937d755a52a7046b54c900',
+      'Unexpected ForcedExit tx signature'
     )
   })
 })

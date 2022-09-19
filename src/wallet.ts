@@ -1153,12 +1153,12 @@ export class Wallet {
   }
 
   async getCurrentPubKeyHash(): Promise<PubKeyHash> {
-    return (await this.provider.getState(this.address())).committed.pubKeyHash
+    return (await this.provider.getState(this.address())).pubKeyHash
   }
 
   async getNonce(nonce: Nonce = 'committed'): Promise<number> {
     if (nonce === 'committed') {
-      return (await this.provider.getState(this.address())).committed.nonce
+      return (await this.provider.getState(this.address())).nonce
     } else if (typeof nonce === 'number') {
       return nonce
     }
@@ -1181,19 +1181,11 @@ export class Wallet {
     return this.provider.getSubAccountState(this.address(), subAccountId)
   }
 
-  async getBalance(
-    token: TokenLike,
-    subAccountId: number,
-    type: 'committed' | 'verified' = 'committed'
-  ): Promise<BigNumber> {
+  async getBalance(token: TokenLike, subAccountId: number): Promise<BigNumber> {
     const accountState = await this.getAccountState()
-    const tokenSymbol = this.provider.tokenSet.resolveTokenSymbol(token)
+    const tokenId = this.provider.tokenSet.resolveTokenId(token)
     let balance: BigNumberish
-    if (type === 'committed') {
-      balance = accountState.committed.balances[subAccountId][tokenSymbol]
-    } else {
-      balance = accountState.verified.balances[subAccountId][tokenSymbol]
-    }
+    balance = accountState.balances[subAccountId][tokenId]
     return balance ? BigNumber.from(balance) : undefined
   }
 

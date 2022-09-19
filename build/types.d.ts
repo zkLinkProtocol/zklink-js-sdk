@@ -26,44 +26,23 @@ export interface Create2Data {
     codeHash: string;
 }
 export interface AccountState {
-    address: Address;
     id?: number;
-    depositing: {
-        balances: {
-            [subAccountId: number]: {
-                [token: string]: {
-                    amount: BigNumberish;
-                    expectedAcceptBlock: number;
-                };
-            };
+    address: Address;
+    nonce: number;
+    pubKeyHash: PubKeyHash;
+    balances: {
+        [subAccountId: string]: {
+            [tokenId: string]: BigNumberish;
         };
     };
-    committed: {
-        balances: {
-            [subAccountId: number]: {
-                [token: string]: BigNumberish;
+    orders: {
+        [subAccountId: string]: {
+            [slotId: string]: {
+                nonce: number;
+                orderHash: string;
+                residue: string;
             };
         };
-        nonce: number;
-        pubKeyHash: PubKeyHash;
-        orders: {
-            [subAccountId: number]: {
-                [slotId: number]: {
-                    nonce: number;
-                    order_hash: string;
-                    residue: string;
-                };
-            };
-        };
-    };
-    verified: {
-        balances: {
-            [subAccountId: number]: {
-                [token: string]: BigNumberish;
-            };
-        };
-        nonce: number;
-        pubKeyHash: PubKeyHash;
     };
 }
 export declare type EthSignerType = {

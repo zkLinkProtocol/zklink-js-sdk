@@ -732,13 +732,13 @@ class Wallet {
     }
     getCurrentPubKeyHash() {
         return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.provider.getState(this.address())).committed.pubKeyHash;
+            return (yield this.provider.getState(this.address())).pubKeyHash;
         });
     }
     getNonce(nonce = 'committed') {
         return __awaiter(this, void 0, void 0, function* () {
             if (nonce === 'committed') {
-                return (yield this.provider.getState(this.address())).committed.nonce;
+                return (yield this.provider.getState(this.address())).nonce;
             }
             else if (typeof nonce === 'number') {
                 return nonce;
@@ -764,17 +764,12 @@ class Wallet {
             return this.provider.getSubAccountState(this.address(), subAccountId);
         });
     }
-    getBalance(token, subAccountId, type = 'committed') {
+    getBalance(token, subAccountId) {
         return __awaiter(this, void 0, void 0, function* () {
             const accountState = yield this.getAccountState();
-            const tokenSymbol = this.provider.tokenSet.resolveTokenSymbol(token);
+            const tokenId = this.provider.tokenSet.resolveTokenId(token);
             let balance;
-            if (type === 'committed') {
-                balance = accountState.committed.balances[subAccountId][tokenSymbol];
-            }
-            else {
-                balance = accountState.verified.balances[subAccountId][tokenSymbol];
-            }
+            balance = accountState.balances[subAccountId][tokenId];
             return balance ? ethers_1.BigNumber.from(balance) : undefined;
         });
     }
