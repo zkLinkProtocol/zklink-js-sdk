@@ -211,12 +211,11 @@ export class DummyTransport extends AbstractJSONRPCTransport {
       for (const tokenItem of tokensList) {
         const token = {
           chains: tokenItem.chains,
-          address: tokenItem.address,
           id: tokenItem.id,
           symbol: tokenItem.symbol,
           decimals: tokenItem.decimals,
         }
-        tokens[tokenItem.symbol] = token
+        tokens[tokenItem.id] = token
       }
 
       return tokens
@@ -235,7 +234,7 @@ export class DummyTransport extends AbstractJSONRPCTransport {
         committed: {
           balances: {
             0: {
-              DAI: BigNumber.from(12345),
+              USD: BigNumber.from(12345),
             },
           },
           nonce: 0,
@@ -244,7 +243,7 @@ export class DummyTransport extends AbstractJSONRPCTransport {
         verified: {
           balances: {
             0: {
-              USDC: BigNumber.from(98765),
+              USD: BigNumber.from(98765),
             },
           },
           nonce: 0,

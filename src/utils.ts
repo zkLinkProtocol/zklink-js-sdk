@@ -352,22 +352,19 @@ type TokenOrId = TokenLike | number
 
 export class TokenSet {
   // TODO: handle stale entries, edge case when we rename token after adding it (ZKS-120).
-  constructor(private tokensBySymbol: Tokens) {}
+  constructor(private tokensById: Tokens) {}
 
   private resolveTokenObject(tokenLike: TokenOrId) {
-    if (this.tokensBySymbol[tokenLike]) {
-      return this.tokensBySymbol[tokenLike]
+    if (this.tokensById[tokenLike]) {
+      return this.tokensById[tokenLike]
     }
 
-    for (const token of Object.values(this.tokensBySymbol)) {
+    for (const token of Object.values(this.tokensById)) {
       if (typeof tokenLike === 'number') {
         if (token.id === tokenLike) {
           return token
         }
-      } else if (
-        token.address.map((a) => a.toLowerCase()).includes(tokenLike.toLowerCase()) ||
-        token.symbol.toLocaleLowerCase() === tokenLike.toLocaleLowerCase()
-      ) {
+      } else if (token.symbol.toLocaleLowerCase() === tokenLike.toLocaleLowerCase()) {
         return token
       }
     }
@@ -404,8 +401,7 @@ export class TokenSet {
   }
 
   public resolveTokenAddress(tokenLike: TokenOrId, chainId: ChainId): TokenAddress {
-    const index = this.resolveTokenObject(tokenLike).chains.findIndex((c) => c === chainId)
-    return this.resolveTokenObject(tokenLike).address[index]
+    return this.resolveTokenObject(tokenLike).chains[chainId].address
   }
 
   public resolveTokenSymbol(tokenLike: TokenOrId): TokenSymbol {

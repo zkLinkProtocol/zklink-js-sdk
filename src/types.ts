@@ -6,7 +6,7 @@ export type Address = string
 export type PubKeyHash = string
 
 // Symbol like "ETH" or "FAU" or token contract address(zero address is implied for "ETH").
-export type TokenLike = TokenSymbol | TokenAddress
+export type TokenLike = TokenSymbol
 // Token symbol (e.g. "ETH", "FAU", etc.)
 export type TokenSymbol = string
 // Token address (e.g. 0xde..ad for ERC20, or 0x00.00 for "ETH")
@@ -314,11 +314,16 @@ export interface ContractAddress {
 export interface Tokens {
   // Tokens are indexed by their symbol (e.g. "ETH")
   [token: string]: {
-    chains: number[]
-    address: string[]
     id: number
     symbol: string
     decimals: number
+    chains: {
+      [x: number]: {
+        chainId: number
+        address: Address
+        fastWithdraw: boolean
+      }
+    }
   }
 }
 

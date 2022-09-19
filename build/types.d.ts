@@ -1,7 +1,7 @@
 import { BigNumber, BigNumberish } from 'ethers';
 export declare type Address = string;
 export declare type PubKeyHash = string;
-export declare type TokenLike = TokenSymbol | TokenAddress;
+export declare type TokenLike = TokenSymbol;
 export declare type TokenSymbol = string;
 export declare type TokenAddress = string;
 export declare type TokenId = number;
@@ -244,11 +244,16 @@ export interface ContractAddress {
 }
 export interface Tokens {
     [token: string]: {
-        chains: number[];
-        address: string[];
         id: number;
         symbol: string;
         decimals: number;
+        chains: {
+            [x: number]: {
+                chainId: number;
+                address: Address;
+                fastWithdraw: boolean;
+            };
+        };
     };
 }
 export interface ChangePubKeyFee {

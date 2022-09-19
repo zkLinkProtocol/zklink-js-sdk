@@ -47,8 +47,8 @@ export declare function sleep(ms: number): Promise<unknown>;
 export declare function isTokenETH(token: TokenLike): boolean;
 declare type TokenOrId = TokenLike | number;
 export declare class TokenSet {
-    private tokensBySymbol;
-    constructor(tokensBySymbol: Tokens);
+    private tokensById;
+    constructor(tokensById: Tokens);
     private resolveTokenObject;
     isTokenTransferAmountPackable(tokenLike: TokenOrId, amount: string): boolean;
     isTokenTransactionFeePackable(tokenLike: TokenOrId, amount: string): boolean;

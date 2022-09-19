@@ -1,64 +1,53 @@
 [
   {
     "id": 1,
-    "chains": [1],
-    "address": ["0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"],
+    "symbol": "USD",
+    "decimals": 18,
+    "chains": {
+      "1": {
+        "chainId": 1,
+        "address": "0x0000000000000000000000000000000000000000",
+        "fastWithdraw": false
+      },
+      "2": {
+        "chainId": 2,
+        "address": "0x0000000000000000000000000000000000000000",
+        "fastWithdraw": false
+      }
+    }
+  },
+  {
+    "id": 17,
+    "symbol": "USDC",
+    "decimals": 6,
+    "chains": {
+      "1": {
+        "chainId": 1,
+        "address": "0xDDdddddddddddddddddddddddddddddddddddddd",
+        "fastWithdraw": false
+      },
+      "2": {
+        "chainId": 2,
+        "address": "0xFFffffffffffffffffffffffffffffffffffffff",
+        "fastWithdraw": false
+      }
+    }
+  },
+  {
+    "id": 32,
     "symbol": "ETH",
     "decimals": 18,
-    "stable": false,
-    "fast_withdraw": false
-  },
-  {
-    "id": 2,
-    "chains": [1, 2],
-    "address": [
-      "0xDDdddddddddddddddddddddddddddddddddddddd",
-      "0xFFffffffffffffffffffffffffffffffffffffff"
-    ],
-    "symbol": "USDC",
-    "decimals": 18,
-    "stable": false,
-    "fast_withdraw": false
-  },
-  {
-    "id": 6,
-    "chains": [1, 2, 3, 4],
-    "address": [
-      "0xe583769738b6dd4e7caf8451050d1948be717679",
-      "0xcdba597900674206504f4b4e2116b224455bbe9b",
-      "0xa689352b7c1cad82864beb1d90679356d3962f4d",
-      "0xe583769738b6dd4e7caf8451050d1948be717679"
-    ],
-    "symbol": "USDT",
-    "decimals": 18,
-    "stable": false,
-    "fast_withdraw": false
-  },
-  {
-    "id": 7,
-    "chains": [4],
-    "address": ["0xb809b9b2dc5e93cb863176ea2d565425b03c0540"],
-    "symbol": "BUSD",
-    "decimals": 18,
-    "stable": false,
-    "fast_withdraw": false
-  },
-  {
-    "id": 8,
-    "chains": [1],
-    "address": ["0x6b175474e89094c44da98b954eedeac495271d0f"],
-    "symbol": "DAI",
-    "decimals": 18,
-    "stable": false,
-    "fast_withdraw": false
-  },
-  {
-    "id": 22,
-    "chains": [1],
-    "address": ["0x6b175474e89094c44da98b954eedeac495271d0e"],
-    "symbol": "DAI1",
-    "decimals": 18,
-    "stable": false,
-    "fast_withdraw": false
+    "chains": {
+      "1": {
+        "chainId": 1,
+        "address": "0x0000000000000000000000000000000000000000",
+        "fastWithdraw": false
+      },
+      "2": {
+        "chainId": 2,
+        "address": "0xFFffffffffffffffffffffffffffffffffffffff",
+        "fastWithdraw": false
+      }
+    }
   }
 ]
