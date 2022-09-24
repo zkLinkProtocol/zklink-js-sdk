@@ -1174,7 +1174,12 @@ export class Wallet {
   }
 
   async getAccountState(): Promise<AccountState> {
-    return this.provider.getState(this.address())
+    const state = await this.provider.getState(this.address())
+    // If exsit account id, refresh it.
+    if (state?.id) {
+      this.accountId = state.id
+    }
+    return state
   }
 
   async getSubAccountState(subAccountId: number): Promise<AccountState> {

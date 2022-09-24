@@ -756,7 +756,12 @@ class Wallet {
     }
     getAccountState() {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.provider.getState(this.address());
+            const state = yield this.provider.getState(this.address());
+            // If exsit account id, refresh it.
+            if (state === null || state === void 0 ? void 0 : state.id) {
+                this.accountId = state.id;
+            }
+            return state;
         });
     }
     getSubAccountState(subAccountId) {
