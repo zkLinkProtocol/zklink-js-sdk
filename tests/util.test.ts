@@ -6,7 +6,6 @@ import {
   closestPackableTransactionFee,
   isTransactionAmountPackable,
   isTransactionFeePackable,
-  TokenSet,
 } from '../src/utils'
 import { BigNumber } from 'ethers'
 
@@ -39,58 +38,5 @@ describe('Packing and unpacking', function () {
       '2050',
       'fee packing up'
     )
-  })
-})
-
-describe('Token cache resolve', function () {
-  it('Test token cache resolve', function () {
-    const tokens = {
-      ETH: {
-        chains: [1],
-        address: ['0x0000000000000000000000000000000000000000'],
-        id: 0,
-        symbol: 'ETH',
-        decimals: 18,
-      },
-      'ERC20-1': {
-        chains: [1],
-        address: ['0xEEeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'],
-        id: 1,
-        symbol: 'ERC20-1',
-        decimals: 6,
-      },
-      'ERC20-2': {
-        chains: [2, 3],
-        address: [
-          '0xDDdddddddddddddddddddddddddddddddddddddd',
-          '0xFFffffffffffffffffffffffffffffffffffffff',
-        ],
-        id: 2,
-        symbol: 'ERC20-2',
-        decimals: 6,
-      },
-    }
-    const tokenCache = new TokenSet(tokens)
-
-    expect(tokenCache.resolveTokenId('ETH')).eq(0, 'ETH by id resolve')
-    expect(tokenCache.resolveTokenId('0x0000000000000000000000000000000000000000')).eq(
-      0,
-      'ETH by addr resolve'
-    )
-    expect(tokenCache.resolveTokenId('ERC20-1')).eq(1, 'ERC20 by id resolve')
-    expect(tokenCache.resolveTokenId('0xEEeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')).eq(
-      1,
-      'ERC20 by addr resolve'
-    )
-    expect(tokenCache.resolveTokenId('0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')).eq(
-      1,
-      'ERC20 by addr resolve'
-    )
-    expect(tokenCache.resolveTokenId('0xFFffffffffffffffffffffffffffffffffffffff')).eq(
-      2,
-      'ERC20 by addr resolve'
-    )
-    expect(() => tokenCache.resolveTokenId('0xgggggggggggggggggggggggggggggggggggggggg')).to.throw()
-    expect(() => tokenCache.resolveTokenId('ERC20-3')).to.throw()
   })
 })

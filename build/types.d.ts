@@ -1,7 +1,7 @@
 import { BigNumber, BigNumberish } from 'ethers';
 export declare type Address = string;
 export declare type PubKeyHash = string;
-export declare type TokenLike = TokenSymbol | TokenAddress;
+export declare type TokenLike = TokenSymbol;
 export declare type TokenSymbol = string;
 export declare type TokenAddress = string;
 export declare type TokenId = number;
@@ -26,44 +26,14 @@ export interface Create2Data {
     codeHash: string;
 }
 export interface AccountState {
-    address: Address;
     id?: number;
-    depositing: {
-        balances: {
-            [subAccountId: number]: {
-                [token: string]: {
-                    amount: BigNumberish;
-                    expectedAcceptBlock: number;
-                };
-            };
-        };
-    };
-    committed: {
-        balances: {
-            [subAccountId: number]: {
-                [token: string]: BigNumberish;
-            };
-        };
-        nonce: number;
-        pubKeyHash: PubKeyHash;
-        orders: {
-            [subAccountId: number]: {
-                [slotId: number]: {
-                    nonce: number;
-                    order_hash: string;
-                    residue: string;
-                };
-            };
-        };
-    };
-    verified: {
-        balances: {
-            [subAccountId: number]: {
-                [token: string]: BigNumberish;
-            };
-        };
-        nonce: number;
-        pubKeyHash: PubKeyHash;
+    address: Address;
+    nonce: number;
+    pubKeyHash: PubKeyHash;
+}
+export interface AccountBalances {
+    [subAccountId: number]: {
+        [tokenId: number]: BigNumberish;
     };
 }
 export declare type EthSignerType = {
@@ -89,58 +59,6 @@ export interface Transfer {
     amount: BigNumberish;
     fee: BigNumberish;
     ts: number;
-    nonce: number;
-    signature?: Signature;
-    validFrom: number;
-    validUntil: number;
-}
-export interface CurveAddLiquidity {
-    type: 'L2CurveAddLiq';
-    account: Address;
-    tokens: TokenId[];
-    amounts: BigNumberish[];
-    lpQuantity: BigNumberish;
-    minLpQuantity: BigNumberish;
-    pairAddress: Address;
-    fee: BigNumberish;
-    feeToken: TokenId;
-    collectFees: BigNumberish[];
-    ts?: number;
-    nonce: number;
-    signature?: Signature;
-    validFrom: number;
-    validUntil: number;
-}
-export interface CurveRemoveLiquidity {
-    type: 'L2CurveRemoveLiquidity';
-    account: Address;
-    tokens: TokenId[];
-    amounts: BigNumberish[];
-    minAmounts: BigNumberish[];
-    lpQuantity: BigNumberish;
-    pairAddress: Address;
-    fee: BigNumberish;
-    feeToken: TokenId;
-    curveFee: BigNumberish;
-    ts?: number;
-    nonce: number;
-    signature?: Signature;
-    validFrom: number;
-    validUntil: number;
-}
-export interface CurveSwap {
-    type: 'CurveSwap';
-    accountId: number;
-    account: Address;
-    pairAddress: Address;
-    tokenIn: TokenId;
-    tokenOut: TokenId;
-    amountIn: BigNumberish;
-    amountOut: BigNumberish;
-    amountOutMin: BigNumberish;
-    fee: BigNumberish;
-    adminFee: BigNumberish;
-    ts?: number;
     nonce: number;
     signature?: Signature;
     validFrom: number;
@@ -220,7 +138,7 @@ export interface CloseAccount {
     signature: Signature;
 }
 export interface SignedTransaction {
-    tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit | CurveAddLiquidity | CurveRemoveLiquidity | CurveSwap | Order | OrderMatching;
+    tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit | Order | OrderMatching;
     ethereumSignature?: TxEthSignature;
 }
 export interface BlockInfo {
@@ -240,15 +158,19 @@ export interface PriorityOperationReceipt {
 }
 export interface ContractAddress {
     mainContract: string;
-    govContract: string;
 }
 export interface Tokens {
     [token: string]: {
-        chains: number[];
-        address: string[];
         id: number;
         symbol: string;
         decimals: number;
+        chains: {
+            [x: number]: {
+                chainId: number;
+                address: Address;
+                fastWithdraw: boolean;
+            };
+        };
     };
 }
 export interface ChangePubKeyFee {

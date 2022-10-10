@@ -2,8 +2,7 @@ import { BigNumber, BigNumberish, Contract, ContractTransaction, ethers } from '
 import { EthMessageSigner } from './eth-message-signer';
 import { Provider } from './provider';
 import { Signer } from './signer';
-import { BatchBuilder } from './batch-builder';
-import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKey, EthSignerType, SignedTransaction, Transfer, TxEthSignature, ForcedExit, Withdraw, ChangePubkeyTypes, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, CurveAddLiquidity, ChainId, TokenId, CurveRemoveLiquidity, CurveSwap, Order, TokenSymbol, TokenAddress, OrderMatching } from './types';
+import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKey, EthSignerType, SignedTransaction, Transfer, TxEthSignature, ForcedExit, Withdraw, ChangePubkeyTypes, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, ChainId, TokenId, Order, TokenSymbol, TokenAddress, OrderMatching } from './types';
 export declare class ZKSyncTxError extends Error {
     value: PriorityOperationReceipt | TransactionReceipt;
     constructor(message: string, value: PriorityOperationReceipt | TransactionReceipt);
@@ -23,20 +22,7 @@ export declare class Wallet {
     static fromEthSignerNoKeys(ethWallet: ethers.Signer, provider: Provider, accountId?: number, ethSignerType?: EthSignerType): Promise<Wallet>;
     getEIP712Signature(data: any): Promise<TxEthSignature>;
     getEthMessageSignature(message: ethers.utils.BytesLike): Promise<TxEthSignature>;
-    batchBuilder(nonce?: Nonce): BatchBuilder;
-    getTransfer(transfer: {
-        fromSubAccountId: number;
-        toSubAccountId: number;
-        to: Address;
-        token: TokenLike;
-        amount: BigNumberish;
-        fee: BigNumberish;
-        accountId: number;
-        ts: number;
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Promise<Transfer>;
+    getTransfer(tx: Transfer): Promise<Transfer>;
     signSyncTransfer(transfer: {
         fromSubAccountId: number;
         toSubAccountId: number;
@@ -77,19 +63,7 @@ export declare class Wallet {
         validFrom?: number;
         validUntil?: number;
     }): Promise<SignedTransaction>;
-    getForcedExit(forcedExit: {
-        toChainId: ChainId;
-        subAccountId: number;
-        target: Address;
-        l2SourceToken: TokenLike;
-        l1TargetToken: TokenLike;
-        feeToken: TokenLike;
-        fee: BigNumberish;
-        ts: number;
-        nonce: number;
-        validFrom?: number;
-        validUntil?: number;
-    }): Promise<ForcedExit>;
+    getForcedExit(tx: ForcedExit): Promise<ForcedExit>;
     signSyncForcedExit(forcedExit: {
         toChainId: ChainId;
         subAccountId: number;
@@ -97,7 +71,7 @@ export declare class Wallet {
         l2SourceToken: TokenLike;
         l1TargetToken: TokenLike;
         feeToken: TokenLike;
-        fee: BigNumberish;
+        fee?: BigNumberish;
         ts?: number;
         nonce: number;
         validFrom?: number;
@@ -116,19 +90,6 @@ export declare class Wallet {
         validFrom?: number;
         validUntil?: number;
     }): Promise<Transaction>;
-    syncMultiTransfer(transfers: {
-        fromSubAccountId: number;
-        toSubAccountId: number;
-        to: Address;
-        token: TokenSymbol;
-        amount: BigNumberish;
-        fee: BigNumberish;
-        accountId?: number;
-        ts: number;
-        nonce?: Nonce;
-        validFrom?: number;
-        validUntil?: number;
-    }[]): Promise<Transaction[]>;
     syncTransfer(transfer: {
         fromSubAccountId: number;
         toSubAccountId: number;
@@ -142,51 +103,6 @@ export declare class Wallet {
         validFrom?: number;
         validUntil?: number;
     }): Promise<Transaction>;
-    getCurveAddLiquidity(payload: CurveAddLiquidity & {
-        nonce?: number;
-        validFrom?: number;
-        validUntil?: number;
-    }): Promise<CurveAddLiquidity>;
-    signSyncCurveAddLiquidity(payload: CurveAddLiquidity & {
-        nonce?: number;
-        validFrom?: number;
-        validUntil?: number;
-    }): Promise<SignedTransaction>;
-    syncCurveAddLiquidity(payload: CurveAddLiquidity & {
-        nonce?: Nonce;
-        validFrom?: number;
-        validUntil?: number;
-    }): Promise<Transaction>;
-    getCurveRemoveLiquidity(payload: CurveRemoveLiquidity & {
-        nonce?: number;
-        validFrom?: number;
-        validUntil?: number;
-    }): Promise<CurveRemoveLiquidity>;
-    signSyncCurveRemoveLiquidity(payload: CurveRemoveLiquidity & {
-        nonce?: number;
-        validFrom?: number;
-        validUntil?: number;
-    }): Promise<SignedTransaction>;
-    syncCurveRemoveLiquidity(payload: CurveRemoveLiquidity & {
-        nonce?: Nonce;
-        validFrom?: number;
-        validUntil?: number;
-    }): Promise<Transaction>;
-    getCurveSwap(payload: CurveSwap & {
-        nonce?: number;
-        validFrom?: number;
-        validUntil?: number;
-    }): Promise<CurveSwap>;
-    signSyncCurveSwap(payload: CurveSwap & {
-        nonce?: number;
-        validFrom?: number;
-        validUntil?: number;
-    }): Promise<SignedTransaction>;
-    syncCurveSwap(payload: CurveSwap & {
-        nonce?: Nonce;
-        validFrom?: number;
-        validUntil?: number;
-    }): Promise<Transaction>;
     getOrder(payload: Order & {
         validFrom?: number;
         validUntil?: number;
@@ -195,22 +111,7 @@ export declare class Wallet {
         validFrom?: number;
         validUntil?: number;
     }): Promise<SignedTransaction>;
-    getWithdrawFromSyncToEthereum(withdraw: {
-        toChainId: number;
-        subAccountId: number;
-        to: string;
-        l2SourceToken: TokenLike;
-        l1TargetToken: TokenLike;
-        amount: BigNumberish;
-        fee: BigNumberish;
-        withdrawFeeRatio: number;
-        fastWithdraw: number;
-        ts: number;
-        nonce: number;
-        accountId: number;
-        validFrom: number;
-        validUntil: number;
-    }): Promise<Withdraw>;
+    getWithdrawFromSyncToEthereum(tx: Withdraw): Promise<Withdraw>;
     signWithdrawFromSyncToEthereum(withdraw: {
         toChainId: number;
         subAccountId: number;
@@ -315,7 +216,7 @@ export declare class Wallet {
     address(): Address;
     getAccountState(): Promise<AccountState>;
     getSubAccountState(subAccountId: number): Promise<AccountState>;
-    getBalance(token: TokenLike, subAccountId: number, type?: 'committed' | 'verified'): Promise<BigNumber>;
+    getBalance(token: TokenLike, subAccountId: number): Promise<BigNumber>;
     getEthereumBalance(token: TokenLike, linkChainId: ChainId): Promise<BigNumber>;
     estimateGasDeposit(linkChainId: number, args: any[]): Promise<BigNumber>;
     depositToSyncFromEthereum(deposit: {
@@ -364,5 +265,5 @@ export declare class Transaction {
     private setErrorState;
     private throwErrorIfFailedState;
 }
-export declare function submitSignedTransaction(signedTx: SignedTransaction, provider: Provider, fastProcessing?: boolean): Promise<Transaction>;
+export declare function submitSignedTransaction(signedTx: SignedTransaction, provider: Provider): Promise<Transaction>;
 export declare function submitSignedTransactionsBatch(provider: Provider, signedTxs: SignedTransaction[], ethSignatures?: TxEthSignature[]): Promise<Transaction[]>;

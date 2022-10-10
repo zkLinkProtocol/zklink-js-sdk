@@ -14,9 +14,6 @@ import {
   ChangePubKey,
   Withdraw,
   CloseAccount,
-  CurveAddLiquidity,
-  CurveRemoveLiquidity,
-  CurveSwap,
   Order,
   ChainId,
   OrderMatching,
@@ -352,22 +349,19 @@ type TokenOrId = TokenLike | number
 
 export class TokenSet {
   // TODO: handle stale entries, edge case when we rename token after adding it (ZKS-120).
-  constructor(private tokensBySymbol: Tokens) {}
+  constructor(private tokensById: Tokens) {}
 
   private resolveTokenObject(tokenLike: TokenOrId) {
-    if (this.tokensBySymbol[tokenLike]) {
-      return this.tokensBySymbol[tokenLike]
+    if (this.tokensById[tokenLike]) {
+      return this.tokensById[tokenLike]
     }
 
-    for (const token of Object.values(this.tokensBySymbol)) {
+    for (const token of Object.values(this.tokensById)) {
       if (typeof tokenLike === 'number') {
         if (token.id === tokenLike) {
           return token
         }
-      } else if (
-        token.address.map((a) => a.toLowerCase()).includes(tokenLike.toLowerCase()) ||
-        token.symbol.toLocaleLowerCase() === tokenLike.toLocaleLowerCase()
-      ) {
+      } else if (token.symbol.toLocaleLowerCase() === tokenLike.toLocaleLowerCase()) {
         return token
       }
     }
@@ -404,8 +398,7 @@ export class TokenSet {
   }
 
   public resolveTokenAddress(tokenLike: TokenOrId, chainId: ChainId): TokenAddress {
-    const index = this.resolveTokenObject(tokenLike).chains.findIndex((c) => c === chainId)
-    return this.resolveTokenObject(tokenLike).address[index]
+    return this.resolveTokenObject(tokenLike).chains[chainId].address
   }
 
   public resolveTokenSymbol(tokenLike: TokenOrId): TokenSymbol {
@@ -718,94 +711,6 @@ export function serializeTransfer(transfer: Transfer): Uint8Array {
     token,
     amount,
     fee,
-    nonce,
-    validFrom,
-    validUntil,
-    tsBytes,
-  ])
-}
-export function serializeCurveAddLiquidity(payload: CurveAddLiquidity): Uint8Array {
-  const type = new Uint8Array([8])
-  const account = serializeAddress(payload.account)
-  const tokens = chainsCompletion(payload.tokens, TOTAL_CHAIN_NUM, 0).map((tokenId) =>
-    serializeTokenId(tokenId)
-  )
-  const amounts = chainsCompletion(payload.amounts, TOTAL_CHAIN_NUM, '0').map((amount) =>
-    serializeAmountPacked(amount)
-  )
-  const minLpQuantity = serializeAmountPacked(payload.minLpQuantity)
-  const feeToken = serializeTokenId(payload.feeToken)
-  const feeAmount = serializeFeePacked(payload.fee)
-  const nonce = serializeNonce(payload.nonce)
-  const validFrom = serializeTimestamp(payload.validFrom)
-  const validUntil = serializeTimestamp(payload.validUntil)
-  const tsBytes = numberToBytesBE(payload.ts, 4)
-  return ethers.utils.concat([
-    type,
-    account,
-    ...tokens,
-    ...amounts,
-    minLpQuantity,
-    feeToken,
-    feeAmount,
-    nonce,
-    validFrom,
-    validUntil,
-    tsBytes,
-  ])
-}
-export function serializeCurveSwap(payload: CurveSwap): Uint8Array {
-  const type = new Uint8Array([9])
-  const account = serializeAddress(payload.account)
-  const pairAddress = serializeAddress(payload.pairAddress)
-  const tokenIn = serializeTokenId(payload.tokenIn)
-  const tokenOut = serializeTokenId(payload.tokenOut)
-  const amountIn = serializeAmountPacked(payload.amountIn)
-  const amountOutMin = serializeAmountPacked(payload.amountOutMin)
-  const feeAmount = serializeFeePacked(payload.fee)
-  const nonce = serializeNonce(payload.nonce)
-  const validFrom = serializeTimestamp(payload.validFrom)
-  const validUntil = serializeTimestamp(payload.validUntil)
-  const tsBytes = numberToBytesBE(payload.ts, 4)
-  return ethers.utils.concat([
-    type,
-    account,
-    pairAddress,
-    tokenIn,
-    tokenOut,
-    amountIn,
-    amountOutMin,
-    feeAmount,
-    nonce,
-    validFrom,
-    validUntil,
-    tsBytes,
-  ])
-}
-export function serializeCurveRemoveLiquidity(payload: CurveRemoveLiquidity): Uint8Array {
-  const type = new Uint8Array([10])
-  const account = serializeAddress(payload.account)
-  const tokens = chainsCompletion(payload.tokens, TOTAL_CHAIN_NUM, 0).map((tokenId) =>
-    serializeTokenId(tokenId)
-  )
-  const minAmounts = chainsCompletion(payload.minAmounts, TOTAL_CHAIN_NUM, '0').map((amount) =>
-    serializeAmountPacked(amount)
-  )
-  const lpQuantity = serializeAmountPacked(payload.lpQuantity)
-  const feeToken = serializeTokenId(payload.feeToken)
-  const feeAmount = serializeFeePacked(payload.fee)
-  const nonce = serializeNonce(payload.nonce)
-  const validFrom = serializeTimestamp(payload.validFrom)
-  const validUntil = serializeTimestamp(payload.validUntil)
-  const tsBytes = numberToBytesBE(payload.ts, 4)
-  return ethers.utils.concat([
-    type,
-    account,
-    ...tokens,
-    ...minAmounts,
-    lpQuantity,
-    feeToken,
-    feeAmount,
     nonce,
     validFrom,
     validUntil,

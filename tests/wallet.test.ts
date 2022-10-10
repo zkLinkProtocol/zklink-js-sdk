@@ -46,7 +46,7 @@ describe('Wallet with mock provider', function () {
   it('Wallet has expected committed balances', async function () {
     const key = new Uint8Array(new Array(32).fill(40))
     const wallet = await getWallet(key, 'mainnet')
-    const balance = await wallet.getBalance('DAI', 0, 'committed')
+    const balance = await wallet.getBalance('USD', 0)
     expect(balance).eql(
       BigNumber.from(12345),
       "Wallet's committed balance does not match the hardcoded mock value"
@@ -57,30 +57,8 @@ describe('Wallet with mock provider', function () {
     const key = new Uint8Array(new Array(32).fill(40))
     const wallet = await getWallet(key, 'mainnet')
 
-    expect(
-      await wallet.getBalance('ETH', 0, 'committed'),
-      'getBalance call was expected to undefined'
-    ).to.be.undefined
-  })
-
-  it('Wallet has expected verified balances', async function () {
-    const key = new Uint8Array(new Array(32).fill(50))
-    const wallet = await getWallet(key, 'mainnet')
-    const balance = await wallet.getBalance('USDC', 0, 'verified')
-    expect(balance).eql(
-      BigNumber.from(98765),
-      "Wallet's committed balance does not match the hardcoded mock value"
-    )
-  })
-
-  it('Wallet do not have unexpected verified balances', async function () {
-    const key = new Uint8Array(new Array(32).fill(50))
-    const wallet = await getWallet(key, 'mainnet')
-
-    expect(
-      await wallet.getBalance('ETH', 0, 'verified'),
-      'getBalance call was expected to undefined'
-    ).to.be.undefined
+    expect(await wallet.getBalance('USDC', 0), 'getBalance call was expected to undefined').to.be
+      .undefined
   })
 
   // it("Wallet's signing key checking", async function () {

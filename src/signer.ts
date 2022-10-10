@@ -19,9 +19,6 @@ import {
   ChangePubKeyCREATE2,
   Create2Data,
   ChainId,
-  CurveAddLiquidity,
-  CurveRemoveLiquidity,
-  CurveSwap,
   Order,
   OrderMatching,
 } from './types'
@@ -44,55 +41,18 @@ export class Signer {
   /**
    * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
    */
-  transferSignBytes(transfer: {
-    fromSubAccountId: number
-    toSubAccountId: number
-    accountId: number
-    fromChainId: number
-    toChainId: number
-    from: Address
-    to: Address
-    tokenId: number
-    amount: BigNumberish
-    fee: BigNumberish
-    ts: number
-    nonce: number
-    validFrom: number
-    validUntil: number
-  }): Uint8Array {
-    return utils.serializeTransfer({
-      ...transfer,
-      type: 'Transfer',
-      token: transfer.tokenId,
-    })
+  transferSignBytes(tx: Transfer): Uint8Array {
+    return utils.serializeTransfer(tx)
   }
 
-  async signSyncTransfer(transfer: {
-    fromSubAccountId: number
-    toSubAccountId: number
-    accountId: number
-    from: Address
-    to: Address
-    tokenId: number
-    amount: BigNumberish
-    fee: BigNumberish
-    ts: number
-    nonce: number
-    validFrom: number
-    validUntil: number
-  }): Promise<Transfer> {
-    const tx: Transfer = {
-      ...transfer,
-      type: 'Transfer',
-      token: transfer.tokenId,
-    }
+  async signSyncTransfer(tx: Transfer): Promise<Transfer> {
     const msgBytes = utils.serializeTransfer(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
 
     return {
       ...tx,
-      amount: BigNumber.from(transfer.amount).toString(),
-      fee: BigNumber.from(transfer.fee).toString(),
+      amount: BigNumber.from(tx.amount).toString(),
+      fee: BigNumber.from(tx.fee).toString(),
       signature,
     }
   }
@@ -135,84 +95,6 @@ export class Signer {
       expectQuoteAmount: BigNumber.from(matching.expectQuoteAmount).toString(),
       signature,
     } as any
-  }
-
-  async signSyncCurveAddLiquidity(
-    payload: CurveAddLiquidity & {
-      chainId: string
-      nonce: number
-      validFrom: number
-      validUntil: number
-    }
-  ): Promise<CurveAddLiquidity> {
-    const tx: CurveAddLiquidity = {
-      ...payload,
-      type: 'L2CurveAddLiq',
-    }
-    const msgBytes = utils.serializeCurveAddLiquidity(tx)
-    const signature = await signTransactionBytes(this.#privateKey, msgBytes)
-
-    return {
-      ...tx,
-      amounts: payload.amounts.map((amount) => BigNumber.from(amount).toString()),
-      collectFees: payload.collectFees.map((fee) => BigNumber.from(fee).toString()),
-      fee: BigNumber.from(payload.fee).toString(),
-      lpQuantity: BigNumber.from(payload.lpQuantity).toString(),
-      minLpQuantity: BigNumber.from(payload.minLpQuantity).toString(),
-      signature,
-    }
-  }
-
-  async signSyncCurveRemoveLiquidity(
-    payload: CurveRemoveLiquidity & {
-      chainId: string
-      nonce: number
-      validFrom: number
-      validUntil: number
-    }
-  ): Promise<CurveRemoveLiquidity> {
-    const tx: CurveRemoveLiquidity = {
-      ...payload,
-      type: 'L2CurveRemoveLiquidity',
-    }
-    const msgBytes = utils.serializeCurveRemoveLiquidity(tx)
-    const signature = await signTransactionBytes(this.#privateKey, msgBytes)
-
-    return {
-      ...tx,
-      amounts: payload.amounts.map((amount) => BigNumber.from(amount).toString()),
-      minAmounts: payload.minAmounts.map((amount) => BigNumber.from(amount).toString()),
-      fee: BigNumber.from(payload.fee).toString(),
-      curveFee: BigNumber.from(payload.curveFee).toString(),
-      lpQuantity: BigNumber.from(payload.lpQuantity).toString(),
-      signature,
-    }
-  }
-
-  async signSyncCurveSwap(
-    payload: CurveSwap & {
-      chainId: string
-      nonce: number
-      validFrom: number
-      validUntil: number
-    }
-  ): Promise<CurveSwap> {
-    const tx: CurveSwap = {
-      ...payload,
-      type: 'CurveSwap',
-    }
-    const msgBytes = utils.serializeCurveSwap(tx)
-    const signature = await signTransactionBytes(this.#privateKey, msgBytes)
-
-    return {
-      ...tx,
-      amountIn: BigNumber.from(payload.amountIn).toString(),
-      amountOut: BigNumber.from(payload.amountOut).toString(),
-      amountOutMin: BigNumber.from(payload.amountOutMin).toString(),
-      fee: BigNumber.from(payload.fee).toString(),
-      adminFee: BigNumber.from(payload.adminFee).toString(),
-      signature,
-    }
   }
 
   async signSyncOrder(
@@ -264,33 +146,13 @@ export class Signer {
     })
   }
 
-  async signSyncWithdraw(withdraw: {
-    toChainId: number
-    subAccountId: number
-    accountId: number
-    from: Address
-    to: string
-    l2SourceToken: number
-    l1TargetToken: number
-    amount: BigNumberish
-    fee: BigNumberish
-    withdrawFeeRatio: number
-    fastWithdraw: number
-    ts: number
-    nonce: number
-    validFrom: number
-    validUntil: number
-  }): Promise<Withdraw> {
-    const tx: Withdraw = {
-      ...withdraw,
-      type: 'Withdraw',
-    }
+  async signSyncWithdraw(tx: Withdraw): Promise<Withdraw> {
     const msgBytes = utils.serializeWithdraw(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
     return {
       ...tx,
-      amount: BigNumber.from(withdraw.amount).toString(),
-      fee: BigNumber.from(withdraw.fee).toString(),
+      amount: BigNumber.from(tx.amount).toString(),
+      fee: BigNumber.from(tx.fee).toString(),
       signature,
     }
   }
@@ -298,49 +160,16 @@ export class Signer {
   /**
    * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
    */
-  forcedExitSignBytes(forcedExit: {
-    toChainId: ChainId
-    subAccountId: number
-    initiatorAccountId: number
-    target: Address
-    l2SourceToken: number
-    l1TargetToken: number
-    feeToken: number
-    fee: BigNumberish
-    ts: number
-    nonce: number
-    validFrom: number
-    validUntil: number
-  }): Uint8Array {
-    return utils.serializeForcedExit({
-      ...forcedExit,
-      type: 'ForcedExit',
-    })
+  forcedExitSignBytes(tx: ForcedExit): Uint8Array {
+    return utils.serializeForcedExit(tx)
   }
 
-  async signSyncForcedExit(forcedExit: {
-    toChainId: ChainId
-    subAccountId: number
-    initiatorAccountId: number
-    target: Address
-    l2SourceToken: number
-    l1TargetToken: number
-    feeToken: number
-    fee: BigNumberish
-    ts: number
-    nonce: number
-    validFrom: number
-    validUntil: number
-  }): Promise<ForcedExit> {
-    const tx: ForcedExit = {
-      ...forcedExit,
-      type: 'ForcedExit',
-    }
+  async signSyncForcedExit(tx: ForcedExit): Promise<ForcedExit> {
     const msgBytes = utils.serializeForcedExit(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
     return {
       ...tx,
-      fee: BigNumber.from(forcedExit.fee).toString(),
+      fee: BigNumber.from(tx.fee).toString(),
       signature,
     }
   }

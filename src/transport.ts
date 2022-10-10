@@ -211,44 +211,33 @@ export class DummyTransport extends AbstractJSONRPCTransport {
       for (const tokenItem of tokensList) {
         const token = {
           chains: tokenItem.chains,
-          address: tokenItem.address,
           id: tokenItem.id,
           symbol: tokenItem.symbol,
           decimals: tokenItem.decimals,
         }
-        tokens[tokenItem.symbol] = token
+        tokens[tokenItem.id] = token
       }
 
       return tokens
     }
 
-    if (method == 'account_info') {
+    if (method == 'account_info_by_address') {
       // The example `AccountState` instance:
       //  - assigns the '42' value to account_id;
       //  - assigns the committed.pubKeyHash to match the wallet's signer's PubKeyHash
       //  - adds single entry of "DAI" token to the committed balances;
       //  - adds single entry of "USDC" token to the verified balances.
       return {
-        address: params[0],
         id: 42,
-        depositing: {},
-        committed: {
-          balances: {
-            0: {
-              DAI: BigNumber.from(12345),
-            },
-          },
-          nonce: 0,
-          pubKeyHash: await this.getPubKeyHash(),
-        },
-        verified: {
-          balances: {
-            0: {
-              USDC: BigNumber.from(98765),
-            },
-          },
-          nonce: 0,
-          pubKeyHash: '',
+        address: params[0],
+        nonce: 0,
+        pubKeyHash: await this.getPubKeyHash(),
+      }
+    }
+    if (method == 'account_balances') {
+      return {
+        '0': {
+          '1': BigNumber.from(12345),
         },
       }
     }

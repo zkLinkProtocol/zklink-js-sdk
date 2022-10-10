@@ -1,6 +1,7 @@
 import { AbstractJSONRPCTransport, DummyTransport, HTTPTransport, WSTransport } from './transport'
 import { BigNumber, Contract, ethers } from 'ethers'
 import {
+  AccountBalances,
   AccountState,
   Address,
   ChangePubKeyFee,
@@ -72,13 +73,12 @@ export class Provider {
   async submitTx({
     tx,
     signature,
-    fastProcessing,
   }: {
     tx: any
     signature?: TxEthSignature
     fastProcessing?: boolean
   }): Promise<string> {
-    return await this.transport.request('tx_submit', [tx, signature, fastProcessing])
+    return await this.transport.request('tx_submit', [tx, signature])
   }
 
   // Requests `zkSync` server to execute several transactions together.
@@ -120,7 +120,14 @@ export class Provider {
   }
 
   async getState(address: Address): Promise<AccountState> {
-    return await this.transport.request('account_info', [address])
+    return await this.transport.request('account_info_by_address', [address])
+  }
+  async getStateById(accountId: number): Promise<AccountState> {
+    return await this.transport.request('account_info_by_id', [accountId])
+  }
+
+  async getBalance(accountId: number, subAccountId: number): Promise<AccountBalances> {
+    return await this.transport.request('account_balances', [accountId, subAccountId])
   }
 
   async getSubAccountState(address: Address, subAccountId: number): Promise<AccountState> {
@@ -215,39 +222,9 @@ export class Provider {
     }
   }
 
-  async getTransactionFee(
-    txType: 'Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee,
-    address: Address,
-    tokenLike: TokenLike,
-    chainId: number | null // Link chain id, required number in withdraw and forcedId, others null
-  ): Promise<Fee> {
-    const transactionFee = await this.transport.request('get_tx_fee', [
-      txType,
-      address.toString(),
-      tokenLike,
-      chainId,
-    ])
-    return {
-      feeType: transactionFee.feeType,
-      gasTxAmounts: transactionFee.gasTxAmounts.map((a: string) => BigNumber.from(a)),
-      gasPriceWei: BigNumber.from(transactionFee.gasPriceWei),
-      gasFee: BigNumber.from(transactionFee.gasFee),
-      zkpFee: BigNumber.from(transactionFee.zkpFee),
-      totalFee: BigNumber.from(transactionFee.totalFee),
-    }
-  }
-
-  async getTransactionsBatchFee(
-    txTypes: ('Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee)[],
-    addresses: Address[],
-    tokenLike: TokenLike
-  ): Promise<BigNumber> {
-    const batchFee = await this.transport.request('get_txs_batch_fee_in_wei', [
-      txTypes,
-      addresses,
-      tokenLike,
-    ])
-    return BigNumber.from(batchFee.totalFee)
+  async getTransactionFee(tx: any): Promise<BigNumber> {
+    const transactionFee = await this.transport.request('get_tx_fee', [tx])
+    return transactionFee
   }
 
   async getTokenPrice(tokenLike: TokenLike): Promise<number> {
@@ -257,32 +234,5 @@ export class Provider {
 
   async disconnect() {
     return await this.transport.disconnect()
-  }
-}
-
-export class ETHProxy {
-  private governanceContract: Contract
-
-  constructor(
-    private ethersProvider: ethers.providers.Provider,
-    public contractAddress: ContractAddress
-  ) {
-    this.governanceContract = new Contract(
-      this.contractAddress.govContract,
-      SYNC_GOV_CONTRACT_INTERFACE,
-      this.ethersProvider
-    )
-  }
-
-  async resolveTokenId(token: TokenAddress): Promise<number> {
-    if (isTokenETH(token)) {
-      return 0
-    } else {
-      const tokenId = await this.governanceContract.tokenIds(token)
-      if (tokenId == 0) {
-        throw new Error(`ERC20 token ${token} is not supported`)
-      }
-      return tokenId
-    }
   }
 }

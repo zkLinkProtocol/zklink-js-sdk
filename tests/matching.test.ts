@@ -31,12 +31,12 @@ describe('matching', () => {
         signature: {
           pubKey: '191f5a474b7b8af67e4338c169b16093a8662bd9fd825b88ec97f987e6453e1c',
           signature:
-            'df557d94e1c6cbafb09afa1582fcbb41c89dd1a93b56aa71af840c34c5d1ee9cf8f9d790202b51defbbd954307b0f98b5f14d944dedfe14bd86eee1ef73f0500',
+            '9868b21aa2eaaca277e4e729258cf4186e4c7ea4b6679030b0f31d07d12e8c193f8d807bbce4a5bf7ce8ff06d9a1f20cdbbac057850b3878542a5c0829ffa402',
         },
         validFrom: 0,
         validUntil: 9007199254740991,
-        baseTokenId: 6,
-        quoteTokenId: 7,
+        baseTokenId: 32,
+        quoteTokenId: 1,
         subAccountId: 1,
       },
       nonce: 0,
@@ -52,16 +52,16 @@ describe('matching', () => {
         signature: {
           pubKey: '191f5a474b7b8af67e4338c169b16093a8662bd9fd825b88ec97f987e6453e1c',
           signature:
-            '95f42b81cd32c1b1ede071db54ac9a436cebac8587712af6a00facd83308380f499528b92acf10e680ba2d5da5dabde243e2727ed6d22a1ca1a3685d12906803',
+            '64344a0ebb9d72ad672b8035076032e676b8e2c63ad026776c5e9b6c55e483a8093bd84db8f59afd16ff67acd5eefc8d03704ccdeaa9c124da803c0566666401',
         },
         validFrom: 0,
         validUntil: 9007199254740991,
-        baseTokenId: 6,
-        quoteTokenId: 7,
+        baseTokenId: 32,
+        quoteTokenId: 1,
         subAccountId: 1,
       },
       account: '0x3498F456645270eE003441df82C718b56c0e6666',
-      feeToken: 7,
+      feeToken: 1,
       accountId: 6,
       signature: {
         pubKey: '0dd4f603531bd78bbecd005d9e7cc62a794dcfadceffe03e269fbb6b72e9c724',
@@ -73,21 +73,14 @@ describe('matching', () => {
     }
 
     const serializedMaker = await serializeOrder(data.maker as any)
-    expect(Array.from(serializedMaker)).to.eql(
-      [
-        255, 0, 0, 0, 6, 1, 1, 0, 0, 0, 1, 0, 6, 0, 7, 0, 0, 0, 0, 0, 0, 0, 20, 209, 18, 13, 123,
-        22, 0, 0, 0, 5, 10, 74, 129, 124, 128, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 255, 255, 255,
-        255, 255, 255,
-      ],
+    expect(Buffer.from(serializedMaker).toString('hex')).to.eq(
+      'ff00000006010100000001002000010000000000000014d1120d7b16000000050a4a817c800a0000000000000000001fffffffffffff',
       'serialized maker is incorrect'
     )
     const serializedTaker = await serializeOrder(data.taker as any)
-    expect(Array.from(serializedTaker)).to.eql(
-      [
-        255, 0, 0, 0, 6, 1, 3, 0, 0, 0, 0, 0, 6, 0, 7, 0, 0, 0, 0, 0, 0, 0, 20, 209, 18, 13, 123,
-        22, 0, 0, 1, 5, 10, 74, 129, 124, 128, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 255, 255, 255, 255,
-        255, 255,
-      ],
+
+    expect(Buffer.from(serializedTaker).toString('hex')).to.eq(
+      'ff00000006010300000000002000010000000000000014d1120d7b16000001050a4a817c80080000000000000000001fffffffffffff',
       'serialized taker is incorrect'
     )
     const maker = await wallet.signSyncOrder(data.maker as any)
@@ -96,26 +89,17 @@ describe('matching', () => {
     expect(taker.tx.signature).to.eql(data.taker.signature, 'taker signature is incorrect')
 
     const serialized = await serializeOrderMatching(data as any)
-    expect(Array.from(serialized)).to.eql(
-      [
-        11, 0, 0, 0, 6, 52, 152, 244, 86, 100, 82, 112, 238, 0, 52, 65, 223, 130, 199, 24, 181, 108,
-        14, 102, 102, 76, 85, 188, 226, 194, 164, 116, 92, 118, 12, 23, 201, 231, 44, 240, 176, 255,
-        224, 160, 185, 218, 203, 223, 73, 86, 220, 82, 92, 4, 128, 147, 0, 7, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 13, 224, 182, 179, 167, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 209, 18, 13, 123,
-        22, 0, 0,
-      ],
+
+    expect(Buffer.from(serialized).toString('hex')).to.eq(
+      '0b000000063498f456645270ee003441df82c718b56c0e666658adffc2cbf9f8849a4c7bf356bd0f7564fdafc946de4c1a074d46647da7d90001000000000000000000000de0b6b3a7640000000000000000000014d1120d7b160000',
       'serialized order matching is incorrect'
-    )
-    expect(sha256(serialized)).to.eq(
-      '0x7481574dbbe3de82866c43dfac8889fc07796c7136309f91fa4ede5df34d8170',
-      'sha256 hash is incorrect'
     )
 
     const signedTransaction = await wallet.signSyncOrderMatching(data as any)
     const { tx } = signedTransaction as any
     // wrong l2 signature: 46ab809c4a5beacfd423bb05332e818fb65d4d570939852206565c9a22adad8a3c3b4e69832c93f5b54b317bebcb44292bce5142f4bfa39f1b51a1cadcacae03
     expect(tx.signature.signature).to.eq(
-      'ff270b36263d1209e2f5a3b3ac1947ccac83342adc3dc21cc9c8438081e969062b58dbc5572a80ea6716a1fc38b7e5be9f7260b3709b9ae14e7de995b4f92404',
+      '7b988abaebbee8f3f2c542e471ee90503fd0546b4133f2080581e80ad7c6ea8d6248ebfff203547a05cdfcf83ab3dc412c305eb93af319263f0251e6f220bb02',
       'order matching signature is incorrect'
     )
   })

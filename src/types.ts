@@ -6,7 +6,7 @@ export type Address = string
 export type PubKeyHash = string
 
 // Symbol like "ETH" or "FAU" or token contract address(zero address is implied for "ETH").
-export type TokenLike = TokenSymbol | TokenAddress
+export type TokenLike = TokenSymbol
 // Token symbol (e.g. "ETH", "FAU", etc.)
 export type TokenSymbol = string
 // Token address (e.g. 0xde..ad for ERC20, or 0x00.00 for "ETH")
@@ -45,50 +45,16 @@ export interface Create2Data {
 }
 
 export interface AccountState {
-  address: Address
   id?: number
-  depositing: {
-    balances: {
-      [subAccountId: number]: {
-        // Token are indexed by their symbol (e.g. "ETH")
-        [token: string]: {
-          // Sum of pending deposits for the token.
-          amount: BigNumberish
-          // Value denoting the block number when the funds are expected
-          // to be received by zkSync network.
-          expectedAcceptBlock: number
-        }
-      }
-    }
-  }
-  committed: {
-    balances: {
-      [subAccountId: number]: {
-        // Token are indexed by their symbol (e.g. "ETH")
-        [token: string]: BigNumberish
-      }
-    }
-    nonce: number
-    pubKeyHash: PubKeyHash
-    orders: {
-      [subAccountId: number]: {
-        [slotId: number]: {
-          nonce: number
-          order_hash: string
-          residue: string
-        }
-      }
-    }
-  }
-  verified: {
-    balances: {
-      [subAccountId: number]: {
-        // Token are indexed by their symbol (e.g. "ETH")
-        [token: string]: BigNumberish
-      }
-    }
-    nonce: number
-    pubKeyHash: PubKeyHash
+  address: Address
+  nonce: number
+  pubKeyHash: PubKeyHash
+}
+
+export interface AccountBalances {
+  [subAccountId: number]: {
+    // Token are indexed by their id (e.g. "1")
+    [tokenId: number]: BigNumberish
   }
 }
 
@@ -120,72 +86,6 @@ export interface Transfer {
   amount: BigNumberish
   fee: BigNumberish
   ts: number
-  nonce: number
-  signature?: Signature
-  validFrom: number
-  validUntil: number
-}
-
-export interface CurveAddLiquidity {
-  type: 'L2CurveAddLiq'
-  account: Address
-  tokens: TokenId[]
-  amounts: BigNumberish[]
-  lpQuantity: BigNumberish
-  minLpQuantity: BigNumberish
-  pairAddress: Address
-  fee: BigNumberish
-  feeToken: TokenId
-  collectFees: BigNumberish[]
-  ts?: number
-  nonce: number
-  signature?: Signature
-  validFrom: number
-  validUntil: number
-}
-
-export interface CurveRemoveLiquidity {
-  type: 'L2CurveRemoveLiquidity'
-  account: Address
-
-  tokens: TokenId[]
-
-  amounts: BigNumberish[]
-  minAmounts: BigNumberish[]
-
-  lpQuantity: BigNumberish
-  pairAddress: Address
-
-  fee: BigNumberish
-  feeToken: TokenId
-
-  curveFee: BigNumberish
-  ts?: number
-
-  nonce: number
-  signature?: Signature
-  validFrom: number
-  validUntil: number
-}
-
-export interface CurveSwap {
-  type: 'CurveSwap'
-  accountId: number
-  account: Address
-  pairAddress: Address
-
-  tokenIn: TokenId
-  tokenOut: TokenId
-
-  amountIn: BigNumberish
-  amountOut: BigNumberish
-  amountOutMin: BigNumberish
-
-  fee: BigNumberish
-
-  adminFee: BigNumberish
-  ts?: number
-
   nonce: number
   signature?: Signature
   validFrom: number
@@ -274,17 +174,7 @@ export interface CloseAccount {
 }
 
 export interface SignedTransaction {
-  tx:
-    | Transfer
-    | Withdraw
-    | ChangePubKey
-    | CloseAccount
-    | ForcedExit
-    | CurveAddLiquidity
-    | CurveRemoveLiquidity
-    | CurveSwap
-    | Order
-    | OrderMatching
+  tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit | Order | OrderMatching
   ethereumSignature?: TxEthSignature
 }
 
@@ -308,17 +198,21 @@ export interface PriorityOperationReceipt {
 
 export interface ContractAddress {
   mainContract: string
-  govContract: string
 }
 
 export interface Tokens {
   // Tokens are indexed by their symbol (e.g. "ETH")
   [token: string]: {
-    chains: number[]
-    address: string[]
     id: number
     symbol: string
     decimals: number
+    chains: {
+      [x: number]: {
+        chainId: number
+        address: Address
+        fastWithdraw: boolean
+      }
+    }
   }
 }
 
