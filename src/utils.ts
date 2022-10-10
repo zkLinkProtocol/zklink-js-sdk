@@ -14,9 +14,6 @@ import {
   ChangePubKey,
   Withdraw,
   CloseAccount,
-  CurveAddLiquidity,
-  CurveRemoveLiquidity,
-  CurveSwap,
   Order,
   ChainId,
   OrderMatching,
@@ -714,94 +711,6 @@ export function serializeTransfer(transfer: Transfer): Uint8Array {
     token,
     amount,
     fee,
-    nonce,
-    validFrom,
-    validUntil,
-    tsBytes,
-  ])
-}
-export function serializeCurveAddLiquidity(payload: CurveAddLiquidity): Uint8Array {
-  const type = new Uint8Array([8])
-  const account = serializeAddress(payload.account)
-  const tokens = chainsCompletion(payload.tokens, TOTAL_CHAIN_NUM, 0).map((tokenId) =>
-    serializeTokenId(tokenId)
-  )
-  const amounts = chainsCompletion(payload.amounts, TOTAL_CHAIN_NUM, '0').map((amount) =>
-    serializeAmountPacked(amount)
-  )
-  const minLpQuantity = serializeAmountPacked(payload.minLpQuantity)
-  const feeToken = serializeTokenId(payload.feeToken)
-  const feeAmount = serializeFeePacked(payload.fee)
-  const nonce = serializeNonce(payload.nonce)
-  const validFrom = serializeTimestamp(payload.validFrom)
-  const validUntil = serializeTimestamp(payload.validUntil)
-  const tsBytes = numberToBytesBE(payload.ts, 4)
-  return ethers.utils.concat([
-    type,
-    account,
-    ...tokens,
-    ...amounts,
-    minLpQuantity,
-    feeToken,
-    feeAmount,
-    nonce,
-    validFrom,
-    validUntil,
-    tsBytes,
-  ])
-}
-export function serializeCurveSwap(payload: CurveSwap): Uint8Array {
-  const type = new Uint8Array([9])
-  const account = serializeAddress(payload.account)
-  const pairAddress = serializeAddress(payload.pairAddress)
-  const tokenIn = serializeTokenId(payload.tokenIn)
-  const tokenOut = serializeTokenId(payload.tokenOut)
-  const amountIn = serializeAmountPacked(payload.amountIn)
-  const amountOutMin = serializeAmountPacked(payload.amountOutMin)
-  const feeAmount = serializeFeePacked(payload.fee)
-  const nonce = serializeNonce(payload.nonce)
-  const validFrom = serializeTimestamp(payload.validFrom)
-  const validUntil = serializeTimestamp(payload.validUntil)
-  const tsBytes = numberToBytesBE(payload.ts, 4)
-  return ethers.utils.concat([
-    type,
-    account,
-    pairAddress,
-    tokenIn,
-    tokenOut,
-    amountIn,
-    amountOutMin,
-    feeAmount,
-    nonce,
-    validFrom,
-    validUntil,
-    tsBytes,
-  ])
-}
-export function serializeCurveRemoveLiquidity(payload: CurveRemoveLiquidity): Uint8Array {
-  const type = new Uint8Array([10])
-  const account = serializeAddress(payload.account)
-  const tokens = chainsCompletion(payload.tokens, TOTAL_CHAIN_NUM, 0).map((tokenId) =>
-    serializeTokenId(tokenId)
-  )
-  const minAmounts = chainsCompletion(payload.minAmounts, TOTAL_CHAIN_NUM, '0').map((amount) =>
-    serializeAmountPacked(amount)
-  )
-  const lpQuantity = serializeAmountPacked(payload.lpQuantity)
-  const feeToken = serializeTokenId(payload.feeToken)
-  const feeAmount = serializeFeePacked(payload.fee)
-  const nonce = serializeNonce(payload.nonce)
-  const validFrom = serializeTimestamp(payload.validFrom)
-  const validUntil = serializeTimestamp(payload.validUntil)
-  const tsBytes = numberToBytesBE(payload.ts, 4)
-  return ethers.utils.concat([
-    type,
-    account,
-    ...tokens,
-    ...minAmounts,
-    lpQuantity,
-    feeToken,
-    feeAmount,
     nonce,
     validFrom,
     validUntil,

@@ -92,72 +92,6 @@ export interface Transfer {
   validUntil: number
 }
 
-export interface CurveAddLiquidity {
-  type: 'L2CurveAddLiq'
-  account: Address
-  tokens: TokenId[]
-  amounts: BigNumberish[]
-  lpQuantity: BigNumberish
-  minLpQuantity: BigNumberish
-  pairAddress: Address
-  fee: BigNumberish
-  feeToken: TokenId
-  collectFees: BigNumberish[]
-  ts?: number
-  nonce: number
-  signature?: Signature
-  validFrom: number
-  validUntil: number
-}
-
-export interface CurveRemoveLiquidity {
-  type: 'L2CurveRemoveLiquidity'
-  account: Address
-
-  tokens: TokenId[]
-
-  amounts: BigNumberish[]
-  minAmounts: BigNumberish[]
-
-  lpQuantity: BigNumberish
-  pairAddress: Address
-
-  fee: BigNumberish
-  feeToken: TokenId
-
-  curveFee: BigNumberish
-  ts?: number
-
-  nonce: number
-  signature?: Signature
-  validFrom: number
-  validUntil: number
-}
-
-export interface CurveSwap {
-  type: 'CurveSwap'
-  accountId: number
-  account: Address
-  pairAddress: Address
-
-  tokenIn: TokenId
-  tokenOut: TokenId
-
-  amountIn: BigNumberish
-  amountOut: BigNumberish
-  amountOutMin: BigNumberish
-
-  fee: BigNumberish
-
-  adminFee: BigNumberish
-  ts?: number
-
-  nonce: number
-  signature?: Signature
-  validFrom: number
-  validUntil: number
-}
-
 export interface Withdraw {
   type: 'Withdraw'
   toChainId: number
@@ -240,17 +174,7 @@ export interface CloseAccount {
 }
 
 export interface SignedTransaction {
-  tx:
-    | Transfer
-    | Withdraw
-    | ChangePubKey
-    | CloseAccount
-    | ForcedExit
-    | CurveAddLiquidity
-    | CurveRemoveLiquidity
-    | CurveSwap
-    | Order
-    | OrderMatching
+  tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit | Order | OrderMatching
   ethereumSignature?: TxEthSignature
 }
 
