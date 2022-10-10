@@ -31,14 +31,12 @@ describe('ChangePubKey', () => {
       chainId: 80001,
       accountId: 2,
       ts: 1654776640,
-      validFrom: 0,
-      validUntil: 4294967295,
     } as any)
     expect(signedTransaction.tx.ethAuthData.ethSignature).eq(
       '0xb0f0f5ca9d165dd28561e9a084049d53aa95683937aa0c14ddbfa8478e19168f25e1ac75afd71f2ca8a24672a80fa6424408d6333ffdcbafd61725fa18aa6ec51c'
     )
     expect(signedTransaction.tx.signature.signature).eq(
-      'd23f20cb8a177b179ef026f2bac6f1a1d0d1f36eb9e8a27e74249e4caba6db17125c69e4e0daa82225a148d18309f6575b0c1ae31651463d57472e826fbc3c01'
+      'cf4a400da2c2c0b38f83930435f629f73b9acfa5f0e2c12e94d0d6280b8ecc2ef01ebb1a3c8db14475ffd01a32a461962c50097b50b660d89f734fd3c4c46405'
     )
   })
 })

@@ -190,8 +190,6 @@ export class Wallet {
     accountId: number
     ts?: number
     nonce: number
-    validFrom?: number
-    validUntil?: number
   }): Promise<SignedTransaction> {
     const transactionData: Transfer = {
       type: 'Transfer',
@@ -205,8 +203,6 @@ export class Wallet {
       fee: transfer.fee,
       ts: transfer.ts || getTimestamp(),
       nonce: transfer.nonce,
-      validFrom: transfer.validFrom || 0,
-      validUntil: transfer.validUntil || MAX_TIMESTAMP,
     }
 
     if (transactionData.fee == null) {
@@ -249,8 +245,6 @@ export class Wallet {
     fee: BigNumberish
     feeToken: TokenLike
     nonce: number
-    validFrom: number
-    validUntil: number
   }): Promise<OrderMatching> {
     if (!this.signer) {
       throw new Error('ZKLink signer is required for sending zklink transactions.')
@@ -269,8 +263,6 @@ export class Wallet {
       fee: matching.fee,
       feeTokenId: feeTokenId,
       nonce: matching.nonce,
-      validFrom: matching.validFrom,
-      validUntil: matching.validUntil,
     }
 
     return this.signer.signSyncOrderMatching(transactionData)
@@ -287,11 +279,7 @@ export class Wallet {
     feeToken: TokenLike
     ts?: number
     nonce: number
-    validFrom?: number
-    validUntil?: number
   }): Promise<SignedTransaction> {
-    matching.validFrom = matching.validFrom || 0
-    matching.validUntil = matching.validUntil || 9007199254740991
     const signedTransferTransaction = await this.getOrderMatching(matching as any)
 
     const stringFee = BigNumber.from(matching.fee).isZero() ? null : utils.formatEther(matching.fee)
@@ -329,8 +317,6 @@ export class Wallet {
     fee?: BigNumberish
     ts?: number
     nonce: number
-    validFrom?: number
-    validUntil?: number
   }): Promise<SignedTransaction> {
     const transactionData: ForcedExit = {
       type: 'ForcedExit',
@@ -344,8 +330,6 @@ export class Wallet {
       fee: forcedExit.fee,
       ts: forcedExit.ts || getTimestamp(),
       nonce: forcedExit.nonce,
-      validFrom: forcedExit.validFrom || 0,
-      validUntil: forcedExit.validUntil || MAX_TIMESTAMP,
     }
 
     if (transactionData.fee == null) {
@@ -384,8 +368,6 @@ export class Wallet {
     ts?: number
     fee?: BigNumberish
     nonce?: Nonce
-    validFrom?: number
-    validUntil?: number
   }): Promise<Transaction> {
     forcedExit.nonce =
       forcedExit.nonce != null ? await this.getNonce(forcedExit.nonce) : await this.getNonce()
@@ -403,8 +385,6 @@ export class Wallet {
     fee?: BigNumberish
     accountId?: number
     nonce?: Nonce
-    validFrom?: number
-    validUntil?: number
   }): Promise<Transaction> {
     transfer.nonce =
       transfer.nonce != null ? await this.getNonce(transfer.nonce) : await this.getNonce()
@@ -413,25 +393,13 @@ export class Wallet {
     return submitSignedTransaction(signedTransferTransaction, this.provider)
   }
 
-  async getOrder(
-    payload: Order & {
-      validFrom?: number
-      validUntil?: number
-    }
-  ): Promise<Order> {
+  async getOrder(payload: Order): Promise<Order> {
     if (!this.signer) {
       throw new Error('ZKLink signer is required for sending zklink transactions.')
     }
     return this.signer.signSyncOrder(payload as any)
   }
-  async signSyncOrder(
-    payload: Order & {
-      validFrom?: number
-      validUntil?: number
-    }
-  ): Promise<SignedTransaction> {
-    payload.validFrom = payload.validFrom || 0
-    payload.validUntil = payload.validUntil || 9007199254740991
+  async signSyncOrder(payload: Order): Promise<SignedTransaction> {
     const signedTransferTransaction = await this.getOrder(payload as any)
 
     return {
@@ -461,8 +429,6 @@ export class Wallet {
     accountId: number
     ts?: number
     nonce: number
-    validFrom?: number
-    validUntil?: number
   }): Promise<SignedTransaction> {
     const transactionData: Withdraw = {
       type: 'Withdraw',
@@ -479,8 +445,6 @@ export class Wallet {
       fee: withdraw.fee,
       ts: withdraw.ts || getTimestamp(),
       nonce: withdraw.nonce,
-      validFrom: withdraw.validFrom || 0,
-      validUntil: withdraw.validUntil || MAX_TIMESTAMP,
     }
 
     if (transactionData.fee == null) {
@@ -526,8 +490,6 @@ export class Wallet {
     fee?: BigNumberish
     nonce?: Nonce
     fastProcessing?: boolean
-    validFrom?: number
-    validUntil?: number
   }): Promise<Transaction> {
     withdraw.nonce =
       withdraw.nonce != null ? await this.getNonce(withdraw.nonce) : await this.getNonce()
@@ -554,8 +516,6 @@ export class Wallet {
     accountId?: number
     ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2
     ts: number
-    validFrom: number
-    validUntil: number
   }): Promise<ChangePubKey> {
     if (!this.signer) {
       throw new Error('ZKLink signer is required for current pubkey calculation.')
@@ -579,8 +539,6 @@ export class Wallet {
       fee: BigNumber.from(changePubKey.fee).toString(),
       ts: changePubKey.ts,
       ethAuthData: changePubKey.ethAuthData,
-      validFrom: changePubKey.validFrom,
-      validUntil: changePubKey.validUntil,
     })
 
     return changePubKeyTx
@@ -599,8 +557,6 @@ export class Wallet {
     accountId?: number
     batchHash?: string
     ts?: number
-    validFrom?: number
-    validUntil?: number
   }): Promise<SignedTransaction> {
     changePubKey.ts = changePubKey.ts || getTimestamp()
     const newPubKeyHash = await this.signer.pubKeyHash()
@@ -646,8 +602,6 @@ export class Wallet {
     }
 
     const changePubkeyTxUnsigned = Object.assign(changePubKey, { ethAuthData })
-    changePubkeyTxUnsigned.validFrom = changePubKey.validFrom || 0
-    changePubkeyTxUnsigned.validUntil = changePubKey.validUntil || MAX_TIMESTAMP
     const changePubKeyTx = await this.getChangePubKey(changePubkeyTxUnsigned as any)
 
     return {
@@ -665,8 +619,6 @@ export class Wallet {
     version?: string
     fee?: BigNumberish
     nonce?: Nonce
-    validFrom?: number
-    validUntil?: number
   }): Promise<Transaction> {
     changePubKey.nonce =
       changePubKey.nonce != null ? await this.getNonce(changePubKey.nonce) : await this.getNonce()

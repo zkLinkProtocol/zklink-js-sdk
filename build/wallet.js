@@ -126,8 +126,6 @@ class Wallet {
                 fee: transfer.fee,
                 ts: transfer.ts || (0, utils_1.getTimestamp)(),
                 nonce: transfer.nonce,
-                validFrom: transfer.validFrom || 0,
-                validUntil: transfer.validUntil || utils_1.MAX_TIMESTAMP,
             };
             if (transactionData.fee == null) {
                 transactionData.fee = yield this.provider.getTransactionFee(transactionData);
@@ -173,16 +171,12 @@ class Wallet {
                 fee: matching.fee,
                 feeTokenId: feeTokenId,
                 nonce: matching.nonce,
-                validFrom: matching.validFrom,
-                validUntil: matching.validUntil,
             };
             return this.signer.signSyncOrderMatching(transactionData);
         });
     }
     signSyncOrderMatching(matching) {
         return __awaiter(this, void 0, void 0, function* () {
-            matching.validFrom = matching.validFrom || 0;
-            matching.validUntil = matching.validUntil || 9007199254740991;
             const signedTransferTransaction = yield this.getOrderMatching(matching);
             const stringFee = ethers_1.BigNumber.from(matching.fee).isZero() ? null : ethers_1.utils.formatEther(matching.fee);
             const stringFeeToken = this.provider.tokenSet.resolveTokenSymbol(matching.feeToken);
@@ -222,8 +216,6 @@ class Wallet {
                 fee: forcedExit.fee,
                 ts: forcedExit.ts || (0, utils_1.getTimestamp)(),
                 nonce: forcedExit.nonce,
-                validFrom: forcedExit.validFrom || 0,
-                validUntil: forcedExit.validUntil || utils_1.MAX_TIMESTAMP,
             };
             if (transactionData.fee == null) {
                 transactionData.fee = yield this.provider.getTransactionFee(transactionData);
@@ -273,8 +265,6 @@ class Wallet {
     }
     signSyncOrder(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            payload.validFrom = payload.validFrom || 0;
-            payload.validUntil = payload.validUntil || 9007199254740991;
             const signedTransferTransaction = yield this.getOrder(payload);
             return {
                 tx: signedTransferTransaction,
@@ -308,8 +298,6 @@ class Wallet {
                 fee: withdraw.fee,
                 ts: withdraw.ts || (0, utils_1.getTimestamp)(),
                 nonce: withdraw.nonce,
-                validFrom: withdraw.validFrom || 0,
-                validUntil: withdraw.validUntil || utils_1.MAX_TIMESTAMP,
             };
             if (transactionData.fee == null) {
                 transactionData.fee = yield this.provider.getTransactionFee(transactionData);
@@ -374,8 +362,6 @@ class Wallet {
                 fee: ethers_1.BigNumber.from(changePubKey.fee).toString(),
                 ts: changePubKey.ts,
                 ethAuthData: changePubKey.ethAuthData,
-                validFrom: changePubKey.validFrom,
-                validUntil: changePubKey.validUntil,
             });
             return changePubKeyTx;
         });
@@ -420,8 +406,6 @@ class Wallet {
                 throw new Error('Unsupported SetSigningKey type');
             }
             const changePubkeyTxUnsigned = Object.assign(changePubKey, { ethAuthData });
-            changePubkeyTxUnsigned.validFrom = changePubKey.validFrom || 0;
-            changePubkeyTxUnsigned.validUntil = changePubKey.validUntil || utils_1.MAX_TIMESTAMP;
             const changePubKeyTx = yield this.getChangePubKey(changePubkeyTxUnsigned);
             return {
                 tx: changePubKeyTx,

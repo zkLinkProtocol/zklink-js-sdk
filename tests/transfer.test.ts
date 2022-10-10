@@ -15,15 +15,13 @@ describe('transfer', () => {
       fee: BigNumber.from('10000000000'),
       ts: 1646101085,
       nonce: 1,
-      validFrom: 0,
-      validUntil: 4294967295,
     } as any)
 
     expect(transaction.txData.ethereumSignature.signature).to.eq(
       '0xf75af5b8223c5e8afa1814e0e74c891ee9ed5f0e7cd0544c463aa33a4859fb8c1ad1facdb95cbac2b846e825c3d1c8468204734a9199090d11640ae9e27aa4f41c'
     )
     expect(transaction.txData.tx.signature.signature).to.eq(
-      '67fc9b4c86db57dc640b7149344a7e74acdad5d47e2992f53382695a0e3b8c2300e7dabf0bccba3a1376643121c137502375c71e0ba57c9ebdff521e5fd60102'
+      '1e2849906465495d3fd13f1966133896d409339f111324489a4d72d043ee65931785541c9a158de89fd7ff120a760f92c1567713f5f23ffa6e2523adc1b60504'
     )
   })
 })

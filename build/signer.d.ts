@@ -20,13 +20,8 @@ export declare class Signer {
         fee: BigNumberish;
         feeTokenId: number;
         nonce: number;
-        validFrom: number;
-        validUntil: number;
     }): Promise<OrderMatching>;
-    signSyncOrder(payload: Order & {
-        validFrom: number;
-        validUntil: number;
-    }): Promise<Order>;
+    signSyncOrder(payload: Order): Promise<Order>;
     /**
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
@@ -44,8 +39,6 @@ export declare class Signer {
         fastWithdraw: number;
         ts: number;
         nonce: number;
-        validFrom: number;
-        validUntil: number;
     }): Uint8Array;
     signSyncWithdraw(tx: Withdraw): Promise<Withdraw>;
     /**
@@ -68,8 +61,6 @@ export declare class Signer {
         fee: BigNumberish;
         ts: number;
         nonce: number;
-        validFrom: number;
-        validUntil: number;
     }): Uint8Array;
     signSyncChangePubKey(changePubKey: {
         linkChainId: number;
@@ -81,8 +72,6 @@ export declare class Signer {
         ts: number;
         nonce: number;
         ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
-        validFrom: number;
-        validUntil: number;
     }): Promise<ChangePubKey>;
     static fromPrivateKey(pk: Uint8Array): Signer;
     static fromSeed(seed: Uint8Array): Promise<Signer>;

@@ -61,8 +61,6 @@ export interface Transfer {
     ts: number;
     nonce: number;
     signature?: Signature;
-    validFrom: number;
-    validUntil: number;
 }
 export interface Withdraw {
     type: 'Withdraw';
@@ -80,8 +78,6 @@ export interface Withdraw {
     ts: number;
     nonce: number;
     signature?: Signature;
-    validFrom: number;
-    validUntil: number;
 }
 export interface ForcedExit {
     type: 'ForcedExit';
@@ -96,8 +92,6 @@ export interface ForcedExit {
     ts: number;
     nonce: number;
     signature?: Signature;
-    validFrom: number;
-    validUntil: number;
 }
 export declare type ChangePubkeyTypes = 'Onchain' | 'ECDSA' | 'CREATE2' | 'ECDSALegacyMessage';
 export interface ChangePubKeyOnchain {
@@ -128,8 +122,6 @@ export interface ChangePubKey {
     signature?: Signature;
     ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
     ethSignature?: string;
-    validFrom: number;
-    validUntil: number;
 }
 export interface CloseAccount {
     type: 'Close';
@@ -205,8 +197,6 @@ export interface Order {
     isSell: number;
     feeRatio1: number;
     feeRatio2: number;
-    validFrom: number;
-    validUntil: number;
     signature?: Signature;
     ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
     ethSignature?: string;
@@ -223,6 +213,4 @@ export interface OrderMatching {
     feeToken: number;
     nonce: number;
     signature?: Signature;
-    validFrom: number;
-    validUntil: number;
 }

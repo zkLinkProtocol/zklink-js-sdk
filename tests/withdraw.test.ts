@@ -21,12 +21,10 @@ describe('withdraw', () => {
       fee: BigNumber.from('4100000000000000'),
       ts: 1649749979,
       nonce: 85,
-      validFrom: 0,
-      validUntil: 4294967295,
       type: 'Withdraw',
     })
     expect(Buffer.from(serialized).toString('hex')).eq(
-      '030300000001013d809e414ba4893709c85f242ba3617481bc41260001001100000000000000056bb8cd3fbf7bc000334d00000055010032000000000000000000000000ffffffff62552fdb',
+      '030300000001013d809e414ba4893709c85f242ba3617481bc41260001001100000000000000056bb8cd3fbf7bc000334d0000005501003262552fdb',
       'withdraw serialize bytes'
     )
   })
@@ -46,8 +44,6 @@ describe('withdraw', () => {
       l2SourceToken: 1,
       l1TargetToken: 17,
       ts: 1649749979,
-      validFrom: 0,
-      validUntil: 4294967295,
       withdrawFeeRatio: 50,
     } as any)
     expect(transaction.txData.ethereumSignature.signature).to.eq(
@@ -55,7 +51,7 @@ describe('withdraw', () => {
       'withdraw eth signature is incorrect'
     )
     expect(transaction.txData.tx.signature.signature).to.eq(
-      '9c777ed4108f7f16fd1b6702008dbda38850ae2851a62c5fae61ef9f6cba1b8df88f58c107e9e466412904a72c5642964e6538fc99525db1b6c5c57f37c7a403',
+      'dec81d37340f9d8522b91cdd84d87dcc6ce907eec14ce684dbfd788eb30653063d57f96ff222609e6f899e1d2b2551bcd8087e459499277898572c3a6ce70b03',
       'withdraw signature is incorrect'
     )
   })

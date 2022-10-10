@@ -665,8 +665,6 @@ export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
   const nonceBytes = serializeNonce(withdraw.nonce)
   const fastWithdrawBytes = serializeFastWithdraw(withdraw.fastWithdraw)
   const withdrawFeeRatioBytes = serializeFeeRatio(withdraw.withdrawFeeRatio)
-  const validFrom = serializeTimestamp(withdraw.validFrom)
-  const validUntil = serializeTimestamp(withdraw.validUntil)
   const tsBytes = numberToBytesBE(withdraw.ts, 4)
   return ethers.utils.concat([
     type,
@@ -681,8 +679,6 @@ export function serializeWithdraw(withdraw: Withdraw): Uint8Array {
     nonceBytes,
     fastWithdrawBytes,
     withdrawFeeRatioBytes,
-    validFrom,
-    validUntil,
     tsBytes,
   ])
 }
@@ -698,8 +694,6 @@ export function serializeTransfer(transfer: Transfer): Uint8Array {
   const amount = serializeAmountPacked(transfer.amount)
   const fee = serializeFeePacked(transfer.fee)
   const nonce = serializeNonce(transfer.nonce)
-  const validFrom = serializeTimestamp(transfer.validFrom)
-  const validUntil = serializeTimestamp(transfer.validUntil)
   const tsBytes = numberToBytesBE(transfer.ts, 4)
   return ethers.utils.concat([
     type,
@@ -712,8 +706,6 @@ export function serializeTransfer(transfer: Transfer): Uint8Array {
     amount,
     fee,
     nonce,
-    validFrom,
-    validUntil,
     tsBytes,
   ])
 }
@@ -726,8 +718,6 @@ export function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array {
   const tokenIdBytes = serializeTokenId(changePubKey.feeToken)
   const feeBytes = serializeFeePacked(changePubKey.fee)
   const nonceBytes = serializeNonce(changePubKey.nonce)
-  const validFrom = serializeTimestamp(changePubKey.validFrom)
-  const validUntil = serializeTimestamp(changePubKey.validUntil)
   const tsBytes = numberToBytesBE(changePubKey.ts, 4)
   return ethers.utils.concat([
     type,
@@ -737,8 +727,6 @@ export function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array {
     tokenIdBytes,
     feeBytes,
     nonceBytes,
-    validFrom,
-    validUntil,
     tsBytes,
   ])
 }
@@ -754,8 +742,6 @@ export function serializeForcedExit(forcedExit: ForcedExit): Uint8Array {
   const feeTokenIdBytes = serializeTokenId(forcedExit.feeToken)
   const feeBytes = serializeFeePacked(forcedExit.fee)
   const nonceBytes = serializeNonce(forcedExit.nonce)
-  const validFrom = serializeTimestamp(forcedExit.validFrom)
-  const validUntil = serializeTimestamp(forcedExit.validUntil)
   const tsBytes = numberToBytesBE(forcedExit.ts, 4)
   return ethers.utils.concat([
     type,
@@ -768,8 +754,6 @@ export function serializeForcedExit(forcedExit: ForcedExit): Uint8Array {
     feeTokenIdBytes,
     feeBytes,
     nonceBytes,
-    validFrom,
-    validUntil,
     tsBytes,
   ])
 }
@@ -787,8 +771,6 @@ export function serializeOrder(order: Order): Uint8Array {
   const feeRatio1Bytes = numberToBytesBE(order.feeRatio1, 1)
   const feeRatio2Bytes = numberToBytesBE(order.feeRatio2, 1)
   const amountBytes = serializeAmountPacked(order.amount)
-  const validFrom = numberToBytesBE(order.validFrom, 8)
-  const validUntil = bigintToBytesBE(BigNumber.from(String(order.validUntil)).toBigInt(), 8)
   return ethers.utils.concat([
     type,
     accountIdBytes,
@@ -802,8 +784,6 @@ export function serializeOrder(order: Order): Uint8Array {
     feeRatio1Bytes,
     feeRatio2Bytes,
     amountBytes,
-    validFrom,
-    validUntil,
   ])
 }
 

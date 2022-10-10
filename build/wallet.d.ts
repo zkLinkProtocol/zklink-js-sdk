@@ -33,8 +33,6 @@ export declare class Wallet {
         accountId: number;
         ts?: number;
         nonce: number;
-        validFrom?: number;
-        validUntil?: number;
     }): Promise<SignedTransaction>;
     getOrderMatching(matching: {
         accountId: number;
@@ -46,8 +44,6 @@ export declare class Wallet {
         fee: BigNumberish;
         feeToken: TokenLike;
         nonce: number;
-        validFrom: number;
-        validUntil: number;
     }): Promise<OrderMatching>;
     signSyncOrderMatching(matching: {
         accountId: number;
@@ -60,8 +56,6 @@ export declare class Wallet {
         feeToken: TokenLike;
         ts?: number;
         nonce: number;
-        validFrom?: number;
-        validUntil?: number;
     }): Promise<SignedTransaction>;
     getForcedExit(tx: ForcedExit): Promise<ForcedExit>;
     signSyncForcedExit(forcedExit: {
@@ -74,8 +68,6 @@ export declare class Wallet {
         fee?: BigNumberish;
         ts?: number;
         nonce: number;
-        validFrom?: number;
-        validUntil?: number;
     }): Promise<SignedTransaction>;
     syncForcedExit(forcedExit: {
         target: Address;
@@ -87,8 +79,6 @@ export declare class Wallet {
         ts?: number;
         fee?: BigNumberish;
         nonce?: Nonce;
-        validFrom?: number;
-        validUntil?: number;
     }): Promise<Transaction>;
     syncTransfer(transfer: {
         fromSubAccountId: number;
@@ -100,17 +90,9 @@ export declare class Wallet {
         fee?: BigNumberish;
         accountId?: number;
         nonce?: Nonce;
-        validFrom?: number;
-        validUntil?: number;
     }): Promise<Transaction>;
-    getOrder(payload: Order & {
-        validFrom?: number;
-        validUntil?: number;
-    }): Promise<Order>;
-    signSyncOrder(payload: Order & {
-        validFrom?: number;
-        validUntil?: number;
-    }): Promise<SignedTransaction>;
+    getOrder(payload: Order): Promise<Order>;
+    signSyncOrder(payload: Order): Promise<SignedTransaction>;
     getWithdrawFromSyncToEthereum(tx: Withdraw): Promise<Withdraw>;
     signWithdrawFromSyncToEthereum(withdraw: {
         toChainId: number;
@@ -125,8 +107,6 @@ export declare class Wallet {
         accountId: number;
         ts?: number;
         nonce: number;
-        validFrom?: number;
-        validUntil?: number;
     }): Promise<SignedTransaction>;
     withdrawFromSyncToEthereum(withdraw: {
         toChainId: number;
@@ -141,8 +121,6 @@ export declare class Wallet {
         fee?: BigNumberish;
         nonce?: Nonce;
         fastProcessing?: boolean;
-        validFrom?: number;
-        validUntil?: number;
     }): Promise<Transaction>;
     isSigningKeySet(): Promise<boolean>;
     getChangePubKey(changePubKey: {
@@ -153,8 +131,6 @@ export declare class Wallet {
         accountId?: number;
         ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
         ts: number;
-        validFrom: number;
-        validUntil: number;
     }): Promise<ChangePubKey>;
     signSetSigningKey(changePubKey: {
         linkChainId: number;
@@ -169,8 +145,6 @@ export declare class Wallet {
         accountId?: number;
         batchHash?: string;
         ts?: number;
-        validFrom?: number;
-        validUntil?: number;
     }): Promise<SignedTransaction>;
     setSigningKey(changePubKey: {
         linkChainId: number;
@@ -182,8 +156,6 @@ export declare class Wallet {
         version?: string;
         fee?: BigNumberish;
         nonce?: Nonce;
-        validFrom?: number;
-        validUntil?: number;
     }): Promise<Transaction>;
     getTransferEthMessagePart(transfer: {
         to: Address;

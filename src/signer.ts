@@ -67,8 +67,6 @@ export class Signer {
     fee: BigNumberish
     feeTokenId: number
     nonce: number
-    validFrom: number
-    validUntil: number
   }): Promise<OrderMatching> {
     const tx: OrderMatching = {
       ...matching,
@@ -97,12 +95,7 @@ export class Signer {
     } as any
   }
 
-  async signSyncOrder(
-    payload: Order & {
-      validFrom: number
-      validUntil: number
-    }
-  ): Promise<Order> {
+  async signSyncOrder(payload: Order): Promise<Order> {
     const tx: Order = {
       ...payload,
       type: 'Order',
@@ -134,8 +127,6 @@ export class Signer {
     fastWithdraw: number
     ts: number
     nonce: number
-    validFrom: number
-    validUntil: number
   }): Uint8Array {
     return utils.serializeWithdraw({
       ...withdraw,
@@ -189,8 +180,6 @@ export class Signer {
     fee: BigNumberish
     ts: number
     nonce: number
-    validFrom: number
-    validUntil: number
   }): Uint8Array {
     return utils.serializeChangePubKey({
       ...changePubKey,
@@ -211,8 +200,6 @@ export class Signer {
     ts: number
     nonce: number
     ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2
-    validFrom: number
-    validUntil: number
   }): Promise<ChangePubKey> {
     const tx: ChangePubKey = {
       ...changePubKey,

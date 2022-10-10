@@ -16,14 +16,12 @@ describe('forcedExit', () => {
       feeToken: 1,
       fee: BigNumber.from('4100000000000000'),
       nonce: 85,
-      validFrom: 0,
-      validUntil: 4294967295,
       l2SourceToken: 1,
       l1TargetToken: 17,
       ts: 1649749979,
     })
     expect(Buffer.from(serialized).toString('hex')).eq(
-      '070100000001003498f456645270ee003441df82c718b56c0e6666000100110001334d00000055000000000000000000000000ffffffff62552fdb'
+      '070100000001003498f456645270ee003441df82c718b56c0e6666000100110001334d0000005562552fdb'
     )
   })
 
@@ -45,7 +43,7 @@ describe('forcedExit', () => {
       'Unexpected ForcedExit ethereum signature'
     )
     expect(transaction.txData.tx.signature.signature).eq(
-      'a156951f90dfc66f0628ebdccf7ac5a21f411f7a888c70f9ae4e084a2c2a8e9b7698cd264d0b46bcbc36ea2606bfb1ed9fc3a4ad52937d755a52a7046b54c900',
+      '393cc9bdf19a18087587f2df85476021c0b96b348bceb505c0ac243107d621a072927b9e969bcc675097513eac0725a4da436155f0297c6f3aac0ca319ab6a02',
       'Unexpected ForcedExit tx signature'
     )
   })
