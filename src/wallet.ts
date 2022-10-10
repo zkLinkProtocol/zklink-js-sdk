@@ -3,7 +3,6 @@ import { ErrorCode } from '@ethersproject/logger'
 import { EthMessageSigner } from './eth-message-signer'
 import { Provider } from './provider'
 import { Create2WalletSigner, Signer } from './signer'
-import { BatchBuilder } from './batch-builder'
 import {
   AccountState,
   Address,
@@ -174,9 +173,6 @@ export class Wallet {
     }
   }
 
-  batchBuilder(nonce?: Nonce): BatchBuilder {
-    return BatchBuilder.fromWallet(this, nonce)
-  }
 
   async getTransfer(transfer: {
     fromSubAccountId: number
