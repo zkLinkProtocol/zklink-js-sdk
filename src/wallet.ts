@@ -29,10 +29,8 @@ import {
   TokenSymbol,
   TokenAddress,
   OrderMatching,
-  ContractAddress,
 } from './types'
 import {
-  ERC20_APPROVE_TRESHOLD,
   IERC20_INTERFACE,
   isTokenETH,
   MAX_ERC20_APPROVE_AMOUNT,
@@ -41,7 +39,6 @@ import {
   signMessagePersonalAPI,
   getSignedBytesFromMessage,
   getChangePubkeyMessage,
-  MAX_TIMESTAMP,
   getEthereumBalance,
   ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT,
   getTimestamp,

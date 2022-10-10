@@ -1,22 +1,16 @@
 import { AbstractJSONRPCTransport, DummyTransport, HTTPTransport, WSTransport } from './transport'
-import { BigNumber, Contract, ethers } from 'ethers'
+import { BigNumber } from 'ethers'
 import {
   AccountBalances,
   AccountState,
   Address,
-  ChangePubKeyFee,
   ContractAddress,
-  Fee,
-  LegacyChangePubKeyFee,
-  Network,
   PriorityOperationReceipt,
-  TokenAddress,
-  TokenLike,
   Tokens,
   TransactionReceipt,
   TxEthSignature,
 } from './types'
-import { isTokenETH, sleep, SYNC_GOV_CONTRACT_INTERFACE, TokenSet } from './utils'
+import { sleep, TokenSet } from './utils'
 import { ErrorCode } from '@ethersproject/logger'
 
 const EthersErrorCode = ErrorCode

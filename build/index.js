@@ -44,4 +44,3 @@ exports.types = __importStar(require("./types"));
 exports.utils = __importStar(require("./utils"));
 exports.crypto = __importStar(require("./crypto"));
 __exportStar(require("./contract"), exports);
-require("./withdraw-helpers");

@@ -18,7 +18,6 @@ import {
   ChangePubKeyECDSA,
   ChangePubKeyCREATE2,
   Create2Data,
-  ChainId,
   Order,
   OrderMatching,
 } from './types'
