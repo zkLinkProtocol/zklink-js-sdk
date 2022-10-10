@@ -222,39 +222,9 @@ export class Provider {
     }
   }
 
-  async getTransactionFee(
-    txType: 'Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee,
-    address: Address,
-    tokenLike: TokenLike,
-    chainId: number | null // Link chain id, required number in withdraw and forcedId, others null
-  ): Promise<Fee> {
-    const transactionFee = await this.transport.request('get_tx_fee', [
-      txType,
-      address.toString(),
-      tokenLike,
-      chainId,
-    ])
-    return {
-      feeType: transactionFee.feeType,
-      gasTxAmounts: transactionFee.gasTxAmounts.map((a: string) => BigNumber.from(a)),
-      gasPriceWei: BigNumber.from(transactionFee.gasPriceWei),
-      gasFee: BigNumber.from(transactionFee.gasFee),
-      zkpFee: BigNumber.from(transactionFee.zkpFee),
-      totalFee: BigNumber.from(transactionFee.totalFee),
-    }
-  }
-
-  async getTransactionsBatchFee(
-    txTypes: ('Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee)[],
-    addresses: Address[],
-    tokenLike: TokenLike
-  ): Promise<BigNumber> {
-    const batchFee = await this.transport.request('get_txs_batch_fee_in_wei', [
-      txTypes,
-      addresses,
-      tokenLike,
-    ])
-    return BigNumber.from(batchFee.totalFee)
+  async getTransactionFee(tx: any): Promise<BigNumber> {
+    const transactionFee = await this.transport.request('get_tx_fee', [tx])
+    return transactionFee
   }
 
   async getTokenPrice(tokenLike: TokenLike): Promise<number> {
@@ -264,32 +234,5 @@ export class Provider {
 
   async disconnect() {
     return await this.transport.disconnect()
-  }
-}
-
-export class ETHProxy {
-  private governanceContract: Contract
-
-  constructor(
-    private ethersProvider: ethers.providers.Provider,
-    public contractAddress: ContractAddress
-  ) {
-    this.governanceContract = new Contract(
-      this.contractAddress.govContract,
-      SYNC_GOV_CONTRACT_INTERFACE,
-      this.ethersProvider
-    )
-  }
-
-  async resolveTokenId(token: TokenAddress): Promise<number> {
-    if (isTokenETH(token)) {
-      return 0
-    } else {
-      const tokenId = await this.governanceContract.tokenIds(token)
-      if (tokenId == 0) {
-        throw new Error(`ERC20 token ${token} is not supported`)
-      }
-      return tokenId
-    }
   }
 }

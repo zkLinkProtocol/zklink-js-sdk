@@ -173,43 +173,14 @@ export class Wallet {
     }
   }
 
-
-  async getTransfer(transfer: {
-    fromSubAccountId: number
-    toSubAccountId: number
-    to: Address
-    token: TokenLike
-    amount: BigNumberish
-    fee: BigNumberish
-    accountId: number
-    ts: number
-    nonce: number
-    validFrom: number
-    validUntil: number
-  }): Promise<Transfer> {
+  async getTransfer(tx: Transfer): Promise<Transfer> {
     if (!this.signer) {
       throw new Error('ZKLink signer is required for sending zklink transactions.')
     }
 
     await this.setRequiredAccountIdFromServer('Transfer funds')
 
-    const tokenId = this.provider.tokenSet.resolveTokenId(transfer.token)
-    const transactionData = {
-      fromSubAccountId: transfer.fromSubAccountId,
-      toSubAccountId: transfer.toSubAccountId,
-      accountId: transfer.accountId || this.accountId,
-      from: this.address(),
-      to: transfer.to,
-      tokenId,
-      amount: transfer.amount,
-      fee: transfer.fee,
-      ts: transfer.ts,
-      nonce: transfer.nonce,
-      validFrom: transfer.validFrom,
-      validUntil: transfer.validUntil,
-    }
-
-    return this.signer.signSyncTransfer(transactionData)
+    return this.signer.signSyncTransfer(tx)
   }
 
   async signSyncTransfer(transfer: {
@@ -225,16 +196,35 @@ export class Wallet {
     validFrom?: number
     validUntil?: number
   }): Promise<SignedTransaction> {
-    transfer.validFrom = transfer.validFrom || 0
-    transfer.validUntil = transfer.validUntil || MAX_TIMESTAMP
-    transfer.ts = transfer.ts || getTimestamp()
-    const signedTransferTransaction = await this.getTransfer(transfer as any)
+    const transactionData: Transfer = {
+      type: 'Transfer',
+      fromSubAccountId: transfer.fromSubAccountId,
+      toSubAccountId: transfer.toSubAccountId,
+      accountId: transfer.accountId || this.accountId,
+      from: this.address(),
+      to: transfer.to,
+      token: this.provider.tokenSet.resolveTokenId(transfer.token),
+      amount: transfer.amount,
+      fee: transfer.fee,
+      ts: transfer.ts || getTimestamp(),
+      nonce: transfer.nonce,
+      validFrom: transfer.validFrom || 0,
+      validUntil: transfer.validUntil || MAX_TIMESTAMP,
+    }
 
-    const stringAmount = BigNumber.from(transfer.amount).isZero()
+    if (transactionData.fee == null) {
+      transactionData.fee = await this.provider.getTransactionFee(transactionData)
+    }
+
+    const signedTransferTransaction = await this.getTransfer(transactionData)
+
+    const stringAmount = BigNumber.from(transactionData.amount).isZero()
       ? null
-      : utils.formatEther(transfer.amount)
-    const stringFee = BigNumber.from(transfer.fee).isZero() ? null : utils.formatEther(transfer.fee)
-    const stringToken = this.provider.tokenSet.resolveTokenSymbol(transfer.token)
+      : utils.formatEther(transactionData.amount)
+    const stringFee = BigNumber.from(transactionData.fee).isZero()
+      ? null
+      : utils.formatEther(transactionData.fee)
+    const stringToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.token)
     const ethereumSignature =
       this.ethSigner instanceof Create2WalletSigner
         ? null
@@ -242,9 +232,9 @@ export class Wallet {
             stringAmount,
             stringFee,
             stringToken,
-            to: transfer.to,
-            nonce: transfer.nonce,
-            accountId: transfer.accountId || this.accountId,
+            to: transactionData.to,
+            nonce: transactionData.nonce,
+            accountId: transactionData.accountId || this.accountId,
           })
     return {
       tx: signedTransferTransaction,
@@ -323,39 +313,13 @@ export class Wallet {
     }
   }
 
-  async getForcedExit(forcedExit: {
-    toChainId: ChainId
-    subAccountId: number
-    target: Address
-    l2SourceToken: TokenLike
-    l1TargetToken: TokenLike
-    feeToken: TokenLike
-    fee: BigNumberish
-    ts: number
-    nonce: number
-    validFrom?: number
-    validUntil?: number
-  }): Promise<ForcedExit> {
+  async getForcedExit(tx: ForcedExit): Promise<ForcedExit> {
     if (!this.signer) {
       throw new Error('ZKLink signer is required for sending zklink transactions.')
     }
     await this.setRequiredAccountIdFromServer('perform a Forced Exit')
-    const transactionData = {
-      toChainId: forcedExit.toChainId,
-      subAccountId: forcedExit.subAccountId,
-      initiatorAccountId: this.accountId,
-      target: forcedExit.target,
-      l2SourceToken: this.provider.tokenSet.resolveTokenId(forcedExit.l2SourceToken),
-      l1TargetToken: this.provider.tokenSet.resolveTokenId(forcedExit.l1TargetToken),
-      feeToken: this.provider.tokenSet.resolveTokenId(forcedExit.feeToken),
-      fee: forcedExit.fee,
-      ts: forcedExit.ts,
-      nonce: forcedExit.nonce,
-      validFrom: forcedExit.validFrom || 0,
-      validUntil: forcedExit.validUntil || MAX_TIMESTAMP,
-    }
 
-    return await this.signer.signSyncForcedExit(transactionData)
+    return await this.signer.signSyncForcedExit(tx)
   }
 
   async signSyncForcedExit(forcedExit: {
@@ -365,27 +329,46 @@ export class Wallet {
     l2SourceToken: TokenLike
     l1TargetToken: TokenLike
     feeToken: TokenLike
-    fee: BigNumberish
+    fee?: BigNumberish
     ts?: number
     nonce: number
     validFrom?: number
     validUntil?: number
   }): Promise<SignedTransaction> {
-    forcedExit.ts = forcedExit.ts || getTimestamp()
-    const signedForcedExitTransaction = await this.getForcedExit(forcedExit as any)
+    const transactionData: ForcedExit = {
+      type: 'ForcedExit',
+      toChainId: forcedExit.toChainId,
+      subAccountId: forcedExit.subAccountId,
+      initiatorAccountId: this.accountId,
+      target: forcedExit.target,
+      l2SourceToken: this.provider.tokenSet.resolveTokenId(forcedExit.l2SourceToken),
+      l1TargetToken: this.provider.tokenSet.resolveTokenId(forcedExit.l1TargetToken),
+      feeToken: this.provider.tokenSet.resolveTokenId(forcedExit.feeToken),
+      fee: forcedExit.fee,
+      ts: forcedExit.ts || getTimestamp(),
+      nonce: forcedExit.nonce,
+      validFrom: forcedExit.validFrom || 0,
+      validUntil: forcedExit.validUntil || MAX_TIMESTAMP,
+    }
 
-    const stringFee = BigNumber.from(forcedExit.fee).isZero()
+    if (transactionData.fee == null) {
+      transactionData.fee = await this.provider.getTransactionFee(transactionData)
+    }
+
+    const signedForcedExitTransaction = await this.getForcedExit(transactionData)
+
+    const stringFee = BigNumber.from(transactionData.fee).isZero()
       ? null
-      : utils.formatEther(forcedExit.fee)
-    const stringToken = this.provider.tokenSet.resolveTokenSymbol(forcedExit.l2SourceToken)
+      : utils.formatEther(transactionData.fee)
+    const stringToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.l2SourceToken)
     const ethereumSignature =
       this.ethSigner instanceof Create2WalletSigner
         ? null
         : await this.ethMessageSigner.ethSignForcedExit({
             stringToken,
             stringFee,
-            target: forcedExit.target,
-            nonce: forcedExit.nonce,
+            target: transactionData.target,
+            nonce: transactionData.nonce,
           })
 
     return {
@@ -409,97 +392,8 @@ export class Wallet {
   }): Promise<Transaction> {
     forcedExit.nonce =
       forcedExit.nonce != null ? await this.getNonce(forcedExit.nonce) : await this.getNonce()
-    if (forcedExit.fee == null) {
-      // Fee for forced exit is defined by `Withdraw` transaction type (as it's essentially just a forced withdraw).
-      const fullFee = await this.provider.getTransactionFee(
-        'Withdraw',
-        forcedExit.target,
-        forcedExit.feeToken,
-        forcedExit.toChainId
-      )
-      forcedExit.fee = fullFee.totalFee
-    }
     const signedForcedExitTransaction = await this.signSyncForcedExit(forcedExit as any)
     return submitSignedTransaction(signedForcedExitTransaction, this.provider)
-  }
-
-  // Note that in syncMultiTransfer, unlike in syncTransfer,
-  // users need to specify the fee for each transaction.
-  // The main reason is that multitransfer enables paying fees
-  // in multiple tokens, (as long as the total sum
-  // of fees is enough to cover up the fees for all of the transactions).
-  // That might bring an inattentive user in a trouble like the following:
-  //
-  // A user wants to submit transactions in multiple tokens and
-  // wants to pay the fees with only some of them. If the user forgets
-  // to set the fees' value to 0 for transactions with tokens
-  // he won't pay the fee with, then this user will overpay a lot.
-  //
-  // That's why we want the users to be explicit about fees in multitransfers.
-  async syncMultiTransfer(
-    transfers: {
-      fromSubAccountId: number
-      toSubAccountId: number
-      to: Address
-      token: TokenSymbol
-      amount: BigNumberish
-      fee: BigNumberish
-      accountId?: number
-      ts: number
-      nonce?: Nonce
-      validFrom?: number
-      validUntil?: number
-    }[]
-  ): Promise<Transaction[]> {
-    if (!this.signer) {
-      throw new Error('ZKLink signer is required for sending zklink transactions.')
-    }
-
-    if (transfers.length == 0) return []
-
-    await this.setRequiredAccountIdFromServer('Transfer funds')
-
-    let batch = []
-    let messages: string[] = []
-
-    let nextNonce =
-      transfers[0].nonce != null ? await this.getNonce(transfers[0].nonce) : await this.getNonce()
-    const batchNonce = nextNonce
-
-    for (let i = 0; i < transfers.length; i++) {
-      const transfer = transfers[i]
-      const nonce = nextNonce
-      nextNonce += 1
-
-      const tx: Transfer = await this.getTransfer({
-        fromSubAccountId: transfer.fromSubAccountId,
-        toSubAccountId: transfer.toSubAccountId,
-        to: transfer.to,
-        token: transfer.token,
-        amount: transfer.amount,
-        fee: transfer.fee,
-        accountId: transfer.accountId,
-        ts: transfer.ts,
-        nonce,
-        validFrom: transfer.validFrom || 0,
-        validUntil: transfer.validUntil || MAX_TIMESTAMP,
-      })
-
-      messages.push(this.getTransferEthMessagePart(transfer))
-      batch.push({ tx, signature: null })
-    }
-
-    messages.push(`Nonce: ${batchNonce}`)
-    const message = messages.filter((part) => part.length != 0).join('\n')
-    const ethSignatures =
-      this.ethSigner instanceof Create2WalletSigner
-        ? []
-        : [await this.ethMessageSigner.getEthMessageSignature(message)]
-
-    const transactionHashes = await this.provider.submitTxsBatch(batch, ethSignatures)
-    return transactionHashes.map(
-      (txHash, idx) => new Transaction(batch[idx], txHash, this.provider)
-    )
   }
 
   async syncTransfer(transfer: {
@@ -518,15 +412,6 @@ export class Wallet {
     transfer.nonce =
       transfer.nonce != null ? await this.getNonce(transfer.nonce) : await this.getNonce()
 
-    if (transfer.fee == null) {
-      const fullFee = await this.provider.getTransactionFee(
-        'Transfer',
-        transfer.to,
-        transfer.token,
-        null
-      )
-      transfer.fee = fullFee.totalFee
-    }
     const signedTransferTransaction = await this.signSyncTransfer(transfer as any)
     return submitSignedTransaction(signedTransferTransaction, this.provider)
   }
@@ -749,44 +634,12 @@ export class Wallet {
     }
   }
 
-  async getWithdrawFromSyncToEthereum(withdraw: {
-    toChainId: number
-    subAccountId: number
-    to: string
-    l2SourceToken: TokenLike
-    l1TargetToken: TokenLike
-    amount: BigNumberish
-    fee: BigNumberish
-    withdrawFeeRatio: number
-    fastWithdraw: number
-    ts: number
-    nonce: number
-    accountId: number
-    validFrom: number
-    validUntil: number
-  }): Promise<Withdraw> {
+  async getWithdrawFromSyncToEthereum(tx: Withdraw): Promise<Withdraw> {
     if (!this.signer) {
       throw new Error('ZKLink signer is required for sending zklink transactions.')
     }
     await this.setRequiredAccountIdFromServer('Withdraw funds')
-    const transactionData = {
-      toChainId: withdraw.toChainId,
-      subAccountId: withdraw.subAccountId,
-      accountId: withdraw.accountId || this.accountId,
-      from: this.address(),
-      to: withdraw.to,
-      l2SourceToken: this.provider.tokenSet.resolveTokenId(withdraw.l2SourceToken),
-      l1TargetToken: this.provider.tokenSet.resolveTokenId(withdraw.l1TargetToken),
-      amount: withdraw.amount,
-      withdrawFeeRatio: withdraw.withdrawFeeRatio,
-      fastWithdraw: withdraw.fastWithdraw,
-      fee: withdraw.fee,
-      ts: withdraw.ts,
-      nonce: withdraw.nonce,
-      validFrom: withdraw.validFrom,
-      validUntil: withdraw.validUntil,
-    }
-    return await this.signer.signSyncWithdraw(transactionData)
+    return await this.signer.signSyncWithdraw(tx)
   }
 
   async signWithdrawFromSyncToEthereum(withdraw: {
@@ -805,12 +658,30 @@ export class Wallet {
     validFrom?: number
     validUntil?: number
   }): Promise<SignedTransaction> {
-    withdraw.validFrom = withdraw.validFrom || 0
-    withdraw.withdrawFeeRatio = withdraw.withdrawFeeRatio || 0
-    withdraw.validUntil = withdraw.validUntil || MAX_TIMESTAMP
-    withdraw.accountId = withdraw.accountId || this.accountId
-    withdraw.ts = withdraw.ts || getTimestamp()
-    const signedWithdrawTransaction = await this.getWithdrawFromSyncToEthereum(withdraw as any)
+    const transactionData: Withdraw = {
+      type: 'Withdraw',
+      toChainId: withdraw.toChainId,
+      subAccountId: withdraw.subAccountId,
+      accountId: withdraw.accountId || this.accountId,
+      from: this.address(),
+      to: withdraw.to,
+      l2SourceToken: this.provider.tokenSet.resolveTokenId(withdraw.l2SourceToken),
+      l1TargetToken: this.provider.tokenSet.resolveTokenId(withdraw.l1TargetToken),
+      amount: withdraw.amount,
+      withdrawFeeRatio: withdraw.withdrawFeeRatio || 0,
+      fastWithdraw: withdraw.fastWithdraw,
+      fee: withdraw.fee,
+      ts: withdraw.ts || getTimestamp(),
+      nonce: withdraw.nonce,
+      validFrom: withdraw.validFrom || 0,
+      validUntil: withdraw.validUntil || MAX_TIMESTAMP,
+    }
+
+    if (transactionData.fee == null) {
+      transactionData.fee = await this.provider.getTransactionFee(transactionData)
+    }
+
+    const signedWithdrawTransaction = await this.getWithdrawFromSyncToEthereum(transactionData)
 
     const stringAmount = BigNumber.from(withdraw.amount).isZero()
       ? null
@@ -855,23 +726,9 @@ export class Wallet {
     withdraw.nonce =
       withdraw.nonce != null ? await this.getNonce(withdraw.nonce) : await this.getNonce()
 
-    if (withdraw.fee == null) {
-      const fullFee = await this.provider.getTransactionFee(
-        'Withdraw',
-        withdraw.to,
-        withdraw.l2SourceToken,
-        withdraw.toChainId
-      )
-      withdraw.fee = fullFee.totalFee
-    }
-
     const signedWithdrawTransaction = await this.signWithdrawFromSyncToEthereum(withdraw as any)
 
-    return submitSignedTransaction(
-      signedWithdrawTransaction,
-      this.provider,
-      withdraw.fastProcessing
-    )
+    return submitSignedTransaction(signedWithdrawTransaction, this.provider)
   }
 
   async isSigningKeySet(): Promise<boolean> {

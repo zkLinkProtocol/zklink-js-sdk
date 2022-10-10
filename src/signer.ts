@@ -44,55 +44,18 @@ export class Signer {
   /**
    * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
    */
-  transferSignBytes(transfer: {
-    fromSubAccountId: number
-    toSubAccountId: number
-    accountId: number
-    fromChainId: number
-    toChainId: number
-    from: Address
-    to: Address
-    tokenId: number
-    amount: BigNumberish
-    fee: BigNumberish
-    ts: number
-    nonce: number
-    validFrom: number
-    validUntil: number
-  }): Uint8Array {
-    return utils.serializeTransfer({
-      ...transfer,
-      type: 'Transfer',
-      token: transfer.tokenId,
-    })
+  transferSignBytes(tx: Transfer): Uint8Array {
+    return utils.serializeTransfer(tx)
   }
 
-  async signSyncTransfer(transfer: {
-    fromSubAccountId: number
-    toSubAccountId: number
-    accountId: number
-    from: Address
-    to: Address
-    tokenId: number
-    amount: BigNumberish
-    fee: BigNumberish
-    ts: number
-    nonce: number
-    validFrom: number
-    validUntil: number
-  }): Promise<Transfer> {
-    const tx: Transfer = {
-      ...transfer,
-      type: 'Transfer',
-      token: transfer.tokenId,
-    }
+  async signSyncTransfer(tx: Transfer): Promise<Transfer> {
     const msgBytes = utils.serializeTransfer(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
 
     return {
       ...tx,
-      amount: BigNumber.from(transfer.amount).toString(),
-      fee: BigNumber.from(transfer.fee).toString(),
+      amount: BigNumber.from(tx.amount).toString(),
+      fee: BigNumber.from(tx.fee).toString(),
       signature,
     }
   }
@@ -264,33 +227,13 @@ export class Signer {
     })
   }
 
-  async signSyncWithdraw(withdraw: {
-    toChainId: number
-    subAccountId: number
-    accountId: number
-    from: Address
-    to: string
-    l2SourceToken: number
-    l1TargetToken: number
-    amount: BigNumberish
-    fee: BigNumberish
-    withdrawFeeRatio: number
-    fastWithdraw: number
-    ts: number
-    nonce: number
-    validFrom: number
-    validUntil: number
-  }): Promise<Withdraw> {
-    const tx: Withdraw = {
-      ...withdraw,
-      type: 'Withdraw',
-    }
+  async signSyncWithdraw(tx: Withdraw): Promise<Withdraw> {
     const msgBytes = utils.serializeWithdraw(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
     return {
       ...tx,
-      amount: BigNumber.from(withdraw.amount).toString(),
-      fee: BigNumber.from(withdraw.fee).toString(),
+      amount: BigNumber.from(tx.amount).toString(),
+      fee: BigNumber.from(tx.fee).toString(),
       signature,
     }
   }
@@ -298,49 +241,16 @@ export class Signer {
   /**
    * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
    */
-  forcedExitSignBytes(forcedExit: {
-    toChainId: ChainId
-    subAccountId: number
-    initiatorAccountId: number
-    target: Address
-    l2SourceToken: number
-    l1TargetToken: number
-    feeToken: number
-    fee: BigNumberish
-    ts: number
-    nonce: number
-    validFrom: number
-    validUntil: number
-  }): Uint8Array {
-    return utils.serializeForcedExit({
-      ...forcedExit,
-      type: 'ForcedExit',
-    })
+  forcedExitSignBytes(tx: ForcedExit): Uint8Array {
+    return utils.serializeForcedExit(tx)
   }
 
-  async signSyncForcedExit(forcedExit: {
-    toChainId: ChainId
-    subAccountId: number
-    initiatorAccountId: number
-    target: Address
-    l2SourceToken: number
-    l1TargetToken: number
-    feeToken: number
-    fee: BigNumberish
-    ts: number
-    nonce: number
-    validFrom: number
-    validUntil: number
-  }): Promise<ForcedExit> {
-    const tx: ForcedExit = {
-      ...forcedExit,
-      type: 'ForcedExit',
-    }
+  async signSyncForcedExit(tx: ForcedExit): Promise<ForcedExit> {
     const msgBytes = utils.serializeForcedExit(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
     return {
       ...tx,
-      fee: BigNumber.from(forcedExit.fee).toString(),
+      fee: BigNumber.from(tx.fee).toString(),
       signature,
     }
   }
