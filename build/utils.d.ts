@@ -1,6 +1,6 @@
 import { utils, ethers, BigNumber, BigNumberish } from 'ethers';
 import { Provider } from '.';
-import { PubKeyHash, TokenAddress, TokenLike, Tokens, TokenSymbol, EthSignerType, Address, Transfer, ForcedExit, ChangePubKey, Withdraw, CloseAccount, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order, ChainId, OrderMatching } from './types';
+import { PubKeyHash, TokenAddress, TokenLike, Tokens, TokenSymbol, EthSignerType, Address, Transfer, ForcedExit, ChangePubKey, Withdraw, CloseAccount, Order, ChainId, OrderMatching } from './types';
 export declare const MAX_TIMESTAMP = 4294967295;
 export declare const MIN_UNONCE = 1;
 export declare const MAX_UNONCE = 4294967295;
@@ -79,9 +79,6 @@ export declare function serializeFastWithdraw(fastWithdraw: number): Uint8Array;
 export declare function serializeTimestamp(time: number): Uint8Array;
 export declare function serializeWithdraw(withdraw: Withdraw): Uint8Array;
 export declare function serializeTransfer(transfer: Transfer): Uint8Array;
-export declare function serializeCurveAddLiquidity(payload: CurveAddLiquidity): Uint8Array;
-export declare function serializeCurveSwap(payload: CurveSwap): Uint8Array;
-export declare function serializeCurveRemoveLiquidity(payload: CurveRemoveLiquidity): Uint8Array;
 export declare function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array;
 export declare function serializeForcedExit(forcedExit: ForcedExit): Uint8Array;
 export declare function serializeOrder(order: Order): Uint8Array;

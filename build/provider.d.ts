@@ -1,6 +1,6 @@
 import { AbstractJSONRPCTransport } from './transport';
-import { BigNumber, ethers } from 'ethers';
-import { AccountState, Address, ChangePubKeyFee, ContractAddress, Fee, LegacyChangePubKeyFee, PriorityOperationReceipt, TokenAddress, TokenLike, Tokens, TransactionReceipt, TxEthSignature } from './types';
+import { BigNumber } from 'ethers';
+import { AccountBalances, AccountState, Address, ContractAddress, PriorityOperationReceipt, TokenLike, Tokens, TransactionReceipt, TxEthSignature } from './types';
 import { TokenSet } from './utils';
 export declare class Provider {
     transport: AbstractJSONRPCTransport;
@@ -19,7 +19,7 @@ export declare class Provider {
      * without communicating with the network
      */
     static newMockProvider(network: string, ethPrivateKey: Uint8Array, getTokens: Function): Promise<Provider>;
-    submitTx({ tx, signature, fastProcessing, }: {
+    submitTx({ tx, signature, }: {
         tx: any;
         signature?: TxEthSignature;
         fastProcessing?: boolean;
@@ -32,6 +32,8 @@ export declare class Provider {
     getTokens(): Promise<Tokens>;
     updateTokenSet(): Promise<void>;
     getState(address: Address): Promise<AccountState>;
+    getStateById(accountId: number): Promise<AccountState>;
+    getBalance(accountId: number, subAccountId: number): Promise<AccountBalances>;
     getSubAccountState(address: Address, subAccountId: number): Promise<AccountState>;
     getTxReceipt(txHash: string): Promise<TransactionReceipt>;
     getPriorityOpStatus(linkChainId: number, serialId: number): Promise<PriorityOperationReceipt>;
@@ -39,15 +41,7 @@ export declare class Provider {
     getEthTxForWithdrawal(withdrawal_hash: string): Promise<string>;
     notifyPriorityOp(linkChainId: number, serialId: number, action: 'COMMIT' | 'VERIFY'): Promise<PriorityOperationReceipt>;
     notifyTransaction(hash: string, action: 'COMMIT' | 'VERIFY'): Promise<TransactionReceipt>;
-    getTransactionFee(txType: 'Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee, address: Address, tokenLike: TokenLike, chainId: number | null): Promise<Fee>;
-    getTransactionsBatchFee(txTypes: ('Withdraw' | 'Transfer' | 'FastWithdraw' | ChangePubKeyFee | LegacyChangePubKeyFee)[], addresses: Address[], tokenLike: TokenLike): Promise<BigNumber>;
+    getTransactionFee(tx: any): Promise<BigNumber>;
     getTokenPrice(tokenLike: TokenLike): Promise<number>;
     disconnect(): Promise<any>;
-}
-export declare class ETHProxy {
-    private ethersProvider;
-    contractAddress: ContractAddress;
-    private governanceContract;
-    constructor(ethersProvider: ethers.providers.Provider, contractAddress: ContractAddress);
-    resolveTokenId(token: TokenAddress): Promise<number>;
 }

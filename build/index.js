@@ -26,12 +26,11 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.crypto = exports.utils = exports.types = exports.wallet = exports.EthMessageSigner = exports.closestPackableTransactionFee = exports.closestPackableTransactionAmount = exports.Create2WalletSigner = exports.Signer = exports.ETHProxy = exports.Provider = exports.Wallet = void 0;
+exports.crypto = exports.utils = exports.types = exports.wallet = exports.EthMessageSigner = exports.closestPackableTransactionFee = exports.closestPackableTransactionAmount = exports.Create2WalletSigner = exports.Signer = exports.Provider = exports.Wallet = void 0;
 var wallet_1 = require("./wallet");
 Object.defineProperty(exports, "Wallet", { enumerable: true, get: function () { return wallet_1.Wallet; } });
 var provider_1 = require("./provider");
 Object.defineProperty(exports, "Provider", { enumerable: true, get: function () { return provider_1.Provider; } });
-Object.defineProperty(exports, "ETHProxy", { enumerable: true, get: function () { return provider_1.ETHProxy; } });
 var signer_1 = require("./signer");
 Object.defineProperty(exports, "Signer", { enumerable: true, get: function () { return signer_1.Signer; } });
 Object.defineProperty(exports, "Create2WalletSigner", { enumerable: true, get: function () { return signer_1.Create2WalletSigner; } });

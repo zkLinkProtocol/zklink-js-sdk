@@ -66,15 +66,14 @@ class Signer {
     /**
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
-    transferSignBytes(transfer) {
-        return utils.serializeTransfer(Object.assign(Object.assign({}, transfer), { type: 'Transfer', token: transfer.tokenId }));
+    transferSignBytes(tx) {
+        return utils.serializeTransfer(tx);
     }
-    signSyncTransfer(transfer) {
+    signSyncTransfer(tx) {
         return __awaiter(this, void 0, void 0, function* () {
-            const tx = Object.assign(Object.assign({}, transfer), { type: 'Transfer', token: transfer.tokenId });
             const msgBytes = utils.serializeTransfer(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
-            return Object.assign(Object.assign({}, tx), { amount: ethers_1.BigNumber.from(transfer.amount).toString(), fee: ethers_1.BigNumber.from(transfer.fee).toString(), signature });
+            return Object.assign(Object.assign({}, tx), { amount: ethers_1.BigNumber.from(tx.amount).toString(), fee: ethers_1.BigNumber.from(tx.fee).toString(), signature });
         });
     }
     signSyncOrderMatching(matching) {
@@ -83,30 +82,6 @@ class Signer {
             const msgBytes = yield utils.serializeOrderMatching(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
             return Object.assign(Object.assign({}, tx), { maker: Object.assign(Object.assign({}, tx.maker), { price: ethers_1.BigNumber.from(tx.maker.price).toString(), amount: ethers_1.BigNumber.from(tx.maker.amount).toString() }), taker: Object.assign(Object.assign({}, tx.taker), { price: ethers_1.BigNumber.from(tx.taker.price).toString(), amount: ethers_1.BigNumber.from(tx.taker.amount).toString() }), fee: ethers_1.BigNumber.from(matching.fee).toString(), expectBaseAmount: ethers_1.BigNumber.from(matching.expectBaseAmount).toString(), expectQuoteAmount: ethers_1.BigNumber.from(matching.expectQuoteAmount).toString(), signature });
-        });
-    }
-    signSyncCurveAddLiquidity(payload) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const tx = Object.assign(Object.assign({}, payload), { type: 'L2CurveAddLiq' });
-            const msgBytes = utils.serializeCurveAddLiquidity(tx);
-            const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
-            return Object.assign(Object.assign({}, tx), { amounts: payload.amounts.map((amount) => ethers_1.BigNumber.from(amount).toString()), collectFees: payload.collectFees.map((fee) => ethers_1.BigNumber.from(fee).toString()), fee: ethers_1.BigNumber.from(payload.fee).toString(), lpQuantity: ethers_1.BigNumber.from(payload.lpQuantity).toString(), minLpQuantity: ethers_1.BigNumber.from(payload.minLpQuantity).toString(), signature });
-        });
-    }
-    signSyncCurveRemoveLiquidity(payload) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const tx = Object.assign(Object.assign({}, payload), { type: 'L2CurveRemoveLiquidity' });
-            const msgBytes = utils.serializeCurveRemoveLiquidity(tx);
-            const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
-            return Object.assign(Object.assign({}, tx), { amounts: payload.amounts.map((amount) => ethers_1.BigNumber.from(amount).toString()), minAmounts: payload.minAmounts.map((amount) => ethers_1.BigNumber.from(amount).toString()), fee: ethers_1.BigNumber.from(payload.fee).toString(), curveFee: ethers_1.BigNumber.from(payload.curveFee).toString(), lpQuantity: ethers_1.BigNumber.from(payload.lpQuantity).toString(), signature });
-        });
-    }
-    signSyncCurveSwap(payload) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const tx = Object.assign(Object.assign({}, payload), { type: 'CurveSwap' });
-            const msgBytes = utils.serializeCurveSwap(tx);
-            const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
-            return Object.assign(Object.assign({}, tx), { amountIn: ethers_1.BigNumber.from(payload.amountIn).toString(), amountOut: ethers_1.BigNumber.from(payload.amountOut).toString(), amountOutMin: ethers_1.BigNumber.from(payload.amountOutMin).toString(), fee: ethers_1.BigNumber.from(payload.fee).toString(), adminFee: ethers_1.BigNumber.from(payload.adminFee).toString(), signature });
         });
     }
     signSyncOrder(payload) {
@@ -123,26 +98,24 @@ class Signer {
     withdrawSignBytes(withdraw) {
         return utils.serializeWithdraw(Object.assign(Object.assign({}, withdraw), { type: 'Withdraw', to: withdraw.ethAddress, l2SourceToken: withdraw.l2SourceToken, l1TargetToken: withdraw.l1TargetToken }));
     }
-    signSyncWithdraw(withdraw) {
+    signSyncWithdraw(tx) {
         return __awaiter(this, void 0, void 0, function* () {
-            const tx = Object.assign(Object.assign({}, withdraw), { type: 'Withdraw' });
             const msgBytes = utils.serializeWithdraw(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
-            return Object.assign(Object.assign({}, tx), { amount: ethers_1.BigNumber.from(withdraw.amount).toString(), fee: ethers_1.BigNumber.from(withdraw.fee).toString(), signature });
+            return Object.assign(Object.assign({}, tx), { amount: ethers_1.BigNumber.from(tx.amount).toString(), fee: ethers_1.BigNumber.from(tx.fee).toString(), signature });
         });
     }
     /**
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
-    forcedExitSignBytes(forcedExit) {
-        return utils.serializeForcedExit(Object.assign(Object.assign({}, forcedExit), { type: 'ForcedExit' }));
+    forcedExitSignBytes(tx) {
+        return utils.serializeForcedExit(tx);
     }
-    signSyncForcedExit(forcedExit) {
+    signSyncForcedExit(tx) {
         return __awaiter(this, void 0, void 0, function* () {
-            const tx = Object.assign(Object.assign({}, forcedExit), { type: 'ForcedExit' });
             const msgBytes = utils.serializeForcedExit(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
-            return Object.assign(Object.assign({}, tx), { fee: ethers_1.BigNumber.from(forcedExit.fee).toString(), signature });
+            return Object.assign(Object.assign({}, tx), { fee: ethers_1.BigNumber.from(tx.fee).toString(), signature });
         });
     }
     /**

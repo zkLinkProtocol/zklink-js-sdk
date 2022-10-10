@@ -1,5 +1,5 @@
 export { Wallet } from './wallet';
-export { Provider, ETHProxy } from './provider';
+export { Provider } from './provider';
 export { Signer, Create2WalletSigner } from './signer';
 export { closestPackableTransactionAmount, closestPackableTransactionFee } from './utils';
 export { EthMessageSigner } from './eth-message-signer';

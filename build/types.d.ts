@@ -30,19 +30,10 @@ export interface AccountState {
     address: Address;
     nonce: number;
     pubKeyHash: PubKeyHash;
-    balances: {
-        [subAccountId: string]: {
-            [tokenId: string]: BigNumberish;
-        };
-    };
-    orders: {
-        [subAccountId: string]: {
-            [slotId: string]: {
-                nonce: number;
-                orderHash: string;
-                residue: string;
-            };
-        };
+}
+export interface AccountBalances {
+    [subAccountId: number]: {
+        [tokenId: number]: BigNumberish;
     };
 }
 export declare type EthSignerType = {
@@ -68,58 +59,6 @@ export interface Transfer {
     amount: BigNumberish;
     fee: BigNumberish;
     ts: number;
-    nonce: number;
-    signature?: Signature;
-    validFrom: number;
-    validUntil: number;
-}
-export interface CurveAddLiquidity {
-    type: 'L2CurveAddLiq';
-    account: Address;
-    tokens: TokenId[];
-    amounts: BigNumberish[];
-    lpQuantity: BigNumberish;
-    minLpQuantity: BigNumberish;
-    pairAddress: Address;
-    fee: BigNumberish;
-    feeToken: TokenId;
-    collectFees: BigNumberish[];
-    ts?: number;
-    nonce: number;
-    signature?: Signature;
-    validFrom: number;
-    validUntil: number;
-}
-export interface CurveRemoveLiquidity {
-    type: 'L2CurveRemoveLiquidity';
-    account: Address;
-    tokens: TokenId[];
-    amounts: BigNumberish[];
-    minAmounts: BigNumberish[];
-    lpQuantity: BigNumberish;
-    pairAddress: Address;
-    fee: BigNumberish;
-    feeToken: TokenId;
-    curveFee: BigNumberish;
-    ts?: number;
-    nonce: number;
-    signature?: Signature;
-    validFrom: number;
-    validUntil: number;
-}
-export interface CurveSwap {
-    type: 'CurveSwap';
-    accountId: number;
-    account: Address;
-    pairAddress: Address;
-    tokenIn: TokenId;
-    tokenOut: TokenId;
-    amountIn: BigNumberish;
-    amountOut: BigNumberish;
-    amountOutMin: BigNumberish;
-    fee: BigNumberish;
-    adminFee: BigNumberish;
-    ts?: number;
     nonce: number;
     signature?: Signature;
     validFrom: number;
@@ -199,7 +138,7 @@ export interface CloseAccount {
     signature: Signature;
 }
 export interface SignedTransaction {
-    tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit | CurveAddLiquidity | CurveRemoveLiquidity | CurveSwap | Order | OrderMatching;
+    tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit | Order | OrderMatching;
     ethereumSignature?: TxEthSignature;
 }
 export interface BlockInfo {
@@ -219,7 +158,6 @@ export interface PriorityOperationReceipt {
 }
 export interface ContractAddress {
     mainContract: string;
-    govContract: string;
 }
 export interface Tokens {
     [token: string]: {

@@ -1,5 +1,5 @@
 import { BigNumberish, ethers } from 'ethers';
-import { Address, EthSignerType, PubKeyHash, Transfer, Withdraw, ForcedExit, ChangePubKey, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, ChainId, CurveAddLiquidity, CurveRemoveLiquidity, CurveSwap, Order, OrderMatching } from './types';
+import { Address, EthSignerType, PubKeyHash, Transfer, Withdraw, ForcedExit, ChangePubKey, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, Order, OrderMatching } from './types';
 export declare class Signer {
     #private;
     private constructor();
@@ -8,36 +8,8 @@ export declare class Signer {
     /**
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
-    transferSignBytes(transfer: {
-        fromSubAccountId: number;
-        toSubAccountId: number;
-        accountId: number;
-        fromChainId: number;
-        toChainId: number;
-        from: Address;
-        to: Address;
-        tokenId: number;
-        amount: BigNumberish;
-        fee: BigNumberish;
-        ts: number;
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Uint8Array;
-    signSyncTransfer(transfer: {
-        fromSubAccountId: number;
-        toSubAccountId: number;
-        accountId: number;
-        from: Address;
-        to: Address;
-        tokenId: number;
-        amount: BigNumberish;
-        fee: BigNumberish;
-        ts: number;
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Promise<Transfer>;
+    transferSignBytes(tx: Transfer): Uint8Array;
+    signSyncTransfer(tx: Transfer): Promise<Transfer>;
     signSyncOrderMatching(matching: {
         accountId: number;
         account: Address;
@@ -51,24 +23,6 @@ export declare class Signer {
         validFrom: number;
         validUntil: number;
     }): Promise<OrderMatching>;
-    signSyncCurveAddLiquidity(payload: CurveAddLiquidity & {
-        chainId: string;
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Promise<CurveAddLiquidity>;
-    signSyncCurveRemoveLiquidity(payload: CurveRemoveLiquidity & {
-        chainId: string;
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Promise<CurveRemoveLiquidity>;
-    signSyncCurveSwap(payload: CurveSwap & {
-        chainId: string;
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Promise<CurveSwap>;
     signSyncOrder(payload: Order & {
         validFrom: number;
         validUntil: number;
@@ -93,54 +47,12 @@ export declare class Signer {
         validFrom: number;
         validUntil: number;
     }): Uint8Array;
-    signSyncWithdraw(withdraw: {
-        toChainId: number;
-        subAccountId: number;
-        accountId: number;
-        from: Address;
-        to: string;
-        l2SourceToken: number;
-        l1TargetToken: number;
-        amount: BigNumberish;
-        fee: BigNumberish;
-        withdrawFeeRatio: number;
-        fastWithdraw: number;
-        ts: number;
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Promise<Withdraw>;
+    signSyncWithdraw(tx: Withdraw): Promise<Withdraw>;
     /**
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */
-    forcedExitSignBytes(forcedExit: {
-        toChainId: ChainId;
-        subAccountId: number;
-        initiatorAccountId: number;
-        target: Address;
-        l2SourceToken: number;
-        l1TargetToken: number;
-        feeToken: number;
-        fee: BigNumberish;
-        ts: number;
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Uint8Array;
-    signSyncForcedExit(forcedExit: {
-        toChainId: ChainId;
-        subAccountId: number;
-        initiatorAccountId: number;
-        target: Address;
-        l2SourceToken: number;
-        l1TargetToken: number;
-        feeToken: number;
-        fee: BigNumberish;
-        ts: number;
-        nonce: number;
-        validFrom: number;
-        validUntil: number;
-    }): Promise<ForcedExit>;
+    forcedExitSignBytes(tx: ForcedExit): Uint8Array;
+    signSyncForcedExit(tx: ForcedExit): Promise<ForcedExit>;
     /**
      * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
      */

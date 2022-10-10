@@ -9,9 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ETHProxy = exports.Provider = void 0;
+exports.Provider = void 0;
 const transport_1 = require("./transport");
-const ethers_1 = require("ethers");
 const utils_1 = require("./utils");
 const logger_1 = require("@ethersproject/logger");
 const EthersErrorCode = logger_1.ErrorCode;
@@ -57,9 +56,9 @@ class Provider {
         });
     }
     // return transaction hash (e.g. sync-tx:dead..beef)
-    submitTx({ tx, signature, fastProcessing, }) {
+    submitTx({ tx, signature, }) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('tx_submit', [tx, signature, fastProcessing]);
+            return yield this.transport.request('tx_submit', [tx, signature]);
         });
     }
     // Requests `zkSync` server to execute several transactions together.
@@ -105,7 +104,17 @@ class Provider {
     }
     getState(address) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('account_info', [address]);
+            return yield this.transport.request('account_info_by_address', [address]);
+        });
+    }
+    getStateById(accountId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.transport.request('account_info_by_id', [accountId]);
+        });
+    }
+    getBalance(accountId, subAccountId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.transport.request('account_balances', [accountId, subAccountId]);
         });
     }
     getSubAccountState(address, subAccountId) {
@@ -192,33 +201,10 @@ class Provider {
             }
         });
     }
-    getTransactionFee(txType, address, tokenLike, chainId // Link chain id, required number in withdraw and forcedId, others null
-    ) {
+    getTransactionFee(tx) {
         return __awaiter(this, void 0, void 0, function* () {
-            const transactionFee = yield this.transport.request('get_tx_fee', [
-                txType,
-                address.toString(),
-                tokenLike,
-                chainId,
-            ]);
-            return {
-                feeType: transactionFee.feeType,
-                gasTxAmounts: transactionFee.gasTxAmounts.map((a) => ethers_1.BigNumber.from(a)),
-                gasPriceWei: ethers_1.BigNumber.from(transactionFee.gasPriceWei),
-                gasFee: ethers_1.BigNumber.from(transactionFee.gasFee),
-                zkpFee: ethers_1.BigNumber.from(transactionFee.zkpFee),
-                totalFee: ethers_1.BigNumber.from(transactionFee.totalFee),
-            };
-        });
-    }
-    getTransactionsBatchFee(txTypes, addresses, tokenLike) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const batchFee = yield this.transport.request('get_txs_batch_fee_in_wei', [
-                txTypes,
-                addresses,
-                tokenLike,
-            ]);
-            return ethers_1.BigNumber.from(batchFee.totalFee);
+            const transactionFee = yield this.transport.request('get_tx_fee', [tx]);
+            return transactionFee;
         });
     }
     getTokenPrice(tokenLike) {
@@ -234,25 +220,3 @@ class Provider {
     }
 }
 exports.Provider = Provider;
-class ETHProxy {
-    constructor(ethersProvider, contractAddress) {
-        this.ethersProvider = ethersProvider;
-        this.contractAddress = contractAddress;
-        this.governanceContract = new ethers_1.Contract(this.contractAddress.govContract, utils_1.SYNC_GOV_CONTRACT_INTERFACE, this.ethersProvider);
-    }
-    resolveTokenId(token) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if ((0, utils_1.isTokenETH)(token)) {
-                return 0;
-            }
-            else {
-                const tokenId = yield this.governanceContract.tokenIds(token);
-                if (tokenId == 0) {
-                    throw new Error(`ERC20 token ${token} is not supported`);
-                }
-                return tokenId;
-            }
-        });
-    }
-}
-exports.ETHProxy = ETHProxy;
