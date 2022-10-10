@@ -274,7 +274,6 @@ export interface PriorityOperationReceipt {
 
 export interface ContractAddress {
   mainContract: string
-  govContract: string
 }
 
 export interface Tokens {

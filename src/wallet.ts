@@ -1500,13 +1500,11 @@ export class Transaction {
 
 export async function submitSignedTransaction(
   signedTx: SignedTransaction,
-  provider: Provider,
-  fastProcessing?: boolean
+  provider: Provider
 ): Promise<Transaction> {
   const transactionHash = await provider.submitTx({
     tx: signedTx.tx,
     signature: signedTx.ethereumSignature,
-    fastProcessing,
   })
   return new Transaction(signedTx, transactionHash, provider)
 }

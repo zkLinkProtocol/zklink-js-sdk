@@ -73,13 +73,12 @@ export class Provider {
   async submitTx({
     tx,
     signature,
-    fastProcessing,
   }: {
     tx: any
     signature?: TxEthSignature
     fastProcessing?: boolean
   }): Promise<string> {
-    return await this.transport.request('tx_submit', [tx, signature, fastProcessing])
+    return await this.transport.request('tx_submit', [tx, signature])
   }
 
   // Requests `zkSync` server to execute several transactions together.
