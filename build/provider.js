@@ -61,25 +61,6 @@ class Provider {
             return yield this.transport.request('tx_submit', [tx, signature]);
         });
     }
-    // Requests `zkSync` server to execute several transactions together.
-    // return transaction hash (e.g. sync-tx:dead..beef)
-    submitTxsBatch(transactions, ethSignatures) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let signatures = [];
-            // For backwards compatibility we allow sending single signature as well
-            // as no signatures at all.
-            if (ethSignatures == undefined) {
-                signatures = [];
-            }
-            else if (ethSignatures instanceof Array) {
-                signatures = ethSignatures;
-            }
-            else {
-                signatures.push(ethSignatures);
-            }
-            return yield this.transport.request('submit_txs_batch', [transactions, signatures]);
-        });
-    }
     getContractAddress(linkChainId) {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.contractAddress[linkChainId]) {
@@ -131,16 +112,6 @@ class Provider {
     getPriorityOpStatus(linkChainId, serialId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.transport.request('ethop_info', [linkChainId, serialId]);
-        });
-    }
-    getConfirmationsForEthOpAmount() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('get_confirmations_for_eth_op_amount', []);
-        });
-    }
-    getEthTxForWithdrawal(withdrawal_hash) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('get_eth_tx_for_withdrawal', [withdrawal_hash]);
         });
     }
     notifyPriorityOp(linkChainId, serialId, action) {
@@ -205,12 +176,6 @@ class Provider {
         return __awaiter(this, void 0, void 0, function* () {
             const transactionFee = yield this.transport.request('get_tx_fee', [tx]);
             return transactionFee;
-        });
-    }
-    getTokenPrice(tokenLike) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const tokenPrice = yield this.transport.request('get_token_price', [tokenLike]);
-            return parseFloat(tokenPrice);
         });
     }
     disconnect() {

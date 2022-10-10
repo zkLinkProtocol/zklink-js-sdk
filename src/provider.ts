@@ -81,25 +81,6 @@ export class Provider {
     return await this.transport.request('tx_submit', [tx, signature])
   }
 
-  // Requests `zkSync` server to execute several transactions together.
-  // return transaction hash (e.g. sync-tx:dead..beef)
-  async submitTxsBatch(
-    transactions: { tx: any; signature?: TxEthSignature }[],
-    ethSignatures?: TxEthSignature | TxEthSignature[]
-  ): Promise<string[]> {
-    let signatures: TxEthSignature[] = []
-    // For backwards compatibility we allow sending single signature as well
-    // as no signatures at all.
-    if (ethSignatures == undefined) {
-      signatures = []
-    } else if (ethSignatures instanceof Array) {
-      signatures = ethSignatures
-    } else {
-      signatures.push(ethSignatures)
-    }
-    return await this.transport.request('submit_txs_batch', [transactions, signatures])
-  }
-
   async getContractAddress(linkChainId: number): Promise<ContractAddress> {
     if (this.contractAddress[linkChainId]) {
       return this.contractAddress[linkChainId]
@@ -144,14 +125,6 @@ export class Provider {
     serialId: number
   ): Promise<PriorityOperationReceipt> {
     return await this.transport.request('ethop_info', [linkChainId, serialId])
-  }
-
-  async getConfirmationsForEthOpAmount(): Promise<number> {
-    return await this.transport.request('get_confirmations_for_eth_op_amount', [])
-  }
-
-  async getEthTxForWithdrawal(withdrawal_hash: string): Promise<string> {
-    return await this.transport.request('get_eth_tx_for_withdrawal', [withdrawal_hash])
   }
 
   async notifyPriorityOp(
@@ -225,11 +198,6 @@ export class Provider {
   async getTransactionFee(tx: any): Promise<BigNumber> {
     const transactionFee = await this.transport.request('get_tx_fee', [tx])
     return transactionFee
-  }
-
-  async getTokenPrice(tokenLike: TokenLike): Promise<number> {
-    const tokenPrice = await this.transport.request('get_token_price', [tokenLike])
-    return parseFloat(tokenPrice)
   }
 
   async disconnect() {

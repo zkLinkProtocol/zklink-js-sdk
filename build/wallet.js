@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.submitSignedTransactionsBatch = exports.submitSignedTransaction = exports.Transaction = exports.ETHOperation = exports.Wallet = exports.ZKSyncTxError = void 0;
+exports.submitSignedTransaction = exports.Transaction = exports.ETHOperation = exports.Wallet = exports.ZKSyncTxError = void 0;
 const ethers_1 = require("ethers");
 const logger_1 = require("@ethersproject/logger");
 const eth_message_signer_1 = require("./eth-message-signer");
@@ -258,7 +258,7 @@ class Wallet {
     getOrder(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
-                throw new Error('ZKLink signer is required for sending zklink transactions.');
+                throw new Error('zkLink signer is required for sending zkLink transactions.');
             }
             return this.signer.signSyncOrder(payload);
         });
@@ -275,7 +275,7 @@ class Wallet {
     getWithdrawFromSyncToEthereum(tx) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
-                throw new Error('ZKLink signer is required for sending zklink transactions.');
+                throw new Error('zkLink signer is required for sending zkLink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Withdraw funds');
             return yield this.signer.signSyncWithdraw(tx);
@@ -816,12 +816,3 @@ function submitSignedTransaction(signedTx, provider) {
     });
 }
 exports.submitSignedTransaction = submitSignedTransaction;
-function submitSignedTransactionsBatch(provider, signedTxs, ethSignatures) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const transactionHashes = yield provider.submitTxsBatch(signedTxs.map((tx) => {
-            return { tx: tx.tx, signature: tx.ethereumSignature };
-        }), ethSignatures);
-        return transactionHashes.map((txHash, idx) => new Transaction(signedTxs[idx], txHash, provider));
-    });
-}
-exports.submitSignedTransactionsBatch = submitSignedTransactionsBatch;

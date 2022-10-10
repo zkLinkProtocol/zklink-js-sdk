@@ -38,13 +38,6 @@ export class Signer {
     return await privateKeyToPubKey(this.#privateKey)
   }
 
-  /**
-   * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
-   */
-  transferSignBytes(tx: Transfer): Uint8Array {
-    return utils.serializeTransfer(tx)
-  }
-
   async signSyncTransfer(tx: Transfer): Promise<Transfer> {
     const msgBytes = utils.serializeTransfer(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
@@ -110,32 +103,6 @@ export class Signer {
       signature,
     }
   }
-  /**
-   * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
-   */
-  withdrawSignBytes(withdraw: {
-    toChainId: number
-    subAccountId: number
-    accountId: number
-    from: Address
-    ethAddress: string
-    l2SourceToken: number
-    l1TargetToken: number
-    amount: BigNumberish
-    fee: BigNumberish
-    withdrawFeeRatio: number
-    fastWithdraw: number
-    ts: number
-    nonce: number
-  }): Uint8Array {
-    return utils.serializeWithdraw({
-      ...withdraw,
-      type: 'Withdraw',
-      to: withdraw.ethAddress,
-      l2SourceToken: withdraw.l2SourceToken,
-      l1TargetToken: withdraw.l1TargetToken,
-    })
-  }
 
   async signSyncWithdraw(tx: Withdraw): Promise<Withdraw> {
     const msgBytes = utils.serializeWithdraw(tx)
@@ -148,13 +115,6 @@ export class Signer {
     }
   }
 
-  /**
-   * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
-   */
-  forcedExitSignBytes(tx: ForcedExit): Uint8Array {
-    return utils.serializeForcedExit(tx)
-  }
-
   async signSyncForcedExit(tx: ForcedExit): Promise<ForcedExit> {
     const msgBytes = utils.serializeForcedExit(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
@@ -163,31 +123,6 @@ export class Signer {
       fee: BigNumber.from(tx.fee).toString(),
       signature,
     }
-  }
-
-  /**
-   * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
-   */
-  changePubKeySignBytes(changePubKey: {
-    linkChainId: number
-    chainId: number
-    accountId: number
-    account: Address
-    newPkHash: PubKeyHash
-    fromChainId: number
-    toChainId: number
-    feeTokenId: number
-    fee: BigNumberish
-    ts: number
-    nonce: number
-  }): Uint8Array {
-    return utils.serializeChangePubKey({
-      ...changePubKey,
-      type: 'ChangePubKey',
-      feeToken: changePubKey.feeTokenId,
-      // this is not important for serialization
-      ethAuthData: { type: 'Onchain' },
-    })
   }
 
   async signSyncChangePubKey(changePubKey: {

@@ -395,7 +395,7 @@ export class Wallet {
 
   async getOrder(payload: Order): Promise<Order> {
     if (!this.signer) {
-      throw new Error('ZKLink signer is required for sending zklink transactions.')
+      throw new Error('zkLink signer is required for sending zkLink transactions.')
     }
     return this.signer.signSyncOrder(payload as any)
   }
@@ -410,7 +410,7 @@ export class Wallet {
 
   async getWithdrawFromSyncToEthereum(tx: Withdraw): Promise<Withdraw> {
     if (!this.signer) {
-      throw new Error('ZKLink signer is required for sending zklink transactions.')
+      throw new Error('zkLink signer is required for sending zkLink transactions.')
     }
     await this.setRequiredAccountIdFromServer('Withdraw funds')
     return await this.signer.signSyncWithdraw(tx)
@@ -1118,18 +1118,4 @@ export async function submitSignedTransaction(
     signature: signedTx.ethereumSignature,
   })
   return new Transaction(signedTx, transactionHash, provider)
-}
-
-export async function submitSignedTransactionsBatch(
-  provider: Provider,
-  signedTxs: SignedTransaction[],
-  ethSignatures?: TxEthSignature[]
-): Promise<Transaction[]> {
-  const transactionHashes = await provider.submitTxsBatch(
-    signedTxs.map((tx) => {
-      return { tx: tx.tx, signature: tx.ethereumSignature }
-    }),
-    ethSignatures
-  )
-  return transactionHashes.map((txHash, idx) => new Transaction(signedTxs[idx], txHash, provider))
 }

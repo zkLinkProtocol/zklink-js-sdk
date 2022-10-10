@@ -63,12 +63,6 @@ class Signer {
             return yield (0, crypto_1.privateKeyToPubKey)(__classPrivateFieldGet(this, _Signer_privateKey, "f"));
         });
     }
-    /**
-     * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
-     */
-    transferSignBytes(tx) {
-        return utils.serializeTransfer(tx);
-    }
     signSyncTransfer(tx) {
         return __awaiter(this, void 0, void 0, function* () {
             const msgBytes = utils.serializeTransfer(tx);
@@ -92,12 +86,6 @@ class Signer {
             return Object.assign(Object.assign({}, tx), { price: ethers_1.BigNumber.from(payload.price).toString(), amount: ethers_1.BigNumber.from(payload.amount).toString(), signature });
         });
     }
-    /**
-     * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
-     */
-    withdrawSignBytes(withdraw) {
-        return utils.serializeWithdraw(Object.assign(Object.assign({}, withdraw), { type: 'Withdraw', to: withdraw.ethAddress, l2SourceToken: withdraw.l2SourceToken, l1TargetToken: withdraw.l1TargetToken }));
-    }
     signSyncWithdraw(tx) {
         return __awaiter(this, void 0, void 0, function* () {
             const msgBytes = utils.serializeWithdraw(tx);
@@ -105,26 +93,12 @@ class Signer {
             return Object.assign(Object.assign({}, tx), { amount: ethers_1.BigNumber.from(tx.amount).toString(), fee: ethers_1.BigNumber.from(tx.fee).toString(), signature });
         });
     }
-    /**
-     * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
-     */
-    forcedExitSignBytes(tx) {
-        return utils.serializeForcedExit(tx);
-    }
     signSyncForcedExit(tx) {
         return __awaiter(this, void 0, void 0, function* () {
             const msgBytes = utils.serializeForcedExit(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
             return Object.assign(Object.assign({}, tx), { fee: ethers_1.BigNumber.from(tx.fee).toString(), signature });
         });
-    }
-    /**
-     * @deprecated `Signer.*SignBytes` methods will be removed in future. Use `utils.serializeTx` instead.
-     */
-    changePubKeySignBytes(changePubKey) {
-        return utils.serializeChangePubKey(Object.assign(Object.assign({}, changePubKey), { type: 'ChangePubKey', feeToken: changePubKey.feeTokenId, 
-            // this is not important for serialization
-            ethAuthData: { type: 'Onchain' } }));
     }
     signSyncChangePubKey(changePubKey) {
         return __awaiter(this, void 0, void 0, function* () {
