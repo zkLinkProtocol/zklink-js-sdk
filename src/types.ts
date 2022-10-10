@@ -49,20 +49,12 @@ export interface AccountState {
   address: Address
   nonce: number
   pubKeyHash: PubKeyHash
-  balances: {
-    [subAccountId: string]: {
-      // Token are indexed by their id (e.g. "1")
-      [tokenId: string]: BigNumberish
-    }
-  }
-  orders: {
-    [subAccountId: string]: {
-      [slotId: string]: {
-        nonce: number
-        orderHash: string
-        residue: string
-      }
-    }
+}
+
+export interface AccountBalances {
+  [subAccountId: number]: {
+    // Token are indexed by their id (e.g. "1")
+    [tokenId: number]: BigNumberish
   }
 }
 

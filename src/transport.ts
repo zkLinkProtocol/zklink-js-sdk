@@ -221,7 +221,7 @@ export class DummyTransport extends AbstractJSONRPCTransport {
       return tokens
     }
 
-    if (method == 'account_info') {
+    if (method == 'account_info_by_address') {
       // The example `AccountState` instance:
       //  - assigns the '42' value to account_id;
       //  - assigns the committed.pubKeyHash to match the wallet's signer's PubKeyHash
@@ -232,12 +232,13 @@ export class DummyTransport extends AbstractJSONRPCTransport {
         address: params[0],
         nonce: 0,
         pubKeyHash: await this.getPubKeyHash(),
-        balances: {
-          '0': {
-            '1': BigNumber.from(12345),
-          },
+      }
+    }
+    if (method == 'account_balances') {
+      return {
+        '0': {
+          '1': BigNumber.from(12345),
         },
-        orders: {},
       }
     }
     if (method == 'tx_submit') {

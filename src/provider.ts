@@ -1,6 +1,7 @@
 import { AbstractJSONRPCTransport, DummyTransport, HTTPTransport, WSTransport } from './transport'
 import { BigNumber, Contract, ethers } from 'ethers'
 import {
+  AccountBalances,
   AccountState,
   Address,
   ChangePubKeyFee,
@@ -120,7 +121,14 @@ export class Provider {
   }
 
   async getState(address: Address): Promise<AccountState> {
-    return await this.transport.request('account_info', [address])
+    return await this.transport.request('account_info_by_address', [address])
+  }
+  async getStateById(accountId: number): Promise<AccountState> {
+    return await this.transport.request('account_info_by_id', [accountId])
+  }
+
+  async getBalance(accountId: number, subAccountId: number): Promise<AccountBalances> {
+    return await this.transport.request('account_balances', [accountId, subAccountId])
   }
 
   async getSubAccountState(address: Address, subAccountId: number): Promise<AccountState> {

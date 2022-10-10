@@ -1187,10 +1187,9 @@ export class Wallet {
   }
 
   async getBalance(token: TokenLike, subAccountId: number): Promise<BigNumber> {
-    const accountState = await this.getAccountState()
+    const balances = await this.provider.getBalance(this.accountId, subAccountId)
     const tokenId = this.provider.tokenSet.resolveTokenId(token)
-    let balance: BigNumberish
-    balance = accountState.balances[subAccountId][tokenId]
+    let balance = balances[subAccountId][tokenId]
     return balance ? BigNumber.from(balance) : undefined
   }
 
