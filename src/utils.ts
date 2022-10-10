@@ -25,7 +25,6 @@ const MAX_NUMBER_OF_TOKENS = 65535
 // Max number of accounts for the current version, it is determined by the zkSync circuit implementation.
 const MAX_NUMBER_OF_ACCOUNTS = Math.pow(2, 24)
 
-export const MAX_TIMESTAMP = 4294967295
 export const MIN_UNONCE = 1
 export const MAX_UNONCE = 4294967295
 
