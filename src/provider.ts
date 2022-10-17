@@ -79,9 +79,8 @@ export class Provider {
     if (this.contractAddress[linkChainId]) {
       return this.contractAddress[linkChainId]
     }
-    this.contractAddress[linkChainId] = await this.transport.request('contract_address', [
-      linkChainId,
-    ])
+    const res = await this.transport.request('get_support_chains', [])
+    this.contractAddress[linkChainId] = res.find((v) => v.chainId === linkChainId)
     return this.contractAddress[linkChainId]
   }
 

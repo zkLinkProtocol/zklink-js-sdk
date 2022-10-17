@@ -195,13 +195,14 @@ export class DummyTransport extends AbstractJSONRPCTransport {
   }
 
   async request(method: string, params = null): Promise<any> {
-    if (method == 'contract_address') {
-      return {
-        // The HEX-encoded sequence of bytes [0..20) provided as the `mainContract`.
-        mainContract: '0x000102030405060708090a0b0c0d0e0f10111213',
-        //  The `govContract` is not used in tests and it is simply an empty string.
-        govContract: '',
-      }
+    if (method == 'get_support_chains') {
+      return [
+        {
+          chainId: 1,
+          layerOneChainId: 1001,
+          mainContract: '0x000102030405060708090a0b0c0d0e0f10111213',
+        },
+      ]
     }
 
     if (method == 'tokens') {
