@@ -711,7 +711,8 @@ export function serializeTransfer(transfer: Transfer): Uint8Array {
 export function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array {
   const type = new Uint8Array([6])
   const linkChainIdBytes = serializeChainId(changePubKey.linkChainId)
-  const accountBytes = serializeAddress(changePubKey.account)
+  const subAccountIdBytes = serializeSubAccountId(changePubKey.subAccountId)
+  const accountIdBytes = serializeAccountId(changePubKey.accountId)
   const pubKeyHashBytes = serializeAddress(changePubKey.newPkHash)
   const tokenIdBytes = serializeTokenId(changePubKey.feeToken)
   const feeBytes = serializeFeePacked(changePubKey.fee)
@@ -720,7 +721,8 @@ export function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array {
   return ethers.utils.concat([
     type,
     linkChainIdBytes,
-    accountBytes,
+    accountIdBytes,
+    subAccountIdBytes,
     pubKeyHashBytes,
     tokenIdBytes,
     feeBytes,

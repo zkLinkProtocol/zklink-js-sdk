@@ -126,6 +126,7 @@ export class Signer {
 
   async signSyncChangePubKey(changePubKey: {
     linkChainId: number
+    subAccountId: number
     accountId: number
     account: Address
     newPkHash: PubKeyHash

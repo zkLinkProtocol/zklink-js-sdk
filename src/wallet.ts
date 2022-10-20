@@ -518,6 +518,7 @@ export class Wallet {
 
   async getChangePubKey(changePubKey: {
     linkChainId: number
+    subAccountId: number
     feeToken: TokenLike
     fee: BigNumberish
     nonce: number
@@ -539,6 +540,7 @@ export class Wallet {
 
     const changePubKeyTx: ChangePubKey = await this.signer.signSyncChangePubKey({
       accountId: changePubKey.accountId || this.accountId,
+      subAccountId: changePubKey.subAccountId,
       account: this.address(),
       linkChainId: changePubKey.linkChainId,
       newPkHash,
@@ -554,6 +556,7 @@ export class Wallet {
 
   async signSetSigningKey(changePubKey: {
     linkChainId: number
+    subAccountId: number
     feeToken: TokenLike
     fee: BigNumberish
     nonce: number
@@ -618,6 +621,7 @@ export class Wallet {
 
   async setSigningKey(changePubKey: {
     linkChainId: number
+    subAccountId: number
     feeToken: TokenLike
     ethAuthType: ChangePubkeyTypes
     chainId: number

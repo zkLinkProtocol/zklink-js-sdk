@@ -359,6 +359,7 @@ class Wallet {
             yield this.setRequiredAccountIdFromServer('Set Signing Key');
             const changePubKeyTx = yield this.signer.signSyncChangePubKey({
                 accountId: changePubKey.accountId || this.accountId,
+                subAccountId: changePubKey.subAccountId,
                 account: this.address(),
                 linkChainId: changePubKey.linkChainId,
                 newPkHash,

@@ -36,7 +36,7 @@ describe('ChangePubKey', () => {
       '0xb0f0f5ca9d165dd28561e9a084049d53aa95683937aa0c14ddbfa8478e19168f25e1ac75afd71f2ca8a24672a80fa6424408d6333ffdcbafd61725fa18aa6ec51c'
     )
     expect(signedTransaction.tx.signature.signature).eq(
-      'cf4a400da2c2c0b38f83930435f629f73b9acfa5f0e2c12e94d0d6280b8ecc2ef01ebb1a3c8db14475ffd01a32a461962c50097b50b660d89f734fd3c4c46405'
+      'fde82c9fff8a16d47fa4ebc0e43ee7c6b236664735cb6e43dd5c0129f53456abe02e422eda6e8712c98c4d677fe2825b985a859e337e8ec486c405fec48a7702'
     )
   })
 })

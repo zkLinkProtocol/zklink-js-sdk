@@ -146,6 +146,7 @@ export interface ChangePubKeyCREATE2 {
 export interface ChangePubKey {
   type: 'ChangePubKey'
   linkChainId: number
+  subAccountId: number
   chainId: number
   accountId: number
   account: Address

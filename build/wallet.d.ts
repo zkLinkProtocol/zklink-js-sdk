@@ -130,6 +130,7 @@ export declare class Wallet {
     isSigningKeySet(): Promise<boolean>;
     getChangePubKey(changePubKey: {
         linkChainId: number;
+        subAccountId: number;
         feeToken: TokenLike;
         fee: BigNumberish;
         nonce: number;
@@ -139,6 +140,7 @@ export declare class Wallet {
     }): Promise<ChangePubKey>;
     signSetSigningKey(changePubKey: {
         linkChainId: number;
+        subAccountId: number;
         feeToken: TokenLike;
         fee: BigNumberish;
         nonce: number;
@@ -152,6 +154,7 @@ export declare class Wallet {
     }): Promise<SignedTransaction>;
     setSigningKey(changePubKey: {
         linkChainId: number;
+        subAccountId: number;
         feeToken: TokenLike;
         ethAuthType: ChangePubkeyTypes;
         chainId: number;

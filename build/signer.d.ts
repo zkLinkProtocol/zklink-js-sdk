@@ -22,6 +22,7 @@ export declare class Signer {
     signSyncForcedExit(tx: ForcedExit): Promise<ForcedExit>;
     signSyncChangePubKey(changePubKey: {
         linkChainId: number;
+        subAccountId: number;
         accountId: number;
         account: Address;
         newPkHash: PubKeyHash;
