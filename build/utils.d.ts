@@ -58,7 +58,7 @@ export declare class TokenSet {
     resolveTokenAddress(tokenLike: TokenOrId, chainId: ChainId): TokenAddress;
     resolveTokenSymbol(tokenLike: TokenOrId): TokenSymbol;
 }
-export declare function getChangePubkeyMessage(pubKeyHash: PubKeyHash, nonce: number, accountId: number, verifyingContract: string, domainName: string, version: string, chainId: number): any;
+export declare function getChangePubkeyMessage(pubKeyHash: PubKeyHash, nonce: number, accountId: number, verifyingContract: string, chainId: number, domainName?: string, version?: string): any;
 export declare function getSignedBytesFromMessage(message: utils.BytesLike | string, addPrefix: boolean): Uint8Array;
 export declare function signMessagePersonalAPI(signer: ethers.Signer, message: Uint8Array): Promise<string>;
 export declare function signMessageEIP712(signer: any, data: any): Promise<string>;

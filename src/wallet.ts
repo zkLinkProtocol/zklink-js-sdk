@@ -44,6 +44,7 @@ import {
   getTimestamp,
   signMessageEIP712,
 } from './utils'
+import { LinkContract } from './contract'
 
 const EthersErrorCode = ErrorCode
 
@@ -56,6 +57,8 @@ export class ZKSyncTxError extends Error {
 export class Wallet {
   public provider: Provider
 
+  public contract: LinkContract
+
   private constructor(
     public ethSigner: ethers.Signer,
     public ethMessageSigner: EthMessageSigner,
@@ -67,6 +70,8 @@ export class Wallet {
 
   connect(provider: Provider) {
     this.provider = provider
+
+    this.contract = new LinkContract(provider, this.ethSigner)
     return this
   }
 
@@ -553,8 +558,8 @@ export class Wallet {
     fee: BigNumberish
     nonce: number
     ethAuthType: ChangePubkeyTypes
-    verifyingContract: string
-    chainId: number
+    verifyingContract?: string
+    chainId?: number
     domainName?: string
     version?: string
     accountId?: number
@@ -562,24 +567,25 @@ export class Wallet {
   }): Promise<SignedTransaction> {
     changePubKey.ts = changePubKey.ts || getTimestamp()
     const newPubKeyHash = await this.signer.pubKeyHash()
+    // request latest account id
     changePubKey.accountId = await this.getAccountId()
 
     let ethAuthData
-    let ethSignature
     if (changePubKey.ethAuthType === 'Onchain') {
       ethAuthData = {
         type: 'Onchain',
       }
     } else if (changePubKey.ethAuthType === 'ECDSA') {
       await this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSA.')
+      const contractInfo = await this.provider.getContractInfo(changePubKey.linkChainId)
       const changePubKeySignData = getChangePubkeyMessage(
         newPubKeyHash,
         changePubKey.nonce,
         changePubKey.accountId || this.accountId,
-        changePubKey.verifyingContract,
-        changePubKey.domainName || 'ZkLink',
-        changePubKey.version || '1',
-        changePubKey.chainId
+        changePubKey.verifyingContract || contractInfo.mainContract,
+        changePubKey.chainId || contractInfo.layerOneChainId,
+        changePubKey.domainName,
+        changePubKey.version
       )
       const ethSignature = (await this.getEIP712Signature(changePubKeySignData)).signature
       ethAuthData = {
@@ -761,7 +767,7 @@ export class Wallet {
     ethTxOptions?: ethers.providers.TransactionRequest
     approveDepositAmountForERC20?: boolean
   }): Promise<ETHOperation> {
-    const contractAddress = await this.provider.getContractAddress(deposit.linkChainId)
+    const contractAddress = await this.provider.getContractInfo(deposit.linkChainId)
     const mainZkSyncContract = await this.getZkSyncMainContract(deposit.linkChainId)
 
     let ethTransaction
@@ -870,7 +876,7 @@ export class Wallet {
   }
 
   async getZkSyncMainContract(linkChainId: number) {
-    const contractAddress = await this.provider.getContractAddress(linkChainId)
+    const contractAddress = await this.provider.getContractInfo(linkChainId)
     return new ethers.Contract(
       contractAddress.mainContract,
       SYNC_MAIN_CONTRACT_INTERFACE,

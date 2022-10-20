@@ -17,7 +17,6 @@ import {
   Order,
   ChainId,
   OrderMatching,
-  ContractAddress,
 } from './types'
 
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
@@ -410,9 +409,9 @@ export function getChangePubkeyMessage(
   nonce: number,
   accountId: number,
   verifyingContract: string,
-  domainName: string,
-  version: string,
-  chainId: number
+  chainId: number,
+  domainName: string = 'ZkLink',
+  version: string = '1'
 ): any {
   const domainType = [
     { name: 'name', type: 'string' },
@@ -923,7 +922,7 @@ export async function getPendingBalance(
   token: TokenLike,
   chainId: ChainId
 ): Promise<BigNumberish> {
-  const contractAddress = await syncProvider.getContractAddress(chainId)
+  const contractAddress = await syncProvider.getContractInfo(chainId)
   const zksyncContract = new Contract(
     contractAddress.mainContract,
     SYNC_MAIN_CONTRACT_INTERFACE,

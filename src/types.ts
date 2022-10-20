@@ -189,7 +189,9 @@ export interface PriorityOperationReceipt {
   block?: BlockInfo
 }
 
-export interface ContractAddress {
+export interface ContractInfo {
+  chainId: number
+  layerOneChainId: number
   mainContract: string
 }
 

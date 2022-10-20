@@ -149,7 +149,9 @@ export interface PriorityOperationReceipt {
     executed: boolean;
     block?: BlockInfo;
 }
-export interface ContractAddress {
+export interface ContractInfo {
+    chainId: number;
+    layerOneChainId: number;
     mainContract: string;
 }
 export interface Tokens {

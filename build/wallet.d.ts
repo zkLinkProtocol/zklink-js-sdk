@@ -3,6 +3,7 @@ import { EthMessageSigner } from './eth-message-signer';
 import { Provider } from './provider';
 import { Signer } from './signer';
 import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKey, EthSignerType, SignedTransaction, Transfer, TxEthSignature, ForcedExit, Withdraw, ChangePubkeyTypes, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, ChainId, TokenId, Order, TokenAddress, OrderMatching } from './types';
+import { LinkContract } from './contract';
 export declare class ZKSyncTxError extends Error {
     value: PriorityOperationReceipt | TransactionReceipt;
     constructor(message: string, value: PriorityOperationReceipt | TransactionReceipt);
@@ -15,6 +16,7 @@ export declare class Wallet {
     accountId?: number;
     ethSignerType?: EthSignerType;
     provider: Provider;
+    contract: LinkContract;
     private constructor();
     connect(provider: Provider): this;
     static fromEthSigner(ethWallet: ethers.Signer, provider: Provider, signer?: Signer, accountId?: number, ethSignerType?: EthSignerType): Promise<Wallet>;
@@ -141,8 +143,8 @@ export declare class Wallet {
         fee: BigNumberish;
         nonce: number;
         ethAuthType: ChangePubkeyTypes;
-        verifyingContract: string;
-        chainId: number;
+        verifyingContract?: string;
+        chainId?: number;
         domainName?: string;
         version?: string;
         accountId?: number;

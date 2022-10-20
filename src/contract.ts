@@ -31,7 +31,7 @@ export class LinkContract {
   }
 
   async getMainContract(linkChainId: number) {
-    const contractAddress = await this.provider.getContractAddress(linkChainId)
+    const contractAddress = await this.provider.getContractInfo(linkChainId)
     return new ethers.Contract(
       contractAddress.mainContract,
       SYNC_MAIN_CONTRACT_INTERFACE,
@@ -40,7 +40,7 @@ export class LinkContract {
   }
 
   async getExitContract(linkChainId: number) {
-    const contractAddress = await this.provider.getContractAddress(linkChainId)
+    const contractAddress = await this.provider.getContractInfo(linkChainId)
     return new ethers.Contract(
       contractAddress.mainContract,
       SYNC_EXIT_CONTRACT_INTERFACE,
@@ -62,7 +62,7 @@ export class LinkContract {
       throw Error('ETH token does not need approval.')
     }
     const erc20contract = new Contract(tokenAddress, IERC20_INTERFACE, this.ethSigner)
-    const contractAddress = await this.provider.getContractAddress(linkChainId)
+    const contractAddress = await this.provider.getContractInfo(linkChainId)
     try {
       const currentAllowance = await erc20contract.allowance(
         accountAddress,
@@ -83,7 +83,7 @@ export class LinkContract {
       throw Error('ETH token does not need approval.')
     }
     const erc20contract = new Contract(tokenAddress, IERC20_INTERFACE, this.ethSigner)
-    const contractAddress = await this.provider.getContractAddress(linkChainId)
+    const contractAddress = await this.provider.getContractInfo(linkChainId)
 
     try {
       return erc20contract.approve(contractAddress.mainContract, max_erc20_approve_amount)

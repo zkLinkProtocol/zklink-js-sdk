@@ -1,10 +1,10 @@
 import { AbstractJSONRPCTransport } from './transport';
 import { BigNumber } from 'ethers';
-import { AccountBalances, AccountState, Address, ContractAddress, PriorityOperationReceipt, Tokens, TransactionReceipt, TxEthSignature } from './types';
+import { AccountBalances, AccountState, Address, ContractInfo, PriorityOperationReceipt, Tokens, TransactionReceipt, TxEthSignature } from './types';
 import { TokenSet } from './utils';
 export declare class Provider {
     transport: AbstractJSONRPCTransport;
-    contractAddress: ContractAddress[];
+    contractInfo: ContractInfo[];
     tokenSet: TokenSet;
     pollIntervalMilliSecs: number;
     chainId: number;
@@ -24,7 +24,7 @@ export declare class Provider {
         signature?: TxEthSignature;
         fastProcessing?: boolean;
     }): Promise<string>;
-    getContractAddress(linkChainId: number): Promise<ContractAddress>;
+    getContractInfo(linkChainId: number): Promise<ContractInfo>;
     getTokens(): Promise<Tokens>;
     updateTokenSet(): Promise<void>;
     getState(address: Address): Promise<AccountState>;

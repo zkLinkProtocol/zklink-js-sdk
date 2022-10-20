@@ -4,7 +4,7 @@ import {
   AccountBalances,
   AccountState,
   Address,
-  ContractAddress,
+  ContractInfo,
   PriorityOperationReceipt,
   Tokens,
   TransactionReceipt,
@@ -16,7 +16,7 @@ import { ErrorCode } from '@ethersproject/logger'
 const EthersErrorCode = ErrorCode
 
 export class Provider {
-  contractAddress: ContractAddress[] = []
+  contractInfo: ContractInfo[]
   public tokenSet: TokenSet
 
   // For HTTP provider
@@ -75,13 +75,14 @@ export class Provider {
     return await this.transport.request('tx_submit', [tx, signature])
   }
 
-  async getContractAddress(linkChainId: number): Promise<ContractAddress> {
-    if (this.contractAddress[linkChainId]) {
-      return this.contractAddress[linkChainId]
+  async getContractInfo(linkChainId: number): Promise<ContractInfo> {
+    if (!this.contractInfo) {
+      this.contractInfo = await this.transport.request('get_support_chains', [])
     }
-    const res = await this.transport.request('get_support_chains', [])
-    this.contractAddress[linkChainId] = res.find((v) => v.chainId === linkChainId)
-    return this.contractAddress[linkChainId]
+
+    if (linkChainId) {
+      return this.contractInfo.find((v) => v.chainId === linkChainId)
+    }
   }
 
   async getTokens(): Promise<Tokens> {

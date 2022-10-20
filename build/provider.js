@@ -17,7 +17,6 @@ const EthersErrorCode = logger_1.ErrorCode;
 class Provider {
     constructor(transport) {
         this.transport = transport;
-        this.contractAddress = [];
         // For HTTP provider
         this.pollIntervalMilliSecs = 500;
     }
@@ -61,14 +60,14 @@ class Provider {
             return yield this.transport.request('tx_submit', [tx, signature]);
         });
     }
-    getContractAddress(linkChainId) {
+    getContractInfo(linkChainId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.contractAddress[linkChainId]) {
-                return this.contractAddress[linkChainId];
+            if (!this.contractInfo) {
+                this.contractInfo = yield this.transport.request('get_support_chains', []);
             }
-            const res = yield this.transport.request('get_support_chains', []);
-            this.contractAddress[linkChainId] = res.find((v) => v.chainId === linkChainId);
-            return this.contractAddress[linkChainId];
+            if (linkChainId) {
+                return this.contractInfo.find((v) => v.chainId === linkChainId);
+            }
         });
     }
     getTokens() {

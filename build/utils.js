@@ -342,7 +342,7 @@ class TokenSet {
     }
 }
 exports.TokenSet = TokenSet;
-function getChangePubkeyMessage(pubKeyHash, nonce, accountId, verifyingContract, domainName, version, chainId) {
+function getChangePubkeyMessage(pubKeyHash, nonce, accountId, verifyingContract, chainId, domainName = 'ZkLink', version = '1') {
     const domainType = [
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
@@ -797,7 +797,7 @@ function getEthereumBalance(ethProvider, syncProvider, address, token, chainId) 
 exports.getEthereumBalance = getEthereumBalance;
 function getPendingBalance(ethProvider, syncProvider, address, token, chainId) {
     return __awaiter(this, void 0, void 0, function* () {
-        const contractAddress = yield syncProvider.getContractAddress(chainId);
+        const contractAddress = yield syncProvider.getContractInfo(chainId);
         const zksyncContract = new ethers_1.Contract(contractAddress.mainContract, exports.SYNC_MAIN_CONTRACT_INTERFACE, ethProvider);
         const tokenAddress = syncProvider.tokenSet.resolveTokenAddress(token, chainId);
         return zksyncContract.getPendingBalance(address, tokenAddress);

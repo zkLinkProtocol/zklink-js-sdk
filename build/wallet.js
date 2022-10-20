@@ -15,6 +15,7 @@ const logger_1 = require("@ethersproject/logger");
 const eth_message_signer_1 = require("./eth-message-signer");
 const signer_1 = require("./signer");
 const utils_1 = require("./utils");
+const contract_1 = require("./contract");
 const EthersErrorCode = logger_1.ErrorCode;
 class ZKSyncTxError extends Error {
     constructor(message, value) {
@@ -34,6 +35,7 @@ class Wallet {
     }
     connect(provider) {
         this.provider = provider;
+        this.contract = new contract_1.LinkContract(provider, this.ethSigner);
         return this;
     }
     static fromEthSigner(ethWallet, provider, signer, accountId, ethSignerType) {
@@ -373,9 +375,9 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             changePubKey.ts = changePubKey.ts || (0, utils_1.getTimestamp)();
             const newPubKeyHash = yield this.signer.pubKeyHash();
+            // request latest account id
             changePubKey.accountId = yield this.getAccountId();
             let ethAuthData;
-            let ethSignature;
             if (changePubKey.ethAuthType === 'Onchain') {
                 ethAuthData = {
                     type: 'Onchain',
@@ -383,7 +385,8 @@ class Wallet {
             }
             else if (changePubKey.ethAuthType === 'ECDSA') {
                 yield this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSA.');
-                const changePubKeySignData = (0, utils_1.getChangePubkeyMessage)(newPubKeyHash, changePubKey.nonce, changePubKey.accountId || this.accountId, changePubKey.verifyingContract, changePubKey.domainName || 'ZkLink', changePubKey.version || '1', changePubKey.chainId);
+                const contractInfo = yield this.provider.getContractInfo(changePubKey.linkChainId);
+                const changePubKeySignData = (0, utils_1.getChangePubkeyMessage)(newPubKeyHash, changePubKey.nonce, changePubKey.accountId || this.accountId, changePubKey.verifyingContract || contractInfo.mainContract, changePubKey.chainId || contractInfo.layerOneChainId, changePubKey.domainName, changePubKey.version);
                 const ethSignature = (yield this.getEIP712Signature(changePubKeySignData)).signature;
                 ethAuthData = {
                     type: 'ECDSA',
@@ -531,7 +534,7 @@ class Wallet {
     }
     depositToSyncFromEthereum(deposit) {
         return __awaiter(this, void 0, void 0, function* () {
-            const contractAddress = yield this.provider.getContractAddress(deposit.linkChainId);
+            const contractAddress = yield this.provider.getContractInfo(deposit.linkChainId);
             const mainZkSyncContract = yield this.getZkSyncMainContract(deposit.linkChainId);
             let ethTransaction;
             if ((0, utils_1.isTokenETH)(deposit.token)) {
@@ -613,7 +616,7 @@ class Wallet {
     }
     getZkSyncMainContract(linkChainId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const contractAddress = yield this.provider.getContractAddress(linkChainId);
+            const contractAddress = yield this.provider.getContractInfo(linkChainId);
             return new ethers_1.ethers.Contract(contractAddress.mainContract, utils_1.SYNC_MAIN_CONTRACT_INTERFACE, this.ethSigner);
         });
     }
