@@ -588,7 +588,6 @@ exports.serializeWithdraw = serializeWithdraw;
 function serializeTransfer(transfer) {
     const type = new Uint8Array([4]); // tx type
     const accountId = serializeAccountId(transfer.accountId);
-    const from = serializeAddress(transfer.from);
     const fromSubAccountId = serializeSubAccountId(transfer.fromSubAccountId);
     const to = serializeAddress(transfer.to);
     const toSubAccountId = serializeSubAccountId(transfer.toSubAccountId);
@@ -600,7 +599,6 @@ function serializeTransfer(transfer) {
     return ethers_1.ethers.utils.concat([
         type,
         accountId,
-        from,
         fromSubAccountId,
         to,
         toSubAccountId,
