@@ -207,9 +207,10 @@ class Wallet {
             const transactionData = {
                 type: 'ForcedExit',
                 toChainId: forcedExit.toChainId,
-                subAccountId: forcedExit.subAccountId,
                 initiatorAccountId: this.accountId,
+                initiatorSubAccountId: forcedExit.initiatorSubAccountId,
                 target: forcedExit.target,
+                targetSubAccountId: forcedExit.targetSubAccountId,
                 l2SourceToken: this.provider.tokenSet.resolveTokenId(forcedExit.l2SourceToken),
                 l1TargetToken: this.provider.tokenSet.resolveTokenId(forcedExit.l1TargetToken),
                 feeToken: this.provider.tokenSet.resolveTokenId(forcedExit.feeToken),
@@ -225,10 +226,12 @@ class Wallet {
                 ? null
                 : ethers_1.utils.formatEther(transactionData.fee);
             const stringToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.l2SourceToken);
+            const stringFeeToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.feeToken);
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
                 : yield this.ethMessageSigner.ethSignForcedExit({
                     stringToken,
+                    stringFeeToken,
                     stringFee,
                     target: transactionData.target,
                     nonce: transactionData.nonce,
@@ -385,7 +388,6 @@ class Wallet {
                 ethAuthData = {
                     type: 'ECDSA',
                     ethSignature,
-                    batchHash: changePubKey.batchHash,
                 };
             }
             else if (changePubKey.ethAuthType === 'CREATE2') {
@@ -422,63 +424,6 @@ class Wallet {
                 throw new Error('Current signing key is already set');
             }
             return submitSignedTransaction(txData, this.provider);
-        });
-    }
-    // The following methods are needed in case user decided to build
-    // a message for the batch himself (e.g. in case of multi-authors batch).
-    // It might seem that these belong to ethMessageSigner, however, we have
-    // to resolve the token and format amount/fee before constructing the
-    // transaction.
-    getTransferEthMessagePart(transfer) {
-        const stringAmount = ethers_1.BigNumber.from(transfer.amount).isZero()
-            ? null
-            : this.provider.tokenSet.formatToken(transfer.token, transfer.amount);
-        const stringFee = ethers_1.BigNumber.from(transfer.fee).isZero()
-            ? null
-            : this.provider.tokenSet.formatToken(transfer.token, transfer.fee);
-        const stringToken = this.provider.tokenSet.resolveTokenSymbol(transfer.token);
-        return this.ethMessageSigner.getTransferEthMessagePart({
-            stringAmount,
-            stringFee,
-            stringToken,
-            to: transfer.to,
-        }, 'transfer');
-    }
-    getWithdrawEthMessagePart(withdraw) {
-        const stringAmount = ethers_1.BigNumber.from(withdraw.amount).isZero()
-            ? null
-            : this.provider.tokenSet.formatToken(withdraw.token, withdraw.amount);
-        const stringFee = ethers_1.BigNumber.from(withdraw.fee).isZero()
-            ? null
-            : this.provider.tokenSet.formatToken(withdraw.token, withdraw.fee);
-        const stringToken = this.provider.tokenSet.resolveTokenSymbol(withdraw.token);
-        return this.ethMessageSigner.getWithdrawEthMessagePart({
-            stringAmount,
-            stringFee,
-            stringToken,
-            to: withdraw.to,
-        });
-    }
-    getChangePubKeyEthMessagePart(changePubKey) {
-        const stringFee = ethers_1.BigNumber.from(changePubKey.fee).isZero()
-            ? null
-            : this.provider.tokenSet.formatToken(changePubKey.feeToken, changePubKey.fee);
-        const stringToken = this.provider.tokenSet.resolveTokenSymbol(changePubKey.feeToken);
-        return this.ethMessageSigner.getChangePubKeyEthMessagePart({
-            pubKeyHash: changePubKey.pubKeyHash,
-            stringToken,
-            stringFee,
-        });
-    }
-    getForcedExitEthMessagePart(forcedExit) {
-        const stringFee = ethers_1.BigNumber.from(forcedExit.fee).isZero()
-            ? null
-            : this.provider.tokenSet.formatToken(forcedExit.token, forcedExit.fee);
-        const stringToken = this.provider.tokenSet.resolveTokenSymbol(forcedExit.token);
-        return this.ethMessageSigner.getForcedExitEthMessagePart({
-            stringToken,
-            stringFee,
-            target: forcedExit.target,
         });
     }
     isOnchainAuthSigningKeySet(linkChainId, nonce = 'committed') {

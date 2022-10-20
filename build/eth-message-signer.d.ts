@@ -1,5 +1,5 @@
 import * as ethers from 'ethers';
-import { TxEthSignature, EthSignerType, PubKeyHash, Address, Order } from './types';
+import { TxEthSignature, EthSignerType, PubKeyHash, Order } from './types';
 /**
  * Wrapper around `ethers.Signer` which provides convenient methods to get and sign messages required for zkSync.
  */
@@ -37,165 +37,6 @@ export declare class EthMessageSigner {
     getOrderMatchingEthMessagePart(tx: {
         stringFeeToken: string;
         stringFee: string;
-    }): string;
-    getSwapEthMessagePart(tx: {
-        stringAmountIn: string;
-        stringAmountOut: string;
-        stringFee0: string;
-        stringFee1: string;
-        stringTokenIn: string;
-        stringTokenOut: string;
-        pairAddress: string;
-    }): string;
-    getSwapEthSignMessage(transfer: {
-        stringAmountIn: string;
-        stringAmountOut: string;
-        stringAmountOutMin: string;
-        stringFee0: string;
-        stringFee1: string;
-        stringTokenIn: string;
-        stringTokenOut: string;
-        pairAddress: string;
-        nonce: number;
-        accountId: number;
-    }): string;
-    ethSignSwap(transfer: {
-        stringAmountIn: string;
-        stringAmountOut: string;
-        stringAmountOutMin: string;
-        stringFee0: string;
-        stringFee1: string;
-        stringTokenIn: string;
-        stringTokenOut: string;
-        pairAddress: string;
-        nonce: number;
-        accountId: number;
-    }): Promise<TxEthSignature>;
-    getRemoveLiquidityEthMessagePart(tx: {
-        stringAmount0: string;
-        stringAmount1: string;
-        stringLpQuantity: string;
-        pairAddress: Address;
-        fee1: string;
-        fee2: string;
-        nonce: number;
-        accountId: number;
-    }): string;
-    getRemoveLiquidityEthSignMessage(transfer: {
-        stringAmount0: string;
-        stringAmount1: string;
-        stringLpQuantity: string;
-        pairAddress: Address;
-        fee1: string;
-        fee2: string;
-        nonce: number;
-        accountId: number;
-    }): string;
-    ethSignRemoveLiquidity(transfer: {
-        stringAmount0: string;
-        stringAmount1: string;
-        stringTokenIn: string;
-        stringTokenOut: string;
-        stringTokenLp: string;
-        stringLpQuantity: string;
-        pairAddress: Address;
-        fee1: string;
-        fee2: string;
-        nonce: number;
-        accountId: number;
-    }): Promise<TxEthSignature>;
-    ethSignAddLiquidity(transfer: {
-        stringAmount0: string;
-        stringAmount1: string;
-        stringAmount0Min: string;
-        stringAmount1Min: string;
-        stringToken0: string;
-        stringToken1: string;
-        account: string;
-        nonce: number;
-        accountId: number;
-        pairAccount: Address;
-    }): Promise<TxEthSignature>;
-    getAddLiquidityEthSignMessage(transfer: {
-        stringAmount0: string;
-        stringAmount1: string;
-        stringToken0: string;
-        stringToken1: string;
-        account: string;
-        nonce: number;
-        accountId: number;
-    }): string;
-    getAddLiquidityEthMessagePart(tx: {
-        stringAmount0: string;
-        stringAmount1: string;
-        stringToken0: string;
-        stringToken1: string;
-        account: string;
-        nonce: number;
-        accountId: number;
-    }): string;
-    ethSignCurveAddLiquidity(payload: {
-        stringAmounts: string[];
-        account: string;
-        nonce: number;
-        pairAccount: Address;
-    }): Promise<TxEthSignature>;
-    getCurveAddLiquidityEthSignMessage(payload: {
-        stringAmounts: string[];
-        account: string;
-        nonce: number;
-        pairAccount: Address;
-    }): string;
-    getCurveAddLiquidityEthMessagePart(tx: {
-        stringAmounts: string[];
-        account: string;
-        nonce: number;
-        pairAccount: Address;
-    }): string;
-    ethSignCurveRemoveLiquidity(payload: {
-        stringAmounts: string[];
-        account: string;
-        nonce: number;
-        pairAccount: Address;
-    }): Promise<TxEthSignature>;
-    getCurveRemoveLiquidityEthSignMessage(payload: {
-        stringAmounts: string[];
-        account: string;
-        nonce: number;
-        pairAccount: Address;
-    }): string;
-    getCurveRemoveLiquidityEthMessagePart(tx: {
-        stringAmounts: string[];
-        account: string;
-        nonce: number;
-        pairAccount: Address;
-    }): string;
-    ethSignCurveSwap(payload: {
-        stringAmountIn: string;
-        stringAmountOut: string;
-        tokenIn: string | number;
-        tokenOut: string | number;
-        account: string;
-        nonce: number;
-        pairAccount: Address;
-    }): Promise<TxEthSignature>;
-    getCurveSwapEthSignMessage(payload: {
-        stringAmountIn: string;
-        stringAmountOut: string;
-        tokenIn: string | number;
-        tokenOut: string | number;
-        account: string;
-        nonce: number;
-        pairAccount: Address;
-    }): string;
-    getCurveSwapEthMessagePart(tx: {
-        stringAmountIn: string;
-        stringAmountOut: string;
-        tokenIn: string | number;
-        tokenOut: string | number;
-        account: string;
-        nonce: number;
-        pairAccount: Address;
     }): string;
     ethSignOrder(payload: Order & {
         address: string;
@@ -236,6 +77,7 @@ export declare class EthMessageSigner {
     }): Promise<TxEthSignature>;
     ethSignForcedExit(forcedExit: {
         stringToken: string;
+        stringFeeToken: string;
         stringFee: string;
         target: string;
         nonce: number;
@@ -250,6 +92,7 @@ export declare class EthMessageSigner {
     }): string;
     getForcedExitEthSignMessage(forcedExit: {
         stringToken: string;
+        stringFeeToken: string;
         stringFee: string;
         target: string;
         nonce: number;
@@ -273,6 +116,7 @@ export declare class EthMessageSigner {
     }): string;
     getForcedExitEthMessagePart(forcedExit: {
         stringToken: string;
+        stringFeeToken: string;
         stringFee: string;
         target: string;
     }): string;

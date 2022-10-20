@@ -83,303 +83,6 @@ export class EthMessageSigner {
     return message
   }
 
-  getSwapEthMessagePart(tx: {
-    stringAmountIn: string
-    stringAmountOut: string
-    stringFee0: string
-    stringFee1: string
-    stringTokenIn: string
-    stringTokenOut: string
-    pairAddress: string
-  }): string {
-    let message = ''
-    message += `Swap ${tx.stringAmountIn} to: ${tx.stringAmountOut}`
-    message += '\n'
-    message += `Amount: ${tx.stringAmountIn} to: ${tx.stringAmountOut}`
-    message += '\n'
-    message += `Fee: ${tx.stringFee0}`
-    message += '\n'
-    return message
-  }
-  getSwapEthSignMessage(transfer: {
-    stringAmountIn: string
-    stringAmountOut: string
-    stringAmountOutMin: string
-    stringFee0: string
-    stringFee1: string
-    stringTokenIn: string
-    stringTokenOut: string
-    pairAddress: string
-    nonce: number
-    accountId: number
-  }): string {
-    let humanReadableTxInfo = this.getSwapEthMessagePart(transfer)
-    if (humanReadableTxInfo.length != 0) {
-      humanReadableTxInfo += '\n'
-    }
-    humanReadableTxInfo += `Nonce: ${transfer.nonce}`
-
-    return humanReadableTxInfo
-  }
-
-  async ethSignSwap(transfer: {
-    stringAmountIn: string
-    stringAmountOut: string
-    stringAmountOutMin: string
-    stringFee0: string
-    stringFee1: string
-    stringTokenIn: string
-    stringTokenOut: string
-    pairAddress: string
-    nonce: number
-    accountId: number
-  }): Promise<TxEthSignature> {
-    const message = this.getSwapEthSignMessage(transfer)
-    return await this.getEthMessageSignature(message)
-  }
-
-  getRemoveLiquidityEthMessagePart(tx: {
-    stringAmount0: string
-    stringAmount1: string
-    stringLpQuantity: string
-    pairAddress: Address
-    fee1: string
-    fee2: string
-    nonce: number
-    accountId: number
-  }): string {
-    let message = ''
-    if (tx.pairAddress != null) {
-      message += `Remove Liquidity`
-    }
-    message += '\n'
-    message += `LP: ${tx.stringLpQuantity}`
-    message += '\n'
-    message += `Amount: ${tx.stringAmount0} - ${tx.stringAmount1}`
-    return message
-  }
-
-  getRemoveLiquidityEthSignMessage(transfer: {
-    stringAmount0: string
-    stringAmount1: string
-    stringLpQuantity: string
-    pairAddress: Address
-    fee1: string
-    fee2: string
-    nonce: number
-    accountId: number
-  }): string {
-    let humanReadableTxInfo = this.getRemoveLiquidityEthMessagePart(transfer)
-    if (humanReadableTxInfo.length != 0) {
-      humanReadableTxInfo += '\n'
-    }
-    humanReadableTxInfo += `Nonce: ${transfer.nonce}`
-
-    return humanReadableTxInfo
-  }
-
-  async ethSignRemoveLiquidity(transfer: {
-    stringAmount0: string
-    stringAmount1: string
-    stringTokenIn: string
-    stringTokenOut: string
-    stringTokenLp: string
-    stringLpQuantity: string
-    pairAddress: Address
-    fee1: string
-    fee2: string
-    nonce: number
-    accountId: number
-  }): Promise<TxEthSignature> {
-    const message = this.getRemoveLiquidityEthSignMessage(transfer)
-    return await this.getEthMessageSignature(message)
-  }
-
-  async ethSignAddLiquidity(transfer: {
-    stringAmount0: string
-    stringAmount1: string
-    stringAmount0Min: string
-    stringAmount1Min: string
-    stringToken0: string
-    stringToken1: string
-    account: string
-    nonce: number
-    accountId: number
-    pairAccount: Address
-  }): Promise<TxEthSignature> {
-    const message = this.getAddLiquidityEthSignMessage(transfer)
-    return await this.getEthMessageSignature(message)
-  }
-
-  getAddLiquidityEthSignMessage(transfer: {
-    stringAmount0: string
-    stringAmount1: string
-    stringToken0: string
-    stringToken1: string
-    account: string
-    nonce: number
-    accountId: number
-  }): string {
-    let humanReadableTxInfo = this.getAddLiquidityEthMessagePart(transfer)
-    if (humanReadableTxInfo.length != 0) {
-      humanReadableTxInfo += '\n'
-    }
-    humanReadableTxInfo += `Nonce: ${transfer.nonce}`
-
-    return humanReadableTxInfo
-  }
-  getAddLiquidityEthMessagePart(tx: {
-    stringAmount0: string
-    stringAmount1: string
-    stringToken0: string
-    stringToken1: string
-    account: string
-    nonce: number
-    accountId: number
-  }): string {
-    let message = ''
-    if (tx.account != null) {
-      message += `Add Liquidity`
-    }
-    message += '\n'
-    message += `Token: ${tx.stringToken0} - ${tx.stringToken1}`
-    message += '\n'
-    message += `Amount: ${tx.stringAmount0} - ${tx.stringAmount1}`
-    return message
-  }
-
-  async ethSignCurveAddLiquidity(payload: {
-    stringAmounts: string[]
-    account: string
-    nonce: number
-    pairAccount: Address
-  }): Promise<TxEthSignature> {
-    const message = this.getCurveAddLiquidityEthSignMessage(payload)
-    return await this.getEthMessageSignature(message)
-  }
-
-  getCurveAddLiquidityEthSignMessage(payload: {
-    stringAmounts: string[]
-    account: string
-    nonce: number
-    pairAccount: Address
-  }): string {
-    let humanReadableTxInfo = this.getCurveAddLiquidityEthMessagePart(payload)
-    if (humanReadableTxInfo.length != 0) {
-      humanReadableTxInfo += '\n'
-    }
-    humanReadableTxInfo += `Nonce: ${payload.nonce}`
-
-    return humanReadableTxInfo
-  }
-  getCurveAddLiquidityEthMessagePart(tx: {
-    stringAmounts: string[]
-    account: string
-    nonce: number
-    pairAccount: Address
-  }): string {
-    let message = ''
-    if (tx.account != null) {
-      message += `Add Liquidity`
-    }
-    message += '\n'
-    message += `Amount: ${tx.stringAmounts
-      .filter((a) => Number(a) != 0 && Number(a) != NaN)
-      .join('-')}`
-    return message
-  }
-
-  async ethSignCurveRemoveLiquidity(payload: {
-    stringAmounts: string[]
-    account: string
-    nonce: number
-    pairAccount: Address
-  }): Promise<TxEthSignature> {
-    const message = this.getCurveRemoveLiquidityEthSignMessage(payload)
-    return await this.getEthMessageSignature(message)
-  }
-
-  getCurveRemoveLiquidityEthSignMessage(payload: {
-    stringAmounts: string[]
-    account: string
-    nonce: number
-    pairAccount: Address
-  }): string {
-    let humanReadableTxInfo = this.getCurveRemoveLiquidityEthMessagePart(payload)
-    if (humanReadableTxInfo.length != 0) {
-      humanReadableTxInfo += '\n'
-    }
-    humanReadableTxInfo += `Nonce: ${payload.nonce}`
-
-    return humanReadableTxInfo
-  }
-  getCurveRemoveLiquidityEthMessagePart(tx: {
-    stringAmounts: string[]
-    account: string
-    nonce: number
-    pairAccount: Address
-  }): string {
-    let message = ''
-    if (tx.account != null) {
-      message += `Remove Liquidity`
-    }
-    message += '\n'
-    message += `Amount: ${tx.stringAmounts
-      .filter((a) => Number(a) != 0 && Number(a) != NaN)
-      .join('-')}`
-    return message
-  }
-
-  async ethSignCurveSwap(payload: {
-    stringAmountIn: string
-    stringAmountOut: string
-    tokenIn: string | number
-    tokenOut: string | number
-    account: string
-    nonce: number
-    pairAccount: Address
-  }): Promise<TxEthSignature> {
-    const message = this.getCurveSwapEthSignMessage(payload)
-    return await this.getEthMessageSignature(message)
-  }
-
-  getCurveSwapEthSignMessage(payload: {
-    stringAmountIn: string
-    stringAmountOut: string
-    tokenIn: string | number
-    tokenOut: string | number
-    account: string
-    nonce: number
-    pairAccount: Address
-  }): string {
-    let humanReadableTxInfo = this.getCurveSwapEthMessagePart(payload)
-    if (humanReadableTxInfo.length != 0) {
-      humanReadableTxInfo += '\n'
-    }
-    humanReadableTxInfo += `Nonce: ${payload.nonce}`
-
-    return humanReadableTxInfo
-  }
-  getCurveSwapEthMessagePart(tx: {
-    stringAmountIn: string
-    stringAmountOut: string
-    tokenIn: string | number
-    tokenOut: string | number
-    account: string
-    nonce: number
-    pairAccount: Address
-  }): string {
-    let message = ''
-    if (tx.account != null) {
-      message += `Swap`
-    }
-    message += '\n'
-    message += `Swap: ${tx.tokenIn} to ${tx.tokenOut}`
-    message += '\n'
-    message += `Amount: ${tx.stringAmountIn} to ${tx.stringAmountOut}`
-    return message
-  }
-
   async ethSignOrder(
     payload: Order & {
       address: string
@@ -466,6 +169,7 @@ export class EthMessageSigner {
 
   async ethSignForcedExit(forcedExit: {
     stringToken: string
+    stringFeeToken: string
     stringFee: string
     target: string
     nonce: number
@@ -493,6 +197,7 @@ export class EthMessageSigner {
 
   getForcedExitEthSignMessage(forcedExit: {
     stringToken: string
+    stringFeeToken: string
     stringFee: string
     target: string
     nonce: number
@@ -557,12 +262,13 @@ export class EthMessageSigner {
 
   getForcedExitEthMessagePart(forcedExit: {
     stringToken: string
+    stringFeeToken: string
     stringFee: string
     target: string
   }): string {
     let message = `ForcedExit ${forcedExit.stringToken} to: ${forcedExit.target.toLowerCase()}`
     if (forcedExit.stringFee != null) {
-      message += `\nFee: ${forcedExit.stringFee} ${forcedExit.stringToken}`
+      message += `\nFee: ${forcedExit.stringFee} ${forcedExit.stringFeeToken}`
     }
     return message
   }

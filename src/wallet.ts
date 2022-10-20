@@ -306,8 +306,9 @@ export class Wallet {
 
   async signSyncForcedExit(forcedExit: {
     toChainId: ChainId
-    subAccountId: number
     target: Address
+    targetSubAccountId: number
+    initiatorSubAccountId: number
     l2SourceToken: TokenLike
     l1TargetToken: TokenLike
     feeToken: TokenLike
@@ -318,9 +319,10 @@ export class Wallet {
     const transactionData: ForcedExit = {
       type: 'ForcedExit',
       toChainId: forcedExit.toChainId,
-      subAccountId: forcedExit.subAccountId,
       initiatorAccountId: this.accountId,
+      initiatorSubAccountId: forcedExit.initiatorSubAccountId,
       target: forcedExit.target,
+      targetSubAccountId: forcedExit.targetSubAccountId,
       l2SourceToken: this.provider.tokenSet.resolveTokenId(forcedExit.l2SourceToken),
       l1TargetToken: this.provider.tokenSet.resolveTokenId(forcedExit.l1TargetToken),
       feeToken: this.provider.tokenSet.resolveTokenId(forcedExit.feeToken),
@@ -339,11 +341,13 @@ export class Wallet {
       ? null
       : utils.formatEther(transactionData.fee)
     const stringToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.l2SourceToken)
+    const stringFeeToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.feeToken)
     const ethereumSignature =
       this.ethSigner instanceof Create2WalletSigner
         ? null
         : await this.ethMessageSigner.ethSignForcedExit({
             stringToken,
+            stringFeeToken,
             stringFee,
             target: transactionData.target,
             nonce: transactionData.nonce,
@@ -357,6 +361,8 @@ export class Wallet {
 
   async syncForcedExit(forcedExit: {
     target: Address
+    targetSubAccountId: number
+    initiatorSubAccountId: number
     toChainId: ChainId
     subAccountId: number
     l2SourceToken: TokenLike
@@ -552,7 +558,6 @@ export class Wallet {
     domainName?: string
     version?: string
     accountId?: number
-    batchHash?: string
     ts?: number
   }): Promise<SignedTransaction> {
     changePubKey.ts = changePubKey.ts || getTimestamp()
@@ -580,7 +585,6 @@ export class Wallet {
       ethAuthData = {
         type: 'ECDSA',
         ethSignature,
-        batchHash: changePubKey.batchHash,
       }
     } else if (changePubKey.ethAuthType === 'CREATE2') {
       if (this.ethSigner instanceof Create2WalletSigner) {
@@ -628,89 +632,6 @@ export class Wallet {
     }
 
     return submitSignedTransaction(txData, this.provider)
-  }
-
-  // The following methods are needed in case user decided to build
-  // a message for the batch himself (e.g. in case of multi-authors batch).
-  // It might seem that these belong to ethMessageSigner, however, we have
-  // to resolve the token and format amount/fee before constructing the
-  // transaction.
-  getTransferEthMessagePart(transfer: {
-    to: Address
-    token: TokenSymbol
-    amount: BigNumberish
-    fee: BigNumberish
-  }): string {
-    const stringAmount = BigNumber.from(transfer.amount).isZero()
-      ? null
-      : this.provider.tokenSet.formatToken(transfer.token, transfer.amount)
-    const stringFee = BigNumber.from(transfer.fee).isZero()
-      ? null
-      : this.provider.tokenSet.formatToken(transfer.token, transfer.fee)
-    const stringToken = this.provider.tokenSet.resolveTokenSymbol(transfer.token)
-    return this.ethMessageSigner.getTransferEthMessagePart(
-      {
-        stringAmount,
-        stringFee,
-        stringToken,
-        to: transfer.to,
-      },
-      'transfer'
-    )
-  }
-
-  getWithdrawEthMessagePart(withdraw: {
-    to: string
-    token: TokenLike
-    amount: BigNumberish
-    fee: BigNumberish
-  }): string {
-    const stringAmount = BigNumber.from(withdraw.amount).isZero()
-      ? null
-      : this.provider.tokenSet.formatToken(withdraw.token, withdraw.amount)
-    const stringFee = BigNumber.from(withdraw.fee).isZero()
-      ? null
-      : this.provider.tokenSet.formatToken(withdraw.token, withdraw.fee)
-    const stringToken = this.provider.tokenSet.resolveTokenSymbol(withdraw.token)
-    return this.ethMessageSigner.getWithdrawEthMessagePart({
-      stringAmount,
-      stringFee,
-      stringToken,
-      to: withdraw.to,
-    })
-  }
-
-  getChangePubKeyEthMessagePart(changePubKey: {
-    pubKeyHash: string
-    feeToken: TokenLike
-    fee: BigNumberish
-  }): string {
-    const stringFee = BigNumber.from(changePubKey.fee).isZero()
-      ? null
-      : this.provider.tokenSet.formatToken(changePubKey.feeToken, changePubKey.fee)
-    const stringToken = this.provider.tokenSet.resolveTokenSymbol(changePubKey.feeToken)
-    return this.ethMessageSigner.getChangePubKeyEthMessagePart({
-      pubKeyHash: changePubKey.pubKeyHash,
-      stringToken,
-      stringFee,
-    })
-  }
-
-  getForcedExitEthMessagePart(forcedExit: {
-    target: Address
-    token: TokenLike
-    fee: BigNumberish
-    nonce: number
-  }): string {
-    const stringFee = BigNumber.from(forcedExit.fee).isZero()
-      ? null
-      : this.provider.tokenSet.formatToken(forcedExit.token, forcedExit.fee)
-    const stringToken = this.provider.tokenSet.resolveTokenSymbol(forcedExit.token)
-    return this.ethMessageSigner.getForcedExitEthMessagePart({
-      stringToken,
-      stringFee,
-      target: forcedExit.target,
-    })
   }
 
   async isOnchainAuthSigningKeySet(

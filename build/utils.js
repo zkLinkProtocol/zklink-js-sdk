@@ -637,8 +637,9 @@ function serializeForcedExit(forcedExit) {
     const type = new Uint8Array([7]);
     const toChainIdBytes = serializeChainId(forcedExit.toChainId);
     const initiatorAccountIdBytes = serializeAccountId(forcedExit.initiatorAccountId);
-    const subAccountIdBytes = serializeSubAccountId(forcedExit.subAccountId);
+    const initiatorSubAccountIdBytes = serializeSubAccountId(forcedExit.initiatorSubAccountId);
     const targetBytes = serializeAddress(forcedExit.target);
+    const targetSubAccountIdBytes = serializeSubAccountId(forcedExit.targetSubAccountId);
     const l2SourceTokenIdBytes = serializeTokenId(forcedExit.l2SourceToken);
     const l1TargetTokenIdBytes = serializeTokenId(forcedExit.l1TargetToken);
     const feeTokenIdBytes = serializeTokenId(forcedExit.feeToken);
@@ -649,8 +650,9 @@ function serializeForcedExit(forcedExit) {
         type,
         toChainIdBytes,
         initiatorAccountIdBytes,
-        subAccountIdBytes,
+        initiatorSubAccountIdBytes,
         targetBytes,
+        targetSubAccountIdBytes,
         l2SourceTokenIdBytes,
         l1TargetTokenIdBytes,
         feeTokenIdBytes,

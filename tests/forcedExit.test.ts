@@ -10,9 +10,10 @@ describe('forcedExit', () => {
     const serialized = serializeForcedExit({
       type: 'ForcedExit',
       toChainId: 1,
-      subAccountId: 0,
+      initiatorSubAccountId: 0,
       initiatorAccountId: 1,
       target: '0x3498F456645270eE003441df82C718b56c0e6666',
+      targetSubAccountId: 0,
       feeToken: 1,
       fee: BigNumber.from('4100000000000000'),
       nonce: 85,
@@ -21,7 +22,7 @@ describe('forcedExit', () => {
       ts: 1649749979,
     })
     expect(Buffer.from(serialized).toString('hex')).eq(
-      '070100000001003498f456645270ee003441df82c718b56c0e6666000100110001334d0000005562552fdb'
+      '070100000001003498f456645270ee003441df82c718b56c0e666600000100110001334d0000005562552fdb'
     )
   })
 
@@ -43,7 +44,7 @@ describe('forcedExit', () => {
       'Unexpected ForcedExit ethereum signature'
     )
     expect(transaction.txData.tx.signature.signature).eq(
-      '393cc9bdf19a18087587f2df85476021c0b96b348bceb505c0ac243107d621a072927b9e969bcc675097513eac0725a4da436155f0297c6f3aac0ca319ab6a02',
+      '5863c06bd044647a12b63ee80028556463a26bdb9a9be4b9927cc73aef6a8fad49c2144167b61047ba09da5f51de0b7fe0b44ca4975f896c86c1288896cc2503',
       'Unexpected ForcedExit tx signature'
     )
   })

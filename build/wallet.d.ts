@@ -2,7 +2,7 @@ import { BigNumber, BigNumberish, Contract, ContractTransaction, ethers } from '
 import { EthMessageSigner } from './eth-message-signer';
 import { Provider } from './provider';
 import { Signer } from './signer';
-import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKey, EthSignerType, SignedTransaction, Transfer, TxEthSignature, ForcedExit, Withdraw, ChangePubkeyTypes, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, ChainId, TokenId, Order, TokenSymbol, TokenAddress, OrderMatching } from './types';
+import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKey, EthSignerType, SignedTransaction, Transfer, TxEthSignature, ForcedExit, Withdraw, ChangePubkeyTypes, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, ChainId, TokenId, Order, TokenAddress, OrderMatching } from './types';
 export declare class ZKSyncTxError extends Error {
     value: PriorityOperationReceipt | TransactionReceipt;
     constructor(message: string, value: PriorityOperationReceipt | TransactionReceipt);
@@ -60,8 +60,9 @@ export declare class Wallet {
     getForcedExit(tx: ForcedExit): Promise<ForcedExit>;
     signSyncForcedExit(forcedExit: {
         toChainId: ChainId;
-        subAccountId: number;
         target: Address;
+        targetSubAccountId: number;
+        initiatorSubAccountId: number;
         l2SourceToken: TokenLike;
         l1TargetToken: TokenLike;
         feeToken: TokenLike;
@@ -71,6 +72,8 @@ export declare class Wallet {
     }): Promise<SignedTransaction>;
     syncForcedExit(forcedExit: {
         target: Address;
+        targetSubAccountId: number;
+        initiatorSubAccountId: number;
         toChainId: ChainId;
         subAccountId: number;
         l2SourceToken: TokenLike;
@@ -143,7 +146,6 @@ export declare class Wallet {
         domainName?: string;
         version?: string;
         accountId?: number;
-        batchHash?: string;
         ts?: number;
     }): Promise<SignedTransaction>;
     setSigningKey(changePubKey: {
@@ -157,29 +159,6 @@ export declare class Wallet {
         fee?: BigNumberish;
         nonce?: Nonce;
     }): Promise<Transaction>;
-    getTransferEthMessagePart(transfer: {
-        to: Address;
-        token: TokenSymbol;
-        amount: BigNumberish;
-        fee: BigNumberish;
-    }): string;
-    getWithdrawEthMessagePart(withdraw: {
-        to: string;
-        token: TokenLike;
-        amount: BigNumberish;
-        fee: BigNumberish;
-    }): string;
-    getChangePubKeyEthMessagePart(changePubKey: {
-        pubKeyHash: string;
-        feeToken: TokenLike;
-        fee: BigNumberish;
-    }): string;
-    getForcedExitEthMessagePart(forcedExit: {
-        target: Address;
-        token: TokenLike;
-        fee: BigNumberish;
-        nonce: number;
-    }): string;
     isOnchainAuthSigningKeySet(linkChainId: number, nonce?: Nonce): Promise<boolean>;
     onchainAuthSigningKey(linkChainId: number, nonce?: Nonce, ethTxOptions?: ethers.providers.TransactionRequest): Promise<ContractTransaction>;
     getCurrentPubKeyHash(): Promise<PubKeyHash>;
