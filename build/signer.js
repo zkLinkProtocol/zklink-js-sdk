@@ -48,6 +48,7 @@ exports.Create2WalletSigner = exports.Signer = void 0;
 const crypto_1 = require("./crypto");
 const ethers_1 = require("ethers");
 const utils = __importStar(require("./utils"));
+const utils_1 = require("ethers/lib/utils");
 class Signer {
     constructor(privKey) {
         _Signer_privateKey.set(this, void 0);
@@ -56,6 +57,11 @@ class Signer {
     pubKeyHash() {
         return __awaiter(this, void 0, void 0, function* () {
             return yield (0, crypto_1.privateKeyToPubKeyHash)(__classPrivateFieldGet(this, _Signer_privateKey, "f"));
+        });
+    }
+    signTransactionBytes(msg) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), (0, utils_1.arrayify)(msg));
         });
     }
     pubKey() {

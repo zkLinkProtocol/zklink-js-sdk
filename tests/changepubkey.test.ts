@@ -4,10 +4,6 @@ import { describe } from 'mocha'
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { getWallet } from './wallet.test'
 
-const PolygonProvider = new JsonRpcProvider('https://matic-mumbai.chainstacklabs.com', {
-  name: 'Polygon Testnet',
-  chainId: 80001,
-})
 describe('ChangePubKey', () => {
   it('L2 signature', async function () {
     const wallet = await getWallet()

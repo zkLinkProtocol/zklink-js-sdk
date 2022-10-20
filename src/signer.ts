@@ -20,7 +20,9 @@ import {
   Create2Data,
   Order,
   OrderMatching,
+  Signature,
 } from './types'
+import { arrayify } from 'ethers/lib/utils'
 
 export class Signer {
   readonly #privateKey: Uint8Array
@@ -31,6 +33,10 @@ export class Signer {
 
   async pubKeyHash(): Promise<PubKeyHash> {
     return await privateKeyToPubKeyHash(this.#privateKey)
+  }
+
+  async signTransactionBytes(msg: string): Promise<Signature> {
+    return await signTransactionBytes(this.#privateKey, arrayify(msg))
   }
 
   async pubKey(): Promise<string> {

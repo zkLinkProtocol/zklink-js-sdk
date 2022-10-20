@@ -60,10 +60,4 @@ describe('Wallet with mock provider', function () {
     expect(await wallet.getBalance('USDC', 0), 'getBalance call was expected to undefined').to.be
       .undefined
   })
-
-  // it("Wallet's signing key checking", async function () {
-  //   const key = new Uint8Array(new Array(32).fill(60))
-  //   const wallet = await getWallet(key, 'mainnet')
-  //   expect(await wallet.isSigningKeySet()).eq(true, "Wallet's signing key is unset")
-  // })
 })
