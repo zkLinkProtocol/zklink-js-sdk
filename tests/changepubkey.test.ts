@@ -1,17 +1,7 @@
 import { expect } from 'chai'
-import { BigNumber, ethers } from 'ethers'
-import { parseEther, sha256 } from 'ethers/lib/utils'
 import { _TypedDataEncoder } from '@ethersproject/hash'
 import { describe } from 'mocha'
-import {
-  closestPackableTransactionAmount,
-  serializeOrder,
-  serializeOrderMatching,
-  signMessageEIP712,
-} from '../src/utils'
 import { JsonRpcProvider } from '@ethersproject/providers'
-import { getTestProvider } from './provider.test'
-import { Wallet } from '../src'
 import { getWallet } from './wallet.test'
 
 const PolygonProvider = new JsonRpcProvider('https://matic-mumbai.chainstacklabs.com', {

@@ -55,26 +55,6 @@ describe('Order', () => {
     )
   })
 
-  it('serialize order matching', async () => {
-    const serialized = await serializeOrderMatching({
-      type: 'OrderMatching',
-      accountId: 2,
-      account: '0xd5bda4d1f6b875b0f96397cf995f4251b77a9104',
-      fee: BigNumber.from('0'),
-      feeToken: 1,
-      nonce: 0,
-      expectBaseAmount: BigNumber.from('500000000000000000'),
-      expectQuoteAmount: BigNumber.from('5000000000000000000'),
-      maker: orderMaker as any,
-      taker: orderTaker as any,
-    })
-
-    expect(Buffer.from(serialized).toString('hex')).eq(
-      '0b00000002d5bda4d1f6b875b0f96397cf995f4251b77a9104614a5454366e364c70c226f5d95029f2d665cebc05b001c55376c6b9914cff00010000000000000000000006f05b59d3b2000000000000000000004563918244f40000',
-      'order matching hex is incorrect'
-    )
-  })
-
   it('sign sync order', async function () {
     const wallet = await getWallet()
     const signedTransaction = await wallet.signSyncOrder(orderMaker as any)

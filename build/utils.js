@@ -701,7 +701,7 @@ function serializeOrderMatching(matching) {
         const ordersHash = yield (0, zksync_crypto_1.rescueHashOrders)(ordersBytes);
         const type = new Uint8Array([11]);
         const accountIdBytes = serializeAccountId(matching.accountId);
-        const accountBytes = serializeAddress(matching.account);
+        const subAccountIdBytes = serializeSubAccountId(matching.subAccountId);
         const feeTokenBytes = serializeTokenId(matching.feeToken);
         const feeBytes = serializeFeePacked(matching.fee);
         const expectBaseAmountBytes = serializeAmountFull(matching.expectBaseAmount);
@@ -709,7 +709,7 @@ function serializeOrderMatching(matching) {
         return ethers_1.ethers.utils.concat([
             type,
             accountIdBytes,
-            accountBytes,
+            subAccountIdBytes,
             ordersHash,
             feeTokenBytes,
             feeBytes,

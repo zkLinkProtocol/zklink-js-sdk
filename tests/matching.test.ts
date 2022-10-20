@@ -19,6 +19,7 @@ describe('matching', () => {
     const data = {
       fee: '0',
       type: 'OrderMatching',
+      subAccountId: 1,
       maker: {
         nonce: 1,
         price: '1500000000000000000',
@@ -87,7 +88,7 @@ describe('matching', () => {
     const serialized = await serializeOrderMatching(data as any)
 
     expect(Buffer.from(serialized).toString('hex')).to.eq(
-      '0b000000063498f456645270ee003441df82c718b56c0e6666f99c088c238aa3ee951c48ce736a411289336a4e3226b525bf0d511655249d0001000000000000000000000de0b6b3a7640000000000000000000014d1120d7b160000',
+      '0b0000000601f99c088c238aa3ee951c48ce736a411289336a4e3226b525bf0d511655249d0001000000000000000000000de0b6b3a7640000000000000000000014d1120d7b160000',
       'serialized order matching is incorrect'
     )
 
@@ -95,7 +96,7 @@ describe('matching', () => {
     const { tx } = signedTransaction as any
     // wrong l2 signature: 46ab809c4a5beacfd423bb05332e818fb65d4d570939852206565c9a22adad8a3c3b4e69832c93f5b54b317bebcb44292bce5142f4bfa39f1b51a1cadcacae03
     expect(tx.signature.signature).to.eq(
-      'a3694c4d6b09ef559782edd507d5a7daa7e000ad56060522b86ed42b222ca7128609ccddae7f01bd7760023a5c902e2afd0f93027c1803f7084af8d91c5eec05',
+      'bb34cdfe08796230a2c44a24cbea525cd191bea4e42652ec38f9c6b49d790022147bcb006b1ae55e6dd27c874331f26686251746b6b42aa246e98975d2f73305',
       'order matching signature is incorrect'
     )
   })

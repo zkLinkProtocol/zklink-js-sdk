@@ -272,6 +272,7 @@ export interface Order {
 export interface OrderMatching {
   type: 'OrderMatching'
   accountId: number
+  subAccountId: number
   account: Address
   taker: Order
   maker: Order

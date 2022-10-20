@@ -798,7 +798,7 @@ export async function serializeOrderMatching(matching: OrderMatching): Promise<U
 
   const type = new Uint8Array([11])
   const accountIdBytes = serializeAccountId(matching.accountId)
-  const accountBytes = serializeAddress(matching.account)
+  const subAccountIdBytes = serializeSubAccountId(matching.subAccountId)
   const feeTokenBytes = serializeTokenId(matching.feeToken)
   const feeBytes = serializeFeePacked(matching.fee)
   const expectBaseAmountBytes = serializeAmountFull(matching.expectBaseAmount)
@@ -806,7 +806,7 @@ export async function serializeOrderMatching(matching: OrderMatching): Promise<U
   return ethers.utils.concat([
     type,
     accountIdBytes,
-    accountBytes,
+    subAccountIdBytes,
     ordersHash,
     feeTokenBytes,
     feeBytes,

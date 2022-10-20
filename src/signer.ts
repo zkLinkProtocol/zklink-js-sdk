@@ -51,6 +51,7 @@ export class Signer {
 
   async signSyncOrderMatching(matching: {
     accountId: number
+    subAccountId: number
     account: Address
     taker: Order
     maker: Order

@@ -38,6 +38,7 @@ export declare class Wallet {
     }): Promise<SignedTransaction>;
     getOrderMatching(matching: {
         accountId: number;
+        subAccountId: number;
         account: Address;
         taker: Order;
         maker: Order;
@@ -49,6 +50,7 @@ export declare class Wallet {
     }): Promise<OrderMatching>;
     signSyncOrderMatching(matching: {
         accountId: number;
+        subAccountId: number;
         account: Address;
         taker: any;
         maker: any;

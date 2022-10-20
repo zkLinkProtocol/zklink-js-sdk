@@ -165,6 +165,7 @@ class Wallet {
             const feeTokenId = this.provider.tokenSet.resolveTokenId(matching.feeToken);
             const transactionData = {
                 accountId: matching.accountId,
+                subAccountId: matching.subAccountId,
                 account: matching.account,
                 taker: matching.taker,
                 maker: matching.maker,

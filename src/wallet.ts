@@ -239,6 +239,7 @@ export class Wallet {
 
   async getOrderMatching(matching: {
     accountId: number
+    subAccountId: number
     account: Address
     taker: Order
     maker: Order
@@ -257,6 +258,7 @@ export class Wallet {
     const feeTokenId = this.provider.tokenSet.resolveTokenId(matching.feeToken)
     const transactionData = {
       accountId: matching.accountId,
+      subAccountId: matching.subAccountId,
       account: matching.account,
       taker: matching.taker,
       maker: matching.maker,
@@ -272,6 +274,7 @@ export class Wallet {
 
   async signSyncOrderMatching(matching: {
     accountId: number
+    subAccountId: number
     account: Address
     taker: any
     maker: any

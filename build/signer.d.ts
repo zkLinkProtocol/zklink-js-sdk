@@ -8,6 +8,7 @@ export declare class Signer {
     signSyncTransfer(tx: Transfer): Promise<Transfer>;
     signSyncOrderMatching(matching: {
         accountId: number;
+        subAccountId: number;
         account: Address;
         taker: Order;
         maker: Order;
