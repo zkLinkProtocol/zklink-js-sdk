@@ -4,6 +4,7 @@ import {
   AccountBalances,
   AccountState,
   Address,
+  BlockInfo,
   ContractInfo,
   PriorityOperationReceipt,
   Tokens,
@@ -45,6 +46,7 @@ export class Provider {
       provider.pollIntervalMilliSecs = pollIntervalMilliSecs
     }
     provider.tokenSet = new TokenSet(await provider.getTokens())
+    await provider.getContractInfo()
     return provider
   }
 
@@ -75,7 +77,7 @@ export class Provider {
     return await this.transport.request('tx_submit', [tx, signature])
   }
 
-  async getContractInfo(linkChainId: number): Promise<ContractInfo> {
+  async getContractInfo(linkChainId?: number): Promise<ContractInfo> {
     if (!this.contractInfo) {
       this.contractInfo = await this.transport.request('get_support_chains', [])
     }
@@ -101,8 +103,17 @@ export class Provider {
     return await this.transport.request('account_info_by_id', [accountId])
   }
 
-  async getBalance(accountId: number, subAccountId: number): Promise<AccountBalances> {
-    return await this.transport.request('account_balances', [accountId, subAccountId])
+  async getBalance(accountId: number, subAccountId?: number): Promise<AccountBalances> {
+    const params = []
+    if (accountId) {
+      params.push(accountId)
+    }
+    if (typeof subAccountId === 'number') {
+      params.push(subAccountId)
+    } else {
+      params.push(null)
+    }
+    return await this.transport.request('account_balances', [...params])
   }
 
   async getSubAccountState(address: Address, subAccountId: number): Promise<AccountState> {
@@ -119,6 +130,15 @@ export class Provider {
     serialId: number
   ): Promise<PriorityOperationReceipt> {
     return await this.transport.request('ethop_info', [linkChainId, serialId])
+  }
+
+  async getBlockInfo(): Promise<{
+    lastBlockNumber: number
+    timestamp: number
+    committed: number
+    verified: number
+  }> {
+    return await this.transport.request('block_info', [])
   }
 
   async notifyPriorityOp(

@@ -43,7 +43,7 @@ export declare function closestGreaterOrEqPackableTransactionFee(fee: BigNumberi
 export declare function isTransactionFeePackable(amount: BigNumberish): boolean;
 export declare function buffer2bitsBE(buff: any): any[];
 export declare function sleep(ms: number): Promise<unknown>;
-export declare function isTokenETH(token: TokenLike): boolean;
+export declare function isTokenETH(token: TokenAddress): boolean;
 declare type TokenOrId = TokenLike | number;
 export declare class TokenSet {
     private tokensById;
@@ -58,7 +58,7 @@ export declare class TokenSet {
     resolveTokenAddress(tokenLike: TokenOrId, chainId: ChainId): TokenAddress;
     resolveTokenSymbol(tokenLike: TokenOrId): TokenSymbol;
 }
-export declare function getChangePubkeyMessage(pubKeyHash: PubKeyHash, nonce: number, accountId: number, verifyingContract: string, chainId: number, domainName?: string, version?: string): any;
+export declare function getChangePubkeyMessage(pubKeyHash: PubKeyHash, nonce: number, accountId: number, verifyingContract: string, layerOneChainId: number, domainName?: string, version?: string): any;
 export declare function getSignedBytesFromMessage(message: utils.BytesLike | string, addPrefix: boolean): Uint8Array;
 export declare function signMessagePersonalAPI(signer: ethers.Signer, message: Uint8Array): Promise<string>;
 export declare function signMessageEIP712(signer: any, data: any): Promise<string>;
@@ -98,7 +98,7 @@ export declare function getCREATE2AddressAndSalt(syncPubkeyHash: string, create2
     salt: string;
     address: string;
 };
-export declare function getEthereumBalance(ethProvider: ethers.providers.Provider, syncProvider: Provider, address: Address, token: TokenLike, chainId: ChainId): Promise<BigNumber>;
+export declare function getEthereumBalance(ethProvider: ethers.providers.Provider, syncProvider: Provider, address: Address, token: TokenAddress, chainId: ChainId): Promise<BigNumber>;
 export declare function getPendingBalance(ethProvider: ethers.providers.Provider, syncProvider: Provider, address: Address, token: TokenLike, chainId: ChainId): Promise<BigNumberish>;
 export declare function getTxHash(tx: Transfer | Withdraw | ChangePubKey | ForcedExit | CloseAccount): string;
 export declare function getRandom(min: number, max: number): number;

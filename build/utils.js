@@ -286,8 +286,7 @@ function sleep(ms) {
 }
 exports.sleep = sleep;
 function isTokenETH(token) {
-    return (token === 'ETH' ||
-        token === ethers_1.constants.AddressZero ||
+    return (token === ethers_1.constants.AddressZero ||
         '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase() === token.toLowerCase());
 }
 exports.isTokenETH = isTokenETH;
@@ -342,7 +341,7 @@ class TokenSet {
     }
 }
 exports.TokenSet = TokenSet;
-function getChangePubkeyMessage(pubKeyHash, nonce, accountId, verifyingContract, chainId, domainName = 'ZkLink', version = '1') {
+function getChangePubkeyMessage(pubKeyHash, nonce, accountId, verifyingContract, layerOneChainId, domainName = 'ZkLink', version = '1') {
     const domainType = [
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
@@ -358,7 +357,7 @@ function getChangePubkeyMessage(pubKeyHash, nonce, accountId, verifyingContract,
     const domain = {
         name: domainName,
         version,
-        chainId,
+        chainId: layerOneChainId,
         verifyingContract,
     };
     // The named list of all type definitions
@@ -612,21 +611,21 @@ function serializeTransfer(transfer) {
 exports.serializeTransfer = serializeTransfer;
 function serializeChangePubKey(changePubKey) {
     const type = new Uint8Array([6]);
-    const linkChainIdBytes = serializeChainId(changePubKey.linkChainId);
+    const chainIdBytes = serializeChainId(changePubKey.chainId);
     const subAccountIdBytes = serializeSubAccountId(changePubKey.subAccountId);
     const accountIdBytes = serializeAccountId(changePubKey.accountId);
     const pubKeyHashBytes = serializeAddress(changePubKey.newPkHash);
-    const tokenIdBytes = serializeTokenId(changePubKey.feeToken);
+    const feeTokenIdBytes = serializeTokenId(changePubKey.feeToken);
     const feeBytes = serializeFeePacked(changePubKey.fee);
     const nonceBytes = serializeNonce(changePubKey.nonce);
     const tsBytes = numberToBytesBE(changePubKey.ts, 4);
     return ethers_1.ethers.utils.concat([
         type,
-        linkChainIdBytes,
+        chainIdBytes,
         accountIdBytes,
         subAccountIdBytes,
         pubKeyHashBytes,
-        tokenIdBytes,
+        feeTokenIdBytes,
         feeBytes,
         nonceBytes,
         tsBytes,
@@ -788,7 +787,7 @@ function getEthereumBalance(ethProvider, syncProvider, address, token, chainId) 
             balance = yield ethProvider.getBalance(address);
         }
         else {
-            const erc20contract = new ethers_1.Contract(syncProvider.tokenSet.resolveTokenAddress(token, chainId), exports.IERC20_INTERFACE, ethProvider);
+            const erc20contract = new ethers_1.Contract(token, exports.IERC20_INTERFACE, ethProvider);
             balance = yield erc20contract.balanceOf(address);
         }
         return balance;

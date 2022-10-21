@@ -21,6 +21,7 @@ import {
   Order,
   OrderMatching,
   Signature,
+  TokenId,
 } from './types'
 import { arrayify } from 'ethers/lib/utils'
 
@@ -132,12 +133,12 @@ export class Signer {
   }
 
   async signSyncChangePubKey(changePubKey: {
-    linkChainId: number
+    chainId: number
     subAccountId: number
     accountId: number
     account: Address
     newPkHash: PubKeyHash
-    feeTokenId: number
+    feeToken: TokenId
     fee: BigNumberish
     ts: number
     nonce: number
@@ -146,8 +147,6 @@ export class Signer {
     const tx: ChangePubKey = {
       ...changePubKey,
       type: 'ChangePubKey',
-      feeToken: changePubKey.feeTokenId,
-      chainId: changePubKey.linkChainId,
     }
     const msgBytes = utils.serializeChangePubKey(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)

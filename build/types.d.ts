@@ -55,7 +55,7 @@ export interface Transfer {
     toSubAccountId: number;
     from: Address;
     to: Address;
-    token: number;
+    token: TokenId;
     amount: BigNumberish;
     fee: BigNumberish;
     ts: number;
@@ -111,9 +111,8 @@ export interface ChangePubKeyCREATE2 {
 }
 export interface ChangePubKey {
     type: 'ChangePubKey';
-    linkChainId: number;
-    subAccountId: number;
     chainId: number;
+    subAccountId: number;
     accountId: number;
     account: Address;
     newPkHash: PubKeyHash;

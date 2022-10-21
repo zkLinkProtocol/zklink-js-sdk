@@ -24,15 +24,21 @@ export declare class Provider {
         signature?: TxEthSignature;
         fastProcessing?: boolean;
     }): Promise<string>;
-    getContractInfo(linkChainId: number): Promise<ContractInfo>;
+    getContractInfo(linkChainId?: number): Promise<ContractInfo>;
     getTokens(): Promise<Tokens>;
     updateTokenSet(): Promise<void>;
     getState(address: Address): Promise<AccountState>;
     getStateById(accountId: number): Promise<AccountState>;
-    getBalance(accountId: number, subAccountId: number): Promise<AccountBalances>;
+    getBalance(accountId: number, subAccountId?: number): Promise<AccountBalances>;
     getSubAccountState(address: Address, subAccountId: number): Promise<AccountState>;
     getTxReceipt(txHash: string): Promise<TransactionReceipt>;
     getPriorityOpStatus(linkChainId: number, serialId: number): Promise<PriorityOperationReceipt>;
+    getBlockInfo(): Promise<{
+        lastBlockNumber: number;
+        timestamp: number;
+        committed: number;
+        verified: number;
+    }>;
     notifyPriorityOp(linkChainId: number, serialId: number, action: 'COMMIT' | 'VERIFY'): Promise<PriorityOperationReceipt>;
     notifyTransaction(hash: string, action: 'COMMIT' | 'VERIFY'): Promise<TransactionReceipt>;
     getTransactionFee(tx: any): Promise<BigNumber>;

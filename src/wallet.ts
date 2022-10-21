@@ -29,6 +29,7 @@ import {
   TokenSymbol,
   TokenAddress,
   OrderMatching,
+  AccountBalances,
 } from './types'
 import {
   IERC20_INTERFACE,
@@ -45,6 +46,7 @@ import {
   signMessageEIP712,
 } from './utils'
 import { LinkContract } from './contract'
+import { isAddress, parseEther } from 'ethers/lib/utils'
 
 const EthersErrorCode = ErrorCode
 
@@ -70,7 +72,6 @@ export class Wallet {
 
   connect(provider: Provider) {
     this.provider = provider
-
     this.contract = new LinkContract(provider, this.ethSigner)
     return this
   }
@@ -186,12 +187,12 @@ export class Wallet {
     fromSubAccountId: number
     toSubAccountId: number
     to: Address
-    token: TokenLike
+    token: TokenId
     amount: BigNumberish
     fee: BigNumberish
     accountId: number
-    ts?: number
     nonce: number
+    ts?: number
   }): Promise<SignedTransaction> {
     const transactionData: Transfer = {
       type: 'Transfer',
@@ -208,11 +209,14 @@ export class Wallet {
     }
 
     if (transactionData.fee == null) {
-      transactionData.fee = await this.provider.getTransactionFee(transactionData)
+      transactionData.fee = await this.provider.getTransactionFee({
+        ...transactionData,
+        fee: '0',
+        amount: BigNumber.from(transactionData.amount).toString(),
+      })
     }
 
     const signedTransferTransaction = await this.getTransfer(transactionData)
-
     const stringAmount = BigNumber.from(transactionData.amount).isZero()
       ? null
       : utils.formatEther(transactionData.amount)
@@ -281,7 +285,7 @@ export class Wallet {
     expectBaseAmount: BigNumberish
     expectQuoteAmount: BigNumberish
     fee: BigNumberish
-    feeToken: TokenLike
+    feeToken: TokenId
     ts?: number
     nonce: number
   }): Promise<SignedTransaction> {
@@ -317,9 +321,9 @@ export class Wallet {
     target: Address
     targetSubAccountId: number
     initiatorSubAccountId: number
-    l2SourceToken: TokenLike
-    l1TargetToken: TokenLike
-    feeToken: TokenLike
+    l2SourceToken: TokenId
+    l1TargetToken: TokenId
+    feeToken: TokenId
     fee?: BigNumberish
     ts?: number
     nonce: number
@@ -340,7 +344,10 @@ export class Wallet {
     }
 
     if (transactionData.fee == null) {
-      transactionData.fee = await this.provider.getTransactionFee(transactionData)
+      transactionData.fee = await this.provider.getTransactionFee({
+        ...transactionData,
+        fee: '0',
+      })
     }
 
     const signedForcedExitTransaction = await this.getForcedExit(transactionData)
@@ -372,10 +379,9 @@ export class Wallet {
     targetSubAccountId: number
     initiatorSubAccountId: number
     toChainId: ChainId
-    subAccountId: number
-    l2SourceToken: TokenLike
-    l1TargetToken: TokenLike
-    feeToken: TokenLike
+    l2SourceToken: TokenId
+    l1TargetToken: TokenId
+    feeToken: TokenId
     ts?: number
     fee?: BigNumberish
     nonce?: Nonce
@@ -390,7 +396,7 @@ export class Wallet {
     fromSubAccountId: number
     toSubAccountId: number
     to: Address
-    token: TokenLike
+    token: TokenId
     amount: BigNumberish
     ts?: number
     fee?: BigNumberish
@@ -427,12 +433,12 @@ export class Wallet {
     return await this.signer.signSyncWithdraw(tx)
   }
 
-  async signWithdrawFromSyncToEthereum(withdraw: {
-    toChainId: number
+  async signWithdrawToEthereum(withdraw: {
+    toChainId: ChainId
     subAccountId: number
     to: string
-    l2SourceToken: TokenLike
-    l1TargetToken: TokenLike
+    l2SourceToken: TokenId
+    l1TargetToken: TokenId
     amount: BigNumberish
     fee: BigNumberish
     withdrawFeeRatio: number
@@ -459,17 +465,23 @@ export class Wallet {
     }
 
     if (transactionData.fee == null) {
-      transactionData.fee = await this.provider.getTransactionFee(transactionData)
+      transactionData.fee = await this.provider.getTransactionFee({
+        ...transactionData,
+        fee: '0',
+        amount: BigNumber.from(transactionData.amount).toString(),
+      })
     }
 
     const signedWithdrawTransaction = await this.getWithdrawFromSyncToEthereum(transactionData)
 
-    const stringAmount = BigNumber.from(withdraw.amount).isZero()
+    const stringAmount = BigNumber.from(transactionData.amount).isZero()
       ? null
-      : utils.formatEther(withdraw.amount)
-    const stringFee = BigNumber.from(withdraw.fee).isZero() ? null : utils.formatEther(withdraw.fee)
+      : utils.formatEther(transactionData.amount)
+    const stringFee = BigNumber.from(transactionData.fee).isZero()
+      ? null
+      : utils.formatEther(transactionData.fee)
 
-    const stringToken = this.provider.tokenSet.resolveTokenSymbol(withdraw.l2SourceToken)
+    const stringToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.l2SourceToken)
     const ethereumSignature =
       this.ethSigner instanceof Create2WalletSigner
         ? null
@@ -477,9 +489,9 @@ export class Wallet {
             stringAmount,
             stringFee,
             stringToken,
-            to: withdraw.to,
-            nonce: withdraw.nonce,
-            accountId: withdraw.accountId || this.accountId,
+            to: transactionData.to,
+            nonce: transactionData.nonce,
+            accountId: transactionData.accountId || this.accountId,
           })
 
     return {
@@ -488,12 +500,12 @@ export class Wallet {
     }
   }
 
-  async withdrawFromSyncToEthereum(withdraw: {
+  async withdrawToEthereum(withdraw: {
     toChainId: number
     subAccountId: number
     to: string
-    l2SourceToken: TokenLike
-    l1TargetToken: TokenLike
+    l2SourceToken: TokenId
+    l1TargetToken: TokenId
     amount: BigNumberish
     withdrawFeeRatio: number
     fastWithdraw: number
@@ -505,7 +517,7 @@ export class Wallet {
     withdraw.nonce =
       withdraw.nonce != null ? await this.getNonce(withdraw.nonce) : await this.getNonce()
 
-    const signedWithdrawTransaction = await this.signWithdrawFromSyncToEthereum(withdraw as any)
+    const signedWithdrawTransaction = await this.signWithdrawToEthereum(withdraw as any)
 
     return submitSignedTransaction(signedWithdrawTransaction, this.provider)
   }
@@ -520,9 +532,10 @@ export class Wallet {
   }
 
   async getChangePubKey(changePubKey: {
-    linkChainId: number
+    chainId: ChainId
     subAccountId: number
-    feeToken: TokenLike
+    feeToken: TokenId
+    newPkHash: string
     fee: BigNumberish
     nonce: number
     accountId?: number
@@ -533,22 +546,16 @@ export class Wallet {
       throw new Error('ZKLink signer is required for current pubkey calculation.')
     }
 
-    let feeTokenId =
-      changePubKey.feeToken === '' || changePubKey.feeToken === undefined
-        ? 1
-        : this.provider.tokenSet.resolveTokenId(changePubKey.feeToken)
-    const newPkHash = await this.signer.pubKeyHash()
-
     await this.setRequiredAccountIdFromServer('Set Signing Key')
 
     const changePubKeyTx: ChangePubKey = await this.signer.signSyncChangePubKey({
       accountId: changePubKey.accountId || this.accountId,
       subAccountId: changePubKey.subAccountId,
       account: this.address(),
-      linkChainId: changePubKey.linkChainId,
-      newPkHash,
+      chainId: changePubKey.chainId,
+      newPkHash: changePubKey.newPkHash,
       nonce: changePubKey.nonce,
-      feeTokenId,
+      feeToken: changePubKey.feeToken,
       fee: BigNumber.from(changePubKey.fee).toString(),
       ts: changePubKey.ts,
       ethAuthData: changePubKey.ethAuthData,
@@ -558,14 +565,14 @@ export class Wallet {
   }
 
   async signSetSigningKey(changePubKey: {
-    linkChainId: number
+    chainId: ChainId
     subAccountId: number
-    feeToken: TokenLike
+    feeToken: TokenId
     fee: BigNumberish
     nonce: number
     ethAuthType: ChangePubkeyTypes
     verifyingContract?: string
-    chainId?: number
+    layerOneChainId?: number
     domainName?: string
     version?: string
     accountId?: number
@@ -574,7 +581,7 @@ export class Wallet {
     changePubKey.ts = changePubKey.ts || getTimestamp()
     const newPubKeyHash = await this.signer.pubKeyHash()
     // request latest account id
-    changePubKey.accountId = await this.getAccountId()
+    changePubKey.accountId = changePubKey.accountId || (await this.getAccountId())
 
     let ethAuthData
     if (changePubKey.ethAuthType === 'Onchain') {
@@ -583,26 +590,27 @@ export class Wallet {
       }
     } else if (changePubKey.ethAuthType === 'ECDSA') {
       await this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSA.')
-      const contractInfo = await this.provider.getContractInfo(changePubKey.linkChainId)
+      const contractInfo = await this.provider.getContractInfo(changePubKey.chainId)
+
       const changePubKeySignData = getChangePubkeyMessage(
         newPubKeyHash,
         changePubKey.nonce,
         changePubKey.accountId || this.accountId,
         changePubKey.verifyingContract || contractInfo.mainContract,
-        changePubKey.chainId || contractInfo.layerOneChainId,
+        changePubKey.layerOneChainId || contractInfo.layerOneChainId,
         changePubKey.domainName,
         changePubKey.version
       )
       const ethSignature = (await this.getEIP712Signature(changePubKeySignData)).signature
       ethAuthData = {
-        type: 'ECDSA',
+        type: 'EthECDSA',
         ethSignature,
       }
     } else if (changePubKey.ethAuthType === 'CREATE2') {
       if (this.ethSigner instanceof Create2WalletSigner) {
         const create2data = this.ethSigner.create2WalletData
         ethAuthData = {
-          type: 'CREATE2',
+          type: 'EthCREATE2',
           creatorAddress: create2data.creatorAddress,
           saltArg: create2data.saltArg,
           codeHash: create2data.codeHash,
@@ -614,21 +622,36 @@ export class Wallet {
       throw new Error('Unsupported SetSigningKey type')
     }
 
-    const changePubkeyTxUnsigned = Object.assign(changePubKey, { ethAuthData })
-    const changePubKeyTx = await this.getChangePubKey(changePubkeyTxUnsigned as any)
+    const changePubkeyTxUnsigned = Object.assign(
+      changePubKey,
+      {
+        type: 'ChangePubKey',
+        newPkHash: await this.signer.pubKeyHash(),
+      },
+      { ethAuthData }
+    )
 
+    if (changePubkeyTxUnsigned.fee == null) {
+      changePubkeyTxUnsigned.fee = await this.provider.getTransactionFee({
+        ...changePubkeyTxUnsigned,
+        fee: '0',
+      })
+    }
+
+    const changePubKeyTx = await this.getChangePubKey(changePubkeyTxUnsigned as any)
+    console.log({ changePubKeyTx })
     return {
       tx: changePubKeyTx,
     }
   }
 
   async setSigningKey(changePubKey: {
-    linkChainId: number
-    subAccountId: number
-    feeToken: TokenLike
-    ethAuthType: ChangePubkeyTypes
     chainId: number
-    verifyingContract: Address
+    subAccountId: number
+    feeToken: TokenId
+    ethAuthType: ChangePubkeyTypes
+    verifyingContract?: Address
+    accountId?: number
     domainName?: string
     version?: string
     fee?: BigNumberish
@@ -728,9 +751,12 @@ export class Wallet {
     return this.provider.getSubAccountState(this.address(), subAccountId)
   }
 
-  async getBalance(token: TokenLike, subAccountId: number): Promise<BigNumber> {
-    const balances = await this.provider.getBalance(this.accountId, subAccountId)
-    const tokenId = this.provider.tokenSet.resolveTokenId(token)
+  async getBalances(subAccountId?: number): Promise<AccountBalances> {
+    return await this.provider.getBalance(this.accountId, subAccountId)
+  }
+
+  async getTokenBalance(tokenId: TokenId, subAccountId: number) {
+    const balances = this.getBalances()
     let balance = balances[subAccountId][tokenId]
     return balance ? BigNumber.from(balance) : undefined
   }
@@ -764,7 +790,7 @@ export class Wallet {
     }
   }
 
-  async depositToSyncFromEthereum(deposit: {
+  async depositFromEthereum(deposit: {
     subAccountId: number
     depositTo: Address
     token: TokenAddress
@@ -778,6 +804,10 @@ export class Wallet {
     const mainZkSyncContract = await this.getZkSyncMainContract(deposit.linkChainId)
 
     let ethTransaction
+
+    if (!isAddress(deposit.token)) {
+      throw new Error('Token address is invalid')
+    }
 
     if (isTokenETH(deposit.token)) {
       try {

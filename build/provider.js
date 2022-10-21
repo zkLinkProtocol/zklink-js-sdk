@@ -39,6 +39,7 @@ class Provider {
                 provider.pollIntervalMilliSecs = pollIntervalMilliSecs;
             }
             provider.tokenSet = new utils_1.TokenSet(yield provider.getTokens());
+            yield provider.getContractInfo();
             return provider;
         });
     }
@@ -93,7 +94,17 @@ class Provider {
     }
     getBalance(accountId, subAccountId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('account_balances', [accountId, subAccountId]);
+            const params = [];
+            if (accountId) {
+                params.push(accountId);
+            }
+            if (typeof subAccountId === 'number') {
+                params.push(subAccountId);
+            }
+            else {
+                params.push(null);
+            }
+            return yield this.transport.request('account_balances', [...params]);
         });
     }
     getSubAccountState(address, subAccountId) {
@@ -110,6 +121,11 @@ class Provider {
     getPriorityOpStatus(linkChainId, serialId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.transport.request('ethop_info', [linkChainId, serialId]);
+        });
+    }
+    getBlockInfo() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.transport.request('block_info', []);
         });
     }
     notifyPriorityOp(linkChainId, serialId, action) {

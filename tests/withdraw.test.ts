@@ -32,7 +32,7 @@ describe('withdraw', () => {
   it('withdrawFromSyncToEthereum', async function () {
     const wallet = await getWallet()
 
-    const transaction = await wallet.withdrawFromSyncToEthereum({
+    const transaction = await wallet.withdrawToEthereum({
       toChainId: 2,
       accountId: 1,
       subAccountId: 1,

@@ -46,7 +46,7 @@ describe('Wallet with mock provider', function () {
   it('Wallet has expected committed balances', async function () {
     const key = new Uint8Array(new Array(32).fill(40))
     const wallet = await getWallet(key, 'mainnet')
-    const balance = await wallet.getBalance('USD', 0)
+    const balance = await wallet.getTokenBalance(1, 0)
     expect(balance).eql(
       BigNumber.from(12345),
       "Wallet's committed balance does not match the hardcoded mock value"
@@ -57,7 +57,7 @@ describe('Wallet with mock provider', function () {
     const key = new Uint8Array(new Array(32).fill(40))
     const wallet = await getWallet(key, 'mainnet')
 
-    expect(await wallet.getBalance('USDC', 0), 'getBalance call was expected to undefined').to.be
+    expect(await wallet.getTokenBalance(17, 0), 'getBalance call was expected to undefined').to.be
       .undefined
   })
 })

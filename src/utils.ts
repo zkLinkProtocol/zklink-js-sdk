@@ -17,6 +17,7 @@ import {
   Order,
   ChainId,
   OrderMatching,
+  TokenId,
 } from './types'
 
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
@@ -335,9 +336,8 @@ export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-export function isTokenETH(token: TokenLike): boolean {
+export function isTokenETH(token: TokenAddress): boolean {
   return (
-    token === 'ETH' ||
     token === constants.AddressZero ||
     '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase() === token.toLowerCase()
   )
@@ -409,7 +409,7 @@ export function getChangePubkeyMessage(
   nonce: number,
   accountId: number,
   verifyingContract: string,
-  chainId: number,
+  layerOneChainId: number,
   domainName: string = 'ZkLink',
   version: string = '1'
 ): any {
@@ -428,7 +428,7 @@ export function getChangePubkeyMessage(
   const domain = {
     name: domainName,
     version,
-    chainId,
+    chainId: layerOneChainId,
     verifyingContract,
   }
   // The named list of all type definitions
@@ -708,21 +708,21 @@ export function serializeTransfer(transfer: Transfer): Uint8Array {
 
 export function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array {
   const type = new Uint8Array([6])
-  const linkChainIdBytes = serializeChainId(changePubKey.linkChainId)
+  const chainIdBytes = serializeChainId(changePubKey.chainId)
   const subAccountIdBytes = serializeSubAccountId(changePubKey.subAccountId)
   const accountIdBytes = serializeAccountId(changePubKey.accountId)
   const pubKeyHashBytes = serializeAddress(changePubKey.newPkHash)
-  const tokenIdBytes = serializeTokenId(changePubKey.feeToken)
+  const feeTokenIdBytes = serializeTokenId(changePubKey.feeToken)
   const feeBytes = serializeFeePacked(changePubKey.fee)
   const nonceBytes = serializeNonce(changePubKey.nonce)
   const tsBytes = numberToBytesBE(changePubKey.ts, 4)
   return ethers.utils.concat([
     type,
-    linkChainIdBytes,
+    chainIdBytes,
     accountIdBytes,
     subAccountIdBytes,
     pubKeyHashBytes,
-    tokenIdBytes,
+    feeTokenIdBytes,
     feeBytes,
     nonceBytes,
     tsBytes,
@@ -897,18 +897,14 @@ export async function getEthereumBalance(
   ethProvider: ethers.providers.Provider,
   syncProvider: Provider,
   address: Address,
-  token: TokenLike,
+  token: TokenAddress,
   chainId: ChainId
 ): Promise<BigNumber> {
   let balance: BigNumber
   if (isTokenETH(token)) {
     balance = await ethProvider.getBalance(address)
   } else {
-    const erc20contract = new Contract(
-      syncProvider.tokenSet.resolveTokenAddress(token, chainId),
-      IERC20_INTERFACE,
-      ethProvider
-    )
+    const erc20contract = new Contract(token, IERC20_INTERFACE, ethProvider)
 
     balance = await erc20contract.balanceOf(address)
   }
