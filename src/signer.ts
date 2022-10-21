@@ -44,7 +44,7 @@ export class Signer {
     return await privateKeyToPubKey(this.#privateKey)
   }
 
-  async signSyncTransfer(tx: Transfer): Promise<Transfer> {
+  async signTransfer(tx: Transfer): Promise<Transfer> {
     const msgBytes = utils.serializeTransfer(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
 
@@ -56,23 +56,7 @@ export class Signer {
     }
   }
 
-  async signSyncOrderMatching(matching: {
-    accountId: number
-    subAccountId: number
-    account: Address
-    taker: Order
-    maker: Order
-    expectBaseAmount: BigNumberish
-    expectQuoteAmount: BigNumberish
-    fee: BigNumberish
-    feeTokenId: number
-    nonce: number
-  }): Promise<OrderMatching> {
-    const tx: OrderMatching = {
-      ...matching,
-      type: 'OrderMatching',
-      feeToken: matching.feeTokenId,
-    }
+  async signOrderMatching(tx: OrderMatching): Promise<OrderMatching> {
     const msgBytes = await utils.serializeOrderMatching(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
 
@@ -88,30 +72,26 @@ export class Signer {
         price: BigNumber.from(tx.taker.price).toString(),
         amount: BigNumber.from(tx.taker.amount).toString(),
       },
-      fee: BigNumber.from(matching.fee).toString(),
-      expectBaseAmount: BigNumber.from(matching.expectBaseAmount).toString(),
-      expectQuoteAmount: BigNumber.from(matching.expectQuoteAmount).toString(),
+      fee: BigNumber.from(tx.fee).toString(),
+      expectBaseAmount: BigNumber.from(tx.expectBaseAmount).toString(),
+      expectQuoteAmount: BigNumber.from(tx.expectQuoteAmount).toString(),
       signature,
     } as any
   }
 
-  async signSyncOrder(payload: Order): Promise<Order> {
-    const tx: Order = {
-      ...payload,
-      type: 'Order',
-    }
+  async signOrder(tx: Order): Promise<Order> {
     const msgBytes = utils.serializeOrder(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
 
     return {
       ...tx,
-      price: BigNumber.from(payload.price).toString(),
-      amount: BigNumber.from(payload.amount).toString(),
+      price: BigNumber.from(tx.price).toString(),
+      amount: BigNumber.from(tx.amount).toString(),
       signature,
     }
   }
 
-  async signSyncWithdraw(tx: Withdraw): Promise<Withdraw> {
+  async signWithdraw(tx: Withdraw): Promise<Withdraw> {
     const msgBytes = utils.serializeWithdraw(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
     return {
@@ -122,7 +102,7 @@ export class Signer {
     }
   }
 
-  async signSyncForcedExit(tx: ForcedExit): Promise<ForcedExit> {
+  async signForcedExit(tx: ForcedExit): Promise<ForcedExit> {
     const msgBytes = utils.serializeForcedExit(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
     return {
@@ -132,7 +112,7 @@ export class Signer {
     }
   }
 
-  async signSyncChangePubKey(changePubKey: {
+  async signChangePubKey(changePubKey: {
     chainId: number
     subAccountId: number
     accountId: number

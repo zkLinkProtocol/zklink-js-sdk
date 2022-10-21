@@ -155,57 +155,48 @@ export class Wallet {
     }
   }
 
-  async getEthMessageSignature(message: ethers.utils.BytesLike): Promise<TxEthSignature> {
-    if (this.ethSignerType == null) {
-      throw new Error('ethSignerType is unknown')
-    }
-
-    const signedBytes = getSignedBytesFromMessage(message, !this.ethSignerType.isSignedMsgPrefixed)
-
-    const signature = await signMessagePersonalAPI(this.ethSigner, signedBytes)
-
-    return {
-      type:
-        this.ethSignerType.verificationMethod === 'ECDSA'
-          ? 'EthereumSignature'
-          : 'EIP1271Signature',
-      signature,
-    }
-  }
-
-  async getTransfer(tx: Transfer): Promise<Transfer> {
-    if (!this.signer) {
-      throw new Error('ZKLink signer is required for sending zklink transactions.')
-    }
-
-    await this.setRequiredAccountIdFromServer('Transfer funds')
-
-    return this.signer.signSyncTransfer(tx)
-  }
-
-  async signSyncTransfer(transfer: {
+  async sendTransfer(transfer: {
     fromSubAccountId: number
     toSubAccountId: number
     to: Address
     token: TokenId
     amount: BigNumberish
-    fee: BigNumberish
+    ts?: number
+    fee?: BigNumberish
+    accountId?: number
+    nonce?: Nonce
+  }): Promise<Transaction> {
+    transfer.nonce =
+      transfer.nonce != null ? await this.getNonce(transfer.nonce) : await this.getNonce()
+
+    const signedTransferTransaction = await this.signTransfer(transfer as any)
+    return submitSignedTransaction(signedTransferTransaction, this.provider)
+  }
+
+  async signTransfer(transfer: {
+    fromSubAccountId: number
+    toSubAccountId: number
+    to: Address
+    token: TokenId
+    amount: BigNumberish
     accountId: number
     nonce: number
+    fee?: BigNumberish
     ts?: number
   }): Promise<SignedTransaction> {
+    if (!this.signer) {
+      throw new Error('ZKLink signer is required for sending zklink transactions.')
+    }
+    await this.setRequiredAccountIdFromServer('Transfer funds')
+
     const transactionData: Transfer = {
+      ...transfer,
       type: 'Transfer',
-      fromSubAccountId: transfer.fromSubAccountId,
-      toSubAccountId: transfer.toSubAccountId,
       accountId: transfer.accountId || this.accountId,
       from: this.address(),
-      to: transfer.to,
       token: this.provider.tokenSet.resolveTokenId(transfer.token),
-      amount: transfer.amount,
-      fee: transfer.fee,
+      fee: transfer.fee ? transfer.fee : null,
       ts: transfer.ts || getTimestamp(),
-      nonce: transfer.nonce,
     }
 
     if (transactionData.fee == null) {
@@ -216,7 +207,8 @@ export class Wallet {
       })
     }
 
-    const signedTransferTransaction = await this.getTransfer(transactionData)
+    const signedTransferTransaction = await this.signer.signTransfer(transactionData)
+
     const stringAmount = BigNumber.from(transactionData.amount).isZero()
       ? null
       : utils.formatEther(transactionData.amount)
@@ -241,82 +233,25 @@ export class Wallet {
     }
   }
 
-  async getOrderMatching(matching: {
-    accountId: number
-    subAccountId: number
-    account: Address
-    taker: Order
-    maker: Order
-    expectBaseAmount: BigNumberish
-    expectQuoteAmount: BigNumberish
-    fee: BigNumberish
-    feeToken: TokenLike
-    nonce: number
-  }): Promise<OrderMatching> {
-    if (!this.signer) {
-      throw new Error('ZKLink signer is required for sending zklink transactions.')
-    }
-
-    await this.setRequiredAccountIdFromServer('Transfer funds')
-
-    const feeTokenId = this.provider.tokenSet.resolveTokenId(matching.feeToken)
-    const transactionData = {
-      accountId: matching.accountId,
-      subAccountId: matching.subAccountId,
-      account: matching.account,
-      taker: matching.taker,
-      maker: matching.maker,
-      expectBaseAmount: matching.expectBaseAmount,
-      expectQuoteAmount: matching.expectQuoteAmount,
-      fee: matching.fee,
-      feeTokenId: feeTokenId,
-      nonce: matching.nonce,
-    }
-
-    return this.signer.signSyncOrderMatching(transactionData)
-  }
-
-  async signSyncOrderMatching(matching: {
-    accountId: number
-    subAccountId: number
-    account: Address
-    taker: any
-    maker: any
-    expectBaseAmount: BigNumberish
-    expectQuoteAmount: BigNumberish
-    fee: BigNumberish
+  async sendForcedExit(forcedExit: {
+    target: Address
+    targetSubAccountId: number
+    initiatorSubAccountId: number
+    toChainId: ChainId
+    l2SourceToken: TokenId
+    l1TargetToken: TokenId
     feeToken: TokenId
     ts?: number
-    nonce: number
-  }): Promise<SignedTransaction> {
-    const signedTransferTransaction = await this.getOrderMatching(matching as any)
-
-    const stringFee = BigNumber.from(matching.fee).isZero() ? null : utils.formatEther(matching.fee)
-    const stringFeeToken = this.provider.tokenSet.resolveTokenSymbol(matching.feeToken)
-    const ethereumSignature =
-      this.ethSigner instanceof Create2WalletSigner
-        ? null
-        : await this.ethMessageSigner.ethSignOrderMatching({
-            stringFee,
-            stringFeeToken,
-            nonce: matching.nonce,
-          })
-    return {
-      tx: signedTransferTransaction,
-      ethereumSignature,
-    }
+    fee?: BigNumberish
+    nonce?: Nonce
+  }): Promise<Transaction> {
+    forcedExit.nonce =
+      forcedExit.nonce != null ? await this.getNonce(forcedExit.nonce) : await this.getNonce()
+    const signedForcedExitTransaction = await this.signForcedExit(forcedExit as any)
+    return submitSignedTransaction(signedForcedExitTransaction, this.provider)
   }
 
-  async getForcedExit(tx: ForcedExit): Promise<ForcedExit> {
-    if (!this.signer) {
-      throw new Error('ZKLink signer is required for sending zklink transactions.')
-    }
-    await this.setRequiredAccountIdFromServer('perform a Forced Exit')
-
-    return await this.signer.signSyncForcedExit(tx)
-  }
-
-  async signSyncForcedExit(forcedExit: {
+  async signForcedExit(forcedExit: {
     toChainId: ChainId
     target: Address
     targetSubAccountId: number
@@ -324,23 +259,23 @@ export class Wallet {
     l2SourceToken: TokenId
     l1TargetToken: TokenId
     feeToken: TokenId
+    nonce: number
     fee?: BigNumberish
     ts?: number
-    nonce: number
   }): Promise<SignedTransaction> {
+    if (!this.signer) {
+      throw new Error('ZKLink signer is required for sending zklink transactions.')
+    }
+    await this.setRequiredAccountIdFromServer('perform a Forced Exit')
     const transactionData: ForcedExit = {
+      ...forcedExit,
       type: 'ForcedExit',
-      toChainId: forcedExit.toChainId,
       initiatorAccountId: this.accountId,
-      initiatorSubAccountId: forcedExit.initiatorSubAccountId,
-      target: forcedExit.target,
-      targetSubAccountId: forcedExit.targetSubAccountId,
       l2SourceToken: this.provider.tokenSet.resolveTokenId(forcedExit.l2SourceToken),
       l1TargetToken: this.provider.tokenSet.resolveTokenId(forcedExit.l1TargetToken),
       feeToken: this.provider.tokenSet.resolveTokenId(forcedExit.feeToken),
-      fee: forcedExit.fee,
+      fee: forcedExit.fee ? forcedExit.fee : null,
       ts: forcedExit.ts || getTimestamp(),
-      nonce: forcedExit.nonce,
     }
 
     if (transactionData.fee == null) {
@@ -350,7 +285,7 @@ export class Wallet {
       })
     }
 
-    const signedForcedExitTransaction = await this.getForcedExit(transactionData)
+    const signedForcedExitTransaction = await this.signer.signForcedExit(transactionData)
 
     const stringFee = BigNumber.from(transactionData.fee).isZero()
       ? null
@@ -374,50 +309,11 @@ export class Wallet {
     }
   }
 
-  async syncForcedExit(forcedExit: {
-    target: Address
-    targetSubAccountId: number
-    initiatorSubAccountId: number
-    toChainId: ChainId
-    l2SourceToken: TokenId
-    l1TargetToken: TokenId
-    feeToken: TokenId
-    ts?: number
-    fee?: BigNumberish
-    nonce?: Nonce
-  }): Promise<Transaction> {
-    forcedExit.nonce =
-      forcedExit.nonce != null ? await this.getNonce(forcedExit.nonce) : await this.getNonce()
-    const signedForcedExitTransaction = await this.signSyncForcedExit(forcedExit as any)
-    return submitSignedTransaction(signedForcedExitTransaction, this.provider)
-  }
-
-  async syncTransfer(transfer: {
-    fromSubAccountId: number
-    toSubAccountId: number
-    to: Address
-    token: TokenId
-    amount: BigNumberish
-    ts?: number
-    fee?: BigNumberish
-    accountId?: number
-    nonce?: Nonce
-  }): Promise<Transaction> {
-    transfer.nonce =
-      transfer.nonce != null ? await this.getNonce(transfer.nonce) : await this.getNonce()
-
-    const signedTransferTransaction = await this.signSyncTransfer(transfer as any)
-    return submitSignedTransaction(signedTransferTransaction, this.provider)
-  }
-
-  async getOrder(payload: Order): Promise<Order> {
+  async signOrder(payload: Order): Promise<SignedTransaction> {
     if (!this.signer) {
       throw new Error('zkLink signer is required for sending zkLink transactions.')
     }
-    return this.signer.signSyncOrder(payload as any)
-  }
-  async signSyncOrder(payload: Order): Promise<SignedTransaction> {
-    const signedTransferTransaction = await this.getOrder(payload as any)
+    const signedTransferTransaction = await this.signer.signOrder(payload as any)
 
     return {
       tx: signedTransferTransaction,
@@ -425,12 +321,70 @@ export class Wallet {
     }
   }
 
-  async getWithdrawFromSyncToEthereum(tx: Withdraw): Promise<Withdraw> {
+  async signOrderMatching(matching: {
+    accountId: number
+    subAccountId: number
+    account: Address
+    taker: any
+    maker: any
+    expectBaseAmount: BigNumberish
+    expectQuoteAmount: BigNumberish
+    feeToken: TokenId
+    fee?: BigNumberish
+    ts?: number
+    nonce: number
+  }): Promise<SignedTransaction> {
     if (!this.signer) {
-      throw new Error('zkLink signer is required for sending zkLink transactions.')
+      throw new Error('ZKLink signer is required for sending zklink transactions.')
     }
-    await this.setRequiredAccountIdFromServer('Withdraw funds')
-    return await this.signer.signSyncWithdraw(tx)
+
+    await this.setRequiredAccountIdFromServer('Transfer funds')
+
+    const transactionData: OrderMatching = {
+      ...matching,
+      type: 'OrderMatching',
+      fee: matching.fee ? matching.fee : null,
+      feeToken: this.provider.tokenSet.resolveTokenId(matching.feeToken),
+    }
+
+    const signedTransferTransaction = await this.signer.signOrderMatching(transactionData)
+
+    const stringFee = BigNumber.from(matching.fee).isZero() ? null : utils.formatEther(matching.fee)
+    const stringFeeToken = this.provider.tokenSet.resolveTokenSymbol(matching.feeToken)
+    const ethereumSignature =
+      this.ethSigner instanceof Create2WalletSigner
+        ? null
+        : await this.ethMessageSigner.ethSignOrderMatching({
+            stringFee,
+            stringFeeToken,
+            nonce: matching.nonce,
+          })
+    return {
+      tx: signedTransferTransaction,
+      ethereumSignature,
+    }
+  }
+
+  async sendWithdrawToEthereum(withdraw: {
+    toChainId: number
+    subAccountId: number
+    to: string
+    l2SourceToken: TokenId
+    l1TargetToken: TokenId
+    amount: BigNumberish
+    withdrawFeeRatio: number
+    fastWithdraw: number
+    ts?: number
+    fee?: BigNumberish
+    nonce?: Nonce
+    fastProcessing?: boolean
+  }): Promise<Transaction> {
+    withdraw.nonce =
+      withdraw.nonce != null ? await this.getNonce(withdraw.nonce) : await this.getNonce()
+
+    const signedWithdrawTransaction = await this.signWithdrawToEthereum(withdraw as any)
+
+    return submitSignedTransaction(signedWithdrawTransaction, this.provider)
   }
 
   async signWithdrawToEthereum(withdraw: {
@@ -440,28 +394,26 @@ export class Wallet {
     l2SourceToken: TokenId
     l1TargetToken: TokenId
     amount: BigNumberish
-    fee: BigNumberish
     withdrawFeeRatio: number
     fastWithdraw: number
     accountId: number
-    ts?: number
     nonce: number
+    fee?: BigNumberish
+    ts?: number
   }): Promise<SignedTransaction> {
+    if (!this.signer) {
+      throw new Error('zkLink signer is required for sending zkLink transactions.')
+    }
+    await this.setRequiredAccountIdFromServer('Withdraw funds')
     const transactionData: Withdraw = {
+      ...withdraw,
       type: 'Withdraw',
-      toChainId: withdraw.toChainId,
-      subAccountId: withdraw.subAccountId,
       accountId: withdraw.accountId || this.accountId,
       from: this.address(),
-      to: withdraw.to,
       l2SourceToken: this.provider.tokenSet.resolveTokenId(withdraw.l2SourceToken),
       l1TargetToken: this.provider.tokenSet.resolveTokenId(withdraw.l1TargetToken),
-      amount: withdraw.amount,
-      withdrawFeeRatio: withdraw.withdrawFeeRatio || 0,
-      fastWithdraw: withdraw.fastWithdraw,
-      fee: withdraw.fee,
+      fee: withdraw.fee ? withdraw.fee : null,
       ts: withdraw.ts || getTimestamp(),
-      nonce: withdraw.nonce,
     }
 
     if (transactionData.fee == null) {
@@ -472,7 +424,7 @@ export class Wallet {
       })
     }
 
-    const signedWithdrawTransaction = await this.getWithdrawFromSyncToEthereum(transactionData)
+    const signedWithdrawTransaction = await await this.signer.signWithdraw(transactionData)
 
     const stringAmount = BigNumber.from(transactionData.amount).isZero()
       ? null
@@ -500,28 +452,6 @@ export class Wallet {
     }
   }
 
-  async withdrawToEthereum(withdraw: {
-    toChainId: number
-    subAccountId: number
-    to: string
-    l2SourceToken: TokenId
-    l1TargetToken: TokenId
-    amount: BigNumberish
-    withdrawFeeRatio: number
-    fastWithdraw: number
-    ts?: number
-    fee?: BigNumberish
-    nonce?: Nonce
-    fastProcessing?: boolean
-  }): Promise<Transaction> {
-    withdraw.nonce =
-      withdraw.nonce != null ? await this.getNonce(withdraw.nonce) : await this.getNonce()
-
-    const signedWithdrawTransaction = await this.signWithdrawToEthereum(withdraw as any)
-
-    return submitSignedTransaction(signedWithdrawTransaction, this.provider)
-  }
-
   async isSigningKeySet(): Promise<boolean> {
     if (!this.signer) {
       throw new Error('ZKLink signer is required for current pubkey calculation.')
@@ -531,121 +461,7 @@ export class Wallet {
     return currentPubKeyHash === signerPubKeyHash
   }
 
-  async getChangePubKey(changePubKey: {
-    chainId: ChainId
-    subAccountId: number
-    feeToken: TokenId
-    newPkHash: string
-    fee: BigNumberish
-    nonce: number
-    accountId?: number
-    ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2
-    ts: number
-  }): Promise<ChangePubKey> {
-    if (!this.signer) {
-      throw new Error('ZKLink signer is required for current pubkey calculation.')
-    }
-
-    await this.setRequiredAccountIdFromServer('Set Signing Key')
-
-    const changePubKeyTx: ChangePubKey = await this.signer.signSyncChangePubKey({
-      accountId: changePubKey.accountId || this.accountId,
-      subAccountId: changePubKey.subAccountId,
-      account: this.address(),
-      chainId: changePubKey.chainId,
-      newPkHash: changePubKey.newPkHash,
-      nonce: changePubKey.nonce,
-      feeToken: changePubKey.feeToken,
-      fee: BigNumber.from(changePubKey.fee).toString(),
-      ts: changePubKey.ts,
-      ethAuthData: changePubKey.ethAuthData,
-    })
-
-    return changePubKeyTx
-  }
-
-  async signSetSigningKey(changePubKey: {
-    chainId: ChainId
-    subAccountId: number
-    feeToken: TokenId
-    fee: BigNumberish
-    nonce: number
-    ethAuthType: ChangePubkeyTypes
-    verifyingContract?: string
-    layerOneChainId?: number
-    domainName?: string
-    version?: string
-    accountId?: number
-    ts?: number
-  }): Promise<SignedTransaction> {
-    changePubKey.ts = changePubKey.ts || getTimestamp()
-    const newPubKeyHash = await this.signer.pubKeyHash()
-    // request latest account id
-    changePubKey.accountId = changePubKey.accountId || (await this.getAccountId())
-
-    let ethAuthData
-    if (changePubKey.ethAuthType === 'Onchain') {
-      ethAuthData = {
-        type: 'Onchain',
-      }
-    } else if (changePubKey.ethAuthType === 'ECDSA') {
-      await this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSA.')
-      const contractInfo = await this.provider.getContractInfo(changePubKey.chainId)
-
-      const changePubKeySignData = getChangePubkeyMessage(
-        newPubKeyHash,
-        changePubKey.nonce,
-        changePubKey.accountId || this.accountId,
-        changePubKey.verifyingContract || contractInfo.mainContract,
-        changePubKey.layerOneChainId || contractInfo.layerOneChainId,
-        changePubKey.domainName,
-        changePubKey.version
-      )
-      const ethSignature = (await this.getEIP712Signature(changePubKeySignData)).signature
-      ethAuthData = {
-        type: 'EthECDSA',
-        ethSignature,
-      }
-    } else if (changePubKey.ethAuthType === 'CREATE2') {
-      if (this.ethSigner instanceof Create2WalletSigner) {
-        const create2data = this.ethSigner.create2WalletData
-        ethAuthData = {
-          type: 'EthCREATE2',
-          creatorAddress: create2data.creatorAddress,
-          saltArg: create2data.saltArg,
-          codeHash: create2data.codeHash,
-        }
-      } else {
-        throw new Error('CREATE2 wallet authentication is only available for CREATE2 wallets')
-      }
-    } else {
-      throw new Error('Unsupported SetSigningKey type')
-    }
-
-    const changePubkeyTxUnsigned = Object.assign(
-      changePubKey,
-      {
-        type: 'ChangePubKey',
-        newPkHash: await this.signer.pubKeyHash(),
-      },
-      { ethAuthData }
-    )
-
-    if (changePubkeyTxUnsigned.fee == null) {
-      changePubkeyTxUnsigned.fee = await this.provider.getTransactionFee({
-        ...changePubkeyTxUnsigned,
-        fee: '0',
-      })
-    }
-
-    const changePubKeyTx = await this.getChangePubKey(changePubkeyTxUnsigned as any)
-    console.log({ changePubKeyTx })
-    return {
-      tx: changePubKeyTx,
-    }
-  }
-
-  async setSigningKey(changePubKey: {
+  async sendChangePubKey(changePubKey: {
     chainId: number
     subAccountId: number
     feeToken: TokenId
@@ -660,7 +476,7 @@ export class Wallet {
     changePubKey.nonce =
       changePubKey.nonce != null ? await this.getNonce(changePubKey.nonce) : await this.getNonce()
 
-    const txData = await this.signSetSigningKey(changePubKey as any)
+    const txData = await this.signChangePubKey(changePubKey as any)
 
     const currentPubKeyHash = await this.getCurrentPubKeyHash()
     if (currentPubKeyHash === (txData.tx as ChangePubKey).newPkHash) {
@@ -670,15 +486,100 @@ export class Wallet {
     return submitSignedTransaction(txData, this.provider)
   }
 
+  async signChangePubKey(changePubKey: {
+    type: 'ChangePubKey'
+    chainId: ChainId
+    subAccountId: number
+    feeToken: TokenId
+    fee?: BigNumberish
+    nonce: number
+    ethAuthType: ChangePubkeyTypes
+    verifyingContract?: string
+    layerOneChainId?: number
+    domainName?: string
+    version?: string
+    accountId?: number
+    ts?: number
+  }): Promise<SignedTransaction> {
+    if (!this.signer) {
+      throw new Error('ZKLink signer is required for current pubkey calculation.')
+    }
+    await this.setRequiredAccountIdFromServer('Set Signing Key')
+
+    const transactionData: ChangePubKey = {
+      type: 'ChangePubKey',
+      chainId: changePubKey.chainId,
+      account: this.address(),
+      accountId: changePubKey.accountId || this.accountId || (await this.getAccountId()),
+      subAccountId: changePubKey.subAccountId,
+      nonce: changePubKey.nonce,
+      newPkHash: await this.signer.pubKeyHash(),
+      fee: changePubKey.fee ? changePubKey.fee : null,
+      feeToken: changePubKey.feeToken,
+      ts: changePubKey.ts || getTimestamp(),
+      ethAuthData: undefined,
+    }
+
+    if (changePubKey.ethAuthType === 'Onchain') {
+      transactionData.ethAuthData = {
+        type: 'Onchain',
+      }
+    } else if (changePubKey.ethAuthType === 'EthECDSA') {
+      await this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSA.')
+      const contractInfo = await this.provider.getContractInfo(changePubKey.chainId)
+      const changePubKeySignData = getChangePubkeyMessage(
+        transactionData.newPkHash,
+        transactionData.nonce,
+        transactionData.accountId || this.accountId,
+        changePubKey.verifyingContract || contractInfo.mainContract,
+        changePubKey.layerOneChainId || contractInfo.layerOneChainId,
+        changePubKey.domainName,
+        changePubKey.version
+      )
+      const ethSignature = (await this.getEIP712Signature(changePubKeySignData)).signature
+      transactionData.ethAuthData = {
+        type: 'EthECDSA',
+        ethSignature,
+      }
+    } else if (changePubKey.ethAuthType === 'EthCREATE2') {
+      if (this.ethSigner instanceof Create2WalletSigner) {
+        const create2data = this.ethSigner.create2WalletData
+        transactionData.ethAuthData = {
+          type: 'EthCREATE2',
+          creatorAddress: create2data.creatorAddress,
+          saltArg: create2data.saltArg,
+          codeHash: create2data.codeHash,
+        }
+      } else {
+        throw new Error('CREATE2 wallet authentication is only available for CREATE2 wallets')
+      }
+    } else {
+      throw new Error('Unsupported SetSigningKey type')
+    }
+
+    if (transactionData.fee == null) {
+      transactionData.fee = await this.provider.getTransactionFee({
+        ...transactionData,
+        fee: '0',
+      })
+    }
+
+    const signedChangePubKeyTransaction = await this.signer.signChangePubKey(transactionData)
+
+    return {
+      tx: signedChangePubKeyTransaction,
+    }
+  }
+
   async isOnchainAuthSigningKeySet(
     linkChainId: number,
     nonce: Nonce = 'committed'
   ): Promise<boolean> {
-    const mainZkSyncContract = await this.getZkSyncMainContract(linkChainId)
+    const mainContract = await this.getMainContract(linkChainId)
 
     const numNonce = await this.getNonce(nonce)
     try {
-      const onchainAuthFact = await mainZkSyncContract.authFacts(this.address(), numNonce)
+      const onchainAuthFact = await mainContract.authFacts(this.address(), numNonce)
       return (
         onchainAuthFact !== '0x0000000000000000000000000000000000000000000000000000000000000000'
       )
@@ -705,10 +606,10 @@ export class Wallet {
 
     const numNonce = await this.getNonce(nonce)
 
-    const mainZkSyncContract = await this.getZkSyncMainContract(linkChainId)
+    const mainContract = await this.getMainContract(linkChainId)
 
     try {
-      return mainZkSyncContract.setAuthPubkeyHash(newPubKeyHash.replace('sync:', '0x'), numNonce, {
+      return mainContract.setAuthPubkeyHash(newPubKeyHash.replace('sync:', '0x'), numNonce, {
         gasLimit: BigNumber.from('200000'),
         ...ethTxOptions,
       })
@@ -756,7 +657,7 @@ export class Wallet {
   }
 
   async getTokenBalance(tokenId: TokenId, subAccountId: number) {
-    const balances = this.getBalances()
+    const balances = await this.getBalances()
     let balance = balances[subAccountId][tokenId]
     return balance ? BigNumber.from(balance) : undefined
   }
@@ -776,10 +677,10 @@ export class Wallet {
   }
 
   async estimateGasDeposit(linkChainId: number, args: any[]) {
-    const mainZkSyncContract = await this.getZkSyncMainContract(linkChainId)
+    const mainContract = await this.getMainContract(linkChainId)
 
     try {
-      const gasEstimate = await mainZkSyncContract.estimateGas.depositERC20(...args).then(
+      const gasEstimate = await mainContract.estimateGas.depositERC20(...args).then(
         (estimate) => estimate,
         () => BigNumber.from('0')
       )
@@ -790,7 +691,7 @@ export class Wallet {
     }
   }
 
-  async depositFromEthereum(deposit: {
+  async sendDepositFromEthereum(deposit: {
     subAccountId: number
     depositTo: Address
     token: TokenAddress
@@ -801,7 +702,7 @@ export class Wallet {
     approveDepositAmountForERC20?: boolean
   }): Promise<ETHOperation> {
     const contractAddress = await this.provider.getContractInfo(deposit.linkChainId)
-    const mainZkSyncContract = await this.getZkSyncMainContract(deposit.linkChainId)
+    const mainContract = await this.getMainContract(deposit.linkChainId)
 
     let ethTransaction
 
@@ -811,15 +712,11 @@ export class Wallet {
 
     if (isTokenETH(deposit.token)) {
       try {
-        ethTransaction = await mainZkSyncContract.depositETH(
-          deposit.depositTo,
-          deposit.subAccountId,
-          {
-            value: BigNumber.from(deposit.amount),
-            gasLimit: BigNumber.from(ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT),
-            ...deposit.ethTxOptions,
-          }
-        )
+        ethTransaction = await mainContract.depositETH(deposit.depositTo, deposit.subAccountId, {
+          value: BigNumber.from(deposit.amount),
+          gasLimit: BigNumber.from(ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT),
+          ...deposit.ethTxOptions,
+        })
       } catch (e) {
         this.modifyEthersError(e)
       }
@@ -862,7 +759,7 @@ export class Wallet {
       }
 
       try {
-        ethTransaction = await mainZkSyncContract.depositERC20(...args)
+        ethTransaction = await mainContract.depositERC20(...args)
       } catch (e) {
         this.modifyEthersError(e)
       }
@@ -893,10 +790,10 @@ export class Wallet {
       accountId = accountState.id
     }
 
-    const mainZkSyncContract = await this.getZkSyncMainContract(withdraw.linkChainId)
+    const mainContract = await this.getMainContract(withdraw.linkChainId)
 
     try {
-      const ethTransaction = await mainZkSyncContract.requestFullExit(
+      const ethTransaction = await mainContract.requestFullExit(
         accountId,
         withdraw.subAccountId,
         withdraw.tokenId,
@@ -912,7 +809,7 @@ export class Wallet {
     }
   }
 
-  async getZkSyncMainContract(linkChainId: number) {
+  async getMainContract(linkChainId: number) {
     const contractAddress = await this.provider.getContractInfo(linkChainId)
     return new ethers.Contract(
       contractAddress.mainContract,

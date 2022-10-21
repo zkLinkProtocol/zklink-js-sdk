@@ -124,20 +124,20 @@ export interface ForcedExit {
   signature?: Signature
 }
 
-export type ChangePubkeyTypes = 'Onchain' | 'ECDSA' | 'CREATE2' | 'ECDSALegacyMessage'
+export type ChangePubkeyTypes = 'Onchain' | 'EthECDSA' | 'EthCREATE2' | 'ECDSALegacyMessage'
 
 export interface ChangePubKeyOnchain {
   type: 'Onchain'
 }
 
 export interface ChangePubKeyECDSA {
-  type: 'ECDSA'
+  type: 'EthECDSA'
   ethSignature: string
   batchHash?: string
 }
 
 export interface ChangePubKeyCREATE2 {
-  type: 'CREATE2'
+  type: 'EthCREATE2'
   creatorAddress: string
   saltArg: string
   codeHash: string

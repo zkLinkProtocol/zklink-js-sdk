@@ -29,7 +29,7 @@ describe('forcedExit', () => {
   it('syncForcedExit', async function () {
     const wallet = await getWallet()
 
-    const transaction = await wallet.syncForcedExit({
+    const transaction = await wallet.sendForcedExit({
       toChainId: 1,
       subAccountId: 0,
       target: '0x3498F456645270eE003441df82C718b56c0e6666',

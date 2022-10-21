@@ -9,9 +9,6 @@ import {
 } from '../src/utils'
 import { getWallet } from './wallet.test'
 
-const defaultValidFrom = 0
-const defaultValidUntil = 9007199254740991
-
 describe('matching', () => {
   it('bytes and signature', async function () {
     const wallet = await getWallet()
@@ -80,8 +77,8 @@ describe('matching', () => {
       'ff00000006010300000000002000010000000000000014d1120d7b16000001050a4a817c8008',
       'serialized taker is incorrect'
     )
-    const maker = await wallet.signSyncOrder(data.maker as any)
-    const taker = await wallet.signSyncOrder(data.taker as any)
+    const maker = await wallet.signOrder(data.maker as any)
+    const taker = await wallet.signOrder(data.taker as any)
     expect(maker.tx.signature).to.eql(data.maker.signature, 'maker signature is incorrect')
     expect(taker.tx.signature).to.eql(data.taker.signature, 'taker signature is incorrect')
 
@@ -92,7 +89,7 @@ describe('matching', () => {
       'serialized order matching is incorrect'
     )
 
-    const signedTransaction = await wallet.signSyncOrderMatching(data as any)
+    const signedTransaction = await wallet.signOrderMatching(data as any)
     const { tx } = signedTransaction as any
     // wrong l2 signature: 46ab809c4a5beacfd423bb05332e818fb65d4d570939852206565c9a22adad8a3c3b4e69832c93f5b54b317bebcb44292bce5142f4bfa39f1b51a1cadcacae03
     expect(tx.signature.signature).to.eq(

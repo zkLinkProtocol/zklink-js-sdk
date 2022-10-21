@@ -69,44 +69,42 @@ class Signer {
             return yield (0, crypto_1.privateKeyToPubKey)(__classPrivateFieldGet(this, _Signer_privateKey, "f"));
         });
     }
-    signSyncTransfer(tx) {
+    signTransfer(tx) {
         return __awaiter(this, void 0, void 0, function* () {
             const msgBytes = utils.serializeTransfer(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
             return Object.assign(Object.assign({}, tx), { amount: ethers_1.BigNumber.from(tx.amount).toString(), fee: ethers_1.BigNumber.from(tx.fee).toString(), signature });
         });
     }
-    signSyncOrderMatching(matching) {
+    signOrderMatching(tx) {
         return __awaiter(this, void 0, void 0, function* () {
-            const tx = Object.assign(Object.assign({}, matching), { type: 'OrderMatching', feeToken: matching.feeTokenId });
             const msgBytes = yield utils.serializeOrderMatching(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
-            return Object.assign(Object.assign({}, tx), { maker: Object.assign(Object.assign({}, tx.maker), { price: ethers_1.BigNumber.from(tx.maker.price).toString(), amount: ethers_1.BigNumber.from(tx.maker.amount).toString() }), taker: Object.assign(Object.assign({}, tx.taker), { price: ethers_1.BigNumber.from(tx.taker.price).toString(), amount: ethers_1.BigNumber.from(tx.taker.amount).toString() }), fee: ethers_1.BigNumber.from(matching.fee).toString(), expectBaseAmount: ethers_1.BigNumber.from(matching.expectBaseAmount).toString(), expectQuoteAmount: ethers_1.BigNumber.from(matching.expectQuoteAmount).toString(), signature });
+            return Object.assign(Object.assign({}, tx), { maker: Object.assign(Object.assign({}, tx.maker), { price: ethers_1.BigNumber.from(tx.maker.price).toString(), amount: ethers_1.BigNumber.from(tx.maker.amount).toString() }), taker: Object.assign(Object.assign({}, tx.taker), { price: ethers_1.BigNumber.from(tx.taker.price).toString(), amount: ethers_1.BigNumber.from(tx.taker.amount).toString() }), fee: ethers_1.BigNumber.from(tx.fee).toString(), expectBaseAmount: ethers_1.BigNumber.from(tx.expectBaseAmount).toString(), expectQuoteAmount: ethers_1.BigNumber.from(tx.expectQuoteAmount).toString(), signature });
         });
     }
-    signSyncOrder(payload) {
+    signOrder(tx) {
         return __awaiter(this, void 0, void 0, function* () {
-            const tx = Object.assign(Object.assign({}, payload), { type: 'Order' });
             const msgBytes = utils.serializeOrder(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
-            return Object.assign(Object.assign({}, tx), { price: ethers_1.BigNumber.from(payload.price).toString(), amount: ethers_1.BigNumber.from(payload.amount).toString(), signature });
+            return Object.assign(Object.assign({}, tx), { price: ethers_1.BigNumber.from(tx.price).toString(), amount: ethers_1.BigNumber.from(tx.amount).toString(), signature });
         });
     }
-    signSyncWithdraw(tx) {
+    signWithdraw(tx) {
         return __awaiter(this, void 0, void 0, function* () {
             const msgBytes = utils.serializeWithdraw(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
             return Object.assign(Object.assign({}, tx), { amount: ethers_1.BigNumber.from(tx.amount).toString(), fee: ethers_1.BigNumber.from(tx.fee).toString(), signature });
         });
     }
-    signSyncForcedExit(tx) {
+    signForcedExit(tx) {
         return __awaiter(this, void 0, void 0, function* () {
             const msgBytes = utils.serializeForcedExit(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
             return Object.assign(Object.assign({}, tx), { fee: ethers_1.BigNumber.from(tx.fee).toString(), signature });
         });
     }
-    signSyncChangePubKey(changePubKey) {
+    signChangePubKey(changePubKey) {
         return __awaiter(this, void 0, void 0, function* () {
             const tx = Object.assign(Object.assign({}, changePubKey), { type: 'ChangePubKey' });
             const msgBytes = utils.serializeChangePubKey(tx);

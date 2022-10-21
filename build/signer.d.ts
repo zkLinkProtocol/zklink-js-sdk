@@ -6,23 +6,12 @@ export declare class Signer {
     pubKeyHash(): Promise<PubKeyHash>;
     signTransactionBytes(msg: string): Promise<Signature>;
     pubKey(): Promise<string>;
-    signSyncTransfer(tx: Transfer): Promise<Transfer>;
-    signSyncOrderMatching(matching: {
-        accountId: number;
-        subAccountId: number;
-        account: Address;
-        taker: Order;
-        maker: Order;
-        expectBaseAmount: BigNumberish;
-        expectQuoteAmount: BigNumberish;
-        fee: BigNumberish;
-        feeTokenId: number;
-        nonce: number;
-    }): Promise<OrderMatching>;
-    signSyncOrder(payload: Order): Promise<Order>;
-    signSyncWithdraw(tx: Withdraw): Promise<Withdraw>;
-    signSyncForcedExit(tx: ForcedExit): Promise<ForcedExit>;
-    signSyncChangePubKey(changePubKey: {
+    signTransfer(tx: Transfer): Promise<Transfer>;
+    signOrderMatching(tx: OrderMatching): Promise<OrderMatching>;
+    signOrder(tx: Order): Promise<Order>;
+    signWithdraw(tx: Withdraw): Promise<Withdraw>;
+    signForcedExit(tx: ForcedExit): Promise<ForcedExit>;
+    signChangePubKey(changePubKey: {
         chainId: number;
         subAccountId: number;
         accountId: number;

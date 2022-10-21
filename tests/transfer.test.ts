@@ -6,7 +6,7 @@ import { getWallet } from './wallet.test'
 describe('transfer', () => {
   it('transfer signature', async function () {
     const wallet = await getWallet()
-    const transaction = await wallet.syncTransfer({
+    const transaction = await wallet.sendTransfer({
       fromSubAccountId: 6,
       toSubAccountId: 6,
       to: '0x3498F456645270eE003441df82C718b56c0e6666',
