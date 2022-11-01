@@ -1,13 +1,21 @@
-import { parseEther } from 'ethers/lib/utils'
+import { parseEther, sha256 } from 'ethers/lib/utils'
 import { expect } from 'chai'
 import { BigNumber } from 'ethers'
 import { describe } from 'mocha'
-import { serializeForcedExit, serializeOrder, serializeWithdraw } from '../src/utils'
+import {
+  serializeFeePacked,
+  serializeForcedExit,
+  serializeOrder,
+  serializeWithdraw,
+} from '../src/utils'
 import { getWallet } from './wallet.test'
+import { ForcedExit } from '../src/types'
+import { sign } from 'crypto'
 
 describe('forcedExit', () => {
-  it('serializeForcedExit', () => {
-    const serialized = serializeForcedExit({
+  it('forcedExit serialize and signature', async () => {
+    const wallet = await getWallet()
+    const data: ForcedExit = {
       type: 'ForcedExit',
       toChainId: 1,
       initiatorSubAccountId: 0,
@@ -15,37 +23,29 @@ describe('forcedExit', () => {
       target: '0x3498F456645270eE003441df82C718b56c0e6666',
       targetSubAccountId: 0,
       feeToken: 1,
-      fee: BigNumber.from('4100000000000000'),
+      fee: '4100000000000000',
       nonce: 85,
       l2SourceToken: 1,
       l1TargetToken: 17,
       ts: 1649749979,
-    })
+    }
+    const serialized = serializeForcedExit(data)
+    const signed = await wallet.signForcedExit(data)
     expect(Buffer.from(serialized).toString('hex')).eq(
-      '070100000001003498f456645270ee003441df82c718b56c0e666600000100110001334d0000005562552fdb'
+      '070100000001003498f456645270ee003441df82c718b56c0e666600000100110001334d0000005562552fdb',
+      'Unexpected serialized bytes'
     )
-  })
-
-  it('syncForcedExit', async function () {
-    const wallet = await getWallet()
-
-    const transaction = await wallet.sendForcedExit({
-      toChainId: 1,
-      subAccountId: 0,
-      target: '0x3498F456645270eE003441df82C718b56c0e6666',
-      l2SourceToken: 1,
-      l1TargetToken: 17,
-      feeToken: 1,
-      fee: BigNumber.from(parseEther('0.001')),
-      ts: 1649749979,
-    } as any)
-    expect(transaction.txData.ethereumSignature.signature).eq(
-      '0x20bd5e4b5c61f064ae61c3281051e5f403d33bedf8272ffb2f420b8f32dbeab35f7a92495ebf0545178f7ede5420a681f3e20ee4d33331768cd142d63d7dd5421b',
+    expect(sha256(serialized)).to.eq(
+      '0x5c0dee07e26608bdc1ce7f66a6fc6eefe58012e17ef38b2f224f23b52f1deca1',
+      'Unexpected tx hash'
+    )
+    expect(signed.ethereumSignature?.signature).eq(
+      '0x3a3d6baad0a1897712f534b9a899cdd58c8e8ad2200b406c85c0b18c98233efc1f26ba62e2e9fdb7f91b61080fa49d7d88ee9db8ca3be96d0315b6511de13ef21c',
       'Unexpected ForcedExit ethereum signature'
     )
-    expect(transaction.txData.tx.signature.signature).eq(
-      '5863c06bd044647a12b63ee80028556463a26bdb9a9be4b9927cc73aef6a8fad49c2144167b61047ba09da5f51de0b7fe0b44ca4975f896c86c1288896cc2503',
-      'Unexpected ForcedExit tx signature'
+    expect(signed.tx.signature?.signature).to.eq(
+      '520892fd7cea7f25a0827c76dcd4babf08dc5f8e40a6adf1ef83f1b946b9caa7285da1b0f8fe2187d365569220cf0473f030fe92cae4bbc84e42c0753baad000',
+      'Unexpected tx signature'
     )
   })
 })

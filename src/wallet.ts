@@ -166,10 +166,7 @@ export class Wallet {
     accountId?: number
     nonce?: Nonce
   }): Promise<Transaction> {
-    transfer.nonce =
-      transfer.nonce != null ? await this.getNonce(transfer.nonce) : await this.getNonce()
-
-    const signedTransferTransaction = await this.signTransfer(transfer as any)
+    const signedTransferTransaction = await this.signTransfer(transfer)
     return submitSignedTransaction(signedTransferTransaction, this.provider)
   }
 
@@ -179,9 +176,9 @@ export class Wallet {
     to: Address
     token: TokenId
     amount: BigNumberish
-    accountId: number
-    nonce: number
+    accountId?: number
     fee?: BigNumberish
+    nonce?: Nonce
     ts?: number
   }): Promise<SignedTransaction> {
     if (!this.signer) {
@@ -196,6 +193,7 @@ export class Wallet {
       from: this.address(),
       token: this.provider.tokenSet.resolveTokenId(transfer.token),
       fee: transfer.fee ? transfer.fee : null,
+      nonce: transfer.nonce == null ? await this.getNonce() : await this.getNonce(transfer.nonce),
       ts: transfer.ts || getTimestamp(),
     }
 
@@ -241,13 +239,11 @@ export class Wallet {
     l2SourceToken: TokenId
     l1TargetToken: TokenId
     feeToken: TokenId
-    ts?: number
     fee?: BigNumberish
     nonce?: Nonce
+    ts?: number
   }): Promise<Transaction> {
-    forcedExit.nonce =
-      forcedExit.nonce != null ? await this.getNonce(forcedExit.nonce) : await this.getNonce()
-    const signedForcedExitTransaction = await this.signForcedExit(forcedExit as any)
+    const signedForcedExitTransaction = await this.signForcedExit(forcedExit)
     return submitSignedTransaction(signedForcedExitTransaction, this.provider)
   }
 
@@ -259,22 +255,26 @@ export class Wallet {
     l2SourceToken: TokenId
     l1TargetToken: TokenId
     feeToken: TokenId
-    nonce: number
+    initiatorAccountId?: number
     fee?: BigNumberish
+    nonce?: Nonce
     ts?: number
   }): Promise<SignedTransaction> {
     if (!this.signer) {
       throw new Error('ZKLink signer is required for sending zklink transactions.')
     }
     await this.setRequiredAccountIdFromServer('perform a Forced Exit')
+
     const transactionData: ForcedExit = {
       ...forcedExit,
       type: 'ForcedExit',
-      initiatorAccountId: this.accountId,
+      initiatorAccountId: forcedExit.initiatorAccountId || this.accountId,
       l2SourceToken: this.provider.tokenSet.resolveTokenId(forcedExit.l2SourceToken),
       l1TargetToken: this.provider.tokenSet.resolveTokenId(forcedExit.l1TargetToken),
       feeToken: this.provider.tokenSet.resolveTokenId(forcedExit.feeToken),
-      fee: forcedExit.fee ? forcedExit.fee : null,
+      fee: forcedExit.fee,
+      nonce:
+        forcedExit.nonce == null ? await this.getNonce() : await this.getNonce(forcedExit.nonce),
       ts: forcedExit.ts || getTimestamp(),
     }
 
@@ -331,8 +331,7 @@ export class Wallet {
     expectQuoteAmount: BigNumberish
     feeToken: TokenId
     fee?: BigNumberish
-    ts?: number
-    nonce: number
+    nonce?: number
   }): Promise<SignedTransaction> {
     if (!this.signer) {
       throw new Error('ZKLink signer is required for sending zklink transactions.')
@@ -343,8 +342,9 @@ export class Wallet {
     const transactionData: OrderMatching = {
       ...matching,
       type: 'OrderMatching',
-      fee: matching.fee ? matching.fee : null,
+      fee: matching.fee,
       feeToken: this.provider.tokenSet.resolveTokenId(matching.feeToken),
+      nonce: matching.nonce == null ? await this.getNonce() : await this.getNonce(matching.nonce),
     }
 
     const signedTransferTransaction = await this.signer.signOrderMatching(transactionData)
@@ -377,13 +377,8 @@ export class Wallet {
     ts?: number
     fee?: BigNumberish
     nonce?: Nonce
-    fastProcessing?: boolean
   }): Promise<Transaction> {
-    withdraw.nonce =
-      withdraw.nonce != null ? await this.getNonce(withdraw.nonce) : await this.getNonce()
-
     const signedWithdrawTransaction = await this.signWithdrawToEthereum(withdraw as any)
-
     return submitSignedTransaction(signedWithdrawTransaction, this.provider)
   }
 
@@ -397,8 +392,9 @@ export class Wallet {
     withdrawFeeRatio: number
     fastWithdraw: number
     accountId: number
-    nonce: number
+    from?: string
     fee?: BigNumberish
+    nonce?: Nonce
     ts?: number
   }): Promise<SignedTransaction> {
     if (!this.signer) {
@@ -409,10 +405,11 @@ export class Wallet {
       ...withdraw,
       type: 'Withdraw',
       accountId: withdraw.accountId || this.accountId,
-      from: this.address(),
+      from: withdraw.from || this.address(),
       l2SourceToken: this.provider.tokenSet.resolveTokenId(withdraw.l2SourceToken),
       l1TargetToken: this.provider.tokenSet.resolveTokenId(withdraw.l1TargetToken),
-      fee: withdraw.fee ? withdraw.fee : null,
+      fee: withdraw.fee,
+      nonce: withdraw.nonce == null ? await this.getNonce() : await this.getNonce(withdraw.nonce),
       ts: withdraw.ts || getTimestamp(),
     }
 
@@ -473,9 +470,6 @@ export class Wallet {
     fee?: BigNumberish
     nonce?: Nonce
   }): Promise<Transaction> {
-    changePubKey.nonce =
-      changePubKey.nonce != null ? await this.getNonce(changePubKey.nonce) : await this.getNonce()
-
     const txData = await this.signChangePubKey(changePubKey as any)
 
     const currentPubKeyHash = await this.getCurrentPubKeyHash()
@@ -492,13 +486,13 @@ export class Wallet {
     subAccountId: number
     feeToken: TokenId
     fee?: BigNumberish
-    nonce: number
     ethAuthType: ChangePubkeyTypes
     verifyingContract?: string
     layerOneChainId?: number
     domainName?: string
     version?: string
     accountId?: number
+    nonce?: Nonce
     ts?: number
   }): Promise<SignedTransaction> {
     if (!this.signer) {
@@ -512,10 +506,14 @@ export class Wallet {
       account: this.address(),
       accountId: changePubKey.accountId || this.accountId || (await this.getAccountId()),
       subAccountId: changePubKey.subAccountId,
-      nonce: changePubKey.nonce,
+
       newPkHash: await this.signer.pubKeyHash(),
-      fee: changePubKey.fee ? changePubKey.fee : null,
+      fee: changePubKey.fee,
       feeToken: changePubKey.feeToken,
+      nonce:
+        changePubKey.nonce == null
+          ? await this.getNonce()
+          : await this.getNonce(changePubKey.nonce),
       ts: changePubKey.ts || getTimestamp(),
       ethAuthData: undefined,
     }

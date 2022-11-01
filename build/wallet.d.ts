@@ -40,9 +40,9 @@ export declare class Wallet {
         to: Address;
         token: TokenId;
         amount: BigNumberish;
-        accountId: number;
-        nonce: number;
+        accountId?: number;
         fee?: BigNumberish;
+        nonce?: Nonce;
         ts?: number;
     }): Promise<SignedTransaction>;
     sendForcedExit(forcedExit: {
@@ -53,9 +53,9 @@ export declare class Wallet {
         l2SourceToken: TokenId;
         l1TargetToken: TokenId;
         feeToken: TokenId;
-        ts?: number;
         fee?: BigNumberish;
         nonce?: Nonce;
+        ts?: number;
     }): Promise<Transaction>;
     signForcedExit(forcedExit: {
         toChainId: ChainId;
@@ -65,8 +65,9 @@ export declare class Wallet {
         l2SourceToken: TokenId;
         l1TargetToken: TokenId;
         feeToken: TokenId;
-        nonce: number;
+        initiatorAccountId?: number;
         fee?: BigNumberish;
+        nonce?: Nonce;
         ts?: number;
     }): Promise<SignedTransaction>;
     signOrder(payload: Order): Promise<SignedTransaction>;
@@ -80,8 +81,7 @@ export declare class Wallet {
         expectQuoteAmount: BigNumberish;
         feeToken: TokenId;
         fee?: BigNumberish;
-        ts?: number;
-        nonce: number;
+        nonce?: number;
     }): Promise<SignedTransaction>;
     sendWithdrawToEthereum(withdraw: {
         toChainId: number;
@@ -95,7 +95,6 @@ export declare class Wallet {
         ts?: number;
         fee?: BigNumberish;
         nonce?: Nonce;
-        fastProcessing?: boolean;
     }): Promise<Transaction>;
     signWithdrawToEthereum(withdraw: {
         toChainId: ChainId;
@@ -107,8 +106,9 @@ export declare class Wallet {
         withdrawFeeRatio: number;
         fastWithdraw: number;
         accountId: number;
-        nonce: number;
+        from?: string;
         fee?: BigNumberish;
+        nonce?: Nonce;
         ts?: number;
     }): Promise<SignedTransaction>;
     isSigningKeySet(): Promise<boolean>;
@@ -130,13 +130,13 @@ export declare class Wallet {
         subAccountId: number;
         feeToken: TokenId;
         fee?: BigNumberish;
-        nonce: number;
         ethAuthType: ChangePubkeyTypes;
         verifyingContract?: string;
         layerOneChainId?: number;
         domainName?: string;
         version?: string;
         accountId?: number;
+        nonce?: Nonce;
         ts?: number;
     }): Promise<SignedTransaction>;
     isOnchainAuthSigningKeySet(linkChainId: number, nonce?: Nonce): Promise<boolean>;

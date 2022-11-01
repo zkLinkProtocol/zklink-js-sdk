@@ -93,8 +93,6 @@ class Wallet {
     }
     sendTransfer(transfer) {
         return __awaiter(this, void 0, void 0, function* () {
-            transfer.nonce =
-                transfer.nonce != null ? yield this.getNonce(transfer.nonce) : yield this.getNonce();
             const signedTransferTransaction = yield this.signTransfer(transfer);
             return submitSignedTransaction(signedTransferTransaction, this.provider);
         });
@@ -105,7 +103,7 @@ class Wallet {
                 throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
-            const transactionData = Object.assign(Object.assign({}, transfer), { type: 'Transfer', accountId: transfer.accountId || this.accountId, from: this.address(), token: this.provider.tokenSet.resolveTokenId(transfer.token), fee: transfer.fee ? transfer.fee : null, ts: transfer.ts || (0, utils_1.getTimestamp)() });
+            const transactionData = Object.assign(Object.assign({}, transfer), { type: 'Transfer', accountId: transfer.accountId || this.accountId, from: this.address(), token: this.provider.tokenSet.resolveTokenId(transfer.token), fee: transfer.fee ? transfer.fee : null, nonce: transfer.nonce == null ? yield this.getNonce() : yield this.getNonce(transfer.nonce), ts: transfer.ts || (0, utils_1.getTimestamp)() });
             if (transactionData.fee == null) {
                 transactionData.fee = yield this.provider.getTransactionFee(Object.assign(Object.assign({}, transactionData), { fee: '0', amount: ethers_1.BigNumber.from(transactionData.amount).toString() }));
             }
@@ -135,8 +133,6 @@ class Wallet {
     }
     sendForcedExit(forcedExit) {
         return __awaiter(this, void 0, void 0, function* () {
-            forcedExit.nonce =
-                forcedExit.nonce != null ? yield this.getNonce(forcedExit.nonce) : yield this.getNonce();
             const signedForcedExitTransaction = yield this.signForcedExit(forcedExit);
             return submitSignedTransaction(signedForcedExitTransaction, this.provider);
         });
@@ -147,7 +143,7 @@ class Wallet {
                 throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('perform a Forced Exit');
-            const transactionData = Object.assign(Object.assign({}, forcedExit), { type: 'ForcedExit', initiatorAccountId: this.accountId, l2SourceToken: this.provider.tokenSet.resolveTokenId(forcedExit.l2SourceToken), l1TargetToken: this.provider.tokenSet.resolveTokenId(forcedExit.l1TargetToken), feeToken: this.provider.tokenSet.resolveTokenId(forcedExit.feeToken), fee: forcedExit.fee ? forcedExit.fee : null, ts: forcedExit.ts || (0, utils_1.getTimestamp)() });
+            const transactionData = Object.assign(Object.assign({}, forcedExit), { type: 'ForcedExit', initiatorAccountId: forcedExit.initiatorAccountId || this.accountId, l2SourceToken: this.provider.tokenSet.resolveTokenId(forcedExit.l2SourceToken), l1TargetToken: this.provider.tokenSet.resolveTokenId(forcedExit.l1TargetToken), feeToken: this.provider.tokenSet.resolveTokenId(forcedExit.feeToken), fee: forcedExit.fee, nonce: forcedExit.nonce == null ? yield this.getNonce() : yield this.getNonce(forcedExit.nonce), ts: forcedExit.ts || (0, utils_1.getTimestamp)() });
             if (transactionData.fee == null) {
                 transactionData.fee = yield this.provider.getTransactionFee(Object.assign(Object.assign({}, transactionData), { fee: '0' }));
             }
@@ -190,7 +186,7 @@ class Wallet {
                 throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
-            const transactionData = Object.assign(Object.assign({}, matching), { type: 'OrderMatching', fee: matching.fee ? matching.fee : null, feeToken: this.provider.tokenSet.resolveTokenId(matching.feeToken) });
+            const transactionData = Object.assign(Object.assign({}, matching), { type: 'OrderMatching', fee: matching.fee, feeToken: this.provider.tokenSet.resolveTokenId(matching.feeToken), nonce: matching.nonce == null ? yield this.getNonce() : yield this.getNonce(matching.nonce) });
             const signedTransferTransaction = yield this.signer.signOrderMatching(transactionData);
             const stringFee = ethers_1.BigNumber.from(matching.fee).isZero() ? null : ethers_1.utils.formatEther(matching.fee);
             const stringFeeToken = this.provider.tokenSet.resolveTokenSymbol(matching.feeToken);
@@ -209,8 +205,6 @@ class Wallet {
     }
     sendWithdrawToEthereum(withdraw) {
         return __awaiter(this, void 0, void 0, function* () {
-            withdraw.nonce =
-                withdraw.nonce != null ? yield this.getNonce(withdraw.nonce) : yield this.getNonce();
             const signedWithdrawTransaction = yield this.signWithdrawToEthereum(withdraw);
             return submitSignedTransaction(signedWithdrawTransaction, this.provider);
         });
@@ -221,7 +215,7 @@ class Wallet {
                 throw new Error('zkLink signer is required for sending zkLink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Withdraw funds');
-            const transactionData = Object.assign(Object.assign({}, withdraw), { type: 'Withdraw', accountId: withdraw.accountId || this.accountId, from: this.address(), l2SourceToken: this.provider.tokenSet.resolveTokenId(withdraw.l2SourceToken), l1TargetToken: this.provider.tokenSet.resolveTokenId(withdraw.l1TargetToken), fee: withdraw.fee ? withdraw.fee : null, ts: withdraw.ts || (0, utils_1.getTimestamp)() });
+            const transactionData = Object.assign(Object.assign({}, withdraw), { type: 'Withdraw', accountId: withdraw.accountId || this.accountId, from: withdraw.from || this.address(), l2SourceToken: this.provider.tokenSet.resolveTokenId(withdraw.l2SourceToken), l1TargetToken: this.provider.tokenSet.resolveTokenId(withdraw.l1TargetToken), fee: withdraw.fee, nonce: withdraw.nonce == null ? yield this.getNonce() : yield this.getNonce(withdraw.nonce), ts: withdraw.ts || (0, utils_1.getTimestamp)() });
             if (transactionData.fee == null) {
                 transactionData.fee = yield this.provider.getTransactionFee(Object.assign(Object.assign({}, transactionData), { fee: '0', amount: ethers_1.BigNumber.from(transactionData.amount).toString() }));
             }
@@ -261,8 +255,6 @@ class Wallet {
     }
     sendChangePubKey(changePubKey) {
         return __awaiter(this, void 0, void 0, function* () {
-            changePubKey.nonce =
-                changePubKey.nonce != null ? yield this.getNonce(changePubKey.nonce) : yield this.getNonce();
             const txData = yield this.signChangePubKey(changePubKey);
             const currentPubKeyHash = yield this.getCurrentPubKeyHash();
             if (currentPubKeyHash === txData.tx.newPkHash) {
@@ -283,10 +275,12 @@ class Wallet {
                 account: this.address(),
                 accountId: changePubKey.accountId || this.accountId || (yield this.getAccountId()),
                 subAccountId: changePubKey.subAccountId,
-                nonce: changePubKey.nonce,
                 newPkHash: yield this.signer.pubKeyHash(),
-                fee: changePubKey.fee ? changePubKey.fee : null,
+                fee: changePubKey.fee,
                 feeToken: changePubKey.feeToken,
+                nonce: changePubKey.nonce == null
+                    ? yield this.getNonce()
+                    : yield this.getNonce(changePubKey.nonce),
                 ts: changePubKey.ts || (0, utils_1.getTimestamp)(),
                 ethAuthData: undefined,
             };
