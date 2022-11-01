@@ -37,10 +37,19 @@ class Wallet {
     connect(provider) {
         this.provider = provider;
         this.contract = new contract_1.LinkContract(provider, this.ethSigner);
+        try {
+            if (this.accountId === undefined) {
+                provider.getState(this.address()).then((r) => {
+                    this.accountId = r.id;
+                });
+            }
+        }
+        catch (e) {
+            console.error(JSON.stringify(e.jrpcError));
+        }
         return this;
     }
     static fromEthSigner(ethWallet, provider, signer, accountId, ethSignerType) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             if (signer == null) {
                 const signerResult = yield signer_1.Signer.fromETHSignature(ethWallet);
@@ -51,9 +60,6 @@ class Wallet {
                 throw new Error('If you passed signer, you must also pass ethSignerType.');
             }
             const address = yield ethWallet.getAddress();
-            if (accountId === undefined) {
-                accountId = (_a = (yield provider.getState(address))) === null || _a === void 0 ? void 0 : _a.id;
-            }
             const ethMessageSigner = new eth_message_signer_1.EthMessageSigner(ethWallet, ethSignerType);
             const wallet = new Wallet(ethWallet, ethMessageSigner, address, signer, accountId, ethSignerType);
             wallet.connect(provider);

@@ -73,6 +73,16 @@ export class Wallet {
   connect(provider: Provider) {
     this.provider = provider
     this.contract = new LinkContract(provider, this.ethSigner)
+
+    try {
+      if (this.accountId === undefined) {
+        provider.getState(this.address()).then((r) => {
+          this.accountId = r.id
+        })
+      }
+    } catch (e) {
+      console.error(JSON.stringify(e.jrpcError))
+    }
     return this
   }
 
@@ -91,9 +101,6 @@ export class Wallet {
       throw new Error('If you passed signer, you must also pass ethSignerType.')
     }
     const address = await ethWallet.getAddress()
-    if (accountId === undefined) {
-      accountId = (await provider.getState(address))?.id
-    }
     const ethMessageSigner = new EthMessageSigner(ethWallet, ethSignerType)
     const wallet = new Wallet(
       ethWallet,
