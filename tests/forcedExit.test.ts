@@ -9,13 +9,13 @@ import {
   serializeWithdraw,
 } from '../src/utils'
 import { getWallet } from './wallet.test'
-import { ForcedExit } from '../src/types'
+import { ForcedExitData } from '../src/types'
 import { sign } from 'crypto'
 
 describe('forcedExit', () => {
   it('forcedExit serialize and signature', async () => {
     const wallet = await getWallet()
-    const data: ForcedExit = {
+    const data: ForcedExitData = {
       type: 'ForcedExit',
       toChainId: 1,
       initiatorSubAccountId: 0,

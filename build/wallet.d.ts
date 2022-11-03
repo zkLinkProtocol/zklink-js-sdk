@@ -2,7 +2,7 @@ import { BigNumber, BigNumberish, Contract, ContractTransaction, ethers } from '
 import { EthMessageSigner } from './eth-message-signer';
 import { Provider } from './provider';
 import { Signer } from './signer';
-import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, EthSignerType, SignedTransaction, TxEthSignature, ChangePubkeyTypes, Create2Data, ChainId, TokenId, Order, TokenAddress, AccountBalances } from './types';
+import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, EthSignerType, SignedTransaction, TransferData, TxEthSignature, ForcedExitData, WithdrawData, ChangePubkeyTypes, Create2Data, ChainId, TokenId, OrderData, TokenAddress, AccountBalances, TransferEntries, ForcedExitEntries, WithdrawEntries } from './types';
 import { LinkContract } from './contract';
 export declare class ZKSyncTxError extends Error {
     value: PriorityOperationReceipt | TransactionReceipt;
@@ -23,54 +23,13 @@ export declare class Wallet {
     static fromCreate2Data(syncSigner: Signer, provider: Provider, create2Data: Create2Data, accountId?: number): Promise<Wallet>;
     static fromEthSignerNoKeys(ethWallet: ethers.Signer, provider: Provider, accountId?: number, ethSignerType?: EthSignerType): Promise<Wallet>;
     getEIP712Signature(data: any): Promise<TxEthSignature>;
-    sendTransfer(transfer: {
-        fromSubAccountId: number;
-        toSubAccountId: number;
-        to: Address;
-        token: TokenId;
-        amount: BigNumberish;
-        ts?: number;
-        fee?: BigNumberish;
-        accountId?: number;
-        nonce?: Nonce;
-    }): Promise<Transaction>;
-    signTransfer(transfer: {
-        fromSubAccountId: number;
-        toSubAccountId: number;
-        to: Address;
-        token: TokenId;
-        amount: BigNumberish;
-        accountId?: number;
-        fee?: BigNumberish;
-        nonce?: Nonce;
-        ts?: number;
-    }): Promise<SignedTransaction>;
-    sendForcedExit(forcedExit: {
-        target: Address;
-        targetSubAccountId: number;
-        initiatorSubAccountId: number;
-        toChainId: ChainId;
-        l2SourceToken: TokenId;
-        l1TargetToken: TokenId;
-        feeToken: TokenId;
-        fee?: BigNumberish;
-        nonce?: Nonce;
-        ts?: number;
-    }): Promise<Transaction>;
-    signForcedExit(forcedExit: {
-        toChainId: ChainId;
-        target: Address;
-        targetSubAccountId: number;
-        initiatorSubAccountId: number;
-        l2SourceToken: TokenId;
-        l1TargetToken: TokenId;
-        feeToken: TokenId;
-        initiatorAccountId?: number;
-        fee?: BigNumberish;
-        nonce?: Nonce;
-        ts?: number;
-    }): Promise<SignedTransaction>;
-    signOrder(payload: Order): Promise<SignedTransaction>;
+    sendTransfer(transfer: TransferEntries): Promise<Transaction>;
+    getTransferData(payload: TransferEntries): Promise<TransferData>;
+    signTransfer(transfer: TransferEntries): Promise<SignedTransaction>;
+    sendForcedExit(entries: ForcedExitEntries): Promise<Transaction>;
+    getForcedExitData(entries: ForcedExitEntries): Promise<ForcedExitData>;
+    signForcedExit(entries: ForcedExitEntries): Promise<SignedTransaction>;
+    signOrder(entries: OrderData): Promise<SignedTransaction>;
     signOrderMatching(matching: {
         accountId: number;
         subAccountId: number;
@@ -83,34 +42,9 @@ export declare class Wallet {
         fee?: BigNumberish;
         nonce?: number;
     }): Promise<SignedTransaction>;
-    sendWithdrawToEthereum(withdraw: {
-        toChainId: number;
-        subAccountId: number;
-        to: string;
-        l2SourceToken: TokenId;
-        l1TargetToken: TokenId;
-        amount: BigNumberish;
-        withdrawFeeRatio: number;
-        fastWithdraw: number;
-        ts?: number;
-        fee?: BigNumberish;
-        nonce?: Nonce;
-    }): Promise<Transaction>;
-    signWithdrawToEthereum(withdraw: {
-        toChainId: ChainId;
-        subAccountId: number;
-        to: string;
-        l2SourceToken: TokenId;
-        l1TargetToken: TokenId;
-        amount: BigNumberish;
-        withdrawFeeRatio: number;
-        fastWithdraw: number;
-        accountId: number;
-        from?: string;
-        fee?: BigNumberish;
-        nonce?: Nonce;
-        ts?: number;
-    }): Promise<SignedTransaction>;
+    sendWithdrawToEthereum(entries: WithdrawEntries): Promise<Transaction>;
+    getWithdrawData(entries: WithdrawEntries): Promise<WithdrawData>;
+    signWithdrawToEthereum(entries: WithdrawEntries): Promise<SignedTransaction>;
     isSigningKeySet(): Promise<boolean>;
     sendChangePubKey(changePubKey: {
         chainId: number;

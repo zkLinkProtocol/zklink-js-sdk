@@ -48,7 +48,18 @@ export interface Signature {
     pubKey: string;
     signature: string;
 }
-export interface Transfer {
+export interface TransferEntries {
+    fromSubAccountId: number;
+    toSubAccountId: number;
+    to: Address;
+    token: TokenId;
+    amount: BigNumberish;
+    accountId?: number;
+    fee?: BigNumberish;
+    nonce?: Nonce;
+    ts?: number;
+}
+export interface TransferData {
     type: 'Transfer';
     accountId: number;
     fromSubAccountId: number;
@@ -62,7 +73,22 @@ export interface Transfer {
     nonce: number;
     signature?: Signature;
 }
-export interface Withdraw {
+export interface WithdrawEntries {
+    toChainId: ChainId;
+    subAccountId: number;
+    to: string;
+    l2SourceToken: TokenId;
+    l1TargetToken: TokenId;
+    amount: BigNumberish;
+    withdrawFeeRatio: number;
+    fastWithdraw: number;
+    accountId: number;
+    from?: string;
+    fee?: BigNumberish;
+    nonce?: Nonce;
+    ts?: number;
+}
+export interface WithdrawData {
     type: 'Withdraw';
     toChainId: number;
     subAccountId: number;
@@ -79,7 +105,20 @@ export interface Withdraw {
     nonce: number;
     signature?: Signature;
 }
-export interface ForcedExit {
+export interface ForcedExitEntries {
+    target: Address;
+    targetSubAccountId: number;
+    initiatorSubAccountId: number;
+    toChainId: ChainId;
+    l2SourceToken: TokenId;
+    l1TargetToken: TokenId;
+    feeToken: TokenId;
+    initiatorAccountId?: number;
+    fee?: BigNumberish;
+    nonce?: Nonce;
+    ts?: number;
+}
+export interface ForcedExitData {
     type: 'ForcedExit';
     toChainId: ChainId;
     initiatorAccountId: number;
@@ -109,7 +148,7 @@ export interface ChangePubKeyCREATE2 {
     saltArg: string;
     codeHash: string;
 }
-export interface ChangePubKey {
+export interface ChangePubKeyData {
     type: 'ChangePubKey';
     chainId: number;
     subAccountId: number;
@@ -131,7 +170,7 @@ export interface CloseAccount {
     signature: Signature;
 }
 export interface SignedTransaction {
-    tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit | Order | OrderMatching;
+    tx: TransferData | WithdrawData | ChangePubKeyData | CloseAccount | ForcedExitData | OrderData | OrderMatchingData;
     ethereumSignature?: TxEthSignature;
 }
 export interface BlockInfo {
@@ -187,7 +226,7 @@ export interface Fee {
 export interface BatchFee {
     totalFee: BigNumber;
 }
-export interface Order {
+export interface OrderData {
     type: 'Order';
     accountId: number;
     subAccountId: number;
@@ -201,16 +240,14 @@ export interface Order {
     feeRatio1: number;
     feeRatio2: number;
     signature?: Signature;
-    ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
-    ethSignature?: string;
 }
-export interface OrderMatching {
+export interface OrderMatchingData {
     type: 'OrderMatching';
     accountId: number;
     subAccountId: number;
     account: Address;
-    taker: Order;
-    maker: Order;
+    taker: OrderData;
+    maker: OrderData;
     expectBaseAmount: BigNumberish;
     expectQuoteAmount: BigNumberish;
     fee: BigNumberish;

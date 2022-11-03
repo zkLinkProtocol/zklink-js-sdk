@@ -4,7 +4,7 @@ import { describe } from 'mocha'
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { getWallet } from './wallet.test'
 import { utils } from '../src'
-import { ChangePubKey } from '../src/types'
+import { ChangePubKeyData } from '../src/types'
 import { sha256 } from 'ethers/lib/utils'
 
 describe('ChangePubKey', () => {
@@ -19,7 +19,7 @@ describe('ChangePubKey', () => {
       accountId: 2,
       ts: 1654776640,
       newPkHash: 'sync:511494921e9aec60dfd65ce125dec96fe7c07133',
-    } as ChangePubKey)
+    } as ChangePubKeyData)
     expect(Buffer.from(bytes).toString('hex')).to.eq(
       '06010000000201511494921e9aec60dfd65ce125dec96fe7c07133000100000000000062a1e340'
     )

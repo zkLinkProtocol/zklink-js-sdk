@@ -2,14 +2,14 @@ import { expect } from 'chai'
 import { BigNumber } from 'ethers'
 import { sha256 } from 'ethers/lib/utils'
 import { describe } from 'mocha'
-import { Withdraw } from '../src/types'
+import { WithdrawData } from '../src/types'
 import { serializeOrder, serializeWithdraw } from '../src/utils'
 import { getWallet } from './wallet.test'
 
 describe('withdraw', () => {
   it('withdraw serialize and signature', async () => {
     const wallet = await getWallet()
-    const data: Withdraw = {
+    const data: WithdrawData = {
       toChainId: 3,
       subAccountId: 1,
       accountId: 1,

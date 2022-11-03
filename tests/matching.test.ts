@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { BigNumber } from 'ethers'
 import { parseEther, sha256 } from 'ethers/lib/utils'
 import { describe } from 'mocha'
-import { Order, OrderMatching } from '../src/types'
+import { OrderData, OrderMatchingData } from '../src/types'
 import {
   closestPackableTransactionAmount,
   serializeOrder,
@@ -14,7 +14,7 @@ describe('matching', () => {
   it('bytes and signature', async function () {
     const wallet = await getWallet()
 
-    const makerData: Order = {
+    const makerData: OrderData = {
       type: 'Order',
       nonce: 1,
       price: '1500000000000000000',
@@ -28,7 +28,7 @@ describe('matching', () => {
       quoteTokenId: 1,
       subAccountId: 1,
     }
-    const takerData: Order = {
+    const takerData: OrderData = {
       type: 'Order',
       nonce: 0,
       price: '1500000000000000000',
@@ -73,13 +73,13 @@ describe('matching', () => {
       'Unexpected taker signature'
     )
 
-    const matching: OrderMatching = {
+    const matching: OrderMatchingData = {
       fee: '0',
       type: 'OrderMatching',
       subAccountId: 1,
-      maker: maker.tx as Order,
+      maker: maker.tx as OrderData,
       nonce: 0,
-      taker: taker.tx as Order,
+      taker: taker.tx as OrderData,
       account: '0x3498F456645270eE003441df82C718b56c0e6666',
       feeToken: 1,
       accountId: 6,

@@ -1,6 +1,6 @@
 import { utils, ethers, BigNumber, BigNumberish } from 'ethers';
 import { Provider } from '.';
-import { PubKeyHash, TokenAddress, TokenLike, Tokens, TokenSymbol, EthSignerType, Address, Transfer, ForcedExit, ChangePubKey, Withdraw, CloseAccount, Order, ChainId, OrderMatching } from './types';
+import { PubKeyHash, TokenAddress, TokenLike, Tokens, TokenSymbol, EthSignerType, Address, TransferData, ForcedExitData, ChangePubKeyData, WithdrawData, CloseAccount, OrderData, ChainId, OrderMatchingData } from './types';
 export declare const MIN_UNONCE = 1;
 export declare const MAX_UNONCE = 4294967295;
 export declare const IERC20_INTERFACE: utils.Interface;
@@ -76,17 +76,17 @@ export declare function serializeChainId(chainId: number): Uint8Array;
 export declare function serializeFeeRatio(withdrawFeeRatio: number): Uint8Array;
 export declare function serializeFastWithdraw(fastWithdraw: number): Uint8Array;
 export declare function serializeTimestamp(time: number): Uint8Array;
-export declare function serializeWithdraw(withdraw: Withdraw): Uint8Array;
-export declare function serializeTransfer(transfer: Transfer): Uint8Array;
-export declare function serializeChangePubKey(changePubKey: ChangePubKey): Uint8Array;
-export declare function serializeForcedExit(forcedExit: ForcedExit): Uint8Array;
-export declare function serializeOrder(order: Order): Uint8Array;
-export declare function serializeOrderMatching(matching: OrderMatching): Promise<Uint8Array>;
+export declare function serializeWithdraw(withdraw: WithdrawData): Uint8Array;
+export declare function serializeTransfer(transfer: TransferData): Uint8Array;
+export declare function serializeChangePubKey(changePubKey: ChangePubKeyData): Uint8Array;
+export declare function serializeForcedExit(forcedExit: ForcedExitData): Uint8Array;
+export declare function serializeOrder(order: OrderData): Uint8Array;
+export declare function serializeOrderMatching(matching: OrderMatchingData): Promise<Uint8Array>;
 /**
  * Encodes the transaction data as the byte sequence according to the zkSync protocol.
  * @param tx A transaction to serialize.
  */
-export declare function serializeTx(tx: Transfer | Withdraw | ChangePubKey | CloseAccount | ForcedExit): Uint8Array;
+export declare function serializeTx(tx: TransferData | WithdrawData | ChangePubKeyData | CloseAccount | ForcedExitData): Uint8Array;
 export declare function numberToBytesBE(number: number, bytes: number): Uint8Array;
 export declare function bigintToBytesBE(number1: bigint, bytes: number): Uint8Array;
 export declare function parseHexWithPrefix(str: string): Uint8Array;
@@ -100,7 +100,7 @@ export declare function getCREATE2AddressAndSalt(syncPubkeyHash: string, create2
 };
 export declare function getEthereumBalance(ethProvider: ethers.providers.Provider, syncProvider: Provider, address: Address, token: TokenAddress, chainId: ChainId): Promise<BigNumber>;
 export declare function getPendingBalance(ethProvider: ethers.providers.Provider, syncProvider: Provider, address: Address, token: TokenLike, chainId: ChainId): Promise<BigNumberish>;
-export declare function getTxHash(tx: Transfer | Withdraw | ChangePubKey | ForcedExit | CloseAccount): string;
+export declare function getTxHash(tx: TransferData | WithdrawData | ChangePubKeyData | ForcedExitData | CloseAccount): string;
 export declare function getRandom(min: number, max: number): number;
 export declare function getFastSwapUNonce(): number;
 export declare function chainsCompletion(chains: any[], chainNum: number, item: any): any[];
