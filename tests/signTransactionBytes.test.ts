@@ -1,7 +1,4 @@
 import { expect } from 'chai'
-import { arrayify, parseEther } from 'ethers/lib/utils'
-import { describe } from 'mocha'
-import { serializeAmountPacked } from '../src/utils'
 import { getWallet } from './wallet.test'
 
 describe('signTransaction', function () {

@@ -195,19 +195,20 @@ export interface ContractInfo {
     layerOneChainId: number;
     mainContract: string;
 }
-export interface Tokens {
-    [token: string]: {
-        id: number;
-        symbol: string;
-        decimals: number;
-        chains: {
-            [x: number]: {
-                chainId: number;
-                address: Address;
-                fastWithdraw: boolean;
-            };
+export interface Token {
+    id: TokenId;
+    symbol: TokenSymbol;
+    decimals: number;
+    chains: {
+        [x: ChainId]: {
+            chainId: ChainId;
+            address: Address;
+            fastWithdraw: boolean;
         };
     };
+}
+export interface Tokens {
+    [token: TokenId]: Token;
 }
 export interface ChangePubKeyFee {
     "ChangePubKey": ChangePubkeyTypes;

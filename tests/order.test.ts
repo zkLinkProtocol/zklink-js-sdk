@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 import { BigNumber } from 'ethers'
 import { parseEther, sha256 } from 'ethers/lib/utils'
-import { describe } from 'mocha'
 import {
   closestPackableTransactionAmount,
   serializeOrder,
@@ -58,10 +57,10 @@ describe('Order', () => {
   it('sign sync order', async function () {
     const wallet = await getWallet()
     const signedTransaction = await wallet.signOrder(orderMaker as any)
-    expect(signedTransaction.tx.signature.pubKey).eq(
+    expect(signedTransaction?.tx?.signature?.pubKey).eq(
       '191f5a474b7b8af67e4338c169b16093a8662bd9fd825b88ec97f987e6453e1c'
     )
-    expect(signedTransaction.tx.signature.signature).eq(
+    expect(signedTransaction?.tx?.signature?.signature).eq(
       'd5d5bbb4cfd5dc659ec5373bb62d33ca93e9424ff6d5f971edaf1d29451ae707f054fd178abc2213d26f35d5f46c5062e02ecf05a4de3ffc8fb48e390ce26b01'
     )
   })
@@ -81,7 +80,7 @@ describe('Order', () => {
       feeRatio1: 5,
       feeRatio2: 10,
     } as any)
-    expect(signedTransaction.tx.signature.signature).eq(
+    expect(signedTransaction?.tx?.signature?.signature).eq(
       '7330184d20ca76324fd9b3c0cad81e521a41cef22d464039058b479a2500ad2b218edcb380cba62edbd73f97125b7af4e8e75c63f5070a1acce80844eb3fc701'
     )
   })

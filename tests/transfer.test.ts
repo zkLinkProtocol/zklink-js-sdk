@@ -1,6 +1,5 @@
 import { expect } from 'chai'
 import { BigNumber } from 'ethers'
-import { describe } from 'mocha'
 import { getWallet } from './wallet.test'
 
 describe('transfer', () => {

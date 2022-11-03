@@ -1,7 +1,6 @@
 import { parseEther, sha256 } from 'ethers/lib/utils'
 import { expect } from 'chai'
 import { BigNumber } from 'ethers'
-import { describe } from 'mocha'
 import {
   serializeFeePacked,
   serializeForcedExit,

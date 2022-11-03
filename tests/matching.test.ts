@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 import { BigNumber } from 'ethers'
 import { parseEther, sha256 } from 'ethers/lib/utils'
-import { describe } from 'mocha'
 import { OrderData, OrderMatchingData } from '../src/types'
 import {
   closestPackableTransactionAmount,

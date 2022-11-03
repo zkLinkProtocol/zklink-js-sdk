@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 import { BigNumber } from 'ethers'
 import { sha256 } from 'ethers/lib/utils'
-import { describe } from 'mocha'
 import { WithdrawData } from '../src/types'
 import { serializeOrder, serializeWithdraw } from '../src/utils'
 import { getWallet } from './wallet.test'

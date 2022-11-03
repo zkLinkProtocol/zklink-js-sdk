@@ -1,6 +1,5 @@
 import { expect } from 'chai'
 import { _TypedDataEncoder } from '@ethersproject/hash'
-import { describe } from 'mocha'
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { getWallet } from './wallet.test'
 import { utils } from '../src'

@@ -594,8 +594,8 @@ export class Wallet {
   }
 
   async getBalances(subAccountId?: number): Promise<AccountBalances> {
-    const accountId = this.accountId ? this.accountId : await this.getAccountId()
-    return await this.provider.getBalance(accountId, subAccountId)
+    this.accountId = await this.getAccountId()
+    return await this.provider.getBalance(this.accountId, subAccountId)
   }
 
   async getTokenBalance(tokenId: TokenId, subAccountId: number) {

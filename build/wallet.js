@@ -421,8 +421,8 @@ class Wallet {
     }
     getBalances(subAccountId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const accountId = this.accountId ? this.accountId : yield this.getAccountId();
-            return yield this.provider.getBalance(accountId, subAccountId);
+            this.accountId = yield this.getAccountId();
+            return yield this.provider.getBalance(this.accountId, subAccountId);
         });
     }
     getTokenBalance(tokenId, subAccountId) {

@@ -244,20 +244,21 @@ export interface ContractInfo {
   mainContract: string
 }
 
-export interface Tokens {
-  // Tokens are indexed by their symbol (e.g. "ETH")
-  [token: string]: {
-    id: number
-    symbol: string
-    decimals: number
-    chains: {
-      [x: number]: {
-        chainId: number
-        address: Address
-        fastWithdraw: boolean
-      }
+export interface Token {
+  id: TokenId
+  symbol: TokenSymbol
+  decimals: number
+  chains: {
+    [x: ChainId]: {
+      chainId: ChainId
+      address: Address
+      fastWithdraw: boolean
     }
   }
+}
+export interface Tokens {
+  // Tokens are indexed by their symbol (e.g. "ETH")
+  [token: TokenId]: Token
 }
 
 // we have to ignore this because of a bug in prettier causes this exact block
