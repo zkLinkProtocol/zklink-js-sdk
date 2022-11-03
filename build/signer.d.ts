@@ -1,16 +1,16 @@
 import { BigNumberish, ethers } from 'ethers';
-import { Address, EthSignerType, PubKeyHash, Transfer, Withdraw, ForcedExit, ChangePubKey, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, Order, OrderMatching, Signature, TokenId } from './types';
+import { Address, EthSignerType, PubKeyHash, TransferData, WithdrawData, ForcedExitData, ChangePubKeyData, ChangePubKeyOnchain, ChangePubKeyECDSA, ChangePubKeyCREATE2, Create2Data, OrderData, OrderMatchingData, Signature, TokenId } from './types';
 export declare class Signer {
     #private;
     private constructor();
     pubKeyHash(): Promise<PubKeyHash>;
     signTransactionBytes(msg: string): Promise<Signature>;
     pubKey(): Promise<string>;
-    signTransfer(tx: Transfer): Promise<Transfer>;
-    signOrderMatching(tx: OrderMatching): Promise<OrderMatching>;
-    signOrder(tx: Order): Promise<Order>;
-    signWithdraw(tx: Withdraw): Promise<Withdraw>;
-    signForcedExit(tx: ForcedExit): Promise<ForcedExit>;
+    signTransfer(tx: TransferData): Promise<TransferData>;
+    signOrderMatching(tx: OrderMatchingData): Promise<OrderMatchingData>;
+    signOrder(tx: OrderData): Promise<OrderData>;
+    signWithdraw(tx: WithdrawData): Promise<WithdrawData>;
+    signForcedExit(tx: ForcedExitData): Promise<ForcedExitData>;
     signChangePubKey(changePubKey: {
         chainId: number;
         subAccountId: number;
@@ -22,7 +22,7 @@ export declare class Signer {
         ts: number;
         nonce: number;
         ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2;
-    }): Promise<ChangePubKey>;
+    }): Promise<ChangePubKeyData>;
     static fromPrivateKey(pk: Uint8Array): Signer;
     static fromSeed(seed: Uint8Array): Promise<Signer>;
     static fromETHSignature(ethSigner: ethers.Signer): Promise<{

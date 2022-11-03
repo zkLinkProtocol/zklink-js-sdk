@@ -1,5 +1,5 @@
 import * as ethers from 'ethers';
-import { TxEthSignature, EthSignerType, PubKeyHash, Order } from './types';
+import { TxEthSignature, EthSignerType, PubKeyHash, OrderData } from './types';
 /**
  * Wrapper around `ethers.Signer` which provides convenient methods to get and sign messages required for zkSync.
  */
@@ -38,21 +38,21 @@ export declare class EthMessageSigner {
         stringFeeToken: string;
         stringFee: string;
     }): string;
-    ethSignOrder(payload: Order & {
+    ethSignOrder(payload: OrderData & {
         address: string;
         stringPrice: string;
         stringAmount: string;
         baseTokenSymbol: string;
         quoteTokenSymbol: string;
     }): Promise<TxEthSignature>;
-    getOrderEthSignMessage(payload: Order & {
+    getOrderEthSignMessage(payload: OrderData & {
         address: string;
         stringPrice: string;
         stringAmount: string;
         baseTokenSymbol: string;
         quoteTokenSymbol: string;
     }): string;
-    getOrderEthMessagePart(tx: Order & {
+    getOrderEthMessagePart(tx: OrderData & {
         address: string;
         stringPrice: string;
         stringAmount: string;

@@ -1,21 +1,39 @@
-import * as ethers from 'ethers'
-import { TxEthSignature, EthSignerType, PubKeyHash, Address, Order } from './types'
-import { getSignedBytesFromMessage, signMessagePersonalAPI, getChangePubkeyMessage } from './utils'
+import * as ethers from 'ethers';
+import {
+  TxEthSignature,
+  EthSignerType,
+  PubKeyHash,
+  Address,
+  OrderData,
+} from './types';
+import {
+  getSignedBytesFromMessage,
+  signMessagePersonalAPI,
+  getChangePubkeyMessage,
+} from './utils';
 
 /**
  * Wrapper around `ethers.Signer` which provides convenient methods to get and sign messages required for zkSync.
  */
 export class EthMessageSigner {
-  constructor(private ethSigner: ethers.Signer, private ethSignerType?: EthSignerType) {}
+  constructor(
+    private ethSigner: ethers.Signer,
+    private ethSignerType?: EthSignerType
+  ) {}
 
-  async getEthMessageSignature(message: ethers.utils.BytesLike): Promise<TxEthSignature> {
+  async getEthMessageSignature(
+    message: ethers.utils.BytesLike
+  ): Promise<TxEthSignature> {
     if (this.ethSignerType == null) {
-      throw new Error('ethSignerType is unknown')
+      throw new Error('ethSignerType is unknown');
     }
 
-    const signedBytes = getSignedBytesFromMessage(message, !this.ethSignerType.isSignedMsgPrefixed)
+    const signedBytes = getSignedBytesFromMessage(
+      message,
+      !this.ethSignerType.isSignedMsgPrefixed
+    );
 
-    const signature = await signMessagePersonalAPI(this.ethSigner, signedBytes)
+    const signature = await signMessagePersonalAPI(this.ethSigner, signedBytes);
 
     return {
       type:
@@ -23,266 +41,278 @@ export class EthMessageSigner {
           ? 'EthereumSignature'
           : 'EIP1271Signature',
       signature,
-    }
+    };
   }
 
   getTransferEthSignMessage(transfer: {
-    stringAmount: string
-    stringToken: string
-    stringFee: string
-    to: string
-    nonce: number
-    accountId: number
+    stringAmount: string;
+    stringToken: string;
+    stringFee: string;
+    to: string;
+    nonce: number;
+    accountId: number;
   }): string {
-    let humanReadableTxInfo = this.getTransferEthMessagePart(transfer, 'transfer')
+    let humanReadableTxInfo = this.getTransferEthMessagePart(
+      transfer,
+      'transfer'
+    );
     if (humanReadableTxInfo.length != 0) {
-      humanReadableTxInfo += '\n'
+      humanReadableTxInfo += '\n';
     }
-    humanReadableTxInfo += `Nonce: ${transfer.nonce}`
+    humanReadableTxInfo += `Nonce: ${transfer.nonce}`;
 
-    return humanReadableTxInfo
+    return humanReadableTxInfo;
   }
 
   async ethSignTransfer(transfer: {
-    stringAmount: string
-    stringToken: string
-    stringFee: string
-    to: string
-    nonce: number
-    accountId: number
+    stringAmount: string;
+    stringToken: string;
+    stringFee: string;
+    to: string;
+    nonce: number;
+    accountId: number;
   }): Promise<TxEthSignature> {
-    const message = this.getTransferEthSignMessage(transfer)
-    return await this.getEthMessageSignature(message)
+    const message = this.getTransferEthSignMessage(transfer);
+    return await this.getEthMessageSignature(message);
   }
 
   getOrderMatchingEthSignMessage(matching: {
-    stringFeeToken: string
-    stringFee: string
-    nonce: number
+    stringFeeToken: string;
+    stringFee: string;
+    nonce: number;
   }): string {
-    let humanReadableTxInfo = this.getOrderMatchingEthMessagePart(matching)
+    let humanReadableTxInfo = this.getOrderMatchingEthMessagePart(matching);
     if (humanReadableTxInfo.length != 0) {
-      humanReadableTxInfo += '\n'
+      humanReadableTxInfo += '\n';
     }
-    humanReadableTxInfo += `Nonce: ${matching.nonce}`
+    humanReadableTxInfo += `Nonce: ${matching.nonce}`;
 
-    return humanReadableTxInfo
+    return humanReadableTxInfo;
   }
 
   async ethSignOrderMatching(matching: {
-    stringFeeToken: string
-    stringFee: string
-    nonce: number
+    stringFeeToken: string;
+    stringFee: string;
+    nonce: number;
   }): Promise<TxEthSignature> {
-    const message = this.getOrderMatchingEthSignMessage(matching)
-    return await this.getEthMessageSignature(message)
+    const message = this.getOrderMatchingEthSignMessage(matching);
+    return await this.getEthMessageSignature(message);
   }
 
-  getOrderMatchingEthMessagePart(tx: { stringFeeToken: string; stringFee: string }): string {
-    let message = `OrderMatching fee: ${tx.stringFee} ${tx.stringFeeToken}`
-    return message
+  getOrderMatchingEthMessagePart(tx: {
+    stringFeeToken: string;
+    stringFee: string;
+  }): string {
+    let message = `OrderMatching fee: ${tx.stringFee} ${tx.stringFeeToken}`;
+    return message;
   }
 
   async ethSignOrder(
-    payload: Order & {
-      address: string
-      stringPrice: string
-      stringAmount: string
-      baseTokenSymbol: string
-      quoteTokenSymbol: string
+    payload: OrderData & {
+      address: string;
+      stringPrice: string;
+      stringAmount: string;
+      baseTokenSymbol: string;
+      quoteTokenSymbol: string;
     }
   ): Promise<TxEthSignature> {
-    const message = this.getOrderEthSignMessage(payload)
-    return await this.getEthMessageSignature(message)
+    const message = this.getOrderEthSignMessage(payload);
+    return await this.getEthMessageSignature(message);
   }
 
   getOrderEthSignMessage(
-    payload: Order & {
-      address: string
-      stringPrice: string
-      stringAmount: string
-      baseTokenSymbol: string
-      quoteTokenSymbol: string
+    payload: OrderData & {
+      address: string;
+      stringPrice: string;
+      stringAmount: string;
+      baseTokenSymbol: string;
+      quoteTokenSymbol: string;
     }
   ): string {
-    let humanReadableTxInfo = this.getOrderEthMessagePart(payload)
+    let humanReadableTxInfo = this.getOrderEthMessagePart(payload);
     if (humanReadableTxInfo.length != 0) {
-      humanReadableTxInfo += '\n'
+      humanReadableTxInfo += '\n';
     }
-    humanReadableTxInfo += `Nonce: ${payload.nonce}`
+    humanReadableTxInfo += `Nonce: ${payload.nonce}`;
 
-    return humanReadableTxInfo
+    return humanReadableTxInfo;
   }
   getOrderEthMessagePart(
-    tx: Order & {
-      address: string
-      stringPrice: string
-      stringAmount: string
-      baseTokenSymbol: string
-      quoteTokenSymbol: string
+    tx: OrderData & {
+      address: string;
+      stringPrice: string;
+      stringAmount: string;
+      baseTokenSymbol: string;
+      quoteTokenSymbol: string;
     }
   ): string {
-    let message = ''
+    let message = '';
     if (tx.isSell) {
-      message += `Order for ${tx.stringAmount} ${tx.baseTokenSymbol} -> ${tx.quoteTokenSymbol}`
+      message += `Order for ${tx.stringAmount} ${tx.baseTokenSymbol} -> ${tx.quoteTokenSymbol}`;
     } else {
-      message += `Order for ${tx.stringAmount} ${tx.quoteTokenSymbol} -> ${tx.baseTokenSymbol}`
+      message += `Order for ${tx.stringAmount} ${tx.quoteTokenSymbol} -> ${tx.baseTokenSymbol}`;
     }
-    message += '\n'
-    message += `Price: ${tx.stringPrice} ${tx.quoteTokenSymbol}`
-    message += '\n'
-    message += `Address: ${tx.address}`
-    message += '\n'
-    return message
+    message += '\n';
+    message += `Price: ${tx.stringPrice} ${tx.quoteTokenSymbol}`;
+    message += '\n';
+    message += `Address: ${tx.address}`;
+    message += '\n';
+    return message;
   }
 
   getCreatePoolEthMessagePart(tx: { token0: string; token1: string }): string {
-    let message = ''
-    message += `Token: ${tx.token0} - ${tx.token1}`
-    return message
+    let message = '';
+    message += `Token: ${tx.token0} - ${tx.token1}`;
+    return message;
   }
 
   getCreatePoolEthSignMessage(transfer: {
-    token0: string
-    token1: string
-    nonce: number
-    accountId: number
+    token0: string;
+    token1: string;
+    nonce: number;
+    accountId: number;
   }): string {
-    let humanReadableTxInfo = this.getCreatePoolEthMessagePart(transfer)
+    let humanReadableTxInfo = this.getCreatePoolEthMessagePart(transfer);
     if (humanReadableTxInfo.length != 0) {
-      humanReadableTxInfo += '\n'
+      humanReadableTxInfo += '\n';
     }
-    humanReadableTxInfo += `Nonce: ${transfer.nonce}`
+    humanReadableTxInfo += `Nonce: ${transfer.nonce}`;
 
-    return humanReadableTxInfo
+    return humanReadableTxInfo;
   }
 
   async ethSignCreatePool(transfer: {
-    token0: string
-    token1: string
-    nonce: number
-    accountId: number
+    token0: string;
+    token1: string;
+    nonce: number;
+    accountId: number;
   }): Promise<TxEthSignature> {
-    const message = this.getCreatePoolEthSignMessage(transfer)
-    return await this.getEthMessageSignature(message)
+    const message = this.getCreatePoolEthSignMessage(transfer);
+    return await this.getEthMessageSignature(message);
   }
 
   async ethSignForcedExit(forcedExit: {
-    stringToken: string
-    stringFeeToken: string
-    stringFee: string
-    target: string
-    nonce: number
+    stringToken: string;
+    stringFeeToken: string;
+    stringFee: string;
+    target: string;
+    nonce: number;
   }): Promise<TxEthSignature> {
-    const message = this.getForcedExitEthSignMessage(forcedExit)
-    return await this.getEthMessageSignature(message)
+    const message = this.getForcedExitEthSignMessage(forcedExit);
+    return await this.getEthMessageSignature(message);
   }
 
   getWithdrawEthSignMessage(withdraw: {
-    stringAmount: string
-    stringToken: string
-    stringFee: string
-    to: string
-    nonce: number
-    accountId: number
+    stringAmount: string;
+    stringToken: string;
+    stringFee: string;
+    to: string;
+    nonce: number;
+    accountId: number;
   }): string {
-    let humanReadableTxInfo = this.getWithdrawEthMessagePart(withdraw)
+    let humanReadableTxInfo = this.getWithdrawEthMessagePart(withdraw);
     if (humanReadableTxInfo.length != 0) {
-      humanReadableTxInfo += '\n'
+      humanReadableTxInfo += '\n';
     }
-    humanReadableTxInfo += `Nonce: ${withdraw.nonce}`
+    humanReadableTxInfo += `Nonce: ${withdraw.nonce}`;
 
-    return humanReadableTxInfo
+    return humanReadableTxInfo;
   }
 
   getForcedExitEthSignMessage(forcedExit: {
-    stringToken: string
-    stringFeeToken: string
-    stringFee: string
-    target: string
-    nonce: number
+    stringToken: string;
+    stringFeeToken: string;
+    stringFee: string;
+    target: string;
+    nonce: number;
   }): string {
-    let humanReadableTxInfo = this.getForcedExitEthMessagePart(forcedExit)
-    humanReadableTxInfo += `\nNonce: ${forcedExit.nonce}`
-    return humanReadableTxInfo
+    let humanReadableTxInfo = this.getForcedExitEthMessagePart(forcedExit);
+    humanReadableTxInfo += `\nNonce: ${forcedExit.nonce}`;
+    return humanReadableTxInfo;
   }
 
   getTransferEthMessagePart(
     tx: {
-      stringAmount: string
-      stringToken: string
-      stringFee: string
-      to?: string
+      stringAmount: string;
+      stringToken: string;
+      stringFee: string;
+      to?: string;
     },
     type: 'transfer' | 'withdraw'
   ): string {
-    let txType: string
+    let txType: string;
     if (type == 'withdraw') {
-      txType = 'Withdraw'
+      txType = 'Withdraw';
     } else if (type == 'transfer') {
-      txType = 'Transfer'
+      txType = 'Transfer';
     } else {
-      throw new Error('Ether to or ethAddress field must be present')
+      throw new Error('Ether to or ethAddress field must be present');
     }
 
-    let message = ''
+    let message = '';
     if (tx.stringAmount != null) {
-      message += `${txType} ${tx.stringAmount} ${tx.stringToken} to: ${tx.to.toLowerCase()}`
+      message += `${txType} ${tx.stringAmount} ${
+        tx.stringToken
+      } to: ${tx.to.toLowerCase()}`;
     }
     if (tx.stringFee != null) {
       if (message.length != 0) {
-        message += '\n'
+        message += '\n';
       }
-      message += `Fee: ${tx.stringFee} ${tx.stringToken}`
+      message += `Fee: ${tx.stringFee} ${tx.stringToken}`;
     }
-    return message
+    return message;
   }
 
   getWithdrawEthMessagePart(tx: {
-    stringAmount: string
-    stringToken: string
-    stringFee: string
-    to?: string
+    stringAmount: string;
+    stringToken: string;
+    stringFee: string;
+    to?: string;
   }): string {
-    return this.getTransferEthMessagePart(tx, 'withdraw')
+    return this.getTransferEthMessagePart(tx, 'withdraw');
   }
 
   getChangePubKeyEthMessagePart(changePubKey: {
-    pubKeyHash: PubKeyHash
-    stringToken: string
-    stringFee: string
+    pubKeyHash: PubKeyHash;
+    stringToken: string;
+    stringFee: string;
   }): string {
-    let message = ''
-    message += `Set signing key: ${changePubKey.pubKeyHash.replace('sync:', '').toLowerCase()}`
+    let message = '';
+    message += `Set signing key: ${changePubKey.pubKeyHash
+      .replace('sync:', '')
+      .toLowerCase()}`;
     if (changePubKey.stringFee != null) {
-      message += `\nFee: ${changePubKey.stringFee} ${changePubKey.stringToken}`
+      message += `\nFee: ${changePubKey.stringFee} ${changePubKey.stringToken}`;
     }
-    return message
+    return message;
   }
 
   getForcedExitEthMessagePart(forcedExit: {
-    stringToken: string
-    stringFeeToken: string
-    stringFee: string
-    target: string
+    stringToken: string;
+    stringFeeToken: string;
+    stringFee: string;
+    target: string;
   }): string {
-    let message = `ForcedExit ${forcedExit.stringToken} to: ${forcedExit.target.toLowerCase()}`
+    let message = `ForcedExit ${
+      forcedExit.stringToken
+    } to: ${forcedExit.target.toLowerCase()}`;
     if (forcedExit.stringFee != null) {
-      message += `\nFee: ${forcedExit.stringFee} ${forcedExit.stringFeeToken}`
+      message += `\nFee: ${forcedExit.stringFee} ${forcedExit.stringFeeToken}`;
     }
-    return message
+    return message;
   }
 
   async ethSignWithdraw(withdraw: {
-    stringAmount: string
-    stringToken: string
-    stringFee: string
-    to: string
-    nonce: number
-    accountId: number
+    stringAmount: string;
+    stringToken: string;
+    stringFee: string;
+    to: string;
+    nonce: number;
+    accountId: number;
   }): Promise<TxEthSignature> {
-    const message = this.getWithdrawEthSignMessage(withdraw)
-    return await this.getEthMessageSignature(message)
+    const message = this.getWithdrawEthSignMessage(withdraw);
+    return await this.getEthMessageSignature(message);
   }
 
   // getChangePubKeyEthSignMessage(changePubKey: {

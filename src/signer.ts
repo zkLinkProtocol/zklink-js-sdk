@@ -10,16 +10,16 @@ import {
   Address,
   EthSignerType,
   PubKeyHash,
-  Transfer,
-  Withdraw,
-  ForcedExit,
-  ChangePubKey,
+  TransferData,
+  WithdrawData,
+  ForcedExitData,
+  ChangePubKeyData,
   ChangePubKeyOnchain,
   ChangePubKeyECDSA,
   ChangePubKeyCREATE2,
   Create2Data,
-  Order,
-  OrderMatching,
+  OrderData,
+  OrderMatchingData,
   Signature,
   TokenId,
 } from './types'
@@ -44,7 +44,7 @@ export class Signer {
     return await privateKeyToPubKey(this.#privateKey)
   }
 
-  async signTransfer(tx: Transfer): Promise<Transfer> {
+  async signTransfer(tx: TransferData): Promise<TransferData> {
     const msgBytes = utils.serializeTransfer(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
 
@@ -56,7 +56,7 @@ export class Signer {
     }
   }
 
-  async signOrderMatching(tx: OrderMatching): Promise<OrderMatching> {
+  async signOrderMatching(tx: OrderMatchingData): Promise<OrderMatchingData> {
     const msgBytes = await utils.serializeOrderMatching(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
 
@@ -79,7 +79,7 @@ export class Signer {
     } as any
   }
 
-  async signOrder(tx: Order): Promise<Order> {
+  async signOrder(tx: OrderData): Promise<OrderData> {
     const msgBytes = utils.serializeOrder(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
 
@@ -91,7 +91,7 @@ export class Signer {
     }
   }
 
-  async signWithdraw(tx: Withdraw): Promise<Withdraw> {
+  async signWithdraw(tx: WithdrawData): Promise<WithdrawData> {
     const msgBytes = utils.serializeWithdraw(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
     return {
@@ -102,7 +102,7 @@ export class Signer {
     }
   }
 
-  async signForcedExit(tx: ForcedExit): Promise<ForcedExit> {
+  async signForcedExit(tx: ForcedExitData): Promise<ForcedExitData> {
     const msgBytes = utils.serializeForcedExit(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
     return {
@@ -123,8 +123,8 @@ export class Signer {
     ts: number
     nonce: number
     ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2
-  }): Promise<ChangePubKey> {
-    const tx: ChangePubKey = {
+  }): Promise<ChangePubKeyData> {
+    const tx: ChangePubKeyData = {
       ...changePubKey,
       type: 'ChangePubKey',
     }
