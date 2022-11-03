@@ -13,6 +13,8 @@ export type TokenSymbol = string
 export type TokenAddress = string
 export type TokenId = number
 export type ChainId = number
+export type Ether = string
+export type Wei = string
 
 export type TotalFee = Map<TokenLike, BigNumber>
 
@@ -54,7 +56,7 @@ export interface AccountState {
 export interface AccountBalances {
   [subAccountId: number]: {
     // Token are indexed by their id (e.g. "1")
-    [tokenId: number]: BigNumberish
+    [tokenId: number]: Wei
   }
 }
 
