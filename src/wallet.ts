@@ -41,6 +41,7 @@ import {
   ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT,
   getTimestamp,
   signMessageEIP712,
+  ERC20_APPROVE_TRESHOLD,
 } from './utils'
 import { LinkContract } from './contract'
 import { isAddress } from 'ethers/lib/utils'
@@ -632,6 +633,32 @@ export class Wallet {
     } catch (e) {
       this.modifyEthersError(e)
     }
+  }
+
+  async isERC20DepositsApproved(
+    tokenAddress: Address,
+    accountAddress: Address,
+    linkChainId: number,
+    erc20ApproveThreshold: BigNumber = ERC20_APPROVE_TRESHOLD
+  ) {
+    return this.contract.isERC20DepositsApproved(
+      tokenAddress,
+      accountAddress,
+      linkChainId,
+      erc20ApproveThreshold
+    )
+  }
+
+  async approveERC20TokenDeposits(
+    tokenAddress: Address,
+    linkChainId: number,
+    max_erc20_approve_amount: BigNumber = MAX_ERC20_APPROVE_AMOUNT
+  ) {
+    return this.contract.approveERC20TokenDeposits(
+      tokenAddress,
+      linkChainId,
+      max_erc20_approve_amount
+    )
   }
 
   async sendDepositFromEthereum(deposit: {

@@ -455,6 +455,16 @@ class Wallet {
             }
         });
     }
+    isERC20DepositsApproved(tokenAddress, accountAddress, linkChainId, erc20ApproveThreshold = utils_1.ERC20_APPROVE_TRESHOLD) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.contract.isERC20DepositsApproved(tokenAddress, accountAddress, linkChainId, erc20ApproveThreshold);
+        });
+    }
+    approveERC20TokenDeposits(tokenAddress, linkChainId, max_erc20_approve_amount = utils_1.MAX_ERC20_APPROVE_AMOUNT) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.contract.approveERC20TokenDeposits(tokenAddress, linkChainId, max_erc20_approve_amount);
+        });
+    }
     sendDepositFromEthereum(deposit) {
         return __awaiter(this, void 0, void 0, function* () {
             const contractAddress = yield this.provider.getContractInfo(deposit.linkChainId);

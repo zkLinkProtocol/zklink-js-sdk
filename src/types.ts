@@ -252,6 +252,7 @@ export interface Token {
     [x: ChainId]: {
       chainId: ChainId
       address: Address
+      decimals: number
       fastWithdraw: boolean
     }
   }
