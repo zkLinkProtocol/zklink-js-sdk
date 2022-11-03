@@ -77,9 +77,7 @@ export class Wallet {
           this.accountId = r.id
         })
       }
-    } catch (e) {
-      console.error(JSON.stringify(e.jrpcError))
-    }
+    } catch (e) {}
     return this
   }
 

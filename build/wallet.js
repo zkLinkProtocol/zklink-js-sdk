@@ -44,9 +44,7 @@ class Wallet {
                 });
             }
         }
-        catch (e) {
-            console.error(JSON.stringify(e.jrpcError));
-        }
+        catch (e) { }
         return this;
     }
     static fromEthSigner(ethWallet, provider, signer, accountId, ethSignerType) {

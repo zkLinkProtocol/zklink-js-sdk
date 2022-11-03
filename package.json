@@ -39,8 +39,7 @@
     "watch": "tsc --watch",
     "prepublish": "yarn build && rollup -c",
     "generate-test-vectors": "yarn ts-node tests/test-generator.ts",
-    "prerelease": "npm version prerelease --preid=alpha",
-    "patch": "npm version patch",
-    "publish": "npm publish"
+    "prerelease": "npm version prerelease --preid=alpha && npm publish",
+    "patch": "npm version patch"
   }
 }
