@@ -37,14 +37,14 @@ class Wallet {
     connect(provider) {
         this.provider = provider;
         this.contract = new contract_1.LinkContract(provider, this.ethSigner);
-        try {
-            if (this.accountId === undefined) {
-                provider.getState(this.address()).then((r) => {
-                    this.accountId = r.id;
-                });
-            }
+        if (this.accountId === undefined) {
+            this.provider
+                .getState(this.address())
+                .then((r) => {
+                this.accountId = r.id;
+            })
+                .catch((e) => { });
         }
-        catch (e) { }
         return this;
     }
     static fromEthSigner(ethWallet, provider, signer, accountId, ethSignerType) {
