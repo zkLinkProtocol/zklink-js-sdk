@@ -164,21 +164,21 @@ export class Wallet {
     return submitSignedTransaction(signedTransferTransaction, this.provider)
   }
 
-  async getTransferData(payload: TransferEntries): Promise<TransferData> {
+  async getTransferData(entries: TransferEntries): Promise<TransferData> {
     if (!this.signer) {
       throw new Error('ZKLink signer is required for sending zklink transactions.')
     }
     await this.setRequiredAccountIdFromServer('Transfer funds')
 
     const transactionData: TransferData = {
-      ...payload,
+      ...entries,
       type: 'Transfer',
-      accountId: payload.accountId || this.accountId,
+      accountId: entries.accountId || this.accountId,
       from: this.address(),
-      token: this.provider.tokenSet.resolveTokenId(payload.token),
-      fee: payload.fee ? payload.fee : null,
-      nonce: payload.nonce == null ? await this.getNonce() : await this.getNonce(payload.nonce),
-      ts: payload.ts || getTimestamp(),
+      token: this.provider.tokenSet.resolveTokenId(entries.token),
+      fee: entries.fee ? entries.fee : null,
+      nonce: entries.nonce == null ? await this.getNonce() : await this.getNonce(entries.nonce),
+      ts: entries.ts || getTimestamp(),
     }
 
     if (transactionData.fee == null) {
@@ -191,8 +191,8 @@ export class Wallet {
     return transactionData
   }
 
-  async signTransfer(transfer: TransferEntries): Promise<SignedTransaction> {
-    const transactionData = await this.getTransferData(transfer)
+  async signTransfer(entries: TransferEntries): Promise<SignedTransaction> {
+    const transactionData = await this.getTransferData(entries)
 
     const signedTransferTransaction = await this.signer.signTransfer(transactionData)
 

@@ -24,8 +24,8 @@ export declare class Wallet {
     static fromEthSignerNoKeys(ethWallet: ethers.Signer, provider: Provider, accountId?: number, ethSignerType?: EthSignerType): Promise<Wallet>;
     getEIP712Signature(data: any): Promise<TxEthSignature>;
     sendTransfer(transfer: TransferEntries): Promise<Transaction>;
-    getTransferData(payload: TransferEntries): Promise<TransferData>;
-    signTransfer(transfer: TransferEntries): Promise<SignedTransaction>;
+    getTransferData(entries: TransferEntries): Promise<TransferData>;
+    signTransfer(entries: TransferEntries): Promise<SignedTransaction>;
     sendForcedExit(entries: ForcedExitEntries): Promise<Transaction>;
     getForcedExitData(entries: ForcedExitEntries): Promise<ForcedExitData>;
     signForcedExit(entries: ForcedExitEntries): Promise<SignedTransaction>;

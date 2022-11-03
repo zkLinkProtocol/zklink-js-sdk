@@ -103,22 +103,22 @@ class Wallet {
             return submitSignedTransaction(signedTransferTransaction, this.provider);
         });
     }
-    getTransferData(payload) {
+    getTransferData(entries) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
                 throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
-            const transactionData = Object.assign(Object.assign({}, payload), { type: 'Transfer', accountId: payload.accountId || this.accountId, from: this.address(), token: this.provider.tokenSet.resolveTokenId(payload.token), fee: payload.fee ? payload.fee : null, nonce: payload.nonce == null ? yield this.getNonce() : yield this.getNonce(payload.nonce), ts: payload.ts || (0, utils_1.getTimestamp)() });
+            const transactionData = Object.assign(Object.assign({}, entries), { type: 'Transfer', accountId: entries.accountId || this.accountId, from: this.address(), token: this.provider.tokenSet.resolveTokenId(entries.token), fee: entries.fee ? entries.fee : null, nonce: entries.nonce == null ? yield this.getNonce() : yield this.getNonce(entries.nonce), ts: entries.ts || (0, utils_1.getTimestamp)() });
             if (transactionData.fee == null) {
                 transactionData.fee = yield this.provider.getTransactionFee(Object.assign(Object.assign({}, transactionData), { fee: '0', amount: ethers_1.BigNumber.from(transactionData.amount).toString() }));
             }
             return transactionData;
         });
     }
-    signTransfer(transfer) {
+    signTransfer(entries) {
         return __awaiter(this, void 0, void 0, function* () {
-            const transactionData = yield this.getTransferData(transfer);
+            const transactionData = yield this.getTransferData(entries);
             const signedTransferTransaction = yield this.signer.signTransfer(transactionData);
             const stringAmount = ethers_1.BigNumber.from(transactionData.amount).isZero()
                 ? null
