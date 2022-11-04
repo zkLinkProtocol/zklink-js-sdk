@@ -84,7 +84,7 @@ export interface WithdrawEntries {
     amount: BigNumberish;
     withdrawFeeRatio: number;
     fastWithdraw: number;
-    accountId: number;
+    accountId?: number;
     from?: string;
     fee?: BigNumberish;
     nonce?: Nonce;
