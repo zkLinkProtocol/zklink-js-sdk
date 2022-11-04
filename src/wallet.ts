@@ -436,13 +436,25 @@ export class Wallet {
       feeToken: entries.feeToken,
       nonce: entries.nonce == null ? await this.getNonce() : await this.getNonce(entries.nonce),
       ts: entries.ts || getTimestamp(),
-      ethAuthData: {
-        type: entries.ethAuthType,
+    }
+    if (entries.ethAuthType === 'Onchain') {
+      transactionData.ethAuthData = {
+        type: 'Onchain',
+      }
+    } else if (entries.ethAuthType === 'EthECDSA') {
+      transactionData.ethAuthData = {
+        type: 'EthECDSA',
         ethSignature:
           '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
-      } as any,
+      }
+    } else if (entries.ethAuthType === 'EthCREATE2') {
+      transactionData.ethAuthData = {
+        type: 'EthCREATE2',
+        creatorAddress: '0x0000000000000000000000000000000000000000',
+        saltArg: '0x0000000000000000000000000000000000000000000000000000000000000000',
+        codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+      }
     }
-
     if (transactionData.fee == null) {
       transactionData.fee = await this.provider.getTransactionFee({
         ...transactionData,

@@ -307,11 +307,26 @@ class Wallet {
                 feeToken: entries.feeToken,
                 nonce: entries.nonce == null ? yield this.getNonce() : yield this.getNonce(entries.nonce),
                 ts: entries.ts || (0, utils_1.getTimestamp)(),
-                ethAuthData: {
-                    type: entries.ethAuthType,
-                    ethSignature: '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
-                },
             };
+            if (entries.ethAuthType === 'Onchain') {
+                transactionData.ethAuthData = {
+                    type: 'Onchain',
+                };
+            }
+            else if (entries.ethAuthType === 'EthECDSA') {
+                transactionData.ethAuthData = {
+                    type: 'EthECDSA',
+                    ethSignature: '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+                };
+            }
+            else if (entries.ethAuthType === 'EthCREATE2') {
+                transactionData.ethAuthData = {
+                    type: 'EthCREATE2',
+                    creatorAddress: '0x0000000000000000000000000000000000000000',
+                    saltArg: '0x0000000000000000000000000000000000000000000000000000000000000000',
+                    codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+                };
+            }
             if (transactionData.fee == null) {
                 transactionData.fee = yield this.provider.getTransactionFee(Object.assign(Object.assign({}, transactionData), { fee: '0' }));
             }
@@ -320,9 +335,7 @@ class Wallet {
     }
     signChangePubKey(entries) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(111);
             const transactionData = yield this.getChangePubKeyData(entries);
-            console.log(222);
             if (entries.ethAuthType === 'Onchain') {
                 transactionData.ethAuthData = {
                     type: 'Onchain',
