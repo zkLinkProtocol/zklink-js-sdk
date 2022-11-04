@@ -278,9 +278,11 @@ class Wallet {
     sendChangePubKey(changePubKey) {
         return __awaiter(this, void 0, void 0, function* () {
             const txData = yield this.signChangePubKey(changePubKey);
-            const currentPubKeyHash = yield this.getCurrentPubKeyHash();
-            if (currentPubKeyHash === txData.tx.newPkHash) {
-                throw new Error('Current signing key is already set');
+            if (!changePubKey.accountId) {
+                const currentPubKeyHash = yield this.getCurrentPubKeyHash();
+                if (currentPubKeyHash === txData.tx.newPkHash) {
+                    throw new Error('Current signing key is already set');
+                }
             }
             return submitSignedTransaction(txData, this.provider);
         });

@@ -417,9 +417,11 @@ export class Wallet {
   }): Promise<Transaction> {
     const txData = await this.signChangePubKey(changePubKey as any)
 
-    const currentPubKeyHash = await this.getCurrentPubKeyHash()
-    if (currentPubKeyHash === (txData.tx as ChangePubKeyData).newPkHash) {
-      throw new Error('Current signing key is already set')
+    if (!changePubKey.accountId) {
+      const currentPubKeyHash = await this.getCurrentPubKeyHash()
+      if (currentPubKeyHash === (txData.tx as ChangePubKeyData).newPkHash) {
+        throw new Error('Current signing key is already set')
+      }
     }
 
     return submitSignedTransaction(txData, this.provider)
