@@ -166,7 +166,7 @@ export interface ForcedExitData {
   signature?: Signature
 }
 
-export type ChangePubkeyTypes = 'Onchain' | 'EthECDSA' | 'EthCREATE2' | 'ECDSALegacyMessage'
+export type ChangePubkeyTypes = 'Onchain' | 'EthECDSA' | 'EthCREATE2'
 
 export interface ChangePubKeyOnchain {
   type: 'Onchain'
@@ -185,12 +185,24 @@ export interface ChangePubKeyCREATE2 {
   codeHash: string
 }
 
+export interface ChangePubKeyEntries {
+  chainId: number
+  subAccountId: number
+  feeToken: TokenId
+  ethAuthType: ChangePubkeyTypes
+  account?: Address
+  accountId?: number
+  fee?: BigNumberish
+  ts?: number
+  nonce?: Nonce
+}
+
 export interface ChangePubKeyData {
   type: 'ChangePubKey'
   chainId: number
   subAccountId: number
-  accountId: number
   account: Address
+  accountId: number
   newPkHash: PubKeyHash
   feeToken: number
   fee: BigNumberish

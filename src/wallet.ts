@@ -29,6 +29,7 @@ import {
   TransferEntries,
   ForcedExitEntries,
   WithdrawEntries,
+  ChangePubKeyEntries,
 } from './types'
 import {
   IERC20_INTERFACE,
@@ -403,22 +404,10 @@ export class Wallet {
     return currentPubKeyHash === signerPubKeyHash
   }
 
-  async sendChangePubKey(changePubKey: {
-    chainId: number
-    subAccountId: number
-    feeToken: TokenId
-    ethAuthType: ChangePubkeyTypes
-    verifyingContract?: Address
-    account?: Address
-    accountId?: number
-    domainName?: string
-    version?: string
-    fee?: BigNumberish
-    nonce?: Nonce
-  }): Promise<Transaction> {
-    const txData = await this.signChangePubKey(changePubKey as any)
+  async sendChangePubKey(entries: ChangePubKeyEntries): Promise<Transaction> {
+    const txData = await this.signChangePubKey(entries)
 
-    if (!changePubKey.accountId) {
+    if (!entries.accountId) {
       const currentPubKeyHash = await this.getCurrentPubKeyHash()
       if (currentPubKeyHash === (txData.tx as ChangePubKeyData).newPkHash) {
         throw new Error('Current signing key is already set')
@@ -428,22 +417,7 @@ export class Wallet {
     return submitSignedTransaction(txData, this.provider)
   }
 
-  async signChangePubKey(changePubKey: {
-    type: 'ChangePubKey'
-    chainId: ChainId
-    subAccountId: number
-    feeToken: TokenId
-    fee?: BigNumberish
-    ethAuthType: ChangePubkeyTypes
-    verifyingContract?: string
-    layerOneChainId?: number
-    domainName?: string
-    version?: string
-    account?: Address
-    accountId?: number
-    nonce?: Nonce
-    ts?: number
-  }): Promise<SignedTransaction> {
+  async getChangePubKeyData(entries: ChangePubKeyEntries): Promise<ChangePubKeyData> {
     if (!this.signer) {
       throw new Error('ZKLink signer is required for current pubkey calculation.')
     }
@@ -451,44 +425,55 @@ export class Wallet {
 
     const transactionData: ChangePubKeyData = {
       type: 'ChangePubKey',
-      chainId: changePubKey.chainId,
-      account: changePubKey.account || this.address(),
-      accountId: changePubKey.accountId || this.accountId || (await this.getAccountId()),
-      subAccountId: changePubKey.subAccountId,
-
+      chainId: entries.chainId,
+      account: entries.account || this.address(),
+      accountId: entries.accountId || this.accountId || (await this.getAccountId()),
+      subAccountId: entries.subAccountId,
       newPkHash: await this.signer.pubKeyHash(),
-      fee: changePubKey.fee,
-      feeToken: changePubKey.feeToken,
-      nonce:
-        changePubKey.nonce == null
-          ? await this.getNonce()
-          : await this.getNonce(changePubKey.nonce),
-      ts: changePubKey.ts || getTimestamp(),
-      ethAuthData: undefined,
+      fee: entries.fee,
+      feeToken: entries.feeToken,
+      nonce: entries.nonce == null ? await this.getNonce() : await this.getNonce(entries.nonce),
+      ts: entries.ts || getTimestamp(),
+      ethAuthData: {
+        type: entries.ethAuthType,
+        ethSignature:
+          '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+      } as any,
     }
 
-    if (changePubKey.ethAuthType === 'Onchain') {
+    if (transactionData.fee == null) {
+      transactionData.fee = await this.provider.getTransactionFee({
+        ...transactionData,
+        fee: '0',
+      })
+    }
+
+    return transactionData
+  }
+
+  async signChangePubKey(entries: ChangePubKeyEntries): Promise<SignedTransaction> {
+    const transactionData = await this.getChangePubKeyData(entries)
+
+    if (entries.ethAuthType === 'Onchain') {
       transactionData.ethAuthData = {
         type: 'Onchain',
       }
-    } else if (changePubKey.ethAuthType === 'EthECDSA') {
+    } else if (entries.ethAuthType === 'EthECDSA') {
       await this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSA.')
-      const contractInfo = await this.provider.getContractInfo(changePubKey.chainId)
+      const contractInfo = await this.provider.getContractInfo(entries.chainId)
       const changePubKeySignData = getChangePubkeyMessage(
         transactionData.newPkHash,
         transactionData.nonce,
         transactionData.accountId || this.accountId,
-        changePubKey.verifyingContract || contractInfo.mainContract,
-        changePubKey.layerOneChainId || contractInfo.layerOneChainId,
-        changePubKey.domainName,
-        changePubKey.version
+        contractInfo.mainContract,
+        contractInfo.layerOneChainId
       )
       const ethSignature = (await this.getEIP712Signature(changePubKeySignData)).signature
       transactionData.ethAuthData = {
         type: 'EthECDSA',
         ethSignature,
       }
-    } else if (changePubKey.ethAuthType === 'EthCREATE2') {
+    } else if (entries.ethAuthType === 'EthCREATE2') {
       if (this.ethSigner instanceof Create2WalletSigner) {
         const create2data = this.ethSigner.create2WalletData
         transactionData.ethAuthData = {
@@ -502,13 +487,6 @@ export class Wallet {
       }
     } else {
       throw new Error('Unsupported SetSigningKey type')
-    }
-
-    if (transactionData.fee == null) {
-      transactionData.fee = await this.provider.getTransactionFee({
-        ...transactionData,
-        fee: '0',
-      })
     }
 
     const signedChangePubKeyTransaction = await this.signer.signChangePubKey(transactionData)

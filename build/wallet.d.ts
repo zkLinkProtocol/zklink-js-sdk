@@ -2,7 +2,7 @@ import { BigNumber, BigNumberish, Contract, ContractTransaction, ethers } from '
 import { EthMessageSigner } from './eth-message-signer';
 import { Provider } from './provider';
 import { Signer } from './signer';
-import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, EthSignerType, SignedTransaction, TransferData, TxEthSignature, ForcedExitData, WithdrawData, ChangePubkeyTypes, Create2Data, ChainId, TokenId, OrderData, TokenAddress, AccountBalances, TransferEntries, ForcedExitEntries, WithdrawEntries } from './types';
+import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKeyData, EthSignerType, SignedTransaction, TransferData, TxEthSignature, ForcedExitData, WithdrawData, Create2Data, ChainId, TokenId, OrderData, TokenAddress, AccountBalances, TransferEntries, ForcedExitEntries, WithdrawEntries, ChangePubKeyEntries } from './types';
 import { LinkContract } from './contract';
 export declare class ZKSyncTxError extends Error {
     value: PriorityOperationReceipt | TransactionReceipt;
@@ -46,35 +46,9 @@ export declare class Wallet {
     getWithdrawData(entries: WithdrawEntries): Promise<WithdrawData>;
     signWithdrawToEthereum(entries: WithdrawEntries): Promise<SignedTransaction>;
     isSigningKeySet(): Promise<boolean>;
-    sendChangePubKey(changePubKey: {
-        chainId: number;
-        subAccountId: number;
-        feeToken: TokenId;
-        ethAuthType: ChangePubkeyTypes;
-        verifyingContract?: Address;
-        account?: Address;
-        accountId?: number;
-        domainName?: string;
-        version?: string;
-        fee?: BigNumberish;
-        nonce?: Nonce;
-    }): Promise<Transaction>;
-    signChangePubKey(changePubKey: {
-        type: 'ChangePubKey';
-        chainId: ChainId;
-        subAccountId: number;
-        feeToken: TokenId;
-        fee?: BigNumberish;
-        ethAuthType: ChangePubkeyTypes;
-        verifyingContract?: string;
-        layerOneChainId?: number;
-        domainName?: string;
-        version?: string;
-        account?: Address;
-        accountId?: number;
-        nonce?: Nonce;
-        ts?: number;
-    }): Promise<SignedTransaction>;
+    sendChangePubKey(entries: ChangePubKeyEntries): Promise<Transaction>;
+    getChangePubKeyData(entries: ChangePubKeyEntries): Promise<ChangePubKeyData>;
+    signChangePubKey(entries: ChangePubKeyEntries): Promise<SignedTransaction>;
     isOnchainAuthSigningKeySet(linkChainId: number, nonce?: Nonce): Promise<boolean>;
     onchainAuthSigningKey(linkChainId: number, nonce?: Nonce, ethTxOptions?: ethers.providers.TransactionRequest): Promise<ContractTransaction>;
     getCurrentPubKeyHash(): Promise<PubKeyHash>;

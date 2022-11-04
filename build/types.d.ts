@@ -135,7 +135,7 @@ export interface ForcedExitData {
     nonce: number;
     signature?: Signature;
 }
-export declare type ChangePubkeyTypes = 'Onchain' | 'EthECDSA' | 'EthCREATE2' | 'ECDSALegacyMessage';
+export declare type ChangePubkeyTypes = 'Onchain' | 'EthECDSA' | 'EthCREATE2';
 export interface ChangePubKeyOnchain {
     type: 'Onchain';
 }
@@ -150,12 +150,23 @@ export interface ChangePubKeyCREATE2 {
     saltArg: string;
     codeHash: string;
 }
+export interface ChangePubKeyEntries {
+    chainId: number;
+    subAccountId: number;
+    feeToken: TokenId;
+    ethAuthType: ChangePubkeyTypes;
+    account?: Address;
+    accountId?: number;
+    fee?: BigNumberish;
+    ts?: number;
+    nonce?: Nonce;
+}
 export interface ChangePubKeyData {
     type: 'ChangePubKey';
     chainId: number;
     subAccountId: number;
-    accountId: number;
     account: Address;
+    accountId: number;
     newPkHash: PubKeyHash;
     feeToken: number;
     fee: BigNumberish;
