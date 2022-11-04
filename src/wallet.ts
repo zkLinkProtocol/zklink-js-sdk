@@ -409,6 +409,7 @@ export class Wallet {
     feeToken: TokenId
     ethAuthType: ChangePubkeyTypes
     verifyingContract?: Address
+    account?: Address
     accountId?: number
     domainName?: string
     version?: string
@@ -438,6 +439,7 @@ export class Wallet {
     layerOneChainId?: number
     domainName?: string
     version?: string
+    account?: Address
     accountId?: number
     nonce?: Nonce
     ts?: number
@@ -450,7 +452,7 @@ export class Wallet {
     const transactionData: ChangePubKeyData = {
       type: 'ChangePubKey',
       chainId: changePubKey.chainId,
-      account: this.address(),
+      account: changePubKey.account || this.address(),
       accountId: changePubKey.accountId || this.accountId || (await this.getAccountId()),
       subAccountId: changePubKey.subAccountId,
 

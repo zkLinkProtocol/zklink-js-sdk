@@ -296,7 +296,7 @@ class Wallet {
             const transactionData = {
                 type: 'ChangePubKey',
                 chainId: changePubKey.chainId,
-                account: this.address(),
+                account: changePubKey.account || this.address(),
                 accountId: changePubKey.accountId || this.accountId || (yield this.getAccountId()),
                 subAccountId: changePubKey.subAccountId,
                 newPkHash: yield this.signer.pubKeyHash(),

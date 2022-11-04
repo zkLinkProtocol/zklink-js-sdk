@@ -52,6 +52,7 @@ export declare class Wallet {
         feeToken: TokenId;
         ethAuthType: ChangePubkeyTypes;
         verifyingContract?: Address;
+        account?: Address;
         accountId?: number;
         domainName?: string;
         version?: string;
@@ -69,6 +70,7 @@ export declare class Wallet {
         layerOneChainId?: number;
         domainName?: string;
         version?: string;
+        account?: Address;
         accountId?: number;
         nonce?: Nonce;
         ts?: number;
