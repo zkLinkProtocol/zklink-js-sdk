@@ -454,9 +454,7 @@ export class Wallet {
   }
 
   async signChangePubKey(entries: ChangePubKeyEntries): Promise<SignedTransaction> {
-    console.log(111)
     const transactionData = await this.getChangePubKeyData(entries)
-    console.log(222)
     if (entries.ethAuthType === 'Onchain') {
       transactionData.ethAuthData = {
         type: 'Onchain',
