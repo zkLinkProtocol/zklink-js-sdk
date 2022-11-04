@@ -26,7 +26,6 @@ describe('ChangePubKey', () => {
   it('L2 signature', async function () {
     const wallet = await getWallet()
     const signedTransaction: any = await wallet.signChangePubKey({
-      type: 'ChangePubKey',
       subAccountId: 1,
       chainId: 1,
       ethAuthType: 'EthECDSA',

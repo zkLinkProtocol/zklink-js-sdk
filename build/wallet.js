@@ -292,7 +292,10 @@ class Wallet {
             if (!this.signer) {
                 throw new Error('ZKLink signer is required for current pubkey calculation.');
             }
-            yield this.setRequiredAccountIdFromServer('Set Signing Key');
+            // Changepubkey for others does not detect the current wallet account id
+            if (!entries.accountId) {
+                yield this.setRequiredAccountIdFromServer('Set Signing Key');
+            }
             const transactionData = {
                 type: 'ChangePubKey',
                 chainId: entries.chainId,
@@ -317,7 +320,9 @@ class Wallet {
     }
     signChangePubKey(entries) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log(111);
             const transactionData = yield this.getChangePubKeyData(entries);
+            console.log(222);
             if (entries.ethAuthType === 'Onchain') {
                 transactionData.ethAuthData = {
                     type: 'Onchain',
