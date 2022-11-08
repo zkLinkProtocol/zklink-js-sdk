@@ -103,7 +103,12 @@ export class Provider {
     return await this.transport.request('account_info_by_id', [accountId])
   }
 
-  async getBalance(accountId: number, subAccountId?: number): Promise<AccountBalances> {
+  async getBalance(
+    accountId: number,
+    subAccountId?: number
+  ): Promise<{
+    balances: AccountBalances
+  }> {
     const params = []
     if (accountId) {
       params.push(accountId)

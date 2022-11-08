@@ -460,14 +460,15 @@ class Wallet {
     getBalances(subAccountId) {
         return __awaiter(this, void 0, void 0, function* () {
             this.accountId = yield this.getAccountId();
-            return yield this.provider.getBalance(this.accountId, subAccountId);
+            const balances = yield this.provider.getBalance(this.accountId, subAccountId);
+            return balances === null || balances === void 0 ? void 0 : balances.balances;
         });
     }
     getTokenBalance(tokenId, subAccountId) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            const balances = yield this.getBalances();
-            let balance = balances[subAccountId][tokenId];
-            return balance ? ethers_1.BigNumber.from(balance) : undefined;
+            const balances = yield this.getBalances(subAccountId);
+            return (_a = balances === null || balances === void 0 ? void 0 : balances[subAccountId]) === null || _a === void 0 ? void 0 : _a[tokenId];
         });
     }
     getEthereumBalance(token, linkChainId) {

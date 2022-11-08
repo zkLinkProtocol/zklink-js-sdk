@@ -598,13 +598,13 @@ export class Wallet {
 
   async getBalances(subAccountId?: number): Promise<AccountBalances> {
     this.accountId = await this.getAccountId()
-    return await this.provider.getBalance(this.accountId, subAccountId)
+    const balances = await this.provider.getBalance(this.accountId, subAccountId)
+    return balances?.balances
   }
 
   async getTokenBalance(tokenId: TokenId, subAccountId: number) {
-    const balances = await this.getBalances()
-    let balance = balances[subAccountId][tokenId]
-    return balance ? BigNumber.from(balance) : undefined
+    const balances = await this.getBalances(subAccountId)
+    return balances?.[subAccountId]?.[tokenId]
   }
 
   async getEthereumBalance(token: TokenLike, linkChainId: ChainId): Promise<BigNumber> {

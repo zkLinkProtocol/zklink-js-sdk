@@ -237,8 +237,10 @@ export class DummyTransport extends AbstractJSONRPCTransport {
     }
     if (method == 'account_balances') {
       return {
-        '0': {
-          '1': BigNumber.from(12345),
+        balances: {
+          '0': {
+            '1': BigNumber.from(12345),
+          },
         },
       }
     }

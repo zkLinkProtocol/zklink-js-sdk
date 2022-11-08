@@ -29,7 +29,9 @@ export declare class Provider {
     updateTokenSet(): Promise<void>;
     getState(address: Address): Promise<AccountState>;
     getStateById(accountId: number): Promise<AccountState>;
-    getBalance(accountId: number, subAccountId?: number): Promise<AccountBalances>;
+    getBalance(accountId: number, subAccountId?: number): Promise<{
+        balances: AccountBalances;
+    }>;
     getSubAccountState(address: Address, subAccountId: number): Promise<AccountState>;
     getTxReceipt(txHash: string): Promise<TransactionReceipt>;
     getPriorityOpStatus(linkChainId: number, serialId: number): Promise<PriorityOperationReceipt>;
