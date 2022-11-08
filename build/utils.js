@@ -214,16 +214,14 @@ function packFeeUp(amount) {
     return reverseBits(integerToFloatUp(amount, FEE_EXPONENT_BIT_WIDTH, FEE_MANTISSA_BIT_WIDTH, 10));
 }
 function packAmountChecked(amount) {
-    if (closestPackableTransactionAmount(amount.toString()).toString() !==
-        amount.toString()) {
+    if (closestPackableTransactionAmount(amount.toString()).toString() !== amount.toString()) {
         throw new Error('Transaction Amount is not packable');
     }
     return packAmount(amount);
 }
 exports.packAmountChecked = packAmountChecked;
 function packFeeChecked(amount) {
-    if (closestPackableTransactionFee(amount.toString()).toString() !==
-        amount.toString()) {
+    if (closestPackableTransactionFee(amount.toString()).toString() !== amount.toString()) {
         throw new Error('Fee Amount is not packable');
     }
     return packFee(amount);
@@ -289,8 +287,7 @@ function sleep(ms) {
 exports.sleep = sleep;
 function isTokenETH(token) {
     return (token === ethers_1.constants.AddressZero ||
-        '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase() ===
-            token.toLowerCase());
+        '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase() === token.toLowerCase());
 }
 exports.isTokenETH = isTokenETH;
 class TokenSet {
@@ -384,9 +381,7 @@ function getChangePubkeyMessage(pubKeyHash, nonce, accountId, verifyingContract,
 }
 exports.getChangePubkeyMessage = getChangePubkeyMessage;
 function getSignedBytesFromMessage(message, addPrefix) {
-    let messageBytes = typeof message === 'string'
-        ? ethers_1.utils.toUtf8Bytes(message)
-        : ethers_1.utils.arrayify(message);
+    let messageBytes = typeof message === 'string' ? ethers_1.utils.toUtf8Bytes(message) : ethers_1.utils.arrayify(message);
     if (addPrefix) {
         messageBytes = ethers_1.utils.concat([
             ethers_1.utils.toUtf8Bytes(`\x19Ethereum Signed Message:\n${messageBytes.length}`),
@@ -400,10 +395,7 @@ function signMessagePersonalAPI(signer, message) {
     return __awaiter(this, void 0, void 0, function* () {
         if (signer instanceof ethers_1.ethers.providers.JsonRpcSigner) {
             return signer.provider
-                .send('personal_sign', [
-                ethers_1.utils.hexlify(message),
-                yield signer.getAddress(),
-            ])
+                .send('personal_sign', [ethers_1.utils.hexlify(message), yield signer.getAddress()])
                 .then((sign) => sign, (err) => {
                 // We check for method name in the error string because error messages about invalid method name
                 // often contain method name.
@@ -424,10 +416,7 @@ function signMessageEIP712(signer, data) {
     return __awaiter(this, void 0, void 0, function* () {
         if (signer instanceof ethers_1.ethers.providers.JsonRpcSigner) {
             return signer.provider
-                .send('eth_signTypedData_v3', [
-                yield signer.getAddress(),
-                JSON.stringify(data),
-            ])
+                .send('eth_signTypedData_v3', [yield signer.getAddress(), JSON.stringify(data)])
                 .then((sign) => sign, (err) => {
                 console.log('eth_signTypedData_v3', err);
                 throw err;
@@ -709,7 +698,7 @@ function serializeOrderMatching(matching) {
         ordersBytes.fill(0);
         ordersBytes.set([...makerBytes, ...takerBytes], 0);
         const ordersHash = yield (0, zksync_crypto_1.rescueHashOrders)(ordersBytes);
-        const type = new Uint8Array([11]);
+        const type = new Uint8Array([8]);
         const accountIdBytes = serializeAccountId(matching.accountId);
         const subAccountIdBytes = serializeSubAccountId(matching.subAccountId);
         const feeTokenBytes = serializeTokenId(matching.feeToken);
