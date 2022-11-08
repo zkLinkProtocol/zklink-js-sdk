@@ -2,7 +2,7 @@ import { BigNumber, BigNumberish, Contract, ContractTransaction, ethers } from '
 import { EthMessageSigner } from './eth-message-signer';
 import { Provider } from './provider';
 import { Signer } from './signer';
-import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKeyData, EthSignerType, SignedTransaction, TransferData, TxEthSignature, ForcedExitData, WithdrawData, Create2Data, ChainId, TokenId, OrderData, TokenAddress, AccountBalances, TransferEntries, ForcedExitEntries, WithdrawEntries, ChangePubKeyEntries } from './types';
+import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKeyData, EthSignerType, SignedTransaction, TransferData, TxEthSignature, ForcedExitData, WithdrawData, Create2Data, ChainId, TokenId, OrderData, TokenAddress, OrderMatchingData, AccountBalances, TransferEntries, ForcedExitEntries, WithdrawEntries, ChangePubKeyEntries, OrderMatchingEntries } from './types';
 import { LinkContract } from './contract';
 export declare class ZKSyncTxError extends Error {
     value: PriorityOperationReceipt | TransactionReceipt;
@@ -30,18 +30,8 @@ export declare class Wallet {
     getForcedExitData(entries: ForcedExitEntries): Promise<ForcedExitData>;
     signForcedExit(entries: ForcedExitEntries): Promise<SignedTransaction>;
     signOrder(entries: OrderData): Promise<SignedTransaction>;
-    signOrderMatching(matching: {
-        accountId: number;
-        subAccountId: number;
-        account: Address;
-        taker: any;
-        maker: any;
-        expectBaseAmount: BigNumberish;
-        expectQuoteAmount: BigNumberish;
-        feeToken: TokenId;
-        fee?: BigNumberish;
-        nonce?: number;
-    }): Promise<SignedTransaction>;
+    getOrderMatchingData(entries: OrderMatchingEntries): Promise<OrderMatchingData>;
+    signOrderMatching(entries: OrderMatchingEntries): Promise<SignedTransaction>;
     sendWithdrawToEthereum(entries: WithdrawEntries): Promise<Transaction>;
     getWithdrawData(entries: WithdrawEntries): Promise<WithdrawData>;
     signWithdrawToEthereum(entries: WithdrawEntries): Promise<SignedTransaction>;

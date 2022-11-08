@@ -256,6 +256,19 @@ export interface OrderData {
     feeRatio2: number;
     signature?: Signature;
 }
+export interface OrderMatchingEntries {
+    subAccountId: number;
+    taker: OrderData;
+    maker: OrderData;
+    expectBaseAmount: BigNumberish;
+    expectQuoteAmount: BigNumberish;
+    feeToken: number;
+    fee?: BigNumberish;
+    account?: Address;
+    accountId?: number;
+    nonce?: number;
+    signature?: Signature;
+}
 export interface OrderMatchingData {
     type: 'OrderMatching';
     accountId: number;

@@ -88,14 +88,14 @@ describe('matching', () => {
     const serialized = await serializeOrderMatching(matching)
 
     expect(Buffer.from(serialized).toString('hex')).to.eq(
-      '0b0000000601f99c088c238aa3ee951c48ce736a411289336a4e3226b525bf0d511655249d0001000000000000000000000de0b6b3a7640000000000000000000014d1120d7b160000',
+      '080000000601f99c088c238aa3ee951c48ce736a411289336a4e3226b525bf0d511655249d0001000000000000000000000de0b6b3a7640000000000000000000014d1120d7b160000',
       'Unexpected matching serialize bytes'
     )
 
     const signed = await wallet.signOrderMatching(matching)
 
     expect(sha256(serialized)).to.eq(
-      '0x3e17f81185e5ddc85c2b6cef724adcbb6d0325844f56f019a16a6671b79805f7',
+      '0x81b67c4e70fdda630a96f1ffabe41e9142ce683aff813676beac5f8c575fd694',
       'Unexpected matching tx hash'
     )
     expect(signed.tx.signature?.pubKey).to.eq(
@@ -103,7 +103,7 @@ describe('matching', () => {
       'Unexpected matching tx pubKey'
     )
     expect(signed.tx.signature?.signature).to.eq(
-      'bb34cdfe08796230a2c44a24cbea525cd191bea4e42652ec38f9c6b49d790022147bcb006b1ae55e6dd27c874331f26686251746b6b42aa246e98975d2f73305',
+      '0a50f2ef793e6326b9d77ee95931491b1f2f3c43bf2a2cac63d46e9c2294c01d93a4444643d689863ae8a5ee144db8db2bc0332fcf37a9717618e415fe890000',
       'Unexpected matching tx signature'
     )
   })

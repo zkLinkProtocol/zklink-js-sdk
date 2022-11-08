@@ -30,6 +30,7 @@ import {
   ForcedExitEntries,
   WithdrawEntries,
   ChangePubKeyEntries,
+  OrderMatchingEntries,
 } from './types'
 import {
   IERC20_INTERFACE,
@@ -289,18 +290,8 @@ export class Wallet {
       ethereumSignature: null,
     }
   }
-  async signOrderMatching(matching: {
-    accountId: number
-    subAccountId: number
-    account: Address
-    taker: any
-    maker: any
-    expectBaseAmount: BigNumberish
-    expectQuoteAmount: BigNumberish
-    feeToken: TokenId
-    fee?: BigNumberish
-    nonce?: number
-  }): Promise<SignedTransaction> {
+
+  async getOrderMatchingData(entries: OrderMatchingEntries): Promise<OrderMatchingData> {
     if (!this.signer) {
       throw new Error('ZKLink signer is required for sending zklink transactions.')
     }
@@ -308,24 +299,39 @@ export class Wallet {
     await this.setRequiredAccountIdFromServer('Transfer funds')
 
     const transactionData: OrderMatchingData = {
-      ...matching,
+      ...entries,
+      account: entries.account || this.address(),
+      accountId: entries.accountId || this.accountId || (await this.getAccountId()),
       type: 'OrderMatching',
-      fee: matching.fee,
-      feeToken: this.provider.tokenSet.resolveTokenId(matching.feeToken),
-      nonce: matching.nonce == null ? await this.getNonce() : await this.getNonce(matching.nonce),
+      fee: entries.fee,
+      feeToken: this.provider.tokenSet.resolveTokenId(entries.feeToken),
+      nonce: entries.nonce == null ? await this.getNonce() : await this.getNonce(entries.nonce),
     }
 
+    if (transactionData.fee == null) {
+      transactionData.fee = await this.provider.getTransactionFee({
+        ...transactionData,
+        fee: '0',
+      })
+    }
+    return transactionData
+  }
+
+  async signOrderMatching(entries: OrderMatchingEntries): Promise<SignedTransaction> {
+    const transactionData = await this.getOrderMatchingData(entries)
     const signedTransferTransaction = await this.signer.signOrderMatching(transactionData)
 
-    const stringFee = BigNumber.from(matching.fee).isZero() ? null : utils.formatEther(matching.fee)
-    const stringFeeToken = this.provider.tokenSet.resolveTokenSymbol(matching.feeToken)
+    const stringFee = BigNumber.from(transactionData.fee).isZero()
+      ? null
+      : utils.formatEther(transactionData.fee)
+    const stringFeeToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.feeToken)
     const ethereumSignature =
       this.ethSigner instanceof Create2WalletSigner
         ? null
         : await this.ethMessageSigner.ethSignOrderMatching({
             stringFee,
             stringFeeToken,
-            nonce: matching.nonce,
+            nonce: transactionData.nonce,
           })
     return {
       tx: signedTransferTransaction,

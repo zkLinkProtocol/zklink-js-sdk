@@ -196,22 +196,33 @@ class Wallet {
             };
         });
     }
-    signOrderMatching(matching) {
+    getOrderMatchingData(entries) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
                 throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
-            const transactionData = Object.assign(Object.assign({}, matching), { type: 'OrderMatching', fee: matching.fee, feeToken: this.provider.tokenSet.resolveTokenId(matching.feeToken), nonce: matching.nonce == null ? yield this.getNonce() : yield this.getNonce(matching.nonce) });
+            const transactionData = Object.assign(Object.assign({}, entries), { account: entries.account || this.address(), accountId: entries.accountId || this.accountId || (yield this.getAccountId()), type: 'OrderMatching', fee: entries.fee, feeToken: this.provider.tokenSet.resolveTokenId(entries.feeToken), nonce: entries.nonce == null ? yield this.getNonce() : yield this.getNonce(entries.nonce) });
+            if (transactionData.fee == null) {
+                transactionData.fee = yield this.provider.getTransactionFee(Object.assign(Object.assign({}, transactionData), { fee: '0' }));
+            }
+            return transactionData;
+        });
+    }
+    signOrderMatching(entries) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const transactionData = yield this.getOrderMatchingData(entries);
             const signedTransferTransaction = yield this.signer.signOrderMatching(transactionData);
-            const stringFee = ethers_1.BigNumber.from(matching.fee).isZero() ? null : ethers_1.utils.formatEther(matching.fee);
-            const stringFeeToken = this.provider.tokenSet.resolveTokenSymbol(matching.feeToken);
+            const stringFee = ethers_1.BigNumber.from(transactionData.fee).isZero()
+                ? null
+                : ethers_1.utils.formatEther(transactionData.fee);
+            const stringFeeToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.feeToken);
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
                 : yield this.ethMessageSigner.ethSignOrderMatching({
                     stringFee,
                     stringFeeToken,
-                    nonce: matching.nonce,
+                    nonce: transactionData.nonce,
                 });
             return {
                 tx: signedTransferTransaction,
