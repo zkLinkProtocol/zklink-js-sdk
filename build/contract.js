@@ -29,13 +29,13 @@ class LinkContract {
     }
     getMainContract(linkChainId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const contractAddress = yield this.provider.getContractInfo(linkChainId);
+            const contractAddress = yield this.provider.getContractInfoByChainId(linkChainId);
             return new ethers_1.ethers.Contract(contractAddress.mainContract, utils_1.SYNC_MAIN_CONTRACT_INTERFACE, this.ethSigner);
         });
     }
     getExitContract(linkChainId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const contractAddress = yield this.provider.getContractInfo(linkChainId);
+            const contractAddress = yield this.provider.getContractInfoByChainId(linkChainId);
             return new ethers_1.ethers.Contract(contractAddress.mainContract, utils_1.SYNC_EXIT_CONTRACT_INTERFACE, this.ethSigner);
         });
     }
@@ -48,7 +48,7 @@ class LinkContract {
                 throw Error('ETH token does not need approval.');
             }
             const erc20contract = new ethers_1.Contract(tokenAddress, utils_1.IERC20_INTERFACE, this.ethSigner);
-            const contractAddress = yield this.provider.getContractInfo(linkChainId);
+            const contractAddress = yield this.provider.getContractInfoByChainId(linkChainId);
             try {
                 const currentAllowance = yield erc20contract.allowance(accountAddress, contractAddress.mainContract);
                 return ethers_1.BigNumber.from(currentAllowance).gte(erc20ApproveThreshold);
@@ -64,7 +64,7 @@ class LinkContract {
                 throw Error('ETH token does not need approval.');
             }
             const erc20contract = new ethers_1.Contract(tokenAddress, utils_1.IERC20_INTERFACE, this.ethSigner);
-            const contractAddress = yield this.provider.getContractInfo(linkChainId);
+            const contractAddress = yield this.provider.getContractInfoByChainId(linkChainId);
             try {
                 return erc20contract.approve(contractAddress.mainContract, max_erc20_approve_amount);
             }

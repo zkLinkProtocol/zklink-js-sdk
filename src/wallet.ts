@@ -340,7 +340,7 @@ export class Wallet {
   }
 
   async sendWithdrawToEthereum(entries: WithdrawEntries): Promise<Transaction> {
-    const signedWithdrawTransaction = await this.signWithdrawToEthereum(entries as any)
+    const signedWithdrawTransaction = await this.signWithdrawToEthereum(entries)
     return submitSignedTransaction(signedWithdrawTransaction, this.provider)
   }
 
@@ -479,7 +479,7 @@ export class Wallet {
       }
     } else if (entries.ethAuthType === 'EthECDSA') {
       await this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSA.')
-      const contractInfo = await this.provider.getContractInfo(entries.chainId)
+      const contractInfo = await this.provider.getContractInfoByChainId(entries.chainId)
       const changePubKeySignData = getChangePubkeyMessage(
         transactionData.newPkHash,
         transactionData.nonce,
@@ -672,7 +672,7 @@ export class Wallet {
     ethTxOptions?: ethers.providers.TransactionRequest
     approveDepositAmountForERC20?: boolean
   }): Promise<ETHOperation> {
-    const contractAddress = await this.provider.getContractInfo(deposit.linkChainId)
+    const contractAddress = await this.provider.getContractInfoByChainId(deposit.linkChainId)
     const mainContract = await this.getMainContract(deposit.linkChainId)
 
     let ethTransaction
@@ -781,7 +781,7 @@ export class Wallet {
   }
 
   async getMainContract(linkChainId: number) {
-    const contractAddress = await this.provider.getContractInfo(linkChainId)
+    const contractAddress = await this.provider.getContractInfoByChainId(linkChainId)
     return new ethers.Contract(
       contractAddress.mainContract,
       SYNC_MAIN_CONTRACT_INTERFACE,

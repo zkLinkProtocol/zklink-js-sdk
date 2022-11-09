@@ -61,14 +61,19 @@ class Provider {
             return yield this.transport.request('tx_submit', [tx, signature]);
         });
     }
-    getContractInfo(linkChainId) {
+    getContractInfo() {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.contractInfo) {
+            if (!((_a = this.contractInfo) === null || _a === void 0 ? void 0 : _a.length)) {
                 this.contractInfo = yield this.transport.request('get_support_chains', []);
             }
-            if (linkChainId) {
-                return this.contractInfo.find((v) => v.chainId === linkChainId);
-            }
+            return this.contractInfo;
+        });
+    }
+    getContractInfoByChainId(chainId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const contractInfo = yield this.getContractInfo();
+            return contractInfo.find((v) => v.chainId === chainId);
         });
     }
     getTokens() {

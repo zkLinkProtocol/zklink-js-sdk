@@ -77,14 +77,16 @@ export class Provider {
     return await this.transport.request('tx_submit', [tx, signature])
   }
 
-  async getContractInfo(linkChainId?: number): Promise<ContractInfo> {
-    if (!this.contractInfo) {
+  async getContractInfo(): Promise<ContractInfo[]> {
+    if (!this.contractInfo?.length) {
       this.contractInfo = await this.transport.request('get_support_chains', [])
     }
+    return this.contractInfo
+  }
 
-    if (linkChainId) {
-      return this.contractInfo.find((v) => v.chainId === linkChainId)
-    }
+  async getContractInfoByChainId(chainId: number): Promise<ContractInfo> {
+    const contractInfo = await this.getContractInfo()
+    return contractInfo.find((v) => v.chainId === chainId)
   }
 
   async getTokens(): Promise<Tokens> {

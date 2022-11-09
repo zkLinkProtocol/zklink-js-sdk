@@ -918,7 +918,7 @@ export async function getPendingBalance(
   token: TokenLike,
   chainId: ChainId
 ): Promise<BigNumberish> {
-  const contractAddress = await syncProvider.getContractInfo(chainId)
+  const contractAddress = await syncProvider.getContractInfoByChainId(chainId)
   const zksyncContract = new Contract(
     contractAddress.mainContract,
     SYNC_MAIN_CONTRACT_INTERFACE,

@@ -24,7 +24,8 @@ export declare class Provider {
         signature?: TxEthSignature;
         fastProcessing?: boolean;
     }): Promise<string>;
-    getContractInfo(linkChainId?: number): Promise<ContractInfo>;
+    getContractInfo(): Promise<ContractInfo[]>;
+    getContractInfoByChainId(chainId: number): Promise<ContractInfo>;
     getTokens(): Promise<Tokens>;
     updateTokenSet(): Promise<void>;
     getState(address: Address): Promise<AccountState>;

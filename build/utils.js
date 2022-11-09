@@ -796,7 +796,7 @@ function getEthereumBalance(ethProvider, syncProvider, address, token, chainId) 
 exports.getEthereumBalance = getEthereumBalance;
 function getPendingBalance(ethProvider, syncProvider, address, token, chainId) {
     return __awaiter(this, void 0, void 0, function* () {
-        const contractAddress = yield syncProvider.getContractInfo(chainId);
+        const contractAddress = yield syncProvider.getContractInfoByChainId(chainId);
         const zksyncContract = new ethers_1.Contract(contractAddress.mainContract, exports.SYNC_MAIN_CONTRACT_INTERFACE, ethProvider);
         const tokenAddress = syncProvider.tokenSet.resolveTokenAddress(token, chainId);
         return zksyncContract.getPendingBalance(address, tokenAddress);

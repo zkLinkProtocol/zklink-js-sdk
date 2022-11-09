@@ -354,7 +354,7 @@ class Wallet {
             }
             else if (entries.ethAuthType === 'EthECDSA') {
                 yield this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSA.');
-                const contractInfo = yield this.provider.getContractInfo(entries.chainId);
+                const contractInfo = yield this.provider.getContractInfoByChainId(entries.chainId);
                 const changePubKeySignData = (0, utils_1.getChangePubkeyMessage)(transactionData.newPkHash, transactionData.nonce, transactionData.accountId || this.accountId, contractInfo.mainContract, contractInfo.layerOneChainId);
                 const ethSignature = (yield this.getEIP712Signature(changePubKeySignData)).signature;
                 transactionData.ethAuthData = {
@@ -506,7 +506,7 @@ class Wallet {
     }
     sendDepositFromEthereum(deposit) {
         return __awaiter(this, void 0, void 0, function* () {
-            const contractAddress = yield this.provider.getContractInfo(deposit.linkChainId);
+            const contractAddress = yield this.provider.getContractInfoByChainId(deposit.linkChainId);
             const mainContract = yield this.getMainContract(deposit.linkChainId);
             let ethTransaction;
             if (!(0, utils_2.isAddress)(deposit.token)) {
@@ -591,7 +591,7 @@ class Wallet {
     }
     getMainContract(linkChainId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const contractAddress = yield this.provider.getContractInfo(linkChainId);
+            const contractAddress = yield this.provider.getContractInfoByChainId(linkChainId);
             return new ethers_1.ethers.Contract(contractAddress.mainContract, utils_1.SYNC_MAIN_CONTRACT_INTERFACE, this.ethSigner);
         });
     }
