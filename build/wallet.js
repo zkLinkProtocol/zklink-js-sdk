@@ -107,7 +107,7 @@ class Wallet {
                 throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
-            const transactionData = Object.assign(Object.assign({}, entries), { type: 'Transfer', accountId: entries.accountId || this.accountId, from: this.address(), token: this.provider.tokenSet.resolveTokenId(entries.token), fee: entries.fee ? entries.fee : null, nonce: entries.nonce == null ? yield this.getNonce() : yield this.getNonce(entries.nonce), ts: entries.ts || (0, utils_1.getTimestamp)() });
+            const transactionData = Object.assign(Object.assign({}, entries), { type: 'Transfer', accountId: this.accountId || (yield this.getAccountId()), from: this.address(), token: this.provider.tokenSet.resolveTokenId(entries.token), fee: entries.fee ? entries.fee : null, nonce: entries.nonce == null ? yield this.getNonce() : yield this.getNonce(entries.nonce), ts: entries.ts || (0, utils_1.getTimestamp)() });
             if (transactionData.fee == null) {
                 transactionData.fee = yield this.provider.getTransactionFee(Object.assign(Object.assign({}, transactionData), { fee: '0', amount: ethers_1.BigNumber.from(transactionData.amount).toString() }));
             }

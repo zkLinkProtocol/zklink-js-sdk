@@ -83,7 +83,6 @@ export interface TransferEntries {
   to: Address
   token: TokenId
   amount: BigNumberish
-  accountId?: number
   fee?: BigNumberish
   nonce?: Nonce
   ts?: number

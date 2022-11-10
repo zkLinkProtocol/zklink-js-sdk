@@ -180,7 +180,7 @@ export class Wallet {
     const transactionData: TransferData = {
       ...entries,
       type: 'Transfer',
-      accountId: entries.accountId || this.accountId,
+      accountId: this.accountId || (await this.getAccountId()),
       from: this.address(),
       token: this.provider.tokenSet.resolveTokenId(entries.token),
       fee: entries.fee ? entries.fee : null,
