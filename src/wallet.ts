@@ -115,11 +115,16 @@ export class Wallet {
 
   static async fromCreate2Data(
     syncSigner: Signer,
+    createrSigner: ethers.Signer,
     provider: Provider,
     create2Data: Create2Data,
     accountId?: number
   ): Promise<Wallet> {
-    const create2Signer = new Create2WalletSigner(await syncSigner.pubKeyHash(), create2Data)
+    const create2Signer = new Create2WalletSigner(
+      await syncSigner.pubKeyHash(),
+      create2Data,
+      createrSigner
+    )
     return await Wallet.fromEthSigner(create2Signer, provider, syncSigner, accountId, {
       verificationMethod: 'ERC-1271',
       isSignedMsgPrefixed: true,
@@ -205,17 +210,15 @@ export class Wallet {
       ? null
       : utils.formatEther(transactionData.fee)
     const stringToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.token)
-    const ethereumSignature =
-      this.ethSigner instanceof Create2WalletSigner
-        ? null
-        : await this.ethMessageSigner.ethSignTransfer({
-            stringAmount,
-            stringFee,
-            stringToken,
-            to: transactionData.to,
-            nonce: transactionData.nonce,
-            accountId: transactionData.accountId || this.accountId,
-          })
+    const ethereumSignature = await this.ethMessageSigner.ethSignTransfer({
+      stringAmount,
+      stringFee,
+      stringToken,
+      to: transactionData.to,
+      nonce: transactionData.nonce,
+      accountId: transactionData.accountId || this.accountId,
+    })
+
     return {
       tx: signedTransferTransaction,
       ethereumSignature,
@@ -262,16 +265,13 @@ export class Wallet {
       : utils.formatEther(transactionData.fee)
     const stringToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.l2SourceToken)
     const stringFeeToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.feeToken)
-    const ethereumSignature =
-      this.ethSigner instanceof Create2WalletSigner
-        ? null
-        : await this.ethMessageSigner.ethSignForcedExit({
-            stringToken,
-            stringFeeToken,
-            stringFee,
-            target: transactionData.target,
-            nonce: transactionData.nonce,
-          })
+    const ethereumSignature = await this.ethMessageSigner.ethSignForcedExit({
+      stringToken,
+      stringFeeToken,
+      stringFee,
+      target: transactionData.target,
+      nonce: transactionData.nonce,
+    })
 
     return {
       tx: signedForcedExitTransaction,

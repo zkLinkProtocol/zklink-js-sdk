@@ -161,9 +161,7 @@ class EthMessageSigner {
     }
     getChangePubKeyEthMessagePart(changePubKey) {
         let message = '';
-        message += `Set signing key: ${changePubKey.pubKeyHash
-            .replace('sync:', '')
-            .toLowerCase()}`;
+        message += `Set signing key: ${changePubKey.pubKeyHash.replace('sync:', '').toLowerCase()}`;
         if (changePubKey.stringFee != null) {
             message += `\nFee: ${changePubKey.stringFee} ${changePubKey.stringToken}`;
         }

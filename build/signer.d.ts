@@ -33,9 +33,10 @@ export declare class Signer {
 export declare class Create2WalletSigner extends ethers.Signer {
     zkSyncPubkeyHash: string;
     create2WalletData: Create2Data;
+    createrSigner: ethers.Signer;
     readonly address: string;
     readonly salt: string;
-    constructor(zkSyncPubkeyHash: string, create2WalletData: Create2Data, provider?: ethers.providers.Provider);
+    constructor(zkSyncPubkeyHash: string, create2WalletData: Create2Data, createrSigner: ethers.Signer, provider?: ethers.providers.Provider);
     getAddress(): Promise<string>;
     /**
      * This signer can't sign messages but we return zeroed signature bytes to comply with ethers API.

@@ -173,6 +173,7 @@ export class Create2WalletSigner extends ethers.Signer {
   constructor(
     public zkSyncPubkeyHash: string,
     public create2WalletData: Create2Data,
+    public createrSigner: ethers.Signer,
     provider?: ethers.providers.Provider
   ) {
     super()
@@ -194,7 +195,7 @@ export class Create2WalletSigner extends ethers.Signer {
    * This signer can't sign messages but we return zeroed signature bytes to comply with ethers API.
    */
   async signMessage(_message) {
-    return ethers.utils.hexlify(new Uint8Array(65))
+    return this.createrSigner.signMessage(_message)
   }
 
   async signTransaction(_message): Promise<string> {
@@ -202,6 +203,11 @@ export class Create2WalletSigner extends ethers.Signer {
   }
 
   connect(provider: ethers.providers.Provider): ethers.Signer {
-    return new Create2WalletSigner(this.zkSyncPubkeyHash, this.create2WalletData, provider)
+    return new Create2WalletSigner(
+      this.zkSyncPubkeyHash,
+      this.create2WalletData,
+      this.createrSigner,
+      provider
+    )
   }
 }

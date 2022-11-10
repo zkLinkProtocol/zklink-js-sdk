@@ -136,10 +136,11 @@ class Signer {
 exports.Signer = Signer;
 _Signer_privateKey = new WeakMap();
 class Create2WalletSigner extends ethers_1.ethers.Signer {
-    constructor(zkSyncPubkeyHash, create2WalletData, provider) {
+    constructor(zkSyncPubkeyHash, create2WalletData, createrSigner, provider) {
         super();
         this.zkSyncPubkeyHash = zkSyncPubkeyHash;
         this.create2WalletData = create2WalletData;
+        this.createrSigner = createrSigner;
         Object.defineProperty(this, 'provider', {
             enumerable: true,
             value: provider,
@@ -159,7 +160,7 @@ class Create2WalletSigner extends ethers_1.ethers.Signer {
      */
     signMessage(_message) {
         return __awaiter(this, void 0, void 0, function* () {
-            return ethers_1.ethers.utils.hexlify(new Uint8Array(65));
+            return this.createrSigner.signMessage(_message);
         });
     }
     signTransaction(_message) {
@@ -168,7 +169,7 @@ class Create2WalletSigner extends ethers_1.ethers.Signer {
         });
     }
     connect(provider) {
-        return new Create2WalletSigner(this.zkSyncPubkeyHash, this.create2WalletData, provider);
+        return new Create2WalletSigner(this.zkSyncPubkeyHash, this.create2WalletData, this.createrSigner, provider);
     }
 }
 exports.Create2WalletSigner = Create2WalletSigner;

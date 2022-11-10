@@ -221,7 +221,9 @@ export class DummyTransport extends AbstractJSONRPCTransport {
 
       return tokens
     }
-
+    if (method == 'get_tx_fee') {
+      return '4070000000000000'
+    }
     if (method == 'account_info_by_address') {
       // The example `AccountState` instance:
       //  - assigns the '42' value to account_id;

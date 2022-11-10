@@ -64,9 +64,9 @@ class Wallet {
             return wallet;
         });
     }
-    static fromCreate2Data(syncSigner, provider, create2Data, accountId) {
+    static fromCreate2Data(syncSigner, createrSigner, provider, create2Data, accountId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const create2Signer = new signer_1.Create2WalletSigner(yield syncSigner.pubKeyHash(), create2Data);
+            const create2Signer = new signer_1.Create2WalletSigner(yield syncSigner.pubKeyHash(), create2Data, createrSigner);
             return yield Wallet.fromEthSigner(create2Signer, provider, syncSigner, accountId, {
                 verificationMethod: 'ERC-1271',
                 isSignedMsgPrefixed: true,
@@ -125,16 +125,14 @@ class Wallet {
                 ? null
                 : ethers_1.utils.formatEther(transactionData.fee);
             const stringToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.token);
-            const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
-                ? null
-                : yield this.ethMessageSigner.ethSignTransfer({
-                    stringAmount,
-                    stringFee,
-                    stringToken,
-                    to: transactionData.to,
-                    nonce: transactionData.nonce,
-                    accountId: transactionData.accountId || this.accountId,
-                });
+            const ethereumSignature = yield this.ethMessageSigner.ethSignTransfer({
+                stringAmount,
+                stringFee,
+                stringToken,
+                to: transactionData.to,
+                nonce: transactionData.nonce,
+                accountId: transactionData.accountId || this.accountId,
+            });
             return {
                 tx: signedTransferTransaction,
                 ethereumSignature,
@@ -169,15 +167,13 @@ class Wallet {
                 : ethers_1.utils.formatEther(transactionData.fee);
             const stringToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.l2SourceToken);
             const stringFeeToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.feeToken);
-            const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
-                ? null
-                : yield this.ethMessageSigner.ethSignForcedExit({
-                    stringToken,
-                    stringFeeToken,
-                    stringFee,
-                    target: transactionData.target,
-                    nonce: transactionData.nonce,
-                });
+            const ethereumSignature = yield this.ethMessageSigner.ethSignForcedExit({
+                stringToken,
+                stringFeeToken,
+                stringFee,
+                target: transactionData.target,
+                nonce: transactionData.nonce,
+            });
             return {
                 tx: signedForcedExitTransaction,
                 ethereumSignature,
