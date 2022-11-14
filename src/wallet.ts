@@ -906,7 +906,7 @@ export class Transaction {
 
     if (this.state !== 'Sent') return
     const hash = Array.isArray(this.txHash) ? this.txHash[0] : this.txHash
-    const receipt = await this.sidechainProvider.notifyTransaction(hash, 'COMMIT')
+    const receipt = await this.sidechainProvider.notifyTransaction(hash)
 
     if (!receipt.success) {
       this.setErrorState(
@@ -916,15 +916,6 @@ export class Transaction {
     }
 
     this.state = 'Committed'
-    return receipt
-  }
-
-  async awaitVerifyReceipt(): Promise<TransactionReceipt> {
-    await this.awaitReceipt()
-    const hash = Array.isArray(this.txHash) ? this.txHash[0] : this.txHash
-    const receipt = await this.sidechainProvider.notifyTransaction(hash, 'VERIFY')
-
-    this.state = 'Verified'
     return receipt
   }
 

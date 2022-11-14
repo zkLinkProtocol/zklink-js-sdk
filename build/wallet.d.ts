@@ -95,7 +95,6 @@ export declare class Transaction {
     error?: ZKSyncTxError;
     constructor(txData: any, txHash: string, sidechainProvider: Provider);
     awaitReceipt(): Promise<TransactionReceipt>;
-    awaitVerifyReceipt(): Promise<TransactionReceipt>;
     private setErrorState;
     private throwErrorIfFailedState;
 }

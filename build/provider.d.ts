@@ -43,7 +43,7 @@ export declare class Provider {
         verified: number;
     }>;
     notifyPriorityOp(linkChainId: number, serialId: number, action: 'COMMIT' | 'VERIFY'): Promise<PriorityOperationReceipt>;
-    notifyTransaction(hash: string, action: 'COMMIT' | 'VERIFY'): Promise<TransactionReceipt>;
+    notifyTransaction(hash: string, action?: 'COMMIT'): Promise<TransactionReceipt>;
     getTransactionFee(tx: any): Promise<BigNumber>;
     disconnect(): Promise<any>;
 }

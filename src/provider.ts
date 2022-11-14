@@ -183,7 +183,7 @@ export class Provider {
     }
   }
 
-  async notifyTransaction(hash: string, action: 'COMMIT' | 'VERIFY'): Promise<TransactionReceipt> {
+  async notifyTransaction(hash: string, action: 'COMMIT' = 'COMMIT'): Promise<TransactionReceipt> {
     if (this.transport.subscriptionsSupported()) {
       return await new Promise((resolve) => {
         const subscribe = this.transport.subscribe(
@@ -201,12 +201,7 @@ export class Provider {
     } else {
       while (true) {
         const transactionStatus = await this.getTxReceipt(hash)
-        const notifyDone =
-          action == 'COMMIT'
-            ? transactionStatus.failReason ||
-              (transactionStatus.block && transactionStatus.block.committed)
-            : transactionStatus.failReason ||
-              (transactionStatus.block && transactionStatus.block.verified)
+        const notifyDone = transactionStatus.executed && transactionStatus.success
         if (notifyDone) {
           return transactionStatus
         } else {

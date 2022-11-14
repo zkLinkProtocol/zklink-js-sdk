@@ -697,21 +697,12 @@ class Transaction {
             if (this.state !== 'Sent')
                 return;
             const hash = Array.isArray(this.txHash) ? this.txHash[0] : this.txHash;
-            const receipt = yield this.sidechainProvider.notifyTransaction(hash, 'COMMIT');
+            const receipt = yield this.sidechainProvider.notifyTransaction(hash);
             if (!receipt.success) {
                 this.setErrorState(new ZKSyncTxError(`zkLink transaction failed: ${receipt.failReason}`, receipt));
                 this.throwErrorIfFailedState();
             }
             this.state = 'Committed';
-            return receipt;
-        });
-    }
-    awaitVerifyReceipt() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.awaitReceipt();
-            const hash = Array.isArray(this.txHash) ? this.txHash[0] : this.txHash;
-            const receipt = yield this.sidechainProvider.notifyTransaction(hash, 'VERIFY');
-            this.state = 'Verified';
             return receipt;
         });
     }

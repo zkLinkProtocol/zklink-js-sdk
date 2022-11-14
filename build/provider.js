@@ -161,7 +161,7 @@ class Provider {
             }
         });
     }
-    notifyTransaction(hash, action) {
+    notifyTransaction(hash, action = 'COMMIT') {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.transport.subscriptionsSupported()) {
                 return yield new Promise((resolve) => {
@@ -176,11 +176,7 @@ class Provider {
             else {
                 while (true) {
                     const transactionStatus = yield this.getTxReceipt(hash);
-                    const notifyDone = action == 'COMMIT'
-                        ? transactionStatus.failReason ||
-                            (transactionStatus.block && transactionStatus.block.committed)
-                        : transactionStatus.failReason ||
-                            (transactionStatus.block && transactionStatus.block.verified);
+                    const notifyDone = transactionStatus.executed && transactionStatus.success;
                     if (notifyDone) {
                         return transactionStatus;
                     }
