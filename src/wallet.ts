@@ -849,7 +849,7 @@ export class ETHOperation {
     return txReceipt
   }
 
-  async awaitReceipt(): Promise<PriorityOperationReceipt> {
+  async awaitReceipt(): Promise<TransactionReceipt> {
     this.throwErrorIfFailedState()
 
     await this.awaitEthereumTxCommit()

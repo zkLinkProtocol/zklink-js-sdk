@@ -194,7 +194,7 @@ export interface TransactionReceipt {
     executed: boolean;
     success?: boolean;
     failReason?: string;
-    block?: BlockInfo;
+    block?: number;
 }
 export interface PriorityOperationReceipt {
     executed: boolean;
