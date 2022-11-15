@@ -82,8 +82,7 @@ export declare class ETHOperation {
     priorityOpId?: BigNumber;
     constructor(ethTx: ContractTransaction, zkSyncProvider: Provider);
     awaitEthereumTxCommit(): Promise<ethers.ContractReceipt>;
-    awaitReceipt(linkChainId: number): Promise<PriorityOperationReceipt>;
-    awaitVerifyReceipt(linkChainId: number): Promise<PriorityOperationReceipt>;
+    awaitReceipt(): Promise<PriorityOperationReceipt>;
     private setErrorState;
     private throwErrorIfFailedState;
 }

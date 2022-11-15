@@ -44,9 +44,10 @@ import {
   getTimestamp,
   signMessageEIP712,
   ERC20_APPROVE_TRESHOLD,
+  numberToBytesBE,
 } from './utils'
 import { LinkContract } from './contract'
-import { isAddress } from 'ethers/lib/utils'
+import { arrayify, isAddress, sha256 } from 'ethers/lib/utils'
 
 const EthersErrorCode = ErrorCode
 
@@ -848,16 +849,17 @@ export class ETHOperation {
     return txReceipt
   }
 
-  async awaitReceipt(linkChainId: number): Promise<PriorityOperationReceipt> {
+  async awaitReceipt(): Promise<PriorityOperationReceipt> {
     this.throwErrorIfFailedState()
 
     await this.awaitEthereumTxCommit()
+    const bytes = ethers.utils.concat([
+      numberToBytesBE(Number(this.priorityOpId), 8),
+      arrayify(this.ethTx.hash),
+    ])
+    const txHash = sha256(bytes)
     if (this.state !== 'Mined') return
-    const receipt = await this.zkSyncProvider.notifyPriorityOp(
-      linkChainId,
-      this.priorityOpId.toNumber(),
-      'COMMIT'
-    )
+    const receipt = await this.zkSyncProvider.notifyTransaction(txHash)
 
     if (!receipt.executed) {
       this.setErrorState(new ZKSyncTxError('Priority operation failed', receipt))
@@ -865,21 +867,6 @@ export class ETHOperation {
     }
 
     this.state = 'Committed'
-    return receipt
-  }
-
-  async awaitVerifyReceipt(linkChainId: number): Promise<PriorityOperationReceipt> {
-    await this.awaitReceipt(linkChainId)
-    if (this.state !== 'Committed') return
-
-    const receipt = await this.zkSyncProvider.notifyPriorityOp(
-      linkChainId,
-      this.priorityOpId.toNumber(),
-      'VERIFY'
-    )
-
-    this.state = 'Verified'
-
     return receipt
   }
 

@@ -123,42 +123,9 @@ class Provider {
             return yield this.transport.request('tx_info', [txHash]);
         });
     }
-    getPriorityOpStatus(linkChainId, serialId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('ethop_info', [linkChainId, serialId]);
-        });
-    }
     getBlockInfo() {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.transport.request('block_info', []);
-        });
-    }
-    notifyPriorityOp(linkChainId, serialId, action) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.transport.subscriptionsSupported()) {
-                return yield new Promise((resolve) => {
-                    const subscribe = this.transport.subscribe('ethop_subscribe', [serialId, action], 'ethop_unsubscribe', (resp) => {
-                        subscribe
-                            .then((sub) => sub.unsubscribe())
-                            .catch((err) => console.log(`WebSocket connection closed with reason: ${err}`));
-                        resolve(resp);
-                    });
-                });
-            }
-            else {
-                while (true) {
-                    const priorOpStatus = yield this.getPriorityOpStatus(linkChainId, serialId);
-                    const notifyDone = action === 'COMMIT'
-                        ? priorOpStatus.block && priorOpStatus.block.committed
-                        : priorOpStatus.block && priorOpStatus.block.verified;
-                    if (notifyDone) {
-                        return priorOpStatus;
-                    }
-                    else {
-                        yield (0, utils_1.sleep)(this.pollIntervalMilliSecs);
-                    }
-                }
-            }
         });
     }
     notifyTransaction(hash, action = 'COMMIT') {
@@ -175,8 +142,8 @@ class Provider {
             }
             else {
                 while (true) {
-                    const transactionStatus = yield this.getTxReceipt(hash);
-                    const notifyDone = transactionStatus.executed && transactionStatus.success;
+                    const transactionStatus = yield this.getTxReceipt(hash).catch((e) => { });
+                    const notifyDone = transactionStatus && (transactionStatus === null || transactionStatus === void 0 ? void 0 : transactionStatus.executed) && (transactionStatus === null || transactionStatus === void 0 ? void 0 : transactionStatus.success);
                     if (notifyDone) {
                         return transactionStatus;
                     }

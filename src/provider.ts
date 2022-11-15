@@ -132,13 +132,6 @@ export class Provider {
     return await this.transport.request('tx_info', [txHash])
   }
 
-  async getPriorityOpStatus(
-    linkChainId: number,
-    serialId: number
-  ): Promise<PriorityOperationReceipt> {
-    return await this.transport.request('ethop_info', [linkChainId, serialId])
-  }
-
   async getBlockInfo(): Promise<{
     lastBlockNumber: number
     timestamp: number
@@ -146,41 +139,6 @@ export class Provider {
     verified: number
   }> {
     return await this.transport.request('block_info', [])
-  }
-
-  async notifyPriorityOp(
-    linkChainId: number,
-    serialId: number,
-    action: 'COMMIT' | 'VERIFY'
-  ): Promise<PriorityOperationReceipt> {
-    if (this.transport.subscriptionsSupported()) {
-      return await new Promise((resolve) => {
-        const subscribe = this.transport.subscribe(
-          'ethop_subscribe',
-          [serialId, action],
-          'ethop_unsubscribe',
-          (resp) => {
-            subscribe
-              .then((sub) => sub.unsubscribe())
-              .catch((err) => console.log(`WebSocket connection closed with reason: ${err}`))
-            resolve(resp)
-          }
-        )
-      })
-    } else {
-      while (true) {
-        const priorOpStatus = await this.getPriorityOpStatus(linkChainId, serialId)
-        const notifyDone =
-          action === 'COMMIT'
-            ? priorOpStatus.block && priorOpStatus.block.committed
-            : priorOpStatus.block && priorOpStatus.block.verified
-        if (notifyDone) {
-          return priorOpStatus
-        } else {
-          await sleep(this.pollIntervalMilliSecs)
-        }
-      }
-    }
   }
 
   async notifyTransaction(hash: string, action: 'COMMIT' = 'COMMIT'): Promise<TransactionReceipt> {
@@ -200,8 +158,9 @@ export class Provider {
       })
     } else {
       while (true) {
-        const transactionStatus = await this.getTxReceipt(hash)
-        const notifyDone = transactionStatus.executed && transactionStatus.success
+        const transactionStatus = await this.getTxReceipt(hash).catch((e) => {})
+        const notifyDone =
+          transactionStatus && transactionStatus?.executed && transactionStatus?.success
         if (notifyDone) {
           return transactionStatus
         } else {

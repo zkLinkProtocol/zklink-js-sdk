@@ -1,14 +1,13 @@
 import { ethers } from 'ethers'
 import { arrayify, sha256, toUtf8Bytes } from 'ethers/lib/utils'
+import { numberToBytesBE } from '../src/utils'
 
-describe('Eth hash to SyncTxHash', () => {
-  it('sync-tx', async () => {
+describe('EthHash to SyncTxHash', () => {
+  it('compute hash', async () => {
     const serialId = 0
-    const ethHash = '0x88e2a08488e03d7c5c6795c26429c5f8d4988a487df75ac79156b94379454a36'
-    const bytes = ethers.utils.concat([arrayify(serialId), ethHash])
-
+    const ethHash = '0x1558a4ebb18b35e61642b00213f785eac14c0d588838c49d286581a6530c4fa0'
+    const bytes = ethers.utils.concat([numberToBytesBE(serialId, 8), arrayify(ethHash)])
     const r = sha256(bytes)
-
-    expect(r).toBe('0xac2147a10a548cd6e5a383c41d02964039267182ba13c116e40d17703219e32b')
+    expect(r).toBe('0x08040c5fbbac965e3ed5ff99f72adf5fd4ea017fb4785dde5436d84d5420b13b')
   })
 })

@@ -1,6 +1,6 @@
 import { AbstractJSONRPCTransport } from './transport';
 import { BigNumber } from 'ethers';
-import { AccountBalances, AccountState, Address, ContractInfo, PriorityOperationReceipt, Tokens, TransactionReceipt, TxEthSignature } from './types';
+import { AccountBalances, AccountState, Address, ContractInfo, Tokens, TransactionReceipt, TxEthSignature } from './types';
 import { TokenSet } from './utils';
 export declare class Provider {
     transport: AbstractJSONRPCTransport;
@@ -35,14 +35,12 @@ export declare class Provider {
     }>;
     getSubAccountState(address: Address, subAccountId: number): Promise<AccountState>;
     getTxReceipt(txHash: string): Promise<TransactionReceipt>;
-    getPriorityOpStatus(linkChainId: number, serialId: number): Promise<PriorityOperationReceipt>;
     getBlockInfo(): Promise<{
         lastBlockNumber: number;
         timestamp: number;
         committed: number;
         verified: number;
     }>;
-    notifyPriorityOp(linkChainId: number, serialId: number, action: 'COMMIT' | 'VERIFY'): Promise<PriorityOperationReceipt>;
     notifyTransaction(hash: string, action?: 'COMMIT'): Promise<TransactionReceipt>;
     getTransactionFee(tx: any): Promise<BigNumber>;
     disconnect(): Promise<any>;

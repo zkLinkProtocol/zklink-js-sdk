@@ -649,28 +649,23 @@ class ETHOperation {
             return txReceipt;
         });
     }
-    awaitReceipt(linkChainId) {
+    awaitReceipt() {
         return __awaiter(this, void 0, void 0, function* () {
             this.throwErrorIfFailedState();
             yield this.awaitEthereumTxCommit();
+            const bytes = ethers_1.ethers.utils.concat([
+                (0, utils_1.numberToBytesBE)(Number(this.priorityOpId), 8),
+                (0, utils_2.arrayify)(this.ethTx.hash),
+            ]);
+            const txHash = (0, utils_2.sha256)(bytes);
             if (this.state !== 'Mined')
                 return;
-            const receipt = yield this.zkSyncProvider.notifyPriorityOp(linkChainId, this.priorityOpId.toNumber(), 'COMMIT');
+            const receipt = yield this.zkSyncProvider.notifyTransaction(txHash);
             if (!receipt.executed) {
                 this.setErrorState(new ZKSyncTxError('Priority operation failed', receipt));
                 this.throwErrorIfFailedState();
             }
             this.state = 'Committed';
-            return receipt;
-        });
-    }
-    awaitVerifyReceipt(linkChainId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.awaitReceipt(linkChainId);
-            if (this.state !== 'Committed')
-                return;
-            const receipt = yield this.zkSyncProvider.notifyPriorityOp(linkChainId, this.priorityOpId.toNumber(), 'VERIFY');
-            this.state = 'Verified';
             return receipt;
         });
     }
