@@ -55,11 +55,17 @@ export class HTTPTransport extends AbstractJSONRPCTransport {
       method,
       params,
     }
-
-    const response = await Axios.post(this.address, request).then((resp) => {
+    const CancelToken = Axios.CancelToken
+    const source = CancelToken.source()
+    const timeout = setTimeout(() => {
+      source.cancel('timeout')
+    }, 30000)
+    const response = await Axios.post(this.address, request, {
+      cancelToken: source.token,
+    }).then((resp) => {
       return resp.data
     })
-
+    clearTimeout(timeout)
     if ('result' in response) {
       return response.result
     } else if ('error' in response) {
