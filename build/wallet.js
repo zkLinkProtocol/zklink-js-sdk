@@ -657,7 +657,7 @@ class ETHOperation {
                 (0, utils_1.numberToBytesBE)(Number(this.priorityOpId), 8),
                 (0, utils_2.arrayify)(this.ethTx.hash),
             ]);
-            const txHash = (0, utils_2.sha256)(bytes);
+            const txHash = (0, utils_2.sha256)(bytes).replace('0x', 'sync-tx:');
             if (this.state !== 'Mined')
                 return;
             const receipt = yield this.zkSyncProvider.notifyTransaction(txHash);
