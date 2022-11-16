@@ -43,7 +43,7 @@ class Subscription {
 }
 
 export class HTTPTransport extends AbstractJSONRPCTransport {
-  public constructor(public address: string) {
+  public constructor(public address: string, public rpcTimeout: number = 30000) {
     super()
   }
 
@@ -58,8 +58,8 @@ export class HTTPTransport extends AbstractJSONRPCTransport {
     const CancelToken = Axios.CancelToken
     const source = CancelToken.source()
     const timeout = setTimeout(() => {
-      source.cancel('timeout')
-    }, 30000)
+      source.cancel('JRPC Timeout')
+    }, this.rpcTimeout)
     const response = await Axios.post(this.address, request, {
       cancelToken: source.token,
     }).then((resp) => {

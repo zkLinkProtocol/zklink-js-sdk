@@ -21,7 +21,7 @@ export class Provider {
   public tokenSet: TokenSet
 
   // For HTTP provider
-  public pollIntervalMilliSecs = 500
+  public pollIntervalMilliSecs = 2000
   public chainId: number
 
   private constructor(public transport: AbstractJSONRPCTransport) {}
@@ -38,9 +38,10 @@ export class Provider {
 
   static async newHttpProvider(
     address: string = 'http://127.0.0.1:3030',
+    rpcTimeout?: number,
     pollIntervalMilliSecs?: number
   ): Promise<Provider> {
-    const transport = new HTTPTransport(address)
+    const transport = new HTTPTransport(address, rpcTimeout)
     const provider = new Provider(transport)
     if (pollIntervalMilliSecs) {
       provider.pollIntervalMilliSecs = pollIntervalMilliSecs
