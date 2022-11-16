@@ -13,7 +13,7 @@ export declare class Provider {
      * @deprecated Websocket support will be removed in future. Use HTTP transport instead.
      */
     static newWebsocketProvider(address: string): Promise<Provider>;
-    static newHttpProvider(address?: string, pollIntervalMilliSecs?: number): Promise<Provider>;
+    static newHttpProvider(address?: string, rpcTimeout?: number, pollIntervalMilliSecs?: number): Promise<Provider>;
     /**
      * Provides some hardcoded values the `Provider` responsible for
      * without communicating with the network

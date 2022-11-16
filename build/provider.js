@@ -18,7 +18,7 @@ class Provider {
     constructor(transport) {
         this.transport = transport;
         // For HTTP provider
-        this.pollIntervalMilliSecs = 500;
+        this.pollIntervalMilliSecs = 2000;
     }
     /**
      * @deprecated Websocket support will be removed in future. Use HTTP transport instead.
@@ -31,9 +31,9 @@ class Provider {
             return provider;
         });
     }
-    static newHttpProvider(address = 'http://127.0.0.1:3030', pollIntervalMilliSecs) {
+    static newHttpProvider(address = 'http://127.0.0.1:3030', rpcTimeout, pollIntervalMilliSecs) {
         return __awaiter(this, void 0, void 0, function* () {
-            const transport = new transport_1.HTTPTransport(address);
+            const transport = new transport_1.HTTPTransport(address, rpcTimeout);
             const provider = new Provider(transport);
             if (pollIntervalMilliSecs) {
                 provider.pollIntervalMilliSecs = pollIntervalMilliSecs;

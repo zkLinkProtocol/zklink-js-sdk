@@ -21,7 +21,8 @@ declare class Subscription {
 }
 export declare class HTTPTransport extends AbstractJSONRPCTransport {
     address: string;
-    constructor(address: string);
+    rpcTimeout: number;
+    constructor(address: string, rpcTimeout?: number);
     request(method: string, params?: any): Promise<any>;
     disconnect(): Promise<void>;
 }
