@@ -75,14 +75,13 @@ export class Wallet {
     this.provider = provider
     this.contract = new LinkContract(provider, this.ethSigner)
 
-    if (this.accountId === undefined) {
-      this.provider
-        .getState(this.address())
-        .then((r) => {
+    try {
+      if (this.accountId === undefined) {
+        this.provider.getState(this.address()).then((r) => {
           this.accountId = r.id
         })
-        .catch((e) => {})
-    }
+      }
+    } catch (e) {}
     return this
   }
 

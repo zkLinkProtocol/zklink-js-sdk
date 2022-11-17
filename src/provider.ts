@@ -100,10 +100,20 @@ export class Provider {
   }
 
   async getState(address: Address): Promise<AccountState> {
-    return await this.transport.request('account_info_by_address', [address])
-  }
-  async getStateById(accountId: number): Promise<AccountState> {
-    return await this.transport.request('account_info_by_id', [accountId])
+    try {
+      return await this.transport.request('account_info_by_address', [address])
+    } catch (e) {
+      if (e?.jrpcError?.code === 201) {
+        return {
+          id: null,
+          address: address,
+          nonce: 0,
+          pubKeyHash: 'sync:0000000000000000000000000000000000000000',
+          accountType: 'unknown',
+        }
+      }
+      throw e
+    }
   }
 
   async getBalance(

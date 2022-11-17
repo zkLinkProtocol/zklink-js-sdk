@@ -88,13 +88,23 @@ class Provider {
         });
     }
     getState(address) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('account_info_by_address', [address]);
-        });
-    }
-    getStateById(accountId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('account_info_by_id', [accountId]);
+            try {
+                return yield this.transport.request('account_info_by_address', [address]);
+            }
+            catch (e) {
+                if (((_a = e === null || e === void 0 ? void 0 : e.jrpcError) === null || _a === void 0 ? void 0 : _a.code) === 201) {
+                    return {
+                        id: null,
+                        address: address,
+                        nonce: 0,
+                        pubKeyHash: 'sync:0000000000000000000000000000000000000000',
+                        accountType: 'unknown',
+                    };
+                }
+                throw e;
+            }
         });
     }
     getBalance(accountId, subAccountId) {

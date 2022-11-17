@@ -32,6 +32,7 @@ export interface AccountState {
     address: Address;
     nonce: number;
     pubKeyHash: PubKeyHash;
+    accountType: string;
 }
 export interface AccountBalances {
     [subAccountId: number]: {

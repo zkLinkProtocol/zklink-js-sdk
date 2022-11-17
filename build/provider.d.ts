@@ -29,7 +29,6 @@ export declare class Provider {
     getTokens(): Promise<Tokens>;
     updateTokenSet(): Promise<void>;
     getState(address: Address): Promise<AccountState>;
-    getStateById(accountId: number): Promise<AccountState>;
     getBalance(accountId: number, subAccountId?: number): Promise<{
         balances: AccountBalances;
     }>;
