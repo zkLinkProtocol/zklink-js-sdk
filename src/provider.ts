@@ -122,14 +122,9 @@ export class Provider {
   ): Promise<{
     balances: AccountBalances
   }> {
-    const params = []
-    if (accountId) {
-      params.push(accountId)
-    }
+    const params = [accountId]
     if (typeof subAccountId === 'number') {
       params.push(subAccountId)
-    } else {
-      params.push(null)
     }
     return await this.transport.request('account_balances', [...params])
   }
