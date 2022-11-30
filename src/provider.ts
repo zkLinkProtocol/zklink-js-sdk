@@ -165,8 +165,7 @@ export class Provider {
     } else {
       while (true) {
         const transactionStatus = await this.getTxReceipt(hash).catch((e) => {})
-        const notifyDone =
-          transactionStatus && transactionStatus?.executed && transactionStatus?.success
+        const notifyDone = transactionStatus && transactionStatus?.executed
         if (notifyDone) {
           return transactionStatus
         } else {

@@ -147,7 +147,7 @@ class Provider {
             else {
                 while (true) {
                     const transactionStatus = yield this.getTxReceipt(hash).catch((e) => { });
-                    const notifyDone = transactionStatus && (transactionStatus === null || transactionStatus === void 0 ? void 0 : transactionStatus.executed) && (transactionStatus === null || transactionStatus === void 0 ? void 0 : transactionStatus.success);
+                    const notifyDone = transactionStatus && (transactionStatus === null || transactionStatus === void 0 ? void 0 : transactionStatus.executed);
                     if (notifyDone) {
                         return transactionStatus;
                     }
