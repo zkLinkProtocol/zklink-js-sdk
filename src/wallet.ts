@@ -808,7 +808,7 @@ export class Wallet {
   }
 
   private async setRequiredAccountIdFromServer(actionName: string) {
-    if (this.accountId === undefined) {
+    if (this.accountId === undefined || this.accountId === null) {
       const accountIdFromServer = await this.getAccountId()
       if (accountIdFromServer == null) {
         throw new Error(`Failed to ${actionName}: Account does not exist in the zkLink network`)

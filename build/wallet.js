@@ -609,7 +609,7 @@ class Wallet {
     }
     setRequiredAccountIdFromServer(actionName) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.accountId === undefined) {
+            if (this.accountId === undefined || this.accountId === null) {
                 const accountIdFromServer = yield this.getAccountId();
                 if (accountIdFromServer == null) {
                     throw new Error(`Failed to ${actionName}: Account does not exist in the zkLink network`);
