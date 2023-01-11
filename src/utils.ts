@@ -493,11 +493,11 @@ export async function signMessagePersonalAPI(
 export async function signMessageEIP712(signer: any, data: any): Promise<string> {
   if (signer instanceof ethers.providers.JsonRpcSigner) {
     return signer.provider
-      .send('eth_signTypedData_v3', [await signer.getAddress(), JSON.stringify(data)])
+      .send('eth_signTypedData_v4', [await signer.getAddress(), JSON.stringify(data)])
       .then(
         (sign) => sign,
         (err) => {
-          console.log('eth_signTypedData_v3', err)
+          console.log('eth_signTypedData_v4', err)
           throw err
         }
       )

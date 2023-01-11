@@ -416,9 +416,9 @@ function signMessageEIP712(signer, data) {
     return __awaiter(this, void 0, void 0, function* () {
         if (signer instanceof ethers_1.ethers.providers.JsonRpcSigner) {
             return signer.provider
-                .send('eth_signTypedData_v3', [yield signer.getAddress(), JSON.stringify(data)])
+                .send('eth_signTypedData_v4', [yield signer.getAddress(), JSON.stringify(data)])
                 .then((sign) => sign, (err) => {
-                console.log('eth_signTypedData_v3', err);
+                console.log('eth_signTypedData_v4', err);
                 throw err;
             });
         }
