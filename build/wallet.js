@@ -47,12 +47,18 @@ class Wallet {
         catch (e) { }
         return this;
     }
-    static fromEthSigner(ethWallet, provider, signer, accountId, ethSignerType) {
+    static fromRestoreKey(ethWallet, provider, restoreKey) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.fromEthSigner(ethWallet, provider, undefined, undefined, undefined, restoreKey);
+        });
+    }
+    static fromEthSigner(ethWallet, provider, signer, accountId, ethSignerType, restoreKey) {
         return __awaiter(this, void 0, void 0, function* () {
             if (signer == null) {
-                const signerResult = yield signer_1.Signer.fromETHSignature(ethWallet);
+                const signerResult = yield signer_1.Signer.fromETHSignature(ethWallet, restoreKey);
                 signer = signerResult.signer;
                 ethSignerType = ethSignerType || signerResult.ethSignatureType;
+                restoreKey = signerResult.signature;
             }
             else if (ethSignerType == null) {
                 throw new Error('If you passed signer, you must also pass ethSignerType.');
@@ -61,6 +67,7 @@ class Wallet {
             const ethMessageSigner = new eth_message_signer_1.EthMessageSigner(ethWallet, ethSignerType);
             const wallet = new Wallet(ethWallet, ethMessageSigner, address, signer, accountId, ethSignerType);
             wallet.connect(provider);
+            wallet.ethSignature = restoreKey;
             return wallet;
         });
     }

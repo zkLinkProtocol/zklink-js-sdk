@@ -25,8 +25,9 @@ export declare class Signer {
     }): Promise<ChangePubKeyData>;
     static fromPrivateKey(pk: Uint8Array): Signer;
     static fromSeed(seed: Uint8Array): Promise<Signer>;
-    static fromETHSignature(ethSigner: ethers.Signer): Promise<{
+    static fromETHSignature(ethSigner: ethers.Signer, restoreKey?: string): Promise<{
         signer: Signer;
+        signature: string;
         ethSignatureType: EthSignerType;
     }>;
 }

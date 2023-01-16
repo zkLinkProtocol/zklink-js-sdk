@@ -62,6 +62,8 @@ export class Wallet {
 
   public contract: LinkContract
 
+  ethSignature: string
+
   private constructor(
     public ethSigner: ethers.Signer,
     public ethMessageSigner: EthMessageSigner,
@@ -85,17 +87,27 @@ export class Wallet {
     return this
   }
 
+  getRestoreKey() {
+    return this.ethSignature
+  }
+
+  static async fromRestoreKey(ethWallet: ethers.Signer, provider: Provider, restoreKey: string) {
+    return this.fromEthSigner(ethWallet, provider, undefined, undefined, undefined, restoreKey)
+  }
+
   static async fromEthSigner(
     ethWallet: ethers.Signer,
     provider: Provider,
     signer?: Signer,
     accountId?: number,
-    ethSignerType?: EthSignerType
+    ethSignerType?: EthSignerType,
+    restoreKey?: string
   ): Promise<Wallet> {
     if (signer == null) {
-      const signerResult = await Signer.fromETHSignature(ethWallet)
+      const signerResult = await Signer.fromETHSignature(ethWallet, restoreKey)
       signer = signerResult.signer
       ethSignerType = ethSignerType || signerResult.ethSignatureType
+      restoreKey = signerResult.signature
     } else if (ethSignerType == null) {
       throw new Error('If you passed signer, you must also pass ethSignerType.')
     }
@@ -110,6 +122,7 @@ export class Wallet {
       ethSignerType
     )
     wallet.connect(provider)
+    wallet.ethSignature = restoreKey
     return wallet
   }
 

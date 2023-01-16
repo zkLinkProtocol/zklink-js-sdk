@@ -145,14 +145,18 @@ export class Signer {
     return new Signer(await privateKeyFromSeed(seed))
   }
 
-  static async fromETHSignature(ethSigner: ethers.Signer): Promise<{
+  static async fromETHSignature(
+    ethSigner: ethers.Signer,
+    restoreKey?: string
+  ): Promise<{
     signer: Signer
+    signature: string
     ethSignatureType: EthSignerType
   }> {
     let message =
       "Sign this message to create a private key to interact with zkLink's layer 2 services.\nNOTE: This application is powered by zkLink's multi-chain network.\n\nOnly sign this message for a trusted client!"
     const signedBytes = utils.getSignedBytesFromMessage(message, false)
-    const signature = await utils.signMessagePersonalAPI(ethSigner, signedBytes)
+    const signature = restoreKey || (await utils.signMessagePersonalAPI(ethSigner, signedBytes))
     const address = await ethSigner.getAddress()
     const ethSignatureType = await utils.getEthSignatureType(
       ethSigner.provider,
@@ -162,7 +166,7 @@ export class Signer {
     )
     const seed = ethers.utils.arrayify(signature)
     const signer = await Signer.fromSeed(seed)
-    return { signer, ethSignatureType }
+    return { signer, signature, ethSignatureType }
   }
 }
 

@@ -120,16 +120,16 @@ class Signer {
             return new Signer(yield (0, crypto_1.privateKeyFromSeed)(seed));
         });
     }
-    static fromETHSignature(ethSigner) {
+    static fromETHSignature(ethSigner, restoreKey) {
         return __awaiter(this, void 0, void 0, function* () {
             let message = "Sign this message to create a private key to interact with zkLink's layer 2 services.\nNOTE: This application is powered by zkLink's multi-chain network.\n\nOnly sign this message for a trusted client!";
             const signedBytes = utils.getSignedBytesFromMessage(message, false);
-            const signature = yield utils.signMessagePersonalAPI(ethSigner, signedBytes);
+            const signature = restoreKey || (yield utils.signMessagePersonalAPI(ethSigner, signedBytes));
             const address = yield ethSigner.getAddress();
             const ethSignatureType = yield utils.getEthSignatureType(ethSigner.provider, message, signature, address);
             const seed = ethers_1.ethers.utils.arrayify(signature);
             const signer = yield Signer.fromSeed(seed);
-            return { signer, ethSignatureType };
+            return { signer, signature, ethSignatureType };
         });
     }
 }
