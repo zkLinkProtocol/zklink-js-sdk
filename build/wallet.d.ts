@@ -20,6 +20,7 @@ export declare class Wallet {
     ethSignature: string;
     private constructor();
     connect(provider: Provider): this;
+    getRestoreKey(): string;
     static fromRestoreKey(ethWallet: ethers.Signer, provider: Provider, restoreKey: string): Promise<Wallet>;
     static fromEthSigner(ethWallet: ethers.Signer, provider: Provider, signer?: Signer, accountId?: number, ethSignerType?: EthSignerType, restoreKey?: string): Promise<Wallet>;
     static fromCreate2Data(syncSigner: Signer, createrSigner: ethers.Signer, provider: Provider, create2Data: Create2Data, accountId?: number): Promise<Wallet>;

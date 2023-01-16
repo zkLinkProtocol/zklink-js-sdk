@@ -47,6 +47,9 @@ class Wallet {
         catch (e) { }
         return this;
     }
+    getRestoreKey() {
+        return this.ethSignature;
+    }
     static fromRestoreKey(ethWallet, provider, restoreKey) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.fromEthSigner(ethWallet, provider, undefined, undefined, undefined, restoreKey);
