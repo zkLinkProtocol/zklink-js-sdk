@@ -665,7 +665,7 @@ function serializeOrder(order) {
     const type = new Uint8Array([255]);
     const accountIdBytes = serializeAccountId(order.accountId);
     const subAccountIdBytes = serializeSubAccountId(order.subAccountId);
-    const slotBytes = numberToBytesBE(order.slotId, 1);
+    const slotBytes = numberToBytesBE(order.slotId, 2);
     const nonceBytes = serializeNonce(order.nonce);
     const baseTokenIdBytes = serializeTokenId(order.baseTokenId);
     const quoteTokenIdBytes = serializeTokenId(order.quoteTokenId);
