@@ -41,7 +41,7 @@ describe('Order', () => {
   it('serialize order maker', () => {
     const serialized = serializeOrder(orderMaker as any)
     expect(Buffer.from(serialized).toString('hex')).eq(
-      'ff000000020100000000000000010002000000000000008ac7230489e8000000050a2540be4009',
+      'ff0000000201000000000000010002000000000000008ac7230489e8000000050a2540be4009',
       'maker hex is incorrect'
     )
   })
@@ -49,7 +49,7 @@ describe('Order', () => {
   it('serialize order taker', () => {
     const serialized = serializeOrder(orderTaker as any)
     expect(Buffer.from(serialized).toString('hex')).eq(
-      'ff000000020100010000000000010002000000000000004563918244f4000001050a4a817c8009',
+      'ff0000000201000100000000010002000000000000004563918244f4000001050a4a817c8009',
       'taker hex is incorrect'
     )
   })
@@ -61,7 +61,7 @@ describe('Order', () => {
       '191f5a474b7b8af67e4338c169b16093a8662bd9fd825b88ec97f987e6453e1c'
     )
     expect(signedTransaction?.tx?.signature?.signature).eq(
-      '690617379c614844e4d8cd773a3750131dd79dba8eaba581edae89f1414c6328896ae615f613afcd6ef4a74f94742c4190865d2472bf3157f5534f672532ea00'
+      'd5d5bbb4cfd5dc659ec5373bb62d33ca93e9424ff6d5f971edaf1d29451ae707f054fd178abc2213d26f35d5f46c5062e02ecf05a4de3ffc8fb48e390ce26b01'
     )
   })
 
@@ -81,7 +81,7 @@ describe('Order', () => {
       feeRatio2: 10,
     } as any)
     expect(signedTransaction?.tx?.signature?.signature).eq(
-      '36400264d769884a4f096d09a0cf00a498dc6b3c9471b63b627bc1a663de3f9e54dce23ccb54f61df0501a3ee15db3d12d1f8f420c2128fb1be2eb6c12fde505'
+      '235a9ab68f2e53ae721c1ddbcdf71bee170cab6504906bbfec03f3c5923ebc1e018c07ff03e24f546cbbb75651be2a108e4c352d1abf7f63417359b55ede4c00'
     )
   })
 })
