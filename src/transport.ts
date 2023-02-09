@@ -201,7 +201,7 @@ export class DummyTransport extends AbstractJSONRPCTransport {
   }
 
   async request(method: string, params = null): Promise<any> {
-    if (method == 'get_support_chains') {
+    if (method == 'getSupportChains') {
       return [
         {
           chainId: 1,
@@ -211,7 +211,7 @@ export class DummyTransport extends AbstractJSONRPCTransport {
       ]
     }
 
-    if (method == 'tokens') {
+    if (method == 'getSupportTokens') {
       const tokensList = this.getTokens()
       const tokens = {}
 
@@ -227,10 +227,10 @@ export class DummyTransport extends AbstractJSONRPCTransport {
 
       return tokens
     }
-    if (method == 'get_tx_fee') {
+    if (method == 'estimateTransactionFee') {
       return '4070000000000000'
     }
-    if (method == 'account_info_by_address') {
+    if (method == 'getAccount') {
       // The example `AccountState` instance:
       //  - assigns the '42' value to account_id;
       //  - assigns the committed.pubKeyHash to match the wallet's signer's PubKeyHash
@@ -243,7 +243,7 @@ export class DummyTransport extends AbstractJSONRPCTransport {
         pubKeyHash: await this.getPubKeyHash(),
       }
     }
-    if (method == 'account_balances') {
+    if (method == 'getAccountBalances') {
       return {
         balances: {
           '0': {
@@ -252,7 +252,69 @@ export class DummyTransport extends AbstractJSONRPCTransport {
         },
       }
     }
-    if (method == 'tx_submit') {
+    if (method == 'getAccountBalances') {
+      return {
+        balances: {
+          '0': {
+            '1': BigNumber.from(12345),
+          },
+        },
+      }
+    }
+    if (method == 'getTransactionByHash') {
+      return {
+        txHash: params[0],
+        tx: {
+          type: 'Transfer',
+          accountId: 2,
+          fromSubAccountId: 0,
+          toSubAccountId: 1,
+          to: '0xdc9c9863167ee865edd5216964b8b99d43ee7a81',
+          token: 18,
+          amount: '1000000000000',
+          fee: '216000000000000',
+          nonce: 38192,
+          signature: {
+            pubKey: '5f07954b65b5407a37ec0a2c54fb4647e2014475936057bb2f52a6faab938b02',
+            signature:
+              '79bdeaa739557a4be289ef2bf718253ce791adc3ce5fbcb7abcad4b0a2d6e203a9c38d68d987f96ffc7a391f2518f281874f33c7a5a7110d27591ad029b31005',
+          },
+          ts: 1675406687,
+        },
+        receipt: {
+          executed: true,
+          success: true,
+          failReason: null,
+          block: 3947,
+          index: 1,
+        },
+        updates: [
+          {
+            type: 'BalanceUpdate',
+            updateId: 9,
+            accountId: 2,
+            subAccountId: 0,
+            coinId: 18,
+            oldBalance: '1941710093000000000000',
+            newBalance: '1941709876000000000000',
+            oldNonce: 38192,
+            newNonce: 38193,
+          },
+          {
+            type: 'BalanceUpdate',
+            updateId: 10,
+            accountId: 2,
+            subAccountId: 1,
+            coinId: 18,
+            oldBalance: '38191000000000000',
+            newBalance: '38192000000000000',
+            oldNonce: 38192,
+            newNonce: 38193,
+          },
+        ],
+      }
+    }
+    if (method == 'sendTransaction') {
       return ['sync-tx:0d162d589577dc3fdeffb8270feb53da7415b2a82249954c40ced41ae7e2270d']
     }
 

@@ -197,6 +197,22 @@ export interface TransactionReceipt {
     failReason?: string;
     block?: number;
 }
+export interface TransactionResult {
+    txHash?: string;
+    tx?: any;
+    receipt?: TransactionReceipt;
+    updates?: {
+        type: string;
+        updateId: number;
+        accountId: number;
+        subAccountId: number;
+        coinId: number;
+        oldBalance: string;
+        newBalance: string;
+        oldNonce: number;
+        newNonce: number;
+    }[];
+}
 export interface PriorityOperationReceipt {
     executed: boolean;
     block?: BlockInfo;

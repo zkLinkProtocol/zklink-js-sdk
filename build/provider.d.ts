@@ -32,7 +32,6 @@ export declare class Provider {
     getBalance(accountId: number, subAccountId?: number): Promise<{
         balances: AccountBalances;
     }>;
-    getSubAccountState(address: Address, subAccountId: number): Promise<AccountState>;
     getTxReceipt(txHash: string): Promise<TransactionReceipt>;
     getBlockInfo(): Promise<{
         lastBlockNumber: number;

@@ -75,12 +75,12 @@ export class Provider {
     signature?: TxEthSignature
     fastProcessing?: boolean
   }): Promise<string> {
-    return await this.transport.request('tx_submit', [tx, signature])
+    return await this.transport.request('sendTransaction', [tx, signature])
   }
 
   async getContractInfo(): Promise<ContractInfo[]> {
     if (!this.contractInfo?.length) {
-      this.contractInfo = await this.transport.request('get_support_chains', [])
+      this.contractInfo = await this.transport.request('getSupportChains', [])
     }
     return this.contractInfo
   }
@@ -91,7 +91,7 @@ export class Provider {
   }
 
   async getTokens(): Promise<Tokens> {
-    return await this.transport.request('tokens', [])
+    return await this.transport.request('getSupportTokens', [])
   }
 
   async updateTokenSet(): Promise<void> {
@@ -101,7 +101,7 @@ export class Provider {
 
   async getState(address: Address): Promise<AccountState> {
     try {
-      return await this.transport.request('account_info_by_address', [address])
+      return await this.transport.request('getAccount', [address])
     } catch (e) {
       if (e?.jrpcError?.code === 201) {
         return {
@@ -126,16 +126,13 @@ export class Provider {
     if (typeof subAccountId === 'number') {
       params.push(subAccountId)
     }
-    return await this.transport.request('account_balances', [...params])
-  }
-
-  async getSubAccountState(address: Address, subAccountId: number): Promise<AccountState> {
-    return await this.transport.request('sub_account_info', [address, subAccountId])
+    return await this.transport.request('getAccountBalances', [...params])
   }
 
   // get transaction status by its hash (e.g. 0xdead..beef)
   async getTxReceipt(txHash: string): Promise<TransactionReceipt> {
-    return await this.transport.request('tx_info', [txHash])
+    const result = await this.transport.request('getTransactionByHash', [txHash])
+    return result?.receipt
   }
 
   async getBlockInfo(): Promise<{
@@ -144,7 +141,7 @@ export class Provider {
     committed: number
     verified: number
   }> {
-    return await this.transport.request('block_info', [])
+    return await this.transport.request('getLatestBlockNumber', [])
   }
 
   async notifyTransaction(hash: string, action: 'COMMIT' = 'COMMIT'): Promise<TransactionReceipt> {
@@ -176,7 +173,7 @@ export class Provider {
   }
 
   async getTransactionFee(tx: any): Promise<BigNumber> {
-    const transactionFee = await this.transport.request('get_tx_fee', [tx])
+    const transactionFee = await this.transport.request('estimateTransactionFee', [tx])
     return transactionFee
   }
 

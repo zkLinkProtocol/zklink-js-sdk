@@ -58,14 +58,14 @@ class Provider {
     // return transaction hash (e.g. sync-tx:dead..beef)
     submitTx({ tx, signature, }) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('tx_submit', [tx, signature]);
+            return yield this.transport.request('sendTransaction', [tx, signature]);
         });
     }
     getContractInfo() {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             if (!((_a = this.contractInfo) === null || _a === void 0 ? void 0 : _a.length)) {
-                this.contractInfo = yield this.transport.request('get_support_chains', []);
+                this.contractInfo = yield this.transport.request('getSupportChains', []);
             }
             return this.contractInfo;
         });
@@ -78,7 +78,7 @@ class Provider {
     }
     getTokens() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('tokens', []);
+            return yield this.transport.request('getSupportTokens', []);
         });
     }
     updateTokenSet() {
@@ -91,7 +91,7 @@ class Provider {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.transport.request('account_info_by_address', [address]);
+                return yield this.transport.request('getAccount', [address]);
             }
             catch (e) {
                 if (((_a = e === null || e === void 0 ? void 0 : e.jrpcError) === null || _a === void 0 ? void 0 : _a.code) === 201) {
@@ -113,23 +113,19 @@ class Provider {
             if (typeof subAccountId === 'number') {
                 params.push(subAccountId);
             }
-            return yield this.transport.request('account_balances', [...params]);
-        });
-    }
-    getSubAccountState(address, subAccountId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('sub_account_info', [address, subAccountId]);
+            return yield this.transport.request('getAccountBalances', [...params]);
         });
     }
     // get transaction status by its hash (e.g. 0xdead..beef)
     getTxReceipt(txHash) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('tx_info', [txHash]);
+            const result = yield this.transport.request('getTransactionByHash', [txHash]);
+            return result === null || result === void 0 ? void 0 : result.receipt;
         });
     }
     getBlockInfo() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.transport.request('block_info', []);
+            return yield this.transport.request('getLatestBlockNumber', []);
         });
     }
     notifyTransaction(hash, action = 'COMMIT') {
@@ -160,7 +156,7 @@ class Provider {
     }
     getTransactionFee(tx) {
         return __awaiter(this, void 0, void 0, function* () {
-            const transactionFee = yield this.transport.request('get_tx_fee', [tx]);
+            const transactionFee = yield this.transport.request('estimateTransactionFee', [tx]);
             return transactionFee;
         });
     }

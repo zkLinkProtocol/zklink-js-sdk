@@ -49,7 +49,6 @@ export declare class Wallet {
     getAccountId(): Promise<number | undefined>;
     address(): Address;
     getAccountState(): Promise<AccountState>;
-    getSubAccountState(subAccountId: number): Promise<AccountState>;
     getBalances(subAccountId?: number): Promise<AccountBalances>;
     getTokenBalance(tokenId: TokenId, subAccountId: number): Promise<string>;
     getEthereumBalance(token: TokenLike, linkChainId: ChainId): Promise<BigNumber>;

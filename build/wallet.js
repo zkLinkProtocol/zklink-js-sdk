@@ -458,11 +458,6 @@ class Wallet {
             return state;
         });
     }
-    getSubAccountState(subAccountId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.provider.getSubAccountState(this.address(), subAccountId);
-        });
-    }
     getBalances(subAccountId) {
         return __awaiter(this, void 0, void 0, function* () {
             this.accountId = yield this.getAccountId();

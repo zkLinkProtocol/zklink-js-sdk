@@ -2,5 +2,8 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  watchAll: false
+  watchAll: false,
+  testPathIgnorePatterns: [
+    "tests/online/"
+  ]
 };
