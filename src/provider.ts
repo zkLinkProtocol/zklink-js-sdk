@@ -131,7 +131,7 @@ export class Provider {
 
   // get transaction status by its hash (e.g. 0xdead..beef)
   async getTxReceipt(txHash: string): Promise<TransactionReceipt> {
-    const result = await this.transport.request('getTransactionByHash', [txHash])
+    const result = await this.transport.request('getTransactionByHash', [txHash, false])
     return result?.receipt
   }
 
