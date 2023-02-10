@@ -265,10 +265,8 @@ class DummyTransport extends AbstractJSONRPCTransport {
             }
             if (method == 'getAccountBalances') {
                 return {
-                    balances: {
-                        '0': {
-                            '1': ethers_1.BigNumber.from(12345),
-                        },
+                    '0': {
+                        '1': ethers_1.BigNumber.from(12345),
                     },
                 };
             }

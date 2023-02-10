@@ -462,7 +462,7 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             this.accountId = yield this.getAccountId();
             const balances = yield this.provider.getBalance(this.accountId, subAccountId);
-            return balances === null || balances === void 0 ? void 0 : balances.balances;
+            return balances;
         });
     }
     getTokenBalance(tokenId, subAccountId) {
