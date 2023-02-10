@@ -119,7 +119,7 @@ class Provider {
     // get transaction status by its hash (e.g. 0xdead..beef)
     getTxReceipt(txHash) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.transport.request('getTransactionByHash', [txHash]);
+            const result = yield this.transport.request('getTransactionByHash', [txHash, false]);
             return result === null || result === void 0 ? void 0 : result.receipt;
         });
     }
