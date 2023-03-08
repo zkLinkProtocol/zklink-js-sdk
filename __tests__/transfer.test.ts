@@ -1,10 +1,10 @@
 import { expect } from 'chai'
 import { BigNumber } from 'ethers'
-import { getWallet } from './wallet.test'
+import { getTestWallet } from './utils'
 
 describe('transfer', () => {
   it('transfer signature', async function () {
-    const wallet = await getWallet()
+    const wallet = await getTestWallet()
     const transaction = await wallet.sendTransfer({
       fromSubAccountId: 6,
       toSubAccountId: 6,

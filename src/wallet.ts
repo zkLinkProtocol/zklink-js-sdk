@@ -91,23 +91,17 @@ export class Wallet {
     return this.ethSignature
   }
 
-  static async fromRestoreKey(ethWallet: ethers.Signer, provider: Provider, restoreKey: string) {
-    return this.fromEthSigner(ethWallet, provider, undefined, undefined, undefined, restoreKey)
-  }
-
   static async fromEthSigner(
     ethWallet: ethers.Signer,
     provider: Provider,
     signer?: Signer,
     accountId?: number,
-    ethSignerType?: EthSignerType,
-    restoreKey?: string
+    ethSignerType?: EthSignerType
   ): Promise<Wallet> {
     if (signer == null) {
-      const signerResult = await Signer.fromETHSignature(ethWallet, restoreKey)
+      const signerResult = await Signer.fromETHSignature(ethWallet)
       signer = signerResult.signer
       ethSignerType = ethSignerType || signerResult.ethSignatureType
-      restoreKey = signerResult.signature
     } else if (ethSignerType == null) {
       throw new Error('If you passed signer, you must also pass ethSignerType.')
     }
@@ -122,7 +116,30 @@ export class Wallet {
       ethSignerType
     )
     wallet.connect(provider)
-    wallet.ethSignature = restoreKey
+    return wallet
+  }
+
+  static async fromEthSignature(
+    ethWallet: ethers.Signer,
+    provider: Provider,
+    ethSignature: string,
+    ethSignerType?: EthSignerType
+  ): Promise<Wallet> {
+    const signerResult = await Signer.fromETHSignature(ethWallet, ethSignature)
+    const signer = signerResult.signer
+    ethSignerType = ethSignerType || signerResult.ethSignatureType
+    const address = await ethWallet.getAddress()
+    const ethMessageSigner = new EthMessageSigner(ethWallet, ethSignerType)
+    const wallet = new Wallet(
+      ethWallet,
+      ethMessageSigner,
+      address,
+      signer,
+      undefined,
+      ethSignerType
+    )
+    wallet.connect(provider)
+    wallet.ethSignature = ethSignature
     return wallet
   }
 
@@ -630,16 +647,12 @@ export class Wallet {
     }
   }
 
-  async estimateGasDeposit(linkChainId: number, args: any[]) {
-    const mainContract = await this.getMainContract(linkChainId)
-
+  async estimateGasDeposit(tx: ethers.providers.TransactionRequest) {
     try {
-      const gasEstimate = await mainContract.estimateGas.depositERC20(...args).then(
-        (estimate) => estimate,
-        () => BigNumber.from('0')
-      )
-      const recommendedGasLimit = ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT
-      return gasEstimate.gte(recommendedGasLimit) ? gasEstimate : recommendedGasLimit
+      const gasEstimate = await this.ethSigner.estimateGas(tx)
+      return gasEstimate.gte(ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT)
+        ? gasEstimate
+        : ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT
     } catch (e) {
       this.modifyEthersError(e)
     }
@@ -692,7 +705,13 @@ export class Wallet {
 
     if (isTokenETH(deposit.token)) {
       try {
-        ethTransaction = await mainContract.depositETH(deposit.depositTo, deposit.subAccountId, {
+        const data = SYNC_MAIN_CONTRACT_INTERFACE.encodeFunctionData('depositETH', [
+          deposit.depositTo,
+          deposit.subAccountId,
+        ])
+        ethTransaction = await this.ethSigner.sendTransaction({
+          to: contractAddress.mainContract,
+          data,
           value: BigNumber.from(deposit.amount),
           gasLimit: BigNumber.from(ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT),
           ...deposit.ethTxOptions,
@@ -702,44 +721,51 @@ export class Wallet {
       }
     } else {
       // ERC20 token deposit
-      const erc20contract = new Contract(deposit.token, IERC20_INTERFACE, this.ethSigner)
       let nonce: number
       if (deposit.approveDepositAmountForERC20) {
         try {
-          const approveTx = await erc20contract.approve(
+          const data = IERC20_INTERFACE.encodeFunctionData('approve', [
             contractAddress.mainContract,
-            MAX_ERC20_APPROVE_AMOUNT
-          )
+            MAX_ERC20_APPROVE_AMOUNT,
+          ])
+          const approveTx = await this.ethSigner.sendTransaction({
+            to: deposit.token,
+            data,
+          })
           nonce = approveTx.nonce + 1
         } catch (e) {
           this.modifyEthersError(e)
         }
       }
-      const args = [
+
+      const data = SYNC_MAIN_CONTRACT_INTERFACE.encodeFunctionData('depositERC20', [
         deposit.token,
         deposit.amount,
         deposit.depositTo,
         deposit.subAccountId,
         deposit.mapping ? true : false,
-        {
-          nonce,
-          ...deposit.ethTxOptions,
-        } as ethers.providers.TransactionRequest,
-      ]
-
+      ])
+      const tx = {
+        to: contractAddress.mainContract,
+        data,
+        nonce,
+        ...deposit.ethTxOptions,
+      }
+      console.log(tx)
       // We set gas limit only if user does not set it using ethTxOptions.
-      const txRequest = args[args.length - 1] as ethers.providers.TransactionRequest
-      if (txRequest.gasLimit == null) {
-        try {
-          txRequest.gasLimit = await this.estimateGasDeposit(deposit.linkChainId, args)
-          args[args.length - 1] = txRequest
-        } catch (e) {
-          this.modifyEthersError(e)
+      if (tx.gasLimit == null) {
+        if (deposit.approveDepositAmountForERC20) {
+          tx.gasLimit = ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT
+        } else {
+          try {
+            tx.gasLimit = await this.estimateGasDeposit(tx)
+          } catch (e) {
+            this.modifyEthersError(e)
+          }
         }
       }
-
       try {
-        ethTransaction = await mainContract.depositERC20(...args)
+        ethTransaction = await this.ethSigner.sendTransaction(tx)
       } catch (e) {
         this.modifyEthersError(e)
       }

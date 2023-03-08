@@ -35,7 +35,7 @@
   "scripts": {
     "lint:ts": "tslint -c tslint.json {examples,test,src}/**/*.ts",
     "lint:ts-fix": "tslint -c tslint.json --fix {examples,test,src}/**/*.ts",
-    "test": "jest",
+    "test": "jest --watch",
     "build": "tsc",
     "watch": "tsc --watch",
     "prepublish": "yarn build && rollup -c",

@@ -6,7 +6,7 @@ import {
   serializeOrder,
   serializeOrderMatching,
 } from '../src/utils'
-import { getWallet } from './wallet.test'
+import { getTestWallet } from './utils'
 
 const orderMaker = {
   type: 'Order',
@@ -55,7 +55,7 @@ describe('Order', () => {
   })
 
   it('sign sync order', async function () {
-    const wallet = await getWallet()
+    const wallet = await getTestWallet()
     const signedTransaction = await wallet.signOrder(orderMaker as any)
     expect(signedTransaction?.tx?.signature?.pubKey).eq(
       '191f5a474b7b8af67e4338c169b16093a8662bd9fd825b88ec97f987e6453e1c'
@@ -66,7 +66,7 @@ describe('Order', () => {
   })
 
   it('custom order', async function () {
-    const wallet = await getWallet()
+    const wallet = await getTestWallet()
     const signedTransaction = await wallet.signOrder({
       subAccountId: 1,
       accountId: 5,

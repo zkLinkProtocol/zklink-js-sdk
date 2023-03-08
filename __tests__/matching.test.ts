@@ -7,11 +7,11 @@ import {
   serializeOrder,
   serializeOrderMatching,
 } from '../src/utils'
-import { getWallet } from './wallet.test'
+import { getTestWallet } from './utils'
 
 describe('matching', () => {
   it('bytes and signature', async function () {
-    const wallet = await getWallet()
+    const wallet = await getTestWallet()
 
     const makerData: OrderData = {
       type: 'Order',

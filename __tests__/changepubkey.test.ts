@@ -1,10 +1,10 @@
 import { expect } from 'chai'
 import { _TypedDataEncoder } from '@ethersproject/hash'
 import { JsonRpcProvider } from '@ethersproject/providers'
-import { getWallet } from './wallet.test'
 import { utils } from '../src'
 import { ChangePubKeyData } from '../src/types'
 import { sha256 } from 'ethers/lib/utils'
+import { getTestWallet } from './utils'
 
 describe('ChangePubKey', () => {
   it('serializeChangePubKey', async () => {
@@ -24,7 +24,7 @@ describe('ChangePubKey', () => {
     )
   })
   it('L2 signature', async function () {
-    const wallet = await getWallet()
+    const wallet = await getTestWallet()
     const signedTransaction: any = await wallet.signChangePubKey({
       subAccountId: 1,
       chainId: 1,

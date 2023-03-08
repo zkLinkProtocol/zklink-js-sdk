@@ -50,18 +50,12 @@ class Wallet {
     getRestoreKey() {
         return this.ethSignature;
     }
-    static fromRestoreKey(ethWallet, provider, restoreKey) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.fromEthSigner(ethWallet, provider, undefined, undefined, undefined, restoreKey);
-        });
-    }
-    static fromEthSigner(ethWallet, provider, signer, accountId, ethSignerType, restoreKey) {
+    static fromEthSigner(ethWallet, provider, signer, accountId, ethSignerType) {
         return __awaiter(this, void 0, void 0, function* () {
             if (signer == null) {
-                const signerResult = yield signer_1.Signer.fromETHSignature(ethWallet, restoreKey);
+                const signerResult = yield signer_1.Signer.fromETHSignature(ethWallet);
                 signer = signerResult.signer;
                 ethSignerType = ethSignerType || signerResult.ethSignatureType;
-                restoreKey = signerResult.signature;
             }
             else if (ethSignerType == null) {
                 throw new Error('If you passed signer, you must also pass ethSignerType.');
@@ -70,7 +64,19 @@ class Wallet {
             const ethMessageSigner = new eth_message_signer_1.EthMessageSigner(ethWallet, ethSignerType);
             const wallet = new Wallet(ethWallet, ethMessageSigner, address, signer, accountId, ethSignerType);
             wallet.connect(provider);
-            wallet.ethSignature = restoreKey;
+            return wallet;
+        });
+    }
+    static fromEthSignature(ethWallet, provider, ethSignature, ethSignerType) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const signerResult = yield signer_1.Signer.fromETHSignature(ethWallet, ethSignature);
+            const signer = signerResult.signer;
+            ethSignerType = ethSignerType || signerResult.ethSignatureType;
+            const address = yield ethWallet.getAddress();
+            const ethMessageSigner = new eth_message_signer_1.EthMessageSigner(ethWallet, ethSignerType);
+            const wallet = new Wallet(ethWallet, ethMessageSigner, address, signer, undefined, ethSignerType);
+            wallet.connect(provider);
+            wallet.ethSignature = ethSignature;
             return wallet;
         });
     }
@@ -482,13 +488,13 @@ class Wallet {
             }
         });
     }
-    estimateGasDeposit(linkChainId, args) {
+    estimateGasDeposit(tx) {
         return __awaiter(this, void 0, void 0, function* () {
-            const mainContract = yield this.getMainContract(linkChainId);
             try {
-                const gasEstimate = yield mainContract.estimateGas.depositERC20(...args).then((estimate) => estimate, () => ethers_1.BigNumber.from('0'));
-                const recommendedGasLimit = utils_1.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT;
-                return gasEstimate.gte(recommendedGasLimit) ? gasEstimate : recommendedGasLimit;
+                const gasEstimate = yield this.ethSigner.estimateGas(tx);
+                return gasEstimate.gte(utils_1.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT)
+                    ? gasEstimate
+                    : utils_1.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT;
             }
             catch (e) {
                 this.modifyEthersError(e);
@@ -515,7 +521,11 @@ class Wallet {
             }
             if ((0, utils_1.isTokenETH)(deposit.token)) {
                 try {
-                    ethTransaction = yield mainContract.depositETH(deposit.depositTo, deposit.subAccountId, Object.assign({ value: ethers_1.BigNumber.from(deposit.amount), gasLimit: ethers_1.BigNumber.from(utils_1.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT) }, deposit.ethTxOptions));
+                    const data = utils_1.SYNC_MAIN_CONTRACT_INTERFACE.encodeFunctionData('depositETH', [
+                        deposit.depositTo,
+                        deposit.subAccountId,
+                    ]);
+                    ethTransaction = yield this.ethSigner.sendTransaction(Object.assign({ to: contractAddress.mainContract, data, value: ethers_1.BigNumber.from(deposit.amount), gasLimit: ethers_1.BigNumber.from(utils_1.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT) }, deposit.ethTxOptions));
                 }
                 catch (e) {
                     this.modifyEthersError(e);
@@ -523,38 +533,49 @@ class Wallet {
             }
             else {
                 // ERC20 token deposit
-                const erc20contract = new ethers_1.Contract(deposit.token, utils_1.IERC20_INTERFACE, this.ethSigner);
                 let nonce;
                 if (deposit.approveDepositAmountForERC20) {
                     try {
-                        const approveTx = yield erc20contract.approve(contractAddress.mainContract, utils_1.MAX_ERC20_APPROVE_AMOUNT);
+                        const data = utils_1.IERC20_INTERFACE.encodeFunctionData('approve', [
+                            contractAddress.mainContract,
+                            utils_1.MAX_ERC20_APPROVE_AMOUNT,
+                        ]);
+                        const approveTx = yield this.ethSigner.sendTransaction({
+                            to: deposit.token,
+                            data,
+                        });
                         nonce = approveTx.nonce + 1;
                     }
                     catch (e) {
                         this.modifyEthersError(e);
                     }
                 }
-                const args = [
+                const data = utils_1.SYNC_MAIN_CONTRACT_INTERFACE.encodeFunctionData('depositERC20', [
                     deposit.token,
                     deposit.amount,
                     deposit.depositTo,
                     deposit.subAccountId,
                     deposit.mapping ? true : false,
-                    Object.assign({ nonce }, deposit.ethTxOptions),
-                ];
+                ]);
+                const tx = Object.assign({ to: contractAddress.mainContract, data,
+                    nonce }, deposit.ethTxOptions);
+                console.log(tx);
                 // We set gas limit only if user does not set it using ethTxOptions.
-                const txRequest = args[args.length - 1];
-                if (txRequest.gasLimit == null) {
-                    try {
-                        txRequest.gasLimit = yield this.estimateGasDeposit(deposit.linkChainId, args);
-                        args[args.length - 1] = txRequest;
+                if (tx.gasLimit == null) {
+                    if (deposit.approveDepositAmountForERC20) {
+                        tx.gasLimit = utils_1.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT;
                     }
-                    catch (e) {
-                        this.modifyEthersError(e);
+                    else {
+                        try {
+                            tx.gasLimit = yield this.estimateGasDeposit(tx);
+                        }
+                        catch (e) {
+                            this.modifyEthersError(e);
+                        }
                     }
                 }
                 try {
-                    ethTransaction = yield mainContract.depositERC20(...args);
+                    ethTransaction = yield this.ethSigner.sendTransaction(tx);
                 }
                 catch (e) {
                     this.modifyEthersError(e);

@@ -21,8 +21,8 @@ export declare class Wallet {
     private constructor();
     connect(provider: Provider): this;
     getRestoreKey(): string;
-    static fromRestoreKey(ethWallet: ethers.Signer, provider: Provider, restoreKey: string): Promise<Wallet>;
-    static fromEthSigner(ethWallet: ethers.Signer, provider: Provider, signer?: Signer, accountId?: number, ethSignerType?: EthSignerType, restoreKey?: string): Promise<Wallet>;
+    static fromEthSigner(ethWallet: ethers.Signer, provider: Provider, signer?: Signer, accountId?: number, ethSignerType?: EthSignerType): Promise<Wallet>;
+    static fromEthSignature(ethWallet: ethers.Signer, provider: Provider, ethSignature: string, ethSignerType?: EthSignerType): Promise<Wallet>;
     static fromCreate2Data(syncSigner: Signer, createrSigner: ethers.Signer, provider: Provider, create2Data: Create2Data, accountId?: number): Promise<Wallet>;
     static fromEthSignerNoKeys(ethWallet: ethers.Signer, provider: Provider, accountId?: number, ethSignerType?: EthSignerType): Promise<Wallet>;
     getEIP712Signature(data: any): Promise<TxEthSignature>;
@@ -52,7 +52,7 @@ export declare class Wallet {
     getBalances(subAccountId?: number): Promise<AccountBalances>;
     getTokenBalance(tokenId: TokenId, subAccountId: number): Promise<string>;
     getEthereumBalance(token: TokenLike, linkChainId: ChainId): Promise<BigNumber>;
-    estimateGasDeposit(linkChainId: number, args: any[]): Promise<BigNumber>;
+    estimateGasDeposit(tx: ethers.providers.TransactionRequest): Promise<BigNumber>;
     isERC20DepositsApproved(tokenAddress: Address, accountAddress: Address, linkChainId: number, erc20ApproveThreshold?: BigNumber): Promise<boolean>;
     approveERC20TokenDeposits(tokenAddress: Address, linkChainId: number, max_erc20_approve_amount?: BigNumber): Promise<ContractTransaction>;
     sendDepositFromEthereum(deposit: {

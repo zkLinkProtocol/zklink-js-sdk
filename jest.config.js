@@ -4,6 +4,6 @@ module.exports = {
   testEnvironment: 'node',
   watchAll: false,
   testPathIgnorePatterns: [
-    "tests/online/"
+    "__tests__/online/"
   ]
 };

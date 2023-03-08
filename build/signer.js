@@ -49,6 +49,7 @@ const crypto_1 = require("./crypto");
 const ethers_1 = require("ethers");
 const utils = __importStar(require("./utils"));
 const utils_1 = require("ethers/lib/utils");
+const utils_2 = require("./utils");
 class Signer {
     constructor(privKey) {
         _Signer_privateKey.set(this, void 0);
@@ -117,16 +118,17 @@ class Signer {
     }
     static fromSeed(seed) {
         return __awaiter(this, void 0, void 0, function* () {
-            return new Signer(yield (0, crypto_1.privateKeyFromSeed)(seed));
+            const signer = new Signer(yield (0, crypto_1.privateKeyFromSeed)(seed));
+            signer.seed = seed;
+            return signer;
         });
     }
-    static fromETHSignature(ethSigner, restoreKey) {
+    static fromETHSignature(ethSigner, ethSignature) {
         return __awaiter(this, void 0, void 0, function* () {
-            let message = "Sign this message to create a private key to interact with zkLink's layer 2 services.\nNOTE: This application is powered by zkLink's multi-chain network.\n\nOnly sign this message for a trusted client!";
-            const signedBytes = utils.getSignedBytesFromMessage(message, false);
-            const signature = restoreKey || (yield utils.signMessagePersonalAPI(ethSigner, signedBytes));
+            const signedBytes = utils.getSignedBytesFromMessage(utils_2.SIGN_MESSAGE, false);
+            const signature = ethSignature || (yield utils.signMessagePersonalAPI(ethSigner, signedBytes));
             const address = yield ethSigner.getAddress();
-            const ethSignatureType = yield utils.getEthSignatureType(ethSigner.provider, message, signature, address);
+            const ethSignatureType = yield utils.getEthSignatureType(ethSigner.provider, utils_2.SIGN_MESSAGE, signature, address);
             const seed = ethers_1.ethers.utils.arrayify(signature);
             const signer = yield Signer.fromSeed(seed);
             return { signer, signature, ethSignatureType };

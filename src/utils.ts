@@ -65,6 +65,9 @@ const AMOUNT_MANTISSA_BIT_WIDTH = 35
 const FEE_EXPONENT_BIT_WIDTH = 5
 const FEE_MANTISSA_BIT_WIDTH = 11
 
+export const SIGN_MESSAGE =
+  "Sign this message to create a private key to interact with zkLink's layer 2 services.\nNOTE: This application is powered by zkLink's multi-chain network.\n\nOnly sign this message for a trusted client!"
+
 export function floatToInteger(
   floatBytes: Uint8Array,
   expBits: number,
@@ -556,7 +559,7 @@ export async function getEthSignatureType(
   try {
     isSignedMsgPrefixed = await verifyERC1271Signature(
       address,
-      messageNoPrefix,
+      messageWithPrefix,
       signature,
       _provider
     )

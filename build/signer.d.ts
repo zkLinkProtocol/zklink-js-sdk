@@ -3,6 +3,7 @@ import { Address, EthSignerType, PubKeyHash, TransferData, WithdrawData, ForcedE
 export declare class Signer {
     #private;
     private constructor();
+    seed: Uint8Array;
     pubKeyHash(): Promise<PubKeyHash>;
     signTransactionBytes(msg: string): Promise<Signature>;
     pubKey(): Promise<string>;
@@ -25,7 +26,7 @@ export declare class Signer {
     }): Promise<ChangePubKeyData>;
     static fromPrivateKey(pk: Uint8Array): Signer;
     static fromSeed(seed: Uint8Array): Promise<Signer>;
-    static fromETHSignature(ethSigner: ethers.Signer, restoreKey?: string): Promise<{
+    static fromETHSignature(ethSigner: ethers.Signer, ethSignature?: string): Promise<{
         signer: Signer;
         signature: string;
         ethSignatureType: EthSignerType;

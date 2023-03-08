@@ -24,6 +24,7 @@ import {
   TokenId,
 } from './types'
 import { arrayify } from 'ethers/lib/utils'
+import { SIGN_MESSAGE } from './utils'
 
 export class Signer {
   readonly #privateKey: Uint8Array
@@ -31,6 +32,8 @@ export class Signer {
   private constructor(privKey: Uint8Array) {
     this.#privateKey = privKey
   }
+
+  seed: Uint8Array
 
   async pubKeyHash(): Promise<PubKeyHash> {
     return await privateKeyToPubKeyHash(this.#privateKey)
@@ -142,25 +145,25 @@ export class Signer {
   }
 
   static async fromSeed(seed: Uint8Array): Promise<Signer> {
-    return new Signer(await privateKeyFromSeed(seed))
+    const signer = new Signer(await privateKeyFromSeed(seed))
+    signer.seed = seed
+    return signer
   }
 
   static async fromETHSignature(
     ethSigner: ethers.Signer,
-    restoreKey?: string
+    ethSignature?: string
   ): Promise<{
     signer: Signer
     signature: string
     ethSignatureType: EthSignerType
   }> {
-    let message =
-      "Sign this message to create a private key to interact with zkLink's layer 2 services.\nNOTE: This application is powered by zkLink's multi-chain network.\n\nOnly sign this message for a trusted client!"
-    const signedBytes = utils.getSignedBytesFromMessage(message, false)
-    const signature = restoreKey || (await utils.signMessagePersonalAPI(ethSigner, signedBytes))
+    const signedBytes = utils.getSignedBytesFromMessage(SIGN_MESSAGE, false)
+    const signature = ethSignature || (await utils.signMessagePersonalAPI(ethSigner, signedBytes))
     const address = await ethSigner.getAddress()
     const ethSignatureType = await utils.getEthSignatureType(
       ethSigner.provider,
-      message,
+      SIGN_MESSAGE,
       signature,
       address
     )

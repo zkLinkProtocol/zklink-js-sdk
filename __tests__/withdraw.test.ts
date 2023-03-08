@@ -3,11 +3,11 @@ import { BigNumber } from 'ethers'
 import { sha256 } from 'ethers/lib/utils'
 import { WithdrawData } from '../src/types'
 import { serializeOrder, serializeWithdraw } from '../src/utils'
-import { getWallet } from './wallet.test'
+import { getTestWallet } from './utils'
 
 describe('withdraw', () => {
   it('withdraw serialize and signature', async () => {
-    const wallet = await getWallet()
+    const wallet = await getTestWallet()
     const data: WithdrawData = {
       toChainId: 3,
       subAccountId: 1,

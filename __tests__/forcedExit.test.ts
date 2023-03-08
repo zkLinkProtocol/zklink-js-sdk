@@ -7,13 +7,13 @@ import {
   serializeOrder,
   serializeWithdraw,
 } from '../src/utils'
-import { getWallet } from './wallet.test'
 import { ForcedExitData } from '../src/types'
 import { sign } from 'crypto'
+import { getTestWallet } from './utils'
 
 describe('forcedExit', () => {
   it('forcedExit serialize and signature', async () => {
-    const wallet = await getWallet()
+    const wallet = await getTestWallet()
     const data: ForcedExitData = {
       type: 'ForcedExit',
       toChainId: 1,

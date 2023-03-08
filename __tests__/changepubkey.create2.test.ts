@@ -1,6 +1,6 @@
 import { Wallet as LinkWallet } from '../src/wallet'
 import { ChangePubKeyEntries } from '../src/types'
-import { getWallet } from './wallet.test'
+import { getTestWallet } from './utils'
 
 describe('Create2 ChangePubKey', () => {
   it('signature', async () => {
@@ -9,7 +9,7 @@ describe('Create2 ChangePubKey', () => {
     const AlicePrivateKey = '0x43be0b8bdeccb5a13741c8fd076bf2619bfc9f6dcc43ad6cf965ab489e156ced'
     const AccountMockCodeHash = '0x668ee252a9ca183e2ca7813e5c4ccc8791c6a699f097d2d83f24e958ed520c32'
 
-    const wallet = await getWallet(AlicePrivateKey as any)
+    const wallet = await getTestWallet(AlicePrivateKey as any)
 
     const create2Data = {
       creatorAddress: DeployerAddress,

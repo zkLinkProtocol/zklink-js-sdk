@@ -1,6 +1,7 @@
-import { getTestProvider } from './provider.test'
 import { expect } from 'chai'
 import { Transaction } from '../src/wallet'
+import { getTestProvider } from './utils'
+
 describe('Transaction', () => {
   it('Transaction getTxReceipt', async () => {
     const provider = await getTestProvider()
