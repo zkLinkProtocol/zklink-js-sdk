@@ -18,6 +18,7 @@ import {
   ChainId,
   OrderMatchingData,
   TokenId,
+  EthProviderType,
 } from './types'
 
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
@@ -470,8 +471,9 @@ export function getSignedBytesFromMessage(
 }
 
 export async function signMessagePersonalAPI(
-  signer: ethers.Signer,
-  message: Uint8Array
+  signer: ethers.Signer | any,
+  message: Uint8Array,
+  ethProviderType: EthProviderType = 'Metamask'
 ): Promise<string> {
   if (signer instanceof ethers.providers.JsonRpcSigner) {
     return signer.provider
@@ -489,7 +491,13 @@ export async function signMessagePersonalAPI(
         }
       )
   } else {
-    return signer.signMessage(message)
+    if (ethProviderType === 'UniPass') {
+      return signer.signMessage(message, {
+        isEIP191Prefix: true,
+      })
+    } else {
+      return signer.signMessage(message)
+    }
   }
 }
 

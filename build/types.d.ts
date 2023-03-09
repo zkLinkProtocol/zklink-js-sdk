@@ -39,6 +39,7 @@ export interface AccountBalances {
         [tokenId: number]: Wei;
     };
 }
+export declare type EthProviderType = 'Metamask' | 'UniPass';
 export declare type EthSignerType = {
     verificationMethod: 'ECDSA' | 'ERC-1271';
     isSignedMsgPrefixed: boolean;

@@ -1,6 +1,6 @@
 import { utils, ethers, BigNumber, BigNumberish } from 'ethers';
 import { Provider } from '.';
-import { PubKeyHash, TokenAddress, TokenLike, Tokens, TokenSymbol, EthSignerType, Address, TransferData, ForcedExitData, ChangePubKeyData, WithdrawData, CloseAccount, OrderData, ChainId, OrderMatchingData } from './types';
+import { PubKeyHash, TokenAddress, TokenLike, Tokens, TokenSymbol, EthSignerType, Address, TransferData, ForcedExitData, ChangePubKeyData, WithdrawData, CloseAccount, OrderData, ChainId, OrderMatchingData, EthProviderType } from './types';
 export declare const MIN_UNONCE = 1;
 export declare const MAX_UNONCE = 4294967295;
 export declare const IERC20_INTERFACE: utils.Interface;
@@ -61,7 +61,7 @@ export declare class TokenSet {
 }
 export declare function getChangePubkeyMessage(pubKeyHash: PubKeyHash, nonce: number, accountId: number, verifyingContract: string, layerOneChainId: number, domainName?: string, version?: string): any;
 export declare function getSignedBytesFromMessage(message: utils.BytesLike | string, addPrefix: boolean): Uint8Array;
-export declare function signMessagePersonalAPI(signer: ethers.Signer, message: Uint8Array): Promise<string>;
+export declare function signMessagePersonalAPI(signer: ethers.Signer | any, message: Uint8Array, ethProviderType?: EthProviderType): Promise<string>;
 export declare function signMessageEIP712(signer: any, data: any): Promise<string>;
 export declare function verifyERC1271Signature(address: string, message: Uint8Array, signature: string, signerOrProvider: ethers.Signer | ethers.providers.Provider): Promise<boolean>;
 export declare function getEthSignatureType(_provider: ethers.providers.Provider, message: string, signature: string, address: string): Promise<EthSignerType>;

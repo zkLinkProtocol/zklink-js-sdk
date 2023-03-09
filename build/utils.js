@@ -392,7 +392,7 @@ function getSignedBytesFromMessage(message, addPrefix) {
     return messageBytes;
 }
 exports.getSignedBytesFromMessage = getSignedBytesFromMessage;
-function signMessagePersonalAPI(signer, message) {
+function signMessagePersonalAPI(signer, message, ethProviderType = 'Metamask') {
     return __awaiter(this, void 0, void 0, function* () {
         if (signer instanceof ethers_1.ethers.providers.JsonRpcSigner) {
             return signer.provider
@@ -408,7 +408,14 @@ function signMessagePersonalAPI(signer, message) {
             });
         }
         else {
-            return signer.signMessage(message);
+            if (ethProviderType === 'UniPass') {
+                return signer.signMessage(message, {
+                    isEIP191Prefix: true,
+                });
+            }
+            else {
+                return signer.signMessage(message);
+            }
         }
     });
 }

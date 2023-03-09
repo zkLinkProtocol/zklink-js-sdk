@@ -31,6 +31,7 @@ import {
   WithdrawEntries,
   ChangePubKeyEntries,
   OrderMatchingEntries,
+  EthProviderType,
 } from './types'
 import {
   IERC20_INTERFACE,
@@ -62,8 +63,6 @@ export class Wallet {
 
   public contract: LinkContract
 
-  ethSignature: string
-
   private constructor(
     public ethSigner: ethers.Signer,
     public ethMessageSigner: EthMessageSigner,
@@ -85,10 +84,6 @@ export class Wallet {
       }
     } catch (e) {}
     return this
-  }
-
-  getRestoreKey() {
-    return this.ethSignature
   }
 
   static async fromEthSigner(
@@ -123,13 +118,14 @@ export class Wallet {
     ethWallet: ethers.Signer,
     provider: Provider,
     ethSignature: string,
+    ethProviderType: EthProviderType = 'Metamask',
     ethSignerType?: EthSignerType
   ): Promise<Wallet> {
     const signerResult = await Signer.fromETHSignature(ethWallet, ethSignature)
     const signer = signerResult.signer
     ethSignerType = ethSignerType || signerResult.ethSignatureType
     const address = await ethWallet.getAddress()
-    const ethMessageSigner = new EthMessageSigner(ethWallet, ethSignerType)
+    const ethMessageSigner = new EthMessageSigner(ethWallet, ethSignerType, ethProviderType)
     const wallet = new Wallet(
       ethWallet,
       ethMessageSigner,
@@ -139,7 +135,6 @@ export class Wallet {
       ethSignerType
     )
     wallet.connect(provider)
-    wallet.ethSignature = ethSignature
     return wallet
   }
 
@@ -751,7 +746,6 @@ export class Wallet {
         nonce,
         ...deposit.ethTxOptions,
       }
-      console.log(tx)
       // We set gas limit only if user does not set it using ethTxOptions.
       if (tx.gasLimit == null) {
         if (deposit.approveDepositAmountForERC20) {

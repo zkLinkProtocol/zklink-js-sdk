@@ -2,7 +2,7 @@ import { BigNumber, BigNumberish, Contract, ContractTransaction, ethers } from '
 import { EthMessageSigner } from './eth-message-signer';
 import { Provider } from './provider';
 import { Signer } from './signer';
-import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKeyData, EthSignerType, SignedTransaction, TransferData, TxEthSignature, ForcedExitData, WithdrawData, Create2Data, ChainId, TokenId, OrderData, TokenAddress, OrderMatchingData, AccountBalances, TransferEntries, ForcedExitEntries, WithdrawEntries, ChangePubKeyEntries, OrderMatchingEntries } from './types';
+import { AccountState, Address, TokenLike, Nonce, PriorityOperationReceipt, TransactionReceipt, PubKeyHash, ChangePubKeyData, EthSignerType, SignedTransaction, TransferData, TxEthSignature, ForcedExitData, WithdrawData, Create2Data, ChainId, TokenId, OrderData, TokenAddress, OrderMatchingData, AccountBalances, TransferEntries, ForcedExitEntries, WithdrawEntries, ChangePubKeyEntries, OrderMatchingEntries, EthProviderType } from './types';
 import { LinkContract } from './contract';
 export declare class ZKSyncTxError extends Error {
     value: PriorityOperationReceipt | TransactionReceipt;
@@ -17,12 +17,10 @@ export declare class Wallet {
     ethSignerType?: EthSignerType;
     provider: Provider;
     contract: LinkContract;
-    ethSignature: string;
     private constructor();
     connect(provider: Provider): this;
-    getRestoreKey(): string;
     static fromEthSigner(ethWallet: ethers.Signer, provider: Provider, signer?: Signer, accountId?: number, ethSignerType?: EthSignerType): Promise<Wallet>;
-    static fromEthSignature(ethWallet: ethers.Signer, provider: Provider, ethSignature: string, ethSignerType?: EthSignerType): Promise<Wallet>;
+    static fromEthSignature(ethWallet: ethers.Signer, provider: Provider, ethSignature: string, ethProviderType?: EthProviderType, ethSignerType?: EthSignerType): Promise<Wallet>;
     static fromCreate2Data(syncSigner: Signer, createrSigner: ethers.Signer, provider: Provider, create2Data: Create2Data, accountId?: number): Promise<Wallet>;
     static fromEthSignerNoKeys(ethWallet: ethers.Signer, provider: Provider, accountId?: number, ethSignerType?: EthSignerType): Promise<Wallet>;
     getEIP712Signature(data: any): Promise<TxEthSignature>;

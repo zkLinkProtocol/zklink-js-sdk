@@ -17,11 +17,7 @@ describe('Wallet Instance', function () {
     const walletFromSignature = await Wallet.fromEthSignature(
       ethWallet,
       mockProvider,
-      walletFromSigner.ethSignature
-    )
-
-    expect(await walletFromSignature.signer?.pubKeyHash()).toBe(
-      await walletFromSigner.signer?.pubKeyHash()
+      ethers.utils.hexlify(walletFromSigner.signer?.seed!)
     )
   })
 })

@@ -15,9 +15,10 @@ const utils_1 = require("./utils");
  * Wrapper around `ethers.Signer` which provides convenient methods to get and sign messages required for zkSync.
  */
 class EthMessageSigner {
-    constructor(ethSigner, ethSignerType) {
+    constructor(ethSigner, ethSignerType, ethProviderType) {
         this.ethSigner = ethSigner;
         this.ethSignerType = ethSignerType;
+        this.ethProviderType = ethProviderType;
     }
     getEthMessageSignature(message) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -25,7 +26,7 @@ class EthMessageSigner {
                 throw new Error('ethSignerType is unknown');
             }
             const signedBytes = (0, utils_1.getSignedBytesFromMessage)(message, !this.ethSignerType.isSignedMsgPrefixed);
-            const signature = yield (0, utils_1.signMessagePersonalAPI)(this.ethSigner, signedBytes);
+            const signature = yield (0, utils_1.signMessagePersonalAPI)(this.ethSigner, signedBytes, this.ethProviderType);
             return {
                 type: this.ethSignerType.verificationMethod === 'ECDSA'
                     ? 'EthereumSignature'

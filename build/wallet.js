@@ -47,9 +47,6 @@ class Wallet {
         catch (e) { }
         return this;
     }
-    getRestoreKey() {
-        return this.ethSignature;
-    }
     static fromEthSigner(ethWallet, provider, signer, accountId, ethSignerType) {
         return __awaiter(this, void 0, void 0, function* () {
             if (signer == null) {
@@ -67,16 +64,15 @@ class Wallet {
             return wallet;
         });
     }
-    static fromEthSignature(ethWallet, provider, ethSignature, ethSignerType) {
+    static fromEthSignature(ethWallet, provider, ethSignature, ethProviderType = 'Metamask', ethSignerType) {
         return __awaiter(this, void 0, void 0, function* () {
             const signerResult = yield signer_1.Signer.fromETHSignature(ethWallet, ethSignature);
             const signer = signerResult.signer;
             ethSignerType = ethSignerType || signerResult.ethSignatureType;
             const address = yield ethWallet.getAddress();
-            const ethMessageSigner = new eth_message_signer_1.EthMessageSigner(ethWallet, ethSignerType);
+            const ethMessageSigner = new eth_message_signer_1.EthMessageSigner(ethWallet, ethSignerType, ethProviderType);
             const wallet = new Wallet(ethWallet, ethMessageSigner, address, signer, undefined, ethSignerType);
             wallet.connect(provider);
-            wallet.ethSignature = ethSignature;
             return wallet;
         });
     }
@@ -559,7 +555,6 @@ class Wallet {
                 ]);
                 const tx = Object.assign({ to: contractAddress.mainContract, data,
                     nonce }, deposit.ethTxOptions);
-                console.log(tx);
                 // We set gas limit only if user does not set it using ethTxOptions.
                 if (tx.gasLimit == null) {
                     if (deposit.approveDepositAmountForERC20) {

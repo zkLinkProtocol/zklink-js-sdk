@@ -61,6 +61,8 @@ export interface AccountBalances {
   }
 }
 
+export type EthProviderType = 'Metamask' | 'UniPass'
+
 export type EthSignerType = {
   verificationMethod: 'ECDSA' | 'ERC-1271'
   // Indicates if signer adds `\x19Ethereum Signed Message\n${msg.length}` prefix before signing message.
