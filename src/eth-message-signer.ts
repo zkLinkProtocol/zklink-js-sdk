@@ -16,7 +16,7 @@ export class EthMessageSigner {
   constructor(
     private ethSigner: ethers.Signer,
     private ethSignerType?: EthSignerType,
-    private ethProviderType?: EthProviderType
+    public ethProviderType?: EthProviderType
   ) {}
 
   async getEthMessageSignature(message: ethers.utils.BytesLike): Promise<TxEthSignature> {

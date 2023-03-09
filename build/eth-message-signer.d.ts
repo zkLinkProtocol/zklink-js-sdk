@@ -6,7 +6,7 @@ import { TxEthSignature, EthSignerType, PubKeyHash, OrderData, EthProviderType }
 export declare class EthMessageSigner {
     private ethSigner;
     private ethSignerType?;
-    private ethProviderType?;
+    ethProviderType?: EthProviderType;
     constructor(ethSigner: ethers.Signer, ethSignerType?: EthSignerType, ethProviderType?: EthProviderType);
     getEthMessageSignature(message: ethers.utils.BytesLike): Promise<TxEthSignature>;
     getTransferEthSignMessage(transfer: {
