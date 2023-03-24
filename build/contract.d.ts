@@ -9,7 +9,6 @@ export declare class LinkContract {
     connect(provider: Provider): this;
     static fromEthSigner(provider: Provider, ethSigner: ethers.Signer): LinkContract;
     getMainContract(linkChainId: number): Promise<Contract>;
-    getExitContract(linkChainId: number): Promise<Contract>;
     getZKLContract(contractAddress: any): Contract;
     isERC20DepositsApproved(tokenAddress: Address, accountAddress: Address, linkChainId: number, erc20ApproveThreshold?: BigNumber): Promise<boolean>;
     approveERC20TokenDeposits(tokenAddress: Address, linkChainId: number, max_erc20_approve_amount?: BigNumber): Promise<ContractTransaction>;

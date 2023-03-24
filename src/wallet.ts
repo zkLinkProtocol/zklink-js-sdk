@@ -37,7 +37,7 @@ import {
   IERC20_INTERFACE,
   isTokenETH,
   MAX_ERC20_APPROVE_AMOUNT,
-  SYNC_MAIN_CONTRACT_INTERFACE,
+  MAIN_CONTRACT_INTERFACE,
   ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT,
   getChangePubkeyMessage,
   getEthereumBalance,
@@ -700,7 +700,7 @@ export class Wallet {
 
     if (isTokenETH(deposit.token)) {
       try {
-        const data = SYNC_MAIN_CONTRACT_INTERFACE.encodeFunctionData('depositETH', [
+        const data = MAIN_CONTRACT_INTERFACE.encodeFunctionData('depositETH', [
           deposit.depositTo,
           deposit.subAccountId,
         ])
@@ -733,7 +733,7 @@ export class Wallet {
         }
       }
 
-      const data = SYNC_MAIN_CONTRACT_INTERFACE.encodeFunctionData('depositERC20', [
+      const data = MAIN_CONTRACT_INTERFACE.encodeFunctionData('depositERC20', [
         deposit.token,
         deposit.amount,
         deposit.depositTo,
@@ -813,7 +813,7 @@ export class Wallet {
     const contractAddress = await this.provider.getContractInfoByChainId(linkChainId)
     return new ethers.Contract(
       contractAddress.mainContract,
-      SYNC_MAIN_CONTRACT_INTERFACE,
+      MAIN_CONTRACT_INTERFACE,
       this.ethSigner
     )
   }
@@ -863,7 +863,7 @@ export class ETHOperation {
     const txReceipt = await this.ethTx.wait()
     for (const log of txReceipt.logs) {
       try {
-        const priorityQueueLog = SYNC_MAIN_CONTRACT_INTERFACE.parseLog(log)
+        const priorityQueueLog = MAIN_CONTRACT_INTERFACE.parseLog(log)
         if (priorityQueueLog && priorityQueueLog.args.serialId != null) {
           this.priorityOpId = priorityQueueLog.args.serialId
         }

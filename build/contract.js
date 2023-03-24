@@ -30,13 +30,7 @@ class LinkContract {
     getMainContract(linkChainId) {
         return __awaiter(this, void 0, void 0, function* () {
             const contractAddress = yield this.provider.getContractInfoByChainId(linkChainId);
-            return new ethers_1.ethers.Contract(contractAddress.mainContract, utils_1.SYNC_MAIN_CONTRACT_INTERFACE, this.ethSigner);
-        });
-    }
-    getExitContract(linkChainId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const contractAddress = yield this.provider.getContractInfoByChainId(linkChainId);
-            return new ethers_1.ethers.Contract(contractAddress.mainContract, utils_1.SYNC_EXIT_CONTRACT_INTERFACE, this.ethSigner);
+            return new ethers_1.ethers.Contract(contractAddress.mainContract, utils_1.MAIN_CONTRACT_INTERFACE, this.ethSigner);
         });
     }
     getZKLContract(contractAddress) {
@@ -173,28 +167,28 @@ class LinkContract {
     }
     getPendingBalance(pending) {
         return __awaiter(this, void 0, void 0, function* () {
-            const exitContract = yield this.getExitContract(pending.linkChainId);
+            const exitContract = yield this.getMainContract(pending.linkChainId);
             const balance = yield exitContract.getPendingBalance(pending.account, pending.tokenAddress);
             return ethers_1.BigNumber.from(balance);
         });
     }
     getPendingBalances(pending) {
         return __awaiter(this, void 0, void 0, function* () {
-            const exitContract = yield this.getExitContract(pending.linkChainId);
+            const exitContract = yield this.getMainContract(pending.linkChainId);
             const balances = yield exitContract.getPendingBalances(pending.account, pending.tokenAddresses);
             return balances;
         });
     }
     withdrawPendingBalance(withdraw) {
         return __awaiter(this, void 0, void 0, function* () {
-            const exitContract = yield this.getExitContract(withdraw.linkChainId);
+            const exitContract = yield this.getMainContract(withdraw.linkChainId);
             const ethTransaction = yield exitContract.withdrawPendingBalance(withdraw.account, withdraw.tokenAddress, ethers_1.BigNumber.from(withdraw.amount));
             return new wallet_1.ETHOperation(ethTransaction, this.provider);
         });
     }
     withdrawMultiplePendingBalance(withdraw) {
         return __awaiter(this, void 0, void 0, function* () {
-            const exitContract = yield this.getExitContract(withdraw.linkChainId);
+            const exitContract = yield this.getMainContract(withdraw.linkChainId);
             const ethTransaction = yield exitContract.withdrawMultiplePendingBalance(withdraw.account, withdraw.tokenAddresses, withdraw.amounts);
             return new wallet_1.ETHOperation(ethTransaction, this.provider);
         });

@@ -20,8 +20,8 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.serializeChainId = exports.serializeNonce = exports.serializeFeePacked = exports.serializeAmountFull = exports.serializeAmountPacked = exports.serializeTokenId = exports.serializeSubAccountId = exports.serializeAccountId = exports.serializeAddress = exports.getEthSignatureType = exports.verifyERC1271Signature = exports.signMessageEIP712 = exports.signMessagePersonalAPI = exports.getSignedBytesFromMessage = exports.getChangePubkeyMessage = exports.TokenSet = exports.isTokenETH = exports.sleep = exports.buffer2bitsBE = exports.isTransactionFeePackable = exports.closestGreaterOrEqPackableTransactionFee = exports.closestPackableTransactionFee = exports.isTransactionAmountPackable = exports.closestGreaterOrEqPackableTransactionAmount = exports.closestPackableTransactionAmount = exports.packFeeChecked = exports.packAmountChecked = exports.reverseBits = exports.integerToFloatUp = exports.integerToFloat = exports.bitsIntoBytesInBEOrder = exports.floatToInteger = exports.SIGN_MESSAGE = exports.TOTAL_CHAIN_NUM = exports.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ERC20_APPROVE_TRESHOLD = exports.MAX_ERC20_APPROVE_AMOUNT = exports.ERC20_DEPOSIT_GAS_LIMIT = exports.MULTICALL_INTERFACE = exports.IEIP1271_INTERFACE = exports.SYNC_GOV_CONTRACT_INTERFACE = exports.ZKL_CONTRACT_INTERFACE = exports.SYNC_EXIT_CONTRACT_INTERFACE = exports.SYNC_MAIN_CONTRACT_INTERFACE = exports.IERC20_INTERFACE = exports.MAX_UNONCE = exports.MIN_UNONCE = void 0;
-exports.getTimestamp = exports.chainsCompletion = exports.getFastSwapUNonce = exports.getRandom = exports.getTxHash = exports.getPendingBalance = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.parseHexWithPrefix = exports.bigintToBytesBE = exports.numberToBytesBE = exports.serializeTx = exports.serializeOrderMatching = exports.serializeOrder = exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeTransfer = exports.serializeWithdraw = exports.serializeTimestamp = exports.serializeFastWithdraw = exports.serializeFeeRatio = void 0;
+exports.serializeFastWithdraw = exports.serializeFeeRatio = exports.serializeChainId = exports.serializeNonce = exports.serializeFeePacked = exports.serializeAmountFull = exports.serializeAmountPacked = exports.serializeTokenId = exports.serializeSubAccountId = exports.serializeAccountId = exports.serializeAddress = exports.getEthSignatureType = exports.verifyERC1271Signature = exports.signMessageEIP712 = exports.signMessagePersonalAPI = exports.getSignedBytesFromMessage = exports.getChangePubkeyMessage = exports.TokenSet = exports.isTokenETH = exports.sleep = exports.buffer2bitsBE = exports.isTransactionFeePackable = exports.closestGreaterOrEqPackableTransactionFee = exports.closestPackableTransactionFee = exports.isTransactionAmountPackable = exports.closestGreaterOrEqPackableTransactionAmount = exports.closestPackableTransactionAmount = exports.packFeeChecked = exports.packAmountChecked = exports.reverseBits = exports.integerToFloatUp = exports.integerToFloat = exports.bitsIntoBytesInBEOrder = exports.floatToInteger = exports.SIGN_MESSAGE = exports.TOTAL_CHAIN_NUM = exports.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ERC20_APPROVE_TRESHOLD = exports.MAX_ERC20_APPROVE_AMOUNT = exports.ERC20_DEPOSIT_GAS_LIMIT = exports.MULTICALL_INTERFACE = exports.IEIP1271_INTERFACE = exports.ZKL_CONTRACT_INTERFACE = exports.MAIN_CONTRACT_INTERFACE = exports.IERC20_INTERFACE = exports.MAX_UNONCE = exports.MIN_UNONCE = void 0;
+exports.getTimestamp = exports.chainsCompletion = exports.getFastSwapUNonce = exports.getRandom = exports.getTxHash = exports.getPendingBalance = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.parseHexWithPrefix = exports.bigintToBytesBE = exports.numberToBytesBE = exports.serializeTx = exports.serializeOrderMatching = exports.serializeOrder = exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeTransfer = exports.serializeWithdraw = exports.serializeTimestamp = void 0;
 const ethers_1 = require("ethers");
 const zksync_crypto_1 = require("zksync-crypto");
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
@@ -31,10 +31,8 @@ const MAX_NUMBER_OF_ACCOUNTS = Math.pow(2, 24);
 exports.MIN_UNONCE = 1;
 exports.MAX_UNONCE = 4294967295;
 exports.IERC20_INTERFACE = new ethers_1.utils.Interface(require('../abi/IERC20.json').abi);
-exports.SYNC_MAIN_CONTRACT_INTERFACE = new ethers_1.utils.Interface(require('../abi/SyncMain.json').abi);
-exports.SYNC_EXIT_CONTRACT_INTERFACE = new ethers_1.utils.Interface(require('../abi/SyncExit.json').abi);
+exports.MAIN_CONTRACT_INTERFACE = new ethers_1.utils.Interface(require('../abi/ZkLink.json').abi);
 exports.ZKL_CONTRACT_INTERFACE = new ethers_1.utils.Interface(require('../abi/ZKL.json').abi);
-exports.SYNC_GOV_CONTRACT_INTERFACE = new ethers_1.utils.Interface(require('../abi/SyncGov.json').abi);
 exports.IEIP1271_INTERFACE = new ethers_1.utils.Interface(require('../abi/IEIP1271.json').abi);
 exports.MULTICALL_INTERFACE = new ethers_1.utils.Interface(require('../abi/Multicall.json').abi);
 exports.ERC20_DEPOSIT_GAS_LIMIT = require('../misc/DepositERC20GasLimit.json');
@@ -805,7 +803,7 @@ exports.getEthereumBalance = getEthereumBalance;
 function getPendingBalance(ethProvider, syncProvider, address, token, chainId) {
     return __awaiter(this, void 0, void 0, function* () {
         const contractAddress = yield syncProvider.getContractInfoByChainId(chainId);
-        const zksyncContract = new ethers_1.Contract(contractAddress.mainContract, exports.SYNC_MAIN_CONTRACT_INTERFACE, ethProvider);
+        const zksyncContract = new ethers_1.Contract(contractAddress.mainContract, exports.MAIN_CONTRACT_INTERFACE, ethProvider);
         const tokenAddress = syncProvider.tokenSet.resolveTokenAddress(token, chainId);
         return zksyncContract.getPendingBalance(address, tokenAddress);
     });

@@ -9,8 +9,7 @@ import {
   IERC20_INTERFACE,
   isTokenETH,
   MAX_ERC20_APPROVE_AMOUNT,
-  SYNC_MAIN_CONTRACT_INTERFACE,
-  SYNC_EXIT_CONTRACT_INTERFACE,
+  MAIN_CONTRACT_INTERFACE,
   ZKL_CONTRACT_INTERFACE,
 } from './utils'
 import { ETHOperation } from './wallet'
@@ -34,16 +33,7 @@ export class LinkContract {
     const contractAddress = await this.provider.getContractInfoByChainId(linkChainId)
     return new ethers.Contract(
       contractAddress.mainContract,
-      SYNC_MAIN_CONTRACT_INTERFACE,
-      this.ethSigner
-    )
-  }
-
-  async getExitContract(linkChainId: number) {
-    const contractAddress = await this.provider.getContractInfoByChainId(linkChainId)
-    return new ethers.Contract(
-      contractAddress.mainContract,
-      SYNC_EXIT_CONTRACT_INTERFACE,
+      MAIN_CONTRACT_INTERFACE,
       this.ethSigner
     )
   }
@@ -244,7 +234,7 @@ export class LinkContract {
     tokenAddress: Address
     linkChainId: number
   }): Promise<BigNumber> {
-    const exitContract = await this.getExitContract(pending.linkChainId)
+    const exitContract = await this.getMainContract(pending.linkChainId)
     const balance = await exitContract.getPendingBalance(pending.account, pending.tokenAddress)
     return BigNumber.from(balance)
   }
@@ -253,7 +243,7 @@ export class LinkContract {
     tokenAddresses: Address[]
     linkChainId: number
   }): Promise<BigNumber[]> {
-    const exitContract = await this.getExitContract(pending.linkChainId)
+    const exitContract = await this.getMainContract(pending.linkChainId)
     const balances = await exitContract.getPendingBalances(pending.account, pending.tokenAddresses)
     return balances
   }
@@ -264,7 +254,7 @@ export class LinkContract {
     amount: BigNumberish
     linkChainId: number
   }): Promise<ETHOperation> {
-    const exitContract = await this.getExitContract(withdraw.linkChainId)
+    const exitContract = await this.getMainContract(withdraw.linkChainId)
     const ethTransaction = await exitContract.withdrawPendingBalance(
       withdraw.account,
       withdraw.tokenAddress,
@@ -279,7 +269,7 @@ export class LinkContract {
     amounts: BigNumberish[]
     linkChainId: number
   }): Promise<ETHOperation> {
-    const exitContract = await this.getExitContract(withdraw.linkChainId)
+    const exitContract = await this.getMainContract(withdraw.linkChainId)
     const ethTransaction = await exitContract.withdrawMultiplePendingBalance(
       withdraw.account,
       withdraw.tokenAddresses,

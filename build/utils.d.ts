@@ -4,10 +4,8 @@ import { PubKeyHash, TokenAddress, TokenLike, Tokens, TokenSymbol, EthSignerType
 export declare const MIN_UNONCE = 1;
 export declare const MAX_UNONCE = 4294967295;
 export declare const IERC20_INTERFACE: utils.Interface;
-export declare const SYNC_MAIN_CONTRACT_INTERFACE: utils.Interface;
-export declare const SYNC_EXIT_CONTRACT_INTERFACE: utils.Interface;
+export declare const MAIN_CONTRACT_INTERFACE: utils.Interface;
 export declare const ZKL_CONTRACT_INTERFACE: utils.Interface;
-export declare const SYNC_GOV_CONTRACT_INTERFACE: utils.Interface;
 export declare const IEIP1271_INTERFACE: utils.Interface;
 export declare const MULTICALL_INTERFACE: utils.Interface;
 export declare const ERC20_DEPOSIT_GAS_LIMIT: any;

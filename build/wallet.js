@@ -517,7 +517,7 @@ class Wallet {
             }
             if ((0, utils_1.isTokenETH)(deposit.token)) {
                 try {
-                    const data = utils_1.SYNC_MAIN_CONTRACT_INTERFACE.encodeFunctionData('depositETH', [
+                    const data = utils_1.MAIN_CONTRACT_INTERFACE.encodeFunctionData('depositETH', [
                         deposit.depositTo,
                         deposit.subAccountId,
                     ]);
@@ -546,7 +546,7 @@ class Wallet {
                         this.modifyEthersError(e);
                     }
                 }
-                const data = utils_1.SYNC_MAIN_CONTRACT_INTERFACE.encodeFunctionData('depositERC20', [
+                const data = utils_1.MAIN_CONTRACT_INTERFACE.encodeFunctionData('depositERC20', [
                     deposit.token,
                     deposit.amount,
                     deposit.depositTo,
@@ -609,7 +609,7 @@ class Wallet {
     getMainContract(linkChainId) {
         return __awaiter(this, void 0, void 0, function* () {
             const contractAddress = yield this.provider.getContractInfoByChainId(linkChainId);
-            return new ethers_1.ethers.Contract(contractAddress.mainContract, utils_1.SYNC_MAIN_CONTRACT_INTERFACE, this.ethSigner);
+            return new ethers_1.ethers.Contract(contractAddress.mainContract, utils_1.MAIN_CONTRACT_INTERFACE, this.ethSigner);
         });
     }
     modifyEthersError(error) {
@@ -656,7 +656,7 @@ class ETHOperation {
             const txReceipt = yield this.ethTx.wait();
             for (const log of txReceipt.logs) {
                 try {
-                    const priorityQueueLog = utils_1.SYNC_MAIN_CONTRACT_INTERFACE.parseLog(log);
+                    const priorityQueueLog = utils_1.MAIN_CONTRACT_INTERFACE.parseLog(log);
                     if (priorityQueueLog && priorityQueueLog.args.serialId != null) {
                         this.priorityOpId = priorityQueueLog.args.serialId;
                     }
