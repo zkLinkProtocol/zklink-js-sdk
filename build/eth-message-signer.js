@@ -54,7 +54,6 @@ class EthMessageSigner {
         if (humanReadableTxInfo.length != 0) {
             humanReadableTxInfo += '\n';
         }
-        humanReadableTxInfo += `Nonce: ${matching.nonce}`;
         return humanReadableTxInfo;
     }
     ethSignOrderMatching(matching) {

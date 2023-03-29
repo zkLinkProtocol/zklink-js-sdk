@@ -28,12 +28,10 @@ export declare class EthMessageSigner {
     getOrderMatchingEthSignMessage(matching: {
         stringFeeToken: string;
         stringFee: string;
-        nonce: number;
     }): string;
     ethSignOrderMatching(matching: {
         stringFeeToken: string;
         stringFee: string;
-        nonce: number;
     }): Promise<TxEthSignature>;
     getOrderMatchingEthMessagePart(tx: {
         stringFeeToken: string;

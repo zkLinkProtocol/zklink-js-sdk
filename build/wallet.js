@@ -210,7 +210,7 @@ class Wallet {
                 throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
-            const transactionData = Object.assign(Object.assign({}, entries), { account: entries.account || this.address(), accountId: entries.accountId || this.accountId || (yield this.getAccountId()), type: 'OrderMatching', fee: entries.fee, feeToken: this.provider.tokenSet.resolveTokenId(entries.feeToken), nonce: entries.nonce == null ? yield this.getNonce() : yield this.getNonce(entries.nonce) });
+            const transactionData = Object.assign(Object.assign({}, entries), { account: entries.account || this.address(), accountId: entries.accountId || this.accountId || (yield this.getAccountId()), type: 'OrderMatching', fee: entries.fee, feeToken: this.provider.tokenSet.resolveTokenId(entries.feeToken) });
             if (transactionData.fee == null) {
                 transactionData.fee = yield this.provider.getTransactionFee(Object.assign(Object.assign({}, transactionData), { fee: '0' }));
             }
@@ -230,7 +230,6 @@ class Wallet {
                 : yield this.ethMessageSigner.ethSignOrderMatching({
                     stringFee,
                     stringFeeToken,
-                    nonce: transactionData.nonce,
                 });
             return {
                 tx: signedTransferTransaction,
@@ -395,10 +394,14 @@ class Wallet {
     }
     isOnchainAuthSigningKeySet(linkChainId, nonce = 'committed') {
         return __awaiter(this, void 0, void 0, function* () {
-            const mainContract = yield this.getMainContract(linkChainId);
+            const contractAddress = yield this.provider.getContractInfoByChainId(linkChainId);
             const numNonce = yield this.getNonce(nonce);
+            const data = utils_1.MAIN_CONTRACT_INTERFACE.encodeFunctionData('authFacts', [this.address(), numNonce]);
             try {
-                const onchainAuthFact = yield mainContract.authFacts(this.address(), numNonce);
+                const onchainAuthFact = yield this.ethSigner.call({
+                    to: contractAddress.mainContract,
+                    data,
+                });
                 return (onchainAuthFact !== '0x0000000000000000000000000000000000000000000000000000000000000000');
             }
             catch (e) {
@@ -416,10 +419,14 @@ class Wallet {
             if (currentPubKeyHash === newPubKeyHash) {
                 throw new Error('Current PubKeyHash is the same as new');
             }
+            const contractAddress = yield this.provider.getContractInfoByChainId(linkChainId);
             const numNonce = yield this.getNonce(nonce);
-            const mainContract = yield this.getMainContract(linkChainId);
+            const data = utils_1.MAIN_CONTRACT_INTERFACE.encodeFunctionData('setAuthPubkeyHash', [
+                newPubKeyHash.replace('sync:', '0x'),
+                numNonce,
+            ]);
             try {
-                return mainContract.setAuthPubkeyHash(newPubKeyHash.replace('sync:', '0x'), numNonce, Object.assign({ gasLimit: ethers_1.BigNumber.from('200000') }, ethTxOptions));
+                return this.ethSigner.sendTransaction(Object.assign({ to: contractAddress.mainContract, data, gasLimit: ethers_1.BigNumber.from('200000') }, ethTxOptions));
             }
             catch (e) {
                 this.modifyEthersError(e);

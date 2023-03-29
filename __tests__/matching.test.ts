@@ -77,7 +77,6 @@ describe('matching', () => {
       type: 'OrderMatching',
       subAccountId: 1,
       maker: maker.tx as OrderData,
-      nonce: 0,
       taker: taker.tx as OrderData,
       account: '0x3498F456645270eE003441df82C718b56c0e6666',
       feeToken: 1,
@@ -106,5 +105,84 @@ describe('matching', () => {
       'ec7493d6151fbe1673f8bfefc4f5544b86eeef7010b0bc3500d4036f7e36a0a1e1a31f28015fd27258ad5782c0676b97bda3a4380284903e15eec6b2c7836105',
       'Unexpected matching tx signature'
     )
+  })
+
+  const data = {
+    type: 'OrderMatching',
+    accountId: 4,
+    subAccountId: 1,
+    taker: {
+      accountId: 15,
+      subAccountId: 1,
+      slotId: 888,
+      nonce: 239,
+      baseTokenId: 40,
+      quoteTokenId: 1,
+      amount: '43000000000000000',
+      price: '26944960000000000000000',
+      isSell: 1,
+      feeRatio1: 5,
+      feeRatio2: 10,
+      signature: {
+        pubKey: '82117d3ba5d989c438f08566835dc3320f2293234142c87849932750c28add1f',
+        signature:
+          '5a10a9a6e7e78e6d676de03e64cc00a8687a15f5a8262d1734b4f7cda95565017ff3c537aaae811bbb74a0d7f26c5e3208e5f5793d81a54d0b29d13d404fa305',
+      },
+    },
+    maker: {
+      accountId: 2695,
+      subAccountId: 1,
+      slotId: 2,
+      nonce: 1,
+      baseTokenId: 40,
+      quoteTokenId: 1,
+      amount: '134310000000000000',
+      price: '26988000000000000000000',
+      isSell: 0,
+      feeRatio1: 5,
+      feeRatio2: 10,
+      signature: {
+        pubKey: 'ed1964fad861d801e5aa1f87f8a276491121ef6e48de1fa8cd2388bd06032a00',
+        signature:
+          '3a6aa8e5a26a5611b78b09b60d8f06177d374b231e76e38224275fc95a4daa1bab59e858cf10dd02ea412092b59056949ba0784b8316a665ba6d7544dd4e2201',
+      },
+    },
+    fee: '391000000000000',
+    feeToken: 1,
+    expectBaseAmount: '43000000000000000',
+    expectQuoteAmount: '1160484000000000000000',
+    signature: {
+      pubKey: 'e32ce4a89e2cc9702dc756e54479934c95cc7001114615a5b06a4d2386074c9d',
+      signature:
+        '744fc8d74a1fc218b764b95135e8c36d6455d9caef2aff34c28c20f7093f8687f9ed07b4149b7cf9a632901ed1e2c8aee69e4aebe83ef471efe2b714569ddb03',
+    },
+  }
+  const submitterSignature = {
+    pubKey: 'e32ce4a89e2cc9702dc756e54479934c95cc7001114615a5b06a4d2386074c9d',
+    signature:
+      'c4f647a3dd46a8259b270be732e7afb87f9f3433038afeea8c8a2fe93d80309f58e31a63b950f7063f5b3448199bee9cec173fbdf82267da9410f232594c7e04',
+  }
+  test('bytes and signature by data', async function () {
+    const matching: OrderMatchingData = {
+      fee: data.fee,
+      type: 'OrderMatching',
+      subAccountId: data.subAccountId,
+      maker: data.maker as OrderData,
+      taker: data.taker as OrderData,
+      account: '0x3498F456645270eE003441df82C718b56c0e6666',
+      feeToken: data.feeToken,
+      accountId: data.accountId,
+      expectBaseAmount: data.expectBaseAmount,
+      expectQuoteAmount: data.expectQuoteAmount,
+    }
+
+    const serialized = await serializeOrderMatching(matching)
+    const txHash = sha256(serialized)
+    const wallet = await getTestWallet(
+      '0xf3b4f9d137cd7c9ca53ac1c2d2a11384c799b8da5a25a1b00ea9085bd0fe7655' as any
+    )
+    const sign = await wallet?.signer?.signTransactionBytes(txHash)
+    expect(sign?.pubKey).to.eq(submitterSignature.pubKey)
+    expect(sign?.signature).to.eq(submitterSignature.signature)
   })
 })

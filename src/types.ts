@@ -358,7 +358,6 @@ export interface OrderMatchingEntries {
   fee?: BigNumberish
   account?: Address
   accountId?: number
-  nonce?: number
   signature?: Signature
 }
 export interface OrderMatchingData {
@@ -372,6 +371,5 @@ export interface OrderMatchingData {
   expectQuoteAmount: BigNumberish
   fee: BigNumberish
   feeToken: number
-  nonce: number
   signature?: Signature
 }

@@ -330,7 +330,6 @@ export class Wallet {
       type: 'OrderMatching',
       fee: entries.fee,
       feeToken: this.provider.tokenSet.resolveTokenId(entries.feeToken),
-      nonce: entries.nonce == null ? await this.getNonce() : await this.getNonce(entries.nonce),
     }
 
     if (transactionData.fee == null) {
@@ -356,7 +355,6 @@ export class Wallet {
         : await this.ethMessageSigner.ethSignOrderMatching({
             stringFee,
             stringFeeToken,
-            nonce: transactionData.nonce,
           })
     return {
       tx: signedTransferTransaction,
@@ -544,11 +542,14 @@ export class Wallet {
     linkChainId: number,
     nonce: Nonce = 'committed'
   ): Promise<boolean> {
-    const mainContract = await this.getMainContract(linkChainId)
-
+    const contractAddress = await this.provider.getContractInfoByChainId(linkChainId)
     const numNonce = await this.getNonce(nonce)
+    const data = MAIN_CONTRACT_INTERFACE.encodeFunctionData('authFacts', [this.address(), numNonce])
     try {
-      const onchainAuthFact = await mainContract.authFacts(this.address(), numNonce)
+      const onchainAuthFact = await this.ethSigner.call({
+        to: contractAddress.mainContract,
+        data,
+      })
       return (
         onchainAuthFact !== '0x0000000000000000000000000000000000000000000000000000000000000000'
       )
@@ -573,12 +574,16 @@ export class Wallet {
       throw new Error('Current PubKeyHash is the same as new')
     }
 
+    const contractAddress = await this.provider.getContractInfoByChainId(linkChainId)
     const numNonce = await this.getNonce(nonce)
-
-    const mainContract = await this.getMainContract(linkChainId)
-
+    const data = MAIN_CONTRACT_INTERFACE.encodeFunctionData('setAuthPubkeyHash', [
+      newPubKeyHash.replace('sync:', '0x'),
+      numNonce,
+    ])
     try {
-      return mainContract.setAuthPubkeyHash(newPubKeyHash.replace('sync:', '0x'), numNonce, {
+      return this.ethSigner.sendTransaction({
+        to: contractAddress.mainContract,
+        data,
         gasLimit: BigNumber.from('200000'),
         ...ethTxOptions,
       })
