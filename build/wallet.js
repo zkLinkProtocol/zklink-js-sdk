@@ -470,6 +470,9 @@ class Wallet {
     getBalances(subAccountId) {
         return __awaiter(this, void 0, void 0, function* () {
             this.accountId = yield this.getAccountId();
+            if (!this.accountId) {
+                return {};
+            }
             const balances = yield this.provider.getBalance(this.accountId, subAccountId);
             return balances;
         });
