@@ -1,6 +1,6 @@
 {
   "name": "zklink-js-sdk",
-  "version": "0.12.24-alpha.4",
+  "version": "0.12.24-alpha.5",
   "license": "MIT",
   "main": "build/index.js",
   "types": "build/index.d.ts",
