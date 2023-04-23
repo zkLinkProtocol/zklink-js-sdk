@@ -66,7 +66,7 @@ export class Provider {
     return provider
   }
 
-  // return transaction hash (e.g. sync-tx:dead..beef)
+  // return transaction hash (e.g. 0xdead..beef)
   async submitTx({
     tx,
     signature,
@@ -108,7 +108,7 @@ export class Provider {
           id: null,
           address: address,
           nonce: 0,
-          pubKeyHash: 'sync:0000000000000000000000000000000000000000',
+          pubKeyHash: '0x0000000000000000000000000000000000000000',
           accountType: 'unknown',
         }
       }

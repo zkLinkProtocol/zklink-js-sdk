@@ -366,7 +366,7 @@ function getChangePubkeyMessage(pubKeyHash, nonce, accountId, verifyingContract,
     };
     // The data to sign
     const message = {
-        pubKeyHash: pubKeyHash.replace(/^sync:/, '0x'),
+        pubKeyHash,
         nonce,
         accountId,
     };
@@ -766,7 +766,7 @@ function parseHexWithPrefix(str) {
 }
 exports.parseHexWithPrefix = parseHexWithPrefix;
 function getCREATE2AddressAndSalt(syncPubkeyHash, create2Data) {
-    const pubkeyHashHex = syncPubkeyHash.replace('sync:', '0x');
+    const pubkeyHashHex = syncPubkeyHash;
     const additionalSaltArgument = ethers_1.ethers.utils.arrayify(create2Data.saltArg);
     if (additionalSaltArgument.length !== 32) {
         throw new Error('create2Data.saltArg should be exactly 32 bytes long');
@@ -814,7 +814,7 @@ function getTxHash(tx) {
         throw new Error('Close operation is disabled');
     }
     let txBytes = serializeTx(tx);
-    return ethers_1.ethers.utils.sha256(txBytes).replace('0x', 'sync-tx:');
+    return ethers_1.ethers.utils.sha256(txBytes);
 }
 exports.getTxHash = getTxHash;
 function getRandom(min, max) {

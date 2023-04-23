@@ -55,7 +55,7 @@ class Provider {
             return provider;
         });
     }
-    // return transaction hash (e.g. sync-tx:dead..beef)
+    // return transaction hash (e.g. 0xdead..beef)
     submitTx({ tx, signature, }) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.transport.request('sendTransaction', [tx, signature]);
@@ -99,7 +99,7 @@ class Provider {
                         id: null,
                         address: address,
                         nonce: 0,
-                        pubKeyHash: 'sync:0000000000000000000000000000000000000000',
+                        pubKeyHash: '0x0000000000000000000000000000000000000000',
                         accountType: 'unknown',
                     };
                 }

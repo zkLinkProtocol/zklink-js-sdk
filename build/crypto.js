@@ -80,7 +80,7 @@ function privateKeyToPubKeyHash(privateKey) {
     return __awaiter(this, void 0, void 0, function* () {
         yield loadZkSyncCrypto();
         const _zks = asmJs || zks;
-        return `sync:${ethers_1.utils.hexlify(_zks.private_key_to_pubkey_hash(privateKey)).substr(2)}`;
+        return `0x${ethers_1.utils.hexlify(_zks.private_key_to_pubkey_hash(privateKey)).substr(2)}`;
     });
 }
 exports.privateKeyToPubKeyHash = privateKeyToPubKeyHash;

@@ -304,7 +304,7 @@ export class DummyTransport extends AbstractJSONRPCTransport {
       }
     }
     if (method == 'sendTransaction') {
-      return ['sync-tx:0d162d589577dc3fdeffb8270feb53da7415b2a82249954c40ced41ae7e2270d']
+      return ['0x0d162d589577dc3fdeffb8270feb53da7415b2a82249954c40ced41ae7e2270d']
     }
 
     if (method == 'get_zksync_version') {

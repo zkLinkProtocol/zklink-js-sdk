@@ -49,7 +49,7 @@ export async function privateKeyToPubKeyHash(privateKey: Uint8Array): Promise<st
   await loadZkSyncCrypto()
 
   const _zks = asmJs || zks
-  return `sync:${utils.hexlify(_zks.private_key_to_pubkey_hash(privateKey)).substr(2)}`
+  return `0x${utils.hexlify(_zks.private_key_to_pubkey_hash(privateKey)).substr(2)}`
 }
 
 export async function rescueHashOrders(orders: Uint8Array): Promise<Uint8Array> {

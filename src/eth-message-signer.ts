@@ -261,7 +261,7 @@ export class EthMessageSigner {
     stringFee: string
   }): string {
     let message = ''
-    message += `Set signing key: ${changePubKey.pubKeyHash.replace('sync:', '').toLowerCase()}`
+    message += `Set signing key: ${changePubKey.pubKeyHash.toLowerCase()}`
     if (changePubKey.stringFee != null) {
       message += `\nFee: ${changePubKey.stringFee} ${changePubKey.stringToken}`
     }

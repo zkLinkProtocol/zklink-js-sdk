@@ -439,7 +439,7 @@ export function getChangePubkeyMessage(
   }
   // The data to sign
   const message = {
-    pubKeyHash: pubKeyHash.replace(/^sync:/, '0x'),
+    pubKeyHash,
     nonce,
     accountId,
   }
@@ -874,7 +874,7 @@ export function getCREATE2AddressAndSalt(
     codeHash: string
   }
 ): { salt: string; address: string } {
-  const pubkeyHashHex = syncPubkeyHash.replace('sync:', '0x')
+  const pubkeyHashHex = syncPubkeyHash
 
   const additionalSaltArgument = ethers.utils.arrayify(create2Data.saltArg)
   if (additionalSaltArgument.length !== 32) {
@@ -945,7 +945,7 @@ export function getTxHash(
     throw new Error('Close operation is disabled')
   }
   let txBytes = serializeTx(tx)
-  return ethers.utils.sha256(txBytes).replace('0x', 'sync-tx:')
+  return ethers.utils.sha256(txBytes)
 }
 
 export function getRandom(min: number, max: number) {

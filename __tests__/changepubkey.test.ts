@@ -17,7 +17,7 @@ describe('ChangePubKey', () => {
       nonce: 0,
       accountId: 2,
       ts: 1654776640,
-      newPkHash: 'sync:511494921e9aec60dfd65ce125dec96fe7c07133',
+      newPkHash: '0x511494921e9aec60dfd65ce125dec96fe7c07133',
     } as ChangePubKeyData)
     expect(Buffer.from(bytes).toString('hex')).to.eq(
       '06010000000201511494921e9aec60dfd65ce125dec96fe7c07133000100000000000062a1e340'

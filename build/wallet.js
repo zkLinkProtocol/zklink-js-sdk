@@ -422,7 +422,7 @@ class Wallet {
             const contractAddress = yield this.provider.getContractInfoByChainId(linkChainId);
             const numNonce = yield this.getNonce(nonce);
             const data = utils_1.MAIN_CONTRACT_INTERFACE.encodeFunctionData('setAuthPubkeyHash', [
-                newPubKeyHash.replace('sync:', '0x'),
+                newPubKeyHash,
                 numNonce,
             ]);
             try {
@@ -688,7 +688,7 @@ class ETHOperation {
                 (0, utils_1.numberToBytesBE)(Number(this.priorityOpId), 8),
                 (0, utils_2.arrayify)(this.ethTx.hash),
             ]);
-            const txHash = (0, utils_2.sha256)(bytes).replace('0x', 'sync-tx:');
+            const txHash = (0, utils_2.sha256)(bytes);
             if (this.state !== 'Mined')
                 return;
             const receipt = yield this.zkSyncProvider.notifyTransaction(txHash);
