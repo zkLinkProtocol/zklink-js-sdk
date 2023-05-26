@@ -1,13 +1,12 @@
 import * as ethers from 'ethers';
-import { TxEthSignature, EthSignerType, PubKeyHash, OrderData, EthProviderType } from './types';
+import { EthSignerType, OrderData, PubKeyHash, TxEthSignature } from './types';
 /**
  * Wrapper around `ethers.Signer` which provides convenient methods to get and sign messages required for zkSync.
  */
 export declare class EthMessageSigner {
     private ethSigner;
     private ethSignerType?;
-    ethProviderType?: EthProviderType;
-    constructor(ethSigner: ethers.Signer, ethSignerType?: EthSignerType, ethProviderType?: EthProviderType);
+    constructor(ethSigner: ethers.Signer, ethSignerType?: EthSignerType);
     getEthMessageSignature(message: ethers.utils.BytesLike): Promise<TxEthSignature>;
     getTransferEthSignMessage(transfer: {
         stringAmount: string;

@@ -1,54 +1,52 @@
-import { BigNumber, BigNumberish, Contract, ContractTransaction, ethers, utils } from 'ethers'
 import { ErrorCode } from '@ethersproject/logger'
+import { BigNumber, BigNumberish, ContractTransaction, ethers, utils } from 'ethers'
+import { arrayify, isAddress, sha256 } from 'ethers/lib/utils'
+import { LinkContract } from './contract'
 import { EthMessageSigner } from './eth-message-signer'
 import { Provider } from './provider'
 import { Create2WalletSigner, Signer } from './signer'
 import {
+  AccountBalances,
   AccountState,
   Address,
-  TokenLike,
-  Nonce,
-  PriorityOperationReceipt,
-  TransactionReceipt,
-  PubKeyHash,
-  ChangePubKeyData,
-  EthSignerType,
-  SignedTransaction,
-  TransferData,
-  TxEthSignature,
-  ForcedExitData,
-  WithdrawData,
-  ChangePubkeyTypes,
-  Create2Data,
   ChainId,
-  TokenId,
-  OrderData,
-  TokenAddress,
-  OrderMatchingData,
-  AccountBalances,
-  TransferEntries,
-  ForcedExitEntries,
-  WithdrawEntries,
+  ChangePubKeyData,
   ChangePubKeyEntries,
+  Create2Data,
+  EthSignerType,
+  ForcedExitData,
+  ForcedExitEntries,
+  Nonce,
+  OrderData,
+  OrderMatchingData,
   OrderMatchingEntries,
-  EthProviderType,
+  PriorityOperationReceipt,
+  PubKeyHash,
+  SignedTransaction,
+  TokenAddress,
+  TokenId,
+  TokenLike,
+  TransactionReceipt,
+  TransferData,
+  TransferEntries,
+  TxEthSignature,
+  WithdrawData,
+  WithdrawEntries,
 } from './types'
 import {
-  IERC20_INTERFACE,
-  isTokenETH,
-  MAX_ERC20_APPROVE_AMOUNT,
-  MAIN_CONTRACT_INTERFACE,
+  ERC20_APPROVE_TRESHOLD,
   ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT,
+  ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT,
+  IERC20_INTERFACE,
+  MAIN_CONTRACT_INTERFACE,
+  MAX_ERC20_APPROVE_AMOUNT,
   getChangePubkeyMessage,
   getEthereumBalance,
-  ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT,
   getTimestamp,
-  signMessageEIP712,
-  ERC20_APPROVE_TRESHOLD,
+  isTokenETH,
   numberToBytesBE,
+  signMessageEIP712,
 } from './utils'
-import { LinkContract } from './contract'
-import { arrayify, isAddress, sha256 } from 'ethers/lib/utils'
 
 const EthersErrorCode = ErrorCode
 
@@ -118,14 +116,13 @@ export class Wallet {
     ethWallet: ethers.Signer,
     provider: Provider,
     ethSignature: string,
-    ethProviderType: EthProviderType = 'Metamask',
     ethSignerType?: EthSignerType
   ): Promise<Wallet> {
     const signerResult = await Signer.fromETHSignature(ethWallet, ethSignature)
     const signer = signerResult.signer
     ethSignerType = ethSignerType || signerResult.ethSignatureType
     const address = await ethWallet.getAddress()
-    const ethMessageSigner = new EthMessageSigner(ethWallet, ethSignerType, ethProviderType)
+    const ethMessageSigner = new EthMessageSigner(ethWallet, ethSignerType)
     const wallet = new Wallet(
       ethWallet,
       ethMessageSigner,

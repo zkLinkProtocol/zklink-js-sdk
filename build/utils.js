@@ -390,7 +390,7 @@ function getSignedBytesFromMessage(message, addPrefix) {
     return messageBytes;
 }
 exports.getSignedBytesFromMessage = getSignedBytesFromMessage;
-function signMessagePersonalAPI(signer, message, ethProviderType = 'Metamask') {
+function signMessagePersonalAPI(signer, message) {
     return __awaiter(this, void 0, void 0, function* () {
         if (signer instanceof ethers_1.ethers.providers.JsonRpcSigner) {
             return signer.provider
@@ -406,14 +406,7 @@ function signMessagePersonalAPI(signer, message, ethProviderType = 'Metamask') {
             });
         }
         else {
-            if (ethProviderType === 'UniPass') {
-                return signer.signMessage(message, {
-                    isEIP191Prefix: true,
-                });
-            }
-            else {
-                return signer.signMessage(message);
-            }
+            return signer.signMessage(message);
         }
     });
 }
@@ -489,9 +482,10 @@ function removeAddressPrefix(address) {
 // PubKeyHash or eth address
 function serializeAddress(address) {
     const prefixlessAddress = removeAddressPrefix(address);
-    const addressBytes = ethers_1.utils.arrayify(`0x${prefixlessAddress}`);
-    if (addressBytes.length !== 20) {
-        throw new Error('Address must be 20 bytes long');
+    const address32 = ethers_1.utils.zeroPad(`0x${prefixlessAddress}`, 32);
+    const addressBytes = ethers_1.utils.arrayify(address32);
+    if (addressBytes.length !== 32) {
+        throw new Error('Address must be 32 bytes long');
     }
     return addressBytes;
 }

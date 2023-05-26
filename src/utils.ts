@@ -6,7 +6,6 @@ import {
   ChainId,
   ChangePubKeyData,
   CloseAccount,
-  EthProviderType,
   EthSignerType,
   ForcedExitData,
   OrderData,
@@ -17,7 +16,7 @@ import {
   TokenSymbol,
   Tokens,
   TransferData,
-  WithdrawData
+  WithdrawData,
 } from './types'
 
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
@@ -468,8 +467,7 @@ export function getSignedBytesFromMessage(
 
 export async function signMessagePersonalAPI(
   signer: ethers.Signer | any,
-  message: Uint8Array,
-  ethProviderType: EthProviderType = 'Metamask'
+  message: Uint8Array
 ): Promise<string> {
   if (signer instanceof ethers.providers.JsonRpcSigner) {
     return signer.provider
@@ -487,13 +485,7 @@ export async function signMessagePersonalAPI(
         }
       )
   } else {
-    if (ethProviderType === 'UniPass') {
-      return signer.signMessage(message, {
-        isEIP191Prefix: true,
-      })
-    } else {
-      return signer.signMessage(message)
-    }
+    return signer.signMessage(message)
   }
 }
 

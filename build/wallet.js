@@ -10,13 +10,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.submitSignedTransaction = exports.Transaction = exports.ETHOperation = exports.Wallet = exports.ZKSyncTxError = void 0;
-const ethers_1 = require("ethers");
 const logger_1 = require("@ethersproject/logger");
+const ethers_1 = require("ethers");
+const utils_1 = require("ethers/lib/utils");
+const contract_1 = require("./contract");
 const eth_message_signer_1 = require("./eth-message-signer");
 const signer_1 = require("./signer");
-const utils_1 = require("./utils");
-const contract_1 = require("./contract");
-const utils_2 = require("ethers/lib/utils");
+const utils_2 = require("./utils");
 const EthersErrorCode = logger_1.ErrorCode;
 class ZKSyncTxError extends Error {
     constructor(message, value) {
@@ -64,13 +64,13 @@ class Wallet {
             return wallet;
         });
     }
-    static fromEthSignature(ethWallet, provider, ethSignature, ethProviderType = 'Metamask', ethSignerType) {
+    static fromEthSignature(ethWallet, provider, ethSignature, ethSignerType) {
         return __awaiter(this, void 0, void 0, function* () {
             const signerResult = yield signer_1.Signer.fromETHSignature(ethWallet, ethSignature);
             const signer = signerResult.signer;
             ethSignerType = ethSignerType || signerResult.ethSignatureType;
             const address = yield ethWallet.getAddress();
-            const ethMessageSigner = new eth_message_signer_1.EthMessageSigner(ethWallet, ethSignerType, ethProviderType);
+            const ethMessageSigner = new eth_message_signer_1.EthMessageSigner(ethWallet, ethSignerType);
             const wallet = new Wallet(ethWallet, ethMessageSigner, address, signer, undefined, ethSignerType);
             wallet.connect(provider);
             return wallet;
@@ -98,7 +98,7 @@ class Wallet {
             if (this.ethSignerType == null) {
                 throw new Error('ethSignerType is unknown');
             }
-            const signature = yield (0, utils_1.signMessageEIP712)(this.ethSigner, data);
+            const signature = yield (0, utils_2.signMessageEIP712)(this.ethSigner, data);
             return {
                 type: this.ethSignerType.verificationMethod === 'ECDSA'
                     ? 'EthereumSignature'
@@ -119,7 +119,7 @@ class Wallet {
                 throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
-            const transactionData = Object.assign(Object.assign({}, entries), { type: 'Transfer', accountId: this.accountId || (yield this.getAccountId()), from: this.address(), token: this.provider.tokenSet.resolveTokenId(entries.token), fee: entries.fee ? entries.fee : null, nonce: entries.nonce == null ? yield this.getNonce() : yield this.getNonce(entries.nonce), ts: entries.ts || (0, utils_1.getTimestamp)() });
+            const transactionData = Object.assign(Object.assign({}, entries), { type: 'Transfer', accountId: this.accountId || (yield this.getAccountId()), from: this.address(), token: this.provider.tokenSet.resolveTokenId(entries.token), fee: entries.fee ? entries.fee : null, nonce: entries.nonce == null ? yield this.getNonce() : yield this.getNonce(entries.nonce), ts: entries.ts || (0, utils_2.getTimestamp)() });
             if (transactionData.fee == null) {
                 transactionData.fee = yield this.provider.getTransactionFee(Object.assign(Object.assign({}, transactionData), { fee: '0', amount: ethers_1.BigNumber.from(transactionData.amount).toString() }));
             }
@@ -163,7 +163,7 @@ class Wallet {
                 throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('perform a Forced Exit');
-            const transactionData = Object.assign(Object.assign({}, entries), { type: 'ForcedExit', initiatorAccountId: entries.initiatorAccountId || this.accountId, l2SourceToken: this.provider.tokenSet.resolveTokenId(entries.l2SourceToken), l1TargetToken: this.provider.tokenSet.resolveTokenId(entries.l1TargetToken), feeToken: this.provider.tokenSet.resolveTokenId(entries.feeToken), fee: entries.fee, nonce: entries.nonce == null ? yield this.getNonce() : yield this.getNonce(entries.nonce), ts: entries.ts || (0, utils_1.getTimestamp)() });
+            const transactionData = Object.assign(Object.assign({}, entries), { type: 'ForcedExit', initiatorAccountId: entries.initiatorAccountId || this.accountId, l2SourceToken: this.provider.tokenSet.resolveTokenId(entries.l2SourceToken), l1TargetToken: this.provider.tokenSet.resolveTokenId(entries.l1TargetToken), feeToken: this.provider.tokenSet.resolveTokenId(entries.feeToken), fee: entries.fee, nonce: entries.nonce == null ? yield this.getNonce() : yield this.getNonce(entries.nonce), ts: entries.ts || (0, utils_2.getTimestamp)() });
             if (transactionData.fee == null) {
                 transactionData.fee = yield this.provider.getTransactionFee(Object.assign(Object.assign({}, transactionData), { fee: '0' }));
             }
@@ -249,7 +249,7 @@ class Wallet {
                 throw new Error('zkLink signer is required for sending zkLink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Withdraw funds');
-            const transactionData = Object.assign(Object.assign({}, entries), { type: 'Withdraw', accountId: entries.accountId || this.accountId, from: entries.from || this.address(), l2SourceToken: this.provider.tokenSet.resolveTokenId(entries.l2SourceToken), l1TargetToken: this.provider.tokenSet.resolveTokenId(entries.l1TargetToken), fee: entries.fee, nonce: entries.nonce == null ? yield this.getNonce() : yield this.getNonce(entries.nonce), ts: entries.ts || (0, utils_1.getTimestamp)() });
+            const transactionData = Object.assign(Object.assign({}, entries), { type: 'Withdraw', accountId: entries.accountId || this.accountId, from: entries.from || this.address(), l2SourceToken: this.provider.tokenSet.resolveTokenId(entries.l2SourceToken), l1TargetToken: this.provider.tokenSet.resolveTokenId(entries.l1TargetToken), fee: entries.fee, nonce: entries.nonce == null ? yield this.getNonce() : yield this.getNonce(entries.nonce), ts: entries.ts || (0, utils_2.getTimestamp)() });
             if (transactionData.fee == null) {
                 transactionData.fee = yield this.provider.getTransactionFee(Object.assign(Object.assign({}, transactionData), { fee: '0', amount: ethers_1.BigNumber.from(transactionData.amount).toString() }));
             }
@@ -324,7 +324,7 @@ class Wallet {
                 fee: entries.fee,
                 feeToken: entries.feeToken,
                 nonce: entries.nonce == null ? yield this.getNonce() : yield this.getNonce(entries.nonce),
-                ts: entries.ts || (0, utils_1.getTimestamp)(),
+                ts: entries.ts || (0, utils_2.getTimestamp)(),
             };
             if (entries.ethAuthType === 'Onchain') {
                 transactionData.ethAuthData = {
@@ -362,7 +362,7 @@ class Wallet {
             else if (entries.ethAuthType === 'EthECDSA') {
                 yield this.setRequiredAccountIdFromServer('ChangePubKey authorized by ECDSA.');
                 const contractInfo = yield this.provider.getContractInfoByChainId(entries.chainId);
-                const changePubKeySignData = (0, utils_1.getChangePubkeyMessage)(transactionData.newPkHash, transactionData.nonce, transactionData.accountId || this.accountId, contractInfo.mainContract, contractInfo.layerOneChainId);
+                const changePubKeySignData = (0, utils_2.getChangePubkeyMessage)(transactionData.newPkHash, transactionData.nonce, transactionData.accountId || this.accountId, contractInfo.mainContract, contractInfo.layerOneChainId);
                 const ethSignature = (yield this.getEIP712Signature(changePubKeySignData)).signature;
                 transactionData.ethAuthData = {
                     type: 'EthECDSA',
@@ -396,7 +396,7 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             const contractAddress = yield this.provider.getContractInfoByChainId(linkChainId);
             const numNonce = yield this.getNonce(nonce);
-            const data = utils_1.MAIN_CONTRACT_INTERFACE.encodeFunctionData('authFacts', [this.address(), numNonce]);
+            const data = utils_2.MAIN_CONTRACT_INTERFACE.encodeFunctionData('authFacts', [this.address(), numNonce]);
             try {
                 const onchainAuthFact = yield this.ethSigner.call({
                     to: contractAddress.mainContract,
@@ -421,7 +421,7 @@ class Wallet {
             }
             const contractAddress = yield this.provider.getContractInfoByChainId(linkChainId);
             const numNonce = yield this.getNonce(nonce);
-            const data = utils_1.MAIN_CONTRACT_INTERFACE.encodeFunctionData('setAuthPubkeyHash', [
+            const data = utils_2.MAIN_CONTRACT_INTERFACE.encodeFunctionData('setAuthPubkeyHash', [
                 newPubKeyHash,
                 numNonce,
             ]);
@@ -487,7 +487,7 @@ class Wallet {
     getEthereumBalance(token, linkChainId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return (0, utils_1.getEthereumBalance)(this.ethSigner.provider, this.provider, this.cachedAddress, token, linkChainId);
+                return (0, utils_2.getEthereumBalance)(this.ethSigner.provider, this.provider, this.cachedAddress, token, linkChainId);
             }
             catch (e) {
                 this.modifyEthersError(e);
@@ -498,21 +498,21 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const gasEstimate = yield this.ethSigner.estimateGas(tx);
-                return gasEstimate.gte(utils_1.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT)
+                return gasEstimate.gte(utils_2.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT)
                     ? gasEstimate
-                    : utils_1.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT;
+                    : utils_2.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT;
             }
             catch (e) {
                 this.modifyEthersError(e);
             }
         });
     }
-    isERC20DepositsApproved(tokenAddress, accountAddress, linkChainId, erc20ApproveThreshold = utils_1.ERC20_APPROVE_TRESHOLD) {
+    isERC20DepositsApproved(tokenAddress, accountAddress, linkChainId, erc20ApproveThreshold = utils_2.ERC20_APPROVE_TRESHOLD) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.contract.isERC20DepositsApproved(tokenAddress, accountAddress, linkChainId, erc20ApproveThreshold);
         });
     }
-    approveERC20TokenDeposits(tokenAddress, linkChainId, max_erc20_approve_amount = utils_1.MAX_ERC20_APPROVE_AMOUNT) {
+    approveERC20TokenDeposits(tokenAddress, linkChainId, max_erc20_approve_amount = utils_2.MAX_ERC20_APPROVE_AMOUNT) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.contract.approveERC20TokenDeposits(tokenAddress, linkChainId, max_erc20_approve_amount);
         });
@@ -522,16 +522,16 @@ class Wallet {
             const contractAddress = yield this.provider.getContractInfoByChainId(deposit.linkChainId);
             const mainContract = yield this.getMainContract(deposit.linkChainId);
             let ethTransaction;
-            if (!(0, utils_2.isAddress)(deposit.token)) {
+            if (!(0, utils_1.isAddress)(deposit.token)) {
                 throw new Error('Token address is invalid');
             }
-            if ((0, utils_1.isTokenETH)(deposit.token)) {
+            if ((0, utils_2.isTokenETH)(deposit.token)) {
                 try {
-                    const data = utils_1.MAIN_CONTRACT_INTERFACE.encodeFunctionData('depositETH', [
+                    const data = utils_2.MAIN_CONTRACT_INTERFACE.encodeFunctionData('depositETH', [
                         deposit.depositTo,
                         deposit.subAccountId,
                     ]);
-                    ethTransaction = yield this.ethSigner.sendTransaction(Object.assign({ to: contractAddress.mainContract, data, value: ethers_1.BigNumber.from(deposit.amount), gasLimit: ethers_1.BigNumber.from(utils_1.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT) }, deposit.ethTxOptions));
+                    ethTransaction = yield this.ethSigner.sendTransaction(Object.assign({ to: contractAddress.mainContract, data, value: ethers_1.BigNumber.from(deposit.amount), gasLimit: ethers_1.BigNumber.from(utils_2.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT) }, deposit.ethTxOptions));
                 }
                 catch (e) {
                     this.modifyEthersError(e);
@@ -542,9 +542,9 @@ class Wallet {
                 let nonce;
                 if (deposit.approveDepositAmountForERC20) {
                     try {
-                        const data = utils_1.IERC20_INTERFACE.encodeFunctionData('approve', [
+                        const data = utils_2.IERC20_INTERFACE.encodeFunctionData('approve', [
                             contractAddress.mainContract,
-                            utils_1.MAX_ERC20_APPROVE_AMOUNT,
+                            utils_2.MAX_ERC20_APPROVE_AMOUNT,
                         ]);
                         const approveTx = yield this.ethSigner.sendTransaction({
                             to: deposit.token,
@@ -556,7 +556,7 @@ class Wallet {
                         this.modifyEthersError(e);
                     }
                 }
-                const data = utils_1.MAIN_CONTRACT_INTERFACE.encodeFunctionData('depositERC20', [
+                const data = utils_2.MAIN_CONTRACT_INTERFACE.encodeFunctionData('depositERC20', [
                     deposit.token,
                     deposit.amount,
                     deposit.depositTo,
@@ -568,7 +568,7 @@ class Wallet {
                 // We set gas limit only if user does not set it using ethTxOptions.
                 if (tx.gasLimit == null) {
                     if (deposit.approveDepositAmountForERC20) {
-                        tx.gasLimit = utils_1.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT;
+                        tx.gasLimit = utils_2.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT;
                     }
                     else {
                         try {
@@ -619,7 +619,7 @@ class Wallet {
     getMainContract(linkChainId) {
         return __awaiter(this, void 0, void 0, function* () {
             const contractAddress = yield this.provider.getContractInfoByChainId(linkChainId);
-            return new ethers_1.ethers.Contract(contractAddress.mainContract, utils_1.MAIN_CONTRACT_INTERFACE, this.ethSigner);
+            return new ethers_1.ethers.Contract(contractAddress.mainContract, utils_2.MAIN_CONTRACT_INTERFACE, this.ethSigner);
         });
     }
     modifyEthersError(error) {
@@ -666,7 +666,7 @@ class ETHOperation {
             const txReceipt = yield this.ethTx.wait();
             for (const log of txReceipt.logs) {
                 try {
-                    const priorityQueueLog = utils_1.MAIN_CONTRACT_INTERFACE.parseLog(log);
+                    const priorityQueueLog = utils_2.MAIN_CONTRACT_INTERFACE.parseLog(log);
                     if (priorityQueueLog && priorityQueueLog.args.serialId != null) {
                         this.priorityOpId = priorityQueueLog.args.serialId;
                     }
@@ -685,10 +685,10 @@ class ETHOperation {
             this.throwErrorIfFailedState();
             yield this.awaitEthereumTxCommit();
             const bytes = ethers_1.ethers.utils.concat([
-                (0, utils_1.numberToBytesBE)(Number(this.priorityOpId), 8),
-                (0, utils_2.arrayify)(this.ethTx.hash),
+                (0, utils_2.numberToBytesBE)(Number(this.priorityOpId), 8),
+                (0, utils_1.arrayify)(this.ethTx.hash),
             ]);
-            const txHash = (0, utils_2.sha256)(bytes);
+            const txHash = (0, utils_1.sha256)(bytes);
             if (this.state !== 'Mined')
                 return;
             const receipt = yield this.zkSyncProvider.notifyTransaction(txHash);
