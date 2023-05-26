@@ -1,24 +1,23 @@
-import { utils, constants, ethers, BigNumber, BigNumberish, Contract } from 'ethers'
+import { BigNumber, BigNumberish, Contract, constants, ethers, utils } from 'ethers'
 import { rescueHashOrders } from 'zksync-crypto'
 import { Provider } from '.'
 import {
+  Address,
+  ChainId,
+  ChangePubKeyData,
+  CloseAccount,
+  EthProviderType,
+  EthSignerType,
+  ForcedExitData,
+  OrderData,
+  OrderMatchingData,
   PubKeyHash,
   TokenAddress,
   TokenLike,
-  Tokens,
   TokenSymbol,
-  EthSignerType,
-  Address,
+  Tokens,
   TransferData,
-  ForcedExitData,
-  ChangePubKeyData,
-  WithdrawData,
-  CloseAccount,
-  OrderData,
-  ChainId,
-  OrderMatchingData,
-  TokenId,
-  EthProviderType,
+  WithdrawData
 } from './types'
 
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
@@ -589,10 +588,10 @@ function removeAddressPrefix(address: Address | PubKeyHash): string {
 // PubKeyHash or eth address
 export function serializeAddress(address: Address | PubKeyHash): Uint8Array {
   const prefixlessAddress = removeAddressPrefix(address)
-
-  const addressBytes = utils.arrayify(`0x${prefixlessAddress}`)
-  if (addressBytes.length !== 20) {
-    throw new Error('Address must be 20 bytes long')
+  const address32 = utils.zeroPad(`0x${prefixlessAddress}`, 32)
+  const addressBytes = utils.arrayify(address32)
+  if (addressBytes.length !== 32) {
+    throw new Error('Address must be 32 bytes long')
   }
 
   return addressBytes

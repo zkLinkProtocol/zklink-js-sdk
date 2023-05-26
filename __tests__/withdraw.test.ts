@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { BigNumber } from 'ethers'
 import { sha256 } from 'ethers/lib/utils'
 import { WithdrawData } from '../src/types'
-import { serializeOrder, serializeWithdraw } from '../src/utils'
+import { serializeWithdraw } from '../src/utils'
 import { getTestWallet } from './utils'
 
 describe('withdraw', () => {
@@ -27,11 +27,11 @@ describe('withdraw', () => {
     const serialized = serializeWithdraw(data)
     const signed = await wallet.signWithdrawToEthereum(data)
     expect(Buffer.from(serialized).toString('hex')).eq(
-      '030300000001013d809e414ba4893709c85f242ba3617481bc41260001001100000000000000056bb8cd3fbf7bc000334d0000005501003262552fdb',
+      '030300000001010000000000000000000000003d809e414ba4893709c85f242ba3617481bc41260001001100000000000000056bb8cd3fbf7bc000334d0000005501003262552fdb',
       'Unexpected withdraw serialize bytes'
     )
     expect(sha256(serialized)).to.eq(
-      '0xbbd404c0d33c860127452dbd8cff7ff70825437415a4579459fab14e8a0329ca',
+      '0x1c353cb6d3bdc763b27125f0dc1ce7cb38bf76e24ef093a89abd9b0fe2bcb2ee',
       'Unexpected withdraw tx hash'
     )
     expect(signed.ethereumSignature?.signature).to.eq(
@@ -39,7 +39,7 @@ describe('withdraw', () => {
       'Unexpected withdraw eth signature'
     )
     expect(signed.tx.signature?.signature).to.eq(
-      'dc4be429a40f11ca56fbe8204e1310fc780ba8787548c2382b46aa06aee7d917ba8c64fa9b89f4201b9c75e1c321dc4a1df47023bbf74de4cde383b81f704f02',
+      'c50b647f2eb18d1fcb9a15d86046410a28cfb903cdfafc5a973e96b22d5e192d9f22efdf1ecf9321fead240dde50d898f32e53b3d0e827f04830fc1087b88501',
       'Unexpected withdraw tx signature'
     )
   })

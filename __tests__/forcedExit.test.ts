@@ -1,14 +1,7 @@
-import { parseEther, sha256 } from 'ethers/lib/utils'
 import { expect } from 'chai'
-import { BigNumber } from 'ethers'
-import {
-  serializeFeePacked,
-  serializeForcedExit,
-  serializeOrder,
-  serializeWithdraw,
-} from '../src/utils'
+import { sha256 } from 'ethers/lib/utils'
 import { ForcedExitData } from '../src/types'
-import { sign } from 'crypto'
+import { serializeForcedExit } from '../src/utils'
 import { getTestWallet } from './utils'
 
 describe('forcedExit', () => {
@@ -31,11 +24,11 @@ describe('forcedExit', () => {
     const serialized = serializeForcedExit(data)
     const signed = await wallet.signForcedExit(data)
     expect(Buffer.from(serialized).toString('hex')).eq(
-      '070100000001003498f456645270ee003441df82c718b56c0e666600000100110001334d0000005562552fdb',
+      '070100000001000000000000000000000000003498f456645270ee003441df82c718b56c0e666600000100110001334d0000005562552fdb',
       'Unexpected serialized bytes'
     )
     expect(sha256(serialized)).to.eq(
-      '0x5c0dee07e26608bdc1ce7f66a6fc6eefe58012e17ef38b2f224f23b52f1deca1',
+      '0x48b25e383fd609d1180f21a713ae3084457269878ada1cfa25434cb226ab93ce',
       'Unexpected tx hash'
     )
     expect(signed.ethereumSignature?.signature).eq(
@@ -43,7 +36,7 @@ describe('forcedExit', () => {
       'Unexpected ForcedExit ethereum signature'
     )
     expect(signed.tx.signature?.signature).to.eq(
-      '520892fd7cea7f25a0827c76dcd4babf08dc5f8e40a6adf1ef83f1b946b9caa7285da1b0f8fe2187d365569220cf0473f030fe92cae4bbc84e42c0753baad000',
+      '028decf18ec8a3550bcf0d46085c8fbd3e1f427e89fd9c4be0d27c1838ad4710ca873ed1a93daf415521aabb529d7b1f3efabfb446f467683f78083b8103e703',
       'Unexpected tx signature'
     )
   })

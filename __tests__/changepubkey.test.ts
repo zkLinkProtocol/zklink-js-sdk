@@ -1,9 +1,6 @@
 import { expect } from 'chai'
-import { _TypedDataEncoder } from '@ethersproject/hash'
-import { JsonRpcProvider } from '@ethersproject/providers'
 import { utils } from '../src'
 import { ChangePubKeyData } from '../src/types'
-import { sha256 } from 'ethers/lib/utils'
 import { getTestWallet } from './utils'
 
 describe('ChangePubKey', () => {
@@ -20,7 +17,7 @@ describe('ChangePubKey', () => {
       newPkHash: '0x511494921e9aec60dfd65ce125dec96fe7c07133',
     } as ChangePubKeyData)
     expect(Buffer.from(bytes).toString('hex')).to.eq(
-      '06010000000201511494921e9aec60dfd65ce125dec96fe7c07133000100000000000062a1e340'
+      '06010000000201000000000000000000000000511494921e9aec60dfd65ce125dec96fe7c07133000100000000000062a1e340'
     )
   })
   it('L2 signature', async function () {
@@ -39,7 +36,7 @@ describe('ChangePubKey', () => {
       '0xafabda44618bac69a68dfec8b67ccedd1c77fc7f51e0d1a0cd1db99e8250fc0473fb3a4b0e60b2a5136c4807a47e2d7803d64777fbbbebc41a21297e5586deb31c'
     )
     expect(signedTransaction.tx.signature.signature).eq(
-      'c7800f77f24bb960b05ba92aec256304154dfc49bb8773f8ddbba5f4f874ae0aecad3a6033455a6fc0a9b1152bbc362e34f60d9a875d9bab035ecab167795e01'
+      'ac82b49d7411d9a1d7bb9387b34d96f7db4dc525a27122ccc680f7ea466f9606d44c54fbca928aba16fe2daabfb3f12c57d86f180ad3881295cc33963b2cf605'
     )
   })
 })
