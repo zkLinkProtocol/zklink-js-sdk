@@ -64,18 +64,6 @@ class Wallet {
             return wallet;
         });
     }
-    static fromEthSignature(ethWallet, provider, ethSignature, ethSignerType) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const signerResult = yield signer_1.Signer.fromETHSignature(ethWallet, ethSignature);
-            const signer = signerResult.signer;
-            ethSignerType = ethSignerType || signerResult.ethSignatureType;
-            const address = yield ethWallet.getAddress();
-            const ethMessageSigner = new eth_message_signer_1.EthMessageSigner(ethWallet, ethSignerType);
-            const wallet = new Wallet(ethWallet, ethMessageSigner, address, signer, undefined, ethSignerType);
-            wallet.connect(provider);
-            return wallet;
-        });
-    }
     static fromCreate2Data(syncSigner, createrSigner, provider, create2Data, accountId) {
         return __awaiter(this, void 0, void 0, function* () {
             const create2Signer = new signer_1.Create2WalletSigner(yield syncSigner.pubKeyHash(), create2Data, createrSigner);

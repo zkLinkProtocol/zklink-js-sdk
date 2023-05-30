@@ -112,29 +112,6 @@ export class Wallet {
     return wallet
   }
 
-  static async fromEthSignature(
-    ethWallet: ethers.Signer,
-    provider: Provider,
-    ethSignature: string,
-    ethSignerType?: EthSignerType
-  ): Promise<Wallet> {
-    const signerResult = await Signer.fromETHSignature(ethWallet, ethSignature)
-    const signer = signerResult.signer
-    ethSignerType = ethSignerType || signerResult.ethSignatureType
-    const address = await ethWallet.getAddress()
-    const ethMessageSigner = new EthMessageSigner(ethWallet, ethSignerType)
-    const wallet = new Wallet(
-      ethWallet,
-      ethMessageSigner,
-      address,
-      signer,
-      undefined,
-      ethSignerType
-    )
-    wallet.connect(provider)
-    return wallet
-  }
-
   static async fromCreate2Data(
     syncSigner: Signer,
     createrSigner: ethers.Signer,

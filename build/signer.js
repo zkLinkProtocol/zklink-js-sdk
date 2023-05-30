@@ -45,10 +45,10 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 var _Signer_privateKey;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Create2WalletSigner = exports.Signer = void 0;
-const crypto_1 = require("./crypto");
 const ethers_1 = require("ethers");
-const utils = __importStar(require("./utils"));
 const utils_1 = require("ethers/lib/utils");
+const crypto_1 = require("./crypto");
+const utils = __importStar(require("./utils"));
 const utils_2 = require("./utils");
 class Signer {
     constructor(privKey) {
@@ -123,15 +123,15 @@ class Signer {
             return signer;
         });
     }
-    static fromETHSignature(ethSigner, ethSignature) {
+    static fromETHSignature(ethSigner) {
         return __awaiter(this, void 0, void 0, function* () {
             const signedBytes = utils.getSignedBytesFromMessage(utils_2.SIGN_MESSAGE, false);
-            const signature = ethSignature || (yield utils.signMessagePersonalAPI(ethSigner, signedBytes));
+            const signature = yield utils.signMessagePersonalAPI(ethSigner, signedBytes);
             const address = yield ethSigner.getAddress();
             const ethSignatureType = yield utils.getEthSignatureType(ethSigner.provider, utils_2.SIGN_MESSAGE, signature, address);
             const seed = ethers_1.ethers.utils.arrayify(signature);
             const signer = yield Signer.fromSeed(seed);
-            return { signer, signature, ethSignatureType };
+            return { signer, ethSignatureType };
         });
     }
 }

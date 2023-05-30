@@ -1,29 +1,29 @@
+import { BigNumber, BigNumberish, ethers } from 'ethers'
+import { arrayify } from 'ethers/lib/utils'
 import {
   privateKeyFromSeed,
-  signTransactionBytes,
-  privateKeyToPubKeyHash,
   privateKeyToPubKey,
+  privateKeyToPubKeyHash,
+  signTransactionBytes,
 } from './crypto'
-import { BigNumber, BigNumberish, ethers } from 'ethers'
-import * as utils from './utils'
 import {
   Address,
-  EthSignerType,
-  PubKeyHash,
-  TransferData,
-  WithdrawData,
-  ForcedExitData,
-  ChangePubKeyData,
-  ChangePubKeyOnchain,
-  ChangePubKeyECDSA,
   ChangePubKeyCREATE2,
+  ChangePubKeyData,
+  ChangePubKeyECDSA,
+  ChangePubKeyOnchain,
   Create2Data,
+  EthSignerType,
+  ForcedExitData,
   OrderData,
   OrderMatchingData,
+  PubKeyHash,
   Signature,
   TokenId,
+  TransferData,
+  WithdrawData,
 } from './types'
-import { arrayify } from 'ethers/lib/utils'
+import * as utils from './utils'
 import { SIGN_MESSAGE } from './utils'
 
 export class Signer {
@@ -150,16 +150,12 @@ export class Signer {
     return signer
   }
 
-  static async fromETHSignature(
-    ethSigner: ethers.Signer,
-    ethSignature?: string
-  ): Promise<{
+  static async fromETHSignature(ethSigner: ethers.Signer): Promise<{
     signer: Signer
-    signature: string
     ethSignatureType: EthSignerType
   }> {
     const signedBytes = utils.getSignedBytesFromMessage(SIGN_MESSAGE, false)
-    const signature = ethSignature || (await utils.signMessagePersonalAPI(ethSigner, signedBytes))
+    const signature = await utils.signMessagePersonalAPI(ethSigner, signedBytes)
     const address = await ethSigner.getAddress()
     const ethSignatureType = await utils.getEthSignatureType(
       ethSigner.provider,
@@ -169,7 +165,7 @@ export class Signer {
     )
     const seed = ethers.utils.arrayify(signature)
     const signer = await Signer.fromSeed(seed)
-    return { signer, signature, ethSignatureType }
+    return { signer, ethSignatureType }
   }
 }
 

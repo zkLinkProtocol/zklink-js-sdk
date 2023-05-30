@@ -20,7 +20,6 @@ export declare class Wallet {
     private constructor();
     connect(provider: Provider): this;
     static fromEthSigner(ethWallet: ethers.Signer, provider: Provider, signer?: Signer, accountId?: number, ethSignerType?: EthSignerType): Promise<Wallet>;
-    static fromEthSignature(ethWallet: ethers.Signer, provider: Provider, ethSignature: string, ethSignerType?: EthSignerType): Promise<Wallet>;
     static fromCreate2Data(syncSigner: Signer, createrSigner: ethers.Signer, provider: Provider, create2Data: Create2Data, accountId?: number): Promise<Wallet>;
     static fromEthSignerNoKeys(ethWallet: ethers.Signer, provider: Provider, accountId?: number, ethSignerType?: EthSignerType): Promise<Wallet>;
     getEIP712Signature(data: any): Promise<TxEthSignature>;
