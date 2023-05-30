@@ -577,7 +577,17 @@ function removeAddressPrefix(address: Address | PubKeyHash): string {
   throw new Error("ETH address must start with '0x' and PubKeyHash must start with 'sync:'")
 }
 
-// PubKeyHash or eth address
+export function serializePubKeyHash(address: PubKeyHash): Uint8Array {
+  const prefixlessAddress = removeAddressPrefix(address)
+
+  const addressBytes = utils.arrayify(`0x${prefixlessAddress}`)
+  if (addressBytes.length !== 20) {
+    throw new Error('PubKeyHash must be 20 bytes long')
+  }
+
+  return addressBytes
+}
+
 export function serializeAddress(address: Address | PubKeyHash): Uint8Array {
   const prefixlessAddress = removeAddressPrefix(address)
   const address32 = utils.zeroPad(`0x${prefixlessAddress}`, 32)
@@ -710,7 +720,7 @@ export function serializeChangePubKey(changePubKey: ChangePubKeyData): Uint8Arra
   const chainIdBytes = serializeChainId(changePubKey.chainId)
   const subAccountIdBytes = serializeSubAccountId(changePubKey.subAccountId)
   const accountIdBytes = serializeAccountId(changePubKey.accountId)
-  const pubKeyHashBytes = serializeAddress(changePubKey.newPkHash)
+  const pubKeyHashBytes = serializePubKeyHash(changePubKey.newPkHash)
   const feeTokenIdBytes = serializeTokenId(changePubKey.feeToken)
   const feeBytes = serializeFeePacked(changePubKey.fee)
   const nonceBytes = serializeNonce(changePubKey.nonce)

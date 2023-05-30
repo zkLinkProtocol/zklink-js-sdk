@@ -63,6 +63,7 @@ export declare function signMessagePersonalAPI(signer: ethers.Signer | any, mess
 export declare function signMessageEIP712(signer: any, data: any): Promise<string>;
 export declare function verifyERC1271Signature(address: string, message: Uint8Array, signature: string, signerOrProvider: ethers.Signer | ethers.providers.Provider): Promise<boolean>;
 export declare function getEthSignatureType(_provider: ethers.providers.Provider, message: string, signature: string, address: string): Promise<EthSignerType>;
+export declare function serializePubKeyHash(address: PubKeyHash): Uint8Array;
 export declare function serializeAddress(address: Address | PubKeyHash): Uint8Array;
 export declare function serializeAccountId(accountId: number): Uint8Array;
 export declare function serializeSubAccountId(subAccountId: number): Uint8Array;
