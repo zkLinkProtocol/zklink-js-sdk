@@ -18,16 +18,10 @@
     "ethers": "^5.0.0"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^16.0.0",
-    "@rollup/plugin-json": "^4.1.0",
-    "@rollup/plugin-node-resolve": "^10.0.0",
     "@types/chai": "^4.2.14",
     "@types/node": "^14.14.5",
     "chai": "^4.2.0",
     "ethers": "^5.6.8",
-    "rollup": "^2.32.1",
-    "rollup-plugin-copy": "^3.3.0",
-    "rollup-plugin-terser": "^7.0.0",
     "ts-node": "^10.8.1",
     "tslint": "^6.0.0-beta0",
     "typescript": "^4.0.5"
@@ -38,7 +32,7 @@
     "test": "jest --watch",
     "build": "tsc",
     "watch": "tsc --watch",
-    "prepublish": "yarn build && rollup -c",
+    "prepublish": "yarn build",
     "generate-test-vectors": "yarn ts-node tests/test-generator.ts",
     "prerelease": "npm version prerelease --preid=alpha && npm publish",
     "patch": "npm version patch"
