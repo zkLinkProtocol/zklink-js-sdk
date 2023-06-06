@@ -38,7 +38,7 @@ describe('Create2 ChangePubKey', () => {
     expect(signed.tx.signature).toStrictEqual({
       pubKey: '5e1e8f2a972cb702dc55df70310018d63251e6e7698c7079886e3dc07fbb5ea8',
       signature:
-        '2eaee8e13f4a0a342d109fd0363491e56063caa6f1044b3c866bd5cf2ed710960175a77c3a000d54652fac61d370a6f4965757c8f324cb1ad7640e2f7d149404',
+        'bf2ae029b7330e64f980fb2345837b159e6dccb56b20bf6ba8136a4887056a849c0ab5182ede3d221c4b1f5bed2114a63dd0473bf4758f46ce6567ed15fa5804',
     })
   })
 })
