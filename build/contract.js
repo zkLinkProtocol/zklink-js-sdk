@@ -10,10 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LinkContract = void 0;
+const logger_1 = require("@ethersproject/logger");
 const ethers_1 = require("ethers");
 const utils_1 = require("./utils");
 const wallet_1 = require("./wallet");
-const logger_1 = require("@ethersproject/logger");
 const EthersErrorCode = logger_1.ErrorCode;
 class LinkContract {
     constructor(provider, ethSigner) {
@@ -65,104 +65,6 @@ class LinkContract {
             catch (e) {
                 this.modifyEthersError(e);
             }
-        });
-    }
-    bridge(bridge) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const zklContract = this.getZKLContract(bridge.contractAddress);
-            let ethTransaction;
-            let uNonce = (0, utils_1.getFastSwapUNonce)();
-            const lzFees = yield zklContract.estimateBridgeFees(bridge.toChainId, bridge.to, bridge.amount);
-            const args = [
-                bridge.toChainId,
-                bridge.to,
-                bridge.amount,
-                Object.assign({ value: lzFees }, bridge.ethTxOptions),
-            ];
-            // We set gas limit only if user does not set it using ethTxOptions.
-            const txRequest = args[args.length - 1];
-            if (txRequest.gasLimit == null) {
-                try {
-                    const gasEstimate = yield zklContract.estimateGas.bridge(...args).then((estimate) => estimate, () => ethers_1.BigNumber.from('0'));
-                    let recommendedGasLimit = utils_1.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT;
-                    txRequest.gasLimit = gasEstimate.gte(recommendedGasLimit)
-                        ? gasEstimate
-                        : recommendedGasLimit;
-                    args[args.length - 1] = txRequest;
-                }
-                catch (e) {
-                    this.modifyEthersError(e);
-                }
-            }
-            console.log(args);
-            try {
-                ethTransaction = yield zklContract.bridge(...args);
-            }
-            catch (e) {
-                this.modifyEthersError(e);
-            }
-            return new wallet_1.ETHOperation(ethTransaction, this.provider);
-        });
-    }
-    fastSwap(swap) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const mainContract = yield this.getMainContract(swap.fromChainId);
-            let ethTransaction;
-            let uNonce = (0, utils_1.getFastSwapUNonce)();
-            if (!uNonce) {
-                this.modifyEthersError(new Error('swap tx nonce is none'));
-            }
-            // -------------------------------
-            if ((0, utils_1.isTokenETH)(swap.tokenInAddress)) {
-                try {
-                    // function swapExactETHForTokens(address _zkSyncAddress,uint104 _amountOutMin, uint16 _withdrawFee, uint8 _toChainId, uint16 _toTokenId, address _to, uint32 _nonce) external payable
-                    ethTransaction = yield mainContract.swapExactETHForTokens(swap.from, swap.amountOutMin, swap.toChainId, swap.tokenOutId, swap.to, uNonce, swap.pair, swap.acceptTokenId, swap.acceptAmountOutMin, Object.assign({ value: ethers_1.BigNumber.from(swap.amountIn), gasLimit: ethers_1.BigNumber.from(utils_1.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT) }, swap.ethTxOptions));
-                }
-                catch (e) {
-                    this.modifyEthersError(e);
-                }
-            }
-            else {
-                // ERC20 token deposit
-                let nonce;
-                // function swapExactTokensForTokens(address _zkSyncAddress, uint104 _amountIn, uint104 _amountOutMin, uint16 _withdrawFee, IERC20 _fromToken, uint8 _toChainId, uint16 _toTokenId, address _to, uint32 _nonce) external
-                const args = [
-                    swap.from,
-                    swap.amountIn,
-                    swap.amountOutMin,
-                    swap.tokenInAddress,
-                    swap.toChainId,
-                    swap.tokenOutId,
-                    swap.to,
-                    uNonce,
-                    swap.pair,
-                    swap.acceptTokenId,
-                    swap.acceptAmountOutMin,
-                    Object.assign({ nonce }, swap.ethTxOptions),
-                ];
-                // We set gas limit only if user does not set it using ethTxOptions.
-                const txRequest = args[args.length - 1];
-                if (txRequest.gasLimit == null) {
-                    try {
-                        const gasEstimate = yield mainContract.estimateGas.swapExactTokensForTokens(...args).then((estimate) => estimate, () => ethers_1.BigNumber.from('0'));
-                        let recommendedGasLimit = utils_1.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT;
-                        txRequest.gasLimit = gasEstimate.gte(recommendedGasLimit)
-                            ? gasEstimate
-                            : recommendedGasLimit;
-                        args[args.length - 1] = txRequest;
-                    }
-                    catch (e) {
-                        this.modifyEthersError(e);
-                    }
-                }
-                try {
-                    ethTransaction = yield mainContract.swapExactTokensForTokens(...args);
-                }
-                catch (e) {
-                    this.modifyEthersError(e);
-                }
-            }
-            return new wallet_1.ETHOperation(ethTransaction, this.provider);
         });
     }
     getPendingBalance(pending) {

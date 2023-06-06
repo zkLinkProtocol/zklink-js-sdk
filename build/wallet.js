@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.submitSignedTransaction = exports.Transaction = exports.ETHOperation = exports.Wallet = exports.ZKSyncTxError = void 0;
+exports.submitSignedTransaction = exports.Transaction = exports.ETHOperation = exports.Wallet = exports.ZKLinkTxError = void 0;
 const logger_1 = require("@ethersproject/logger");
 const ethers_1 = require("ethers");
 const utils_1 = require("ethers/lib/utils");
@@ -18,13 +18,13 @@ const eth_message_signer_1 = require("./eth-message-signer");
 const signer_1 = require("./signer");
 const utils_2 = require("./utils");
 const EthersErrorCode = logger_1.ErrorCode;
-class ZKSyncTxError extends Error {
+class ZKLinkTxError extends Error {
     constructor(message, value) {
         super(message);
         this.value = value;
     }
 }
-exports.ZKSyncTxError = ZKSyncTxError;
+exports.ZKLinkTxError = ZKLinkTxError;
 class Wallet {
     constructor(ethSigner, ethMessageSigner, cachedAddress, signer, accountId, ethSignerType) {
         this.ethSigner = ethSigner;
@@ -508,11 +508,11 @@ class Wallet {
     sendDepositFromEthereum(deposit) {
         return __awaiter(this, void 0, void 0, function* () {
             const contractAddress = yield this.provider.getContractInfoByChainId(deposit.linkChainId);
-            const mainContract = yield this.getMainContract(deposit.linkChainId);
             let ethTransaction;
             if (!(0, utils_1.isAddress)(deposit.token)) {
                 throw new Error('Token address is invalid');
             }
+            deposit.depositTo = ethers_1.utils.hexZeroPad(`${deposit.depositTo}`, 32);
             if ((0, utils_2.isTokenETH)(deposit.token)) {
                 try {
                     const data = utils_2.MAIN_CONTRACT_INTERFACE.encodeFunctionData('depositETH', [
@@ -681,7 +681,7 @@ class ETHOperation {
                 return;
             const receipt = yield this.zkSyncProvider.notifyTransaction(txHash);
             if (!receipt.executed) {
-                this.setErrorState(new ZKSyncTxError('Priority operation failed', receipt));
+                this.setErrorState(new ZKLinkTxError('Priority operation failed', receipt));
                 this.throwErrorIfFailedState();
             }
             this.state = 'Committed';
@@ -713,7 +713,7 @@ class Transaction {
             const hash = Array.isArray(this.txHash) ? this.txHash[0] : this.txHash;
             const receipt = yield this.sidechainProvider.notifyTransaction(hash);
             if (!receipt.success) {
-                this.setErrorState(new ZKSyncTxError(`zkLink transaction failed: ${receipt.failReason}`, receipt));
+                this.setErrorState(new ZKLinkTxError(`zkLink transaction failed: ${receipt.failReason}`, receipt));
                 this.throwErrorIfFailedState();
             }
             this.state = 'Committed';

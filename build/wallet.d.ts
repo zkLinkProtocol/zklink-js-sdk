@@ -4,7 +4,7 @@ import { EthMessageSigner } from './eth-message-signer';
 import { Provider } from './provider';
 import { Signer } from './signer';
 import { AccountBalances, AccountState, Address, ChainId, ChangePubKeyData, ChangePubKeyEntries, Create2Data, EthSignerType, ForcedExitData, ForcedExitEntries, Nonce, OrderData, OrderMatchingData, OrderMatchingEntries, PriorityOperationReceipt, PubKeyHash, SignedTransaction, TokenAddress, TokenId, TokenLike, TransactionReceipt, TransferData, TransferEntries, TxEthSignature, WithdrawData, WithdrawEntries } from './types';
-export declare class ZKSyncTxError extends Error {
+export declare class ZKLinkTxError extends Error {
     value: PriorityOperationReceipt | TransactionReceipt;
     constructor(message: string, value: PriorityOperationReceipt | TransactionReceipt);
 }
@@ -58,7 +58,7 @@ export declare class Wallet {
         token: TokenAddress;
         amount: BigNumberish;
         linkChainId: number;
-        mapping: boolean;
+        mapping?: boolean;
         ethTxOptions?: ethers.providers.TransactionRequest;
         approveDepositAmountForERC20?: boolean;
     }): Promise<ETHOperation>;
@@ -77,7 +77,7 @@ export declare class ETHOperation {
     ethTx: ContractTransaction;
     zkSyncProvider: Provider;
     state: 'Sent' | 'Mined' | 'Committed' | 'Verified' | 'Failed';
-    error?: ZKSyncTxError;
+    error?: ZKLinkTxError;
     priorityOpId?: BigNumber;
     constructor(ethTx: ContractTransaction, zkSyncProvider: Provider);
     awaitEthereumTxCommit(): Promise<ethers.ContractReceipt>;
@@ -90,7 +90,7 @@ export declare class Transaction {
     txHash: string;
     sidechainProvider: Provider;
     state: 'Sent' | 'Committed' | 'Verified' | 'Failed';
-    error?: ZKSyncTxError;
+    error?: ZKLinkTxError;
     constructor(txData: any, txHash: string, sidechainProvider: Provider);
     awaitReceipt(): Promise<TransactionReceipt>;
     private setErrorState;

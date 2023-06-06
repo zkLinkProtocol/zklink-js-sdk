@@ -7,7 +7,6 @@ export declare const IERC20_INTERFACE: ethers.utils.Interface;
 export declare const MAIN_CONTRACT_INTERFACE: ethers.utils.Interface;
 export declare const ZKL_CONTRACT_INTERFACE: ethers.utils.Interface;
 export declare const IEIP1271_INTERFACE: ethers.utils.Interface;
-export declare const MULTICALL_INTERFACE: ethers.utils.Interface;
 export declare const ERC20_DEPOSIT_GAS_LIMIT: any;
 export declare const MAX_ERC20_APPROVE_AMOUNT: BigNumber;
 export declare const ERC20_APPROVE_TRESHOLD: BigNumber;

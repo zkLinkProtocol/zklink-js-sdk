@@ -667,18 +667,19 @@ export class Wallet {
     token: TokenAddress
     amount: BigNumberish
     linkChainId: number
-    mapping: boolean
+    mapping?: boolean
     ethTxOptions?: ethers.providers.TransactionRequest
     approveDepositAmountForERC20?: boolean
   }): Promise<ETHOperation> {
     const contractAddress = await this.provider.getContractInfoByChainId(deposit.linkChainId)
-    const mainContract = await this.getMainContract(deposit.linkChainId)
 
     let ethTransaction
 
     if (!isAddress(deposit.token)) {
       throw new Error('Token address is invalid')
     }
+
+    deposit.depositTo = utils.hexZeroPad(`${deposit.depositTo}`, 32)
 
     if (isTokenETH(deposit.token)) {
       try {

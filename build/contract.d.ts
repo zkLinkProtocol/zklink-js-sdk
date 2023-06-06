@@ -1,6 +1,6 @@
 import { BigNumber, BigNumberish, Contract, ContractTransaction, ethers } from 'ethers';
 import { Provider } from './provider';
-import { Address, TokenAddress } from './types';
+import { Address } from './types';
 import { ETHOperation } from './wallet';
 export declare class LinkContract {
     provider: Provider;
@@ -12,28 +12,6 @@ export declare class LinkContract {
     getZKLContract(contractAddress: any): Contract;
     isERC20DepositsApproved(tokenAddress: Address, accountAddress: Address, linkChainId: number, erc20ApproveThreshold?: BigNumber): Promise<boolean>;
     approveERC20TokenDeposits(tokenAddress: Address, linkChainId: number, max_erc20_approve_amount?: BigNumber): Promise<ContractTransaction>;
-    bridge(bridge: {
-        to: Address;
-        toChainId: number;
-        amount: BigNumberish;
-        contractAddress: Address;
-        ethTxOptions?: ethers.providers.TransactionRequest;
-    }): Promise<ETHOperation>;
-    fastSwap(swap: {
-        fromChainId: number;
-        toChainId: number;
-        from: Address;
-        to: Address;
-        tokenInAddress: TokenAddress;
-        tokenOutId: number;
-        amountIn: BigNumberish;
-        amountOutMin: BigNumberish;
-        pair: Address;
-        acceptTokenId: number;
-        acceptAmountOutMin: BigNumberish;
-        ethTxOptions?: ethers.providers.TransactionRequest;
-        approveDepositAmountForERC20?: boolean;
-    }): Promise<ETHOperation>;
     getPendingBalance(pending: {
         account: Address;
         tokenAddress: Address;
