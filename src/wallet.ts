@@ -50,7 +50,7 @@ import {
 
 const EthersErrorCode = ErrorCode
 
-export class ZKSyncTxError extends Error {
+export class ZKLinkTxError extends Error {
   constructor(message: string, public value: PriorityOperationReceipt | TransactionReceipt) {
     super(message)
   }
@@ -832,7 +832,7 @@ export class Wallet {
 
 export class ETHOperation {
   state: 'Sent' | 'Mined' | 'Committed' | 'Verified' | 'Failed'
-  error?: ZKSyncTxError
+  error?: ZKLinkTxError
   priorityOpId?: BigNumber
 
   constructor(public ethTx: ContractTransaction, public zkSyncProvider: Provider) {
@@ -872,7 +872,7 @@ export class ETHOperation {
     const receipt = await this.zkSyncProvider.notifyTransaction(txHash)
 
     if (!receipt.executed) {
-      this.setErrorState(new ZKSyncTxError('Priority operation failed', receipt))
+      this.setErrorState(new ZKLinkTxError('Priority operation failed', receipt))
       this.throwErrorIfFailedState()
     }
 
@@ -880,7 +880,7 @@ export class ETHOperation {
     return receipt
   }
 
-  private setErrorState(error: ZKSyncTxError) {
+  private setErrorState(error: ZKLinkTxError) {
     this.state = 'Failed'
     this.error = error
   }
@@ -892,7 +892,7 @@ export class ETHOperation {
 
 export class Transaction {
   state: 'Sent' | 'Committed' | 'Verified' | 'Failed'
-  error?: ZKSyncTxError
+  error?: ZKLinkTxError
 
   constructor(public txData, public txHash: string, public sidechainProvider: Provider) {
     this.state = 'Sent'
@@ -907,7 +907,7 @@ export class Transaction {
 
     if (!receipt.success) {
       this.setErrorState(
-        new ZKSyncTxError(`zkLink transaction failed: ${receipt.failReason}`, receipt)
+        new ZKLinkTxError(`zkLink transaction failed: ${receipt.failReason}`, receipt)
       )
       this.throwErrorIfFailedState()
     }
@@ -916,7 +916,7 @@ export class Transaction {
     return receipt
   }
 
-  private setErrorState(error: ZKSyncTxError) {
+  private setErrorState(error: ZKLinkTxError) {
     this.state = 'Failed'
     this.error = error
   }

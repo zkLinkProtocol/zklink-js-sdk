@@ -33,8 +33,6 @@ export const ZKL_CONTRACT_INTERFACE = new utils.Interface(require('../abi/ZKL.js
 
 export const IEIP1271_INTERFACE = new utils.Interface(require('../abi/IEIP1271.json').abi)
 
-export const MULTICALL_INTERFACE = new utils.Interface(require('../abi/Multicall.json').abi)
-
 export const ERC20_DEPOSIT_GAS_LIMIT = require('../misc/DepositERC20GasLimit.json')
 
 export const MAX_ERC20_APPROVE_AMOUNT = BigNumber.from(
