@@ -15,7 +15,7 @@ export declare const ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT: BigNumber;
 export declare const ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT: BigNumber;
 export declare const ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT: BigNumber;
 export declare const TOTAL_CHAIN_NUM = 4;
-export declare const SIGN_MESSAGE = "Sign this message to create a private key to interact with zkLink's layer 2 services.\nNOTE: This application is powered by zkLink's multi-chain network.\n\nOnly sign this message for a trusted client!";
+export declare const SIGN_MESSAGE = "Sign this message to create a key to interact with zkLink's layer2 services.\nNOTE: This application is powered by zkLink protocol.\n\nOnly sign this message for a trusted client!";
 export declare function floatToInteger(floatBytes: Uint8Array, expBits: number, mantissaBits: number, expBaseNumber: number): BigNumber;
 export declare function bitsIntoBytesInBEOrder(bits: number[]): Uint8Array;
 export declare function integerToFloat(integer: BigNumber, expBits: number, mantissaBits: number, expBase: number): Uint8Array;

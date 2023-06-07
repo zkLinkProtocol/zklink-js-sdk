@@ -1,5 +1,5 @@
-import { AbstractJSONRPCTransport } from './transport';
 import { BigNumber } from 'ethers';
+import { AbstractJSONRPCTransport } from './transport';
 import { AccountBalances, AccountState, Address, ContractInfo, Tokens, TransactionReceipt, TxEthSignature } from './types';
 import { TokenSet } from './utils';
 export declare class Provider {

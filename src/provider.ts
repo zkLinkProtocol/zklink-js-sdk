@@ -1,18 +1,16 @@
-import { AbstractJSONRPCTransport, DummyTransport, HTTPTransport, WSTransport } from './transport'
+import { ErrorCode } from '@ethersproject/logger'
 import { BigNumber } from 'ethers'
+import { AbstractJSONRPCTransport, DummyTransport, HTTPTransport, WSTransport } from './transport'
 import {
   AccountBalances,
   AccountState,
   Address,
-  BlockInfo,
   ContractInfo,
-  PriorityOperationReceipt,
   Tokens,
   TransactionReceipt,
   TxEthSignature,
 } from './types'
-import { sleep, TokenSet } from './utils'
-import { ErrorCode } from '@ethersproject/logger'
+import { TokenSet, sleep } from './utils'
 
 const EthersErrorCode = ErrorCode
 
