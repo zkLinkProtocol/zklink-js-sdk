@@ -110,7 +110,7 @@ export class Signer {
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
     return {
       ...tx,
-      fee: BigNumber.from(tx.fee).toString(),
+      exitAmount: BigNumber.from(tx.exitAmount).toString(),
       signature,
     }
   }

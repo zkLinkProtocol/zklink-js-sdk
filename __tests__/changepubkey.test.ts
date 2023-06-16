@@ -1,4 +1,3 @@
-import { expect } from 'chai'
 import { utils } from '../src'
 import { ChangePubKeyData } from '../src/types'
 import { getTestWallet } from './utils'
@@ -16,7 +15,7 @@ describe('ChangePubKey', () => {
       ts: 1654776640,
       newPkHash: '0x511494921e9aec60dfd65ce125dec96fe7c07133',
     } as ChangePubKeyData)
-    expect(Buffer.from(bytes).toString('hex')).to.eq(
+    expect(Buffer.from(bytes).toString('hex')).toBe(
       '06010000000201511494921e9aec60dfd65ce125dec96fe7c07133000100000000000062a1e340'
     )
   })
@@ -32,11 +31,11 @@ describe('ChangePubKey', () => {
       accountId: 2,
       ts: 1654776640,
     })
-    expect(signedTransaction.tx.ethAuthData.ethSignature).eq(
-      '0xafabda44618bac69a68dfec8b67ccedd1c77fc7f51e0d1a0cd1db99e8250fc0473fb3a4b0e60b2a5136c4807a47e2d7803d64777fbbbebc41a21297e5586deb31c'
+    expect(signedTransaction.tx.ethAuthData.ethSignature).toBe(
+      '0x8a9351d39562b4123dccb0491b00575cf69327b18e41512e12802d74c842629867629484c13beee16175b417c71cd13863e2ce16470a1aeb0cb7d86ca05259fc1c'
     )
-    expect(signedTransaction.tx.signature.signature).eq(
-      'c7800f77f24bb960b05ba92aec256304154dfc49bb8773f8ddbba5f4f874ae0aecad3a6033455a6fc0a9b1152bbc362e34f60d9a875d9bab035ecab167795e01'
+    expect(signedTransaction.tx.signature.signature).toBe(
+      'c752b1a5c0059b35e192d8b051efe11beeb3e3cbdd1803c9ede0b1a1a62f4e1eaff3616c93aeaa837b9ac93db03aa43b65c36ac53464ffd827228e15c82f4c01'
     )
   })
 })

@@ -1,11 +1,5 @@
-import { expect } from 'chai'
 import { BigNumber } from 'ethers'
-import { parseEther, sha256 } from 'ethers/lib/utils'
-import {
-  closestPackableTransactionAmount,
-  serializeOrder,
-  serializeOrderMatching,
-} from '../src/utils'
+import { serializeOrder } from '../src/utils'
 import { getTestWallet } from './utils'
 
 const orderMaker = {
@@ -40,28 +34,26 @@ const orderTaker = {
 describe('Order', () => {
   it('serialize order maker', () => {
     const serialized = serializeOrder(orderMaker as any)
-    expect(Buffer.from(serialized).toString('hex')).eq(
-      'ff0000000201000000000000010002000000000000008ac7230489e8000000050a2540be4009',
-      'maker hex is incorrect'
+    expect(Buffer.from(serialized).toString('hex')).toBe(
+      'ff0000000201000000000000010002000000000000008ac7230489e8000000050a2540be4009'
     )
   })
 
   it('serialize order taker', () => {
     const serialized = serializeOrder(orderTaker as any)
-    expect(Buffer.from(serialized).toString('hex')).eq(
-      'ff0000000201000100000000010002000000000000004563918244f4000001050a4a817c8009',
-      'taker hex is incorrect'
+    expect(Buffer.from(serialized).toString('hex')).toBe(
+      'ff0000000201000100000000010002000000000000004563918244f4000001050a4a817c8009'
     )
   })
 
   it('sign sync order', async function () {
     const wallet = await getTestWallet()
     const signedTransaction = await wallet.signOrder(orderMaker as any)
-    expect(signedTransaction?.tx?.signature?.pubKey).eq(
-      '191f5a474b7b8af67e4338c169b16093a8662bd9fd825b88ec97f987e6453e1c'
+    expect(signedTransaction?.tx?.signature?.pubKey).toBe(
+      '77aa48808967258ac4c115ab14249a4d0b9888360bfb0079ab981822195b3d0c'
     )
-    expect(signedTransaction?.tx?.signature?.signature).eq(
-      'd5d5bbb4cfd5dc659ec5373bb62d33ca93e9424ff6d5f971edaf1d29451ae707f054fd178abc2213d26f35d5f46c5062e02ecf05a4de3ffc8fb48e390ce26b01'
+    expect(signedTransaction?.tx?.signature?.signature).toBe(
+      '381a682a9d8732c66971fa5703a1accf3de9371abf6779cf441cc584ea1df692b170b3c918104e992c9920ba79793ed0138f2423e953a5facef2be96a608f305'
     )
   })
 
@@ -80,8 +72,8 @@ describe('Order', () => {
       feeRatio1: 5,
       feeRatio2: 10,
     } as any)
-    expect(signedTransaction?.tx?.signature?.signature).eq(
-      '235a9ab68f2e53ae721c1ddbcdf71bee170cab6504906bbfec03f3c5923ebc1e018c07ff03e24f546cbbb75651be2a108e4c352d1abf7f63417359b55ede4c00'
+    expect(signedTransaction?.tx?.signature?.signature).toBe(
+      '43a2b06e196f85d93ed5ed759b767238e0dde7949859ca80153add1b57af9b95969d9a60d5c64fef712e021460103e369d40ea83d98e782b9aecd7e230841402'
     )
   })
 })

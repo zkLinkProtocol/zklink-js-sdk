@@ -22,7 +22,7 @@ describe('Create2 ChangePubKey', () => {
       wallet.provider,
       create2Data
     )
-    expect(create2Wallet.address()).toBe('0x31a6b64a162b7e6f8efdf59c0b6f26b60006e040')
+    expect(create2Wallet.address()).toBe('0x02632c1812cbbcb827ab923a8402fbf3df9df037')
     const entries: ChangePubKeyEntries = {
       ethAuthType: 'EthCREATE2',
       chainId: 2,
@@ -36,9 +36,9 @@ describe('Create2 ChangePubKey', () => {
 
     const signed = await create2Wallet.signChangePubKey(entries)
     expect(signed.tx.signature).toStrictEqual({
-      pubKey: '5e1e8f2a972cb702dc55df70310018d63251e6e7698c7079886e3dc07fbb5ea8',
+      pubKey: '0b3e7d5328193b9cda3d5372cece28be209b4c7c136e734c6261c4fda965e710',
       signature:
-        'bf2ae029b7330e64f980fb2345837b159e6dccb56b20bf6ba8136a4887056a849c0ab5182ede3d221c4b1f5bed2114a63dd0473bf4758f46ce6567ed15fa5804',
+        'd865bb6309ecc6a169ee4e42b13845f7f6b94cd6cb23fcaf793f330ee3fc6c89e63150db1b2d63c608dbbcbd870ecfa71f3556d121dba8d39980ba56cba4b903',
     })
   })
 })

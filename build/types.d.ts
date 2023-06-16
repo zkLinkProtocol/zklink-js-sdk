@@ -109,16 +109,15 @@ export interface WithdrawData {
     signature?: Signature;
 }
 export interface ForcedExitEntries {
+    toChainId: ChainId;
+    initiatorAccountId?: number;
+    initiatorSubAccountId: number;
     target: Address;
     targetSubAccountId: number;
-    initiatorSubAccountId: number;
-    toChainId: ChainId;
     l2SourceToken: TokenId;
     l1TargetToken: TokenId;
-    feeToken: TokenId;
-    initiatorAccountId?: number;
-    fee?: BigNumberish;
-    nonce?: Nonce;
+    initiatorNonce?: Nonce;
+    exitAmount: BigNumberish;
     ts?: number;
 }
 export interface ForcedExitData {
@@ -130,11 +129,10 @@ export interface ForcedExitData {
     targetSubAccountId: number;
     l2SourceToken: number;
     l1TargetToken: number;
-    feeToken: number;
-    fee: BigNumberish;
-    ts: number;
-    nonce: number;
+    initiatorNonce: number;
+    exitAmount: BigNumberish;
     signature?: Signature;
+    ts: number;
 }
 export declare type ChangePubkeyTypes = 'Onchain' | 'EthECDSA' | 'EthCREATE2';
 export interface ChangePubKeyOnchain {

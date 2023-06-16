@@ -151,10 +151,9 @@ class Wallet {
                 throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('perform a Forced Exit');
-            const transactionData = Object.assign(Object.assign({}, entries), { type: 'ForcedExit', initiatorAccountId: entries.initiatorAccountId || this.accountId, l2SourceToken: this.provider.tokenSet.resolveTokenId(entries.l2SourceToken), l1TargetToken: this.provider.tokenSet.resolveTokenId(entries.l1TargetToken), feeToken: this.provider.tokenSet.resolveTokenId(entries.feeToken), fee: entries.fee, nonce: entries.nonce == null ? yield this.getNonce() : yield this.getNonce(entries.nonce), ts: entries.ts || (0, utils_2.getTimestamp)() });
-            if (transactionData.fee == null) {
-                transactionData.fee = yield this.provider.getTransactionFee(Object.assign(Object.assign({}, transactionData), { fee: '0' }));
-            }
+            const transactionData = Object.assign(Object.assign({}, entries), { type: 'ForcedExit', initiatorAccountId: entries.initiatorAccountId || this.accountId, l2SourceToken: this.provider.tokenSet.resolveTokenId(entries.l2SourceToken), l1TargetToken: this.provider.tokenSet.resolveTokenId(entries.l1TargetToken), initiatorNonce: entries.initiatorNonce == null
+                    ? yield this.getNonce()
+                    : yield this.getNonce(entries.initiatorNonce), ts: entries.ts || (0, utils_2.getTimestamp)() });
             return transactionData;
         });
     }
@@ -162,21 +161,8 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             const transactionData = yield this.getForcedExitData(entries);
             const signedForcedExitTransaction = yield this.signer.signForcedExit(transactionData);
-            const stringFee = ethers_1.BigNumber.from(transactionData.fee).isZero()
-                ? null
-                : ethers_1.utils.formatEther(transactionData.fee);
-            const stringToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.l2SourceToken);
-            const stringFeeToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.feeToken);
-            const ethereumSignature = yield this.ethMessageSigner.ethSignForcedExit({
-                stringToken,
-                stringFeeToken,
-                stringFee,
-                target: transactionData.target,
-                nonce: transactionData.nonce,
-            });
             return {
                 tx: signedForcedExitTransaction,
-                ethereumSignature,
             };
         });
     }

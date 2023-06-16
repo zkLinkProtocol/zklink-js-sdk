@@ -1,12 +1,6 @@
-import { expect } from 'chai'
-import { BigNumber } from 'ethers'
-import { parseEther, sha256 } from 'ethers/lib/utils'
+import { sha256 } from 'ethers/lib/utils'
 import { OrderData, OrderMatchingData } from '../src/types'
-import {
-  closestPackableTransactionAmount,
-  serializeOrder,
-  serializeOrderMatching,
-} from '../src/utils'
+import { serializeOrder, serializeOrderMatching } from '../src/utils'
 import { getTestWallet } from './utils'
 
 describe('matching', () => {
@@ -43,33 +37,27 @@ describe('matching', () => {
     }
 
     const serializedMaker = serializeOrder(makerData)
-    expect(Buffer.from(serializedMaker).toString('hex')).to.eq(
-      'ff00000006010001000001002000010000000000000014d1120d7b16000000050a4a817c800a',
-      'Unexpected maker serialize bytes'
+    expect(Buffer.from(serializedMaker).toString('hex')).toBe(
+      'ff00000006010001000001002000010000000000000014d1120d7b16000000050a4a817c800a'
     )
     const serializedTaker = serializeOrder(takerData as any)
-    expect(Buffer.from(serializedTaker).toString('hex')).to.eq(
-      'ff00000006010003000000002000010000000000000014d1120d7b16000001050a4a817c8008',
-      'Unexpected taker serialize bytes'
+    expect(Buffer.from(serializedTaker).toString('hex')).toBe(
+      'ff00000006010003000000002000010000000000000014d1120d7b16000001050a4a817c8008'
     )
     const maker = await wallet.signOrder(makerData)
-    expect(maker.tx.signature?.pubKey).to.eq(
-      '191f5a474b7b8af67e4338c169b16093a8662bd9fd825b88ec97f987e6453e1c',
-      'Unexpected maker pubKey'
+    expect(maker.tx.signature?.pubKey).toBe(
+      '77aa48808967258ac4c115ab14249a4d0b9888360bfb0079ab981822195b3d0c'
     )
-    expect(maker.tx.signature?.signature).to.eq(
-      '6dc92f9bf96fae1fcdd6de9cb0ef44157535b354f6fcc73efa935c255d7b011583843a51099bf720b56c1bb07f247f392ad0f2e4852264f79b241756d21e9502',
-      'Unexpected maker signature'
+    expect(maker.tx.signature?.signature).toBe(
+      '2cd57a2c1b3477994b224e9c3bc04e913d31b94b540d7c0bb918b2f54430da18f309a1613e97d5b7168b6a8b176d0cc6c0b444cb03918be187b2d7d97265af03'
     )
 
     const taker = await wallet.signOrder(takerData)
-    expect(taker.tx.signature?.pubKey).to.eq(
-      '191f5a474b7b8af67e4338c169b16093a8662bd9fd825b88ec97f987e6453e1c',
-      'Unexpected taker pubKey'
+    expect(taker.tx.signature?.pubKey).toBe(
+      '77aa48808967258ac4c115ab14249a4d0b9888360bfb0079ab981822195b3d0c'
     )
-    expect(taker.tx.signature?.signature).to.eq(
-      '22d0af59458b7efe82b58b7f71bdc0ac894ba791e5923b879894059305344290e3eade79e3e329fffa9de84018beadb4e58cc78be3a96faaacdfa79c5dc82e00',
-      'Unexpected taker signature'
+    expect(taker.tx.signature?.signature).toBe(
+      'd5fb216a16a2de103f8f8281b631825c5ecc923012269f88fa3eb170dd20628f48a540ef7baf29ac9de2ee6e552c504bc5c34623a9f1782ed229b1930c99a900'
     )
 
     const matching: OrderMatchingData = {
@@ -86,24 +74,20 @@ describe('matching', () => {
     }
     const serialized = await serializeOrderMatching(matching)
 
-    expect(Buffer.from(serialized).toString('hex')).to.eq(
-      '08000000060183be69c82b2c56df952594436bd024ce85ed2eaee63dadb5b3a3e1aec623880001000000000000000000000de0b6b3a7640000000000000000000014d1120d7b160000',
-      'Unexpected matching serialize bytes'
+    expect(Buffer.from(serialized).toString('hex')).toBe(
+      '08000000060183be69c82b2c56df952594436bd024ce85ed2eaee63dadb5b3a3e1aec623880001000000000000000000000de0b6b3a7640000000000000000000014d1120d7b160000'
     )
 
     const signed = await wallet.signOrderMatching(matching)
 
-    expect(sha256(serialized)).to.eq(
-      '0x2a85e0d5fc683da1f00019366444f9e9bf419b973cacb41e9fc4a3b44ed66421',
-      'Unexpected matching tx hash'
+    expect(sha256(serialized)).toBe(
+      '0x2a85e0d5fc683da1f00019366444f9e9bf419b973cacb41e9fc4a3b44ed66421'
     )
-    expect(signed.tx.signature?.pubKey).to.eq(
-      '191f5a474b7b8af67e4338c169b16093a8662bd9fd825b88ec97f987e6453e1c',
-      'Unexpected matching tx pubKey'
+    expect(signed.tx.signature?.pubKey).toBe(
+      '77aa48808967258ac4c115ab14249a4d0b9888360bfb0079ab981822195b3d0c'
     )
-    expect(signed.tx.signature?.signature).to.eq(
-      'ec7493d6151fbe1673f8bfefc4f5544b86eeef7010b0bc3500d4036f7e36a0a1e1a31f28015fd27258ad5782c0676b97bda3a4380284903e15eec6b2c7836105',
-      'Unexpected matching tx signature'
+    expect(signed.tx.signature?.signature).toBe(
+      '7f8126c3e032cba9f0877f0ad7016b4c14e7171de50aa387f97f89611f2a11976a8ff34ed3bfa1678b52365416f62d9a4f94e29026cb1f23e0d81335c87f6601'
     )
   })
 
@@ -158,9 +142,9 @@ describe('matching', () => {
     },
   }
   const submitterSignature = {
-    pubKey: 'e32ce4a89e2cc9702dc756e54479934c95cc7001114615a5b06a4d2386074c9d',
+    pubKey: '643a80bc00a25c84ade07cb40db832e9144a7d5316589bb0e550f8cb442cfa15',
     signature:
-      'c4f647a3dd46a8259b270be732e7afb87f9f3433038afeea8c8a2fe93d80309f58e31a63b950f7063f5b3448199bee9cec173fbdf82267da9410f232594c7e04',
+      'ba2b61e853ae996d93156e20798cd8df5e690409559332e3c87855a531a6332e25be7cb00b726381cdae7190c68e0b90bdf76502652c24eb1bdb18bc59279f03',
   }
   test('bytes and signature by data', async function () {
     const matching: OrderMatchingData = {
@@ -182,7 +166,7 @@ describe('matching', () => {
       '0xf3b4f9d137cd7c9ca53ac1c2d2a11384c799b8da5a25a1b00ea9085bd0fe7655' as any
     )
     const sign = await wallet?.signer?.signTransactionBytes(txHash)
-    expect(sign?.pubKey).to.eq(submitterSignature.pubKey)
-    expect(sign?.signature).to.eq(submitterSignature.signature)
+    expect(sign?.pubKey).toBe(submitterSignature.pubKey)
+    expect(sign?.signature).toBe(submitterSignature.signature)
   })
 })

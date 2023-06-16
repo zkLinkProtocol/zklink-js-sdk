@@ -240,17 +240,11 @@ export class Wallet {
       initiatorAccountId: entries.initiatorAccountId || this.accountId,
       l2SourceToken: this.provider.tokenSet.resolveTokenId(entries.l2SourceToken),
       l1TargetToken: this.provider.tokenSet.resolveTokenId(entries.l1TargetToken),
-      feeToken: this.provider.tokenSet.resolveTokenId(entries.feeToken),
-      fee: entries.fee,
-      nonce: entries.nonce == null ? await this.getNonce() : await this.getNonce(entries.nonce),
+      initiatorNonce:
+        entries.initiatorNonce == null
+          ? await this.getNonce()
+          : await this.getNonce(entries.initiatorNonce),
       ts: entries.ts || getTimestamp(),
-    }
-
-    if (transactionData.fee == null) {
-      transactionData.fee = await this.provider.getTransactionFee({
-        ...transactionData,
-        fee: '0',
-      })
     }
 
     return transactionData
@@ -259,22 +253,8 @@ export class Wallet {
     const transactionData = await this.getForcedExitData(entries)
     const signedForcedExitTransaction = await this.signer.signForcedExit(transactionData)
 
-    const stringFee = BigNumber.from(transactionData.fee).isZero()
-      ? null
-      : utils.formatEther(transactionData.fee)
-    const stringToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.l2SourceToken)
-    const stringFeeToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.feeToken)
-    const ethereumSignature = await this.ethMessageSigner.ethSignForcedExit({
-      stringToken,
-      stringFeeToken,
-      stringFee,
-      target: transactionData.target,
-      nonce: transactionData.nonce,
-    })
-
     return {
       tx: signedForcedExitTransaction,
-      ethereumSignature,
     }
   }
 

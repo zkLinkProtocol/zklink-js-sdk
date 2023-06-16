@@ -745,9 +745,8 @@ export function serializeForcedExit(forcedExit: ForcedExitData): Uint8Array {
   const targetSubAccountIdBytes = serializeSubAccountId(forcedExit.targetSubAccountId)
   const l2SourceTokenIdBytes = serializeTokenId(forcedExit.l2SourceToken)
   const l1TargetTokenIdBytes = serializeTokenId(forcedExit.l1TargetToken)
-  const feeTokenIdBytes = serializeTokenId(forcedExit.feeToken)
-  const feeBytes = serializeFeePacked(forcedExit.fee)
-  const nonceBytes = serializeNonce(forcedExit.nonce)
+  const initiatorNonceBytes = serializeNonce(forcedExit.initiatorNonce)
+  const exitAmountBytes = serializeAmountFull(forcedExit.exitAmount)
   const tsBytes = numberToBytesBE(forcedExit.ts, 4)
   return ethers.utils.concat([
     type,
@@ -758,9 +757,8 @@ export function serializeForcedExit(forcedExit: ForcedExitData): Uint8Array {
     targetSubAccountIdBytes,
     l2SourceTokenIdBytes,
     l1TargetTokenIdBytes,
-    feeTokenIdBytes,
-    feeBytes,
-    nonceBytes,
+    initiatorNonceBytes,
+    exitAmountBytes,
     tsBytes,
   ])
 }

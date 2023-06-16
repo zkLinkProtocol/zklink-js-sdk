@@ -1,4 +1,3 @@
-import { expect } from 'chai'
 import { Transaction } from '../src/wallet'
 import { getTestProvider } from './utils'
 
@@ -8,8 +7,8 @@ describe('Transaction', () => {
     const receipt = await provider.getTxReceipt(
       '0x4221afe405566e4b057d36060e6a5d33151a10a1b9b00da71705e534b6646f22'
     )
-    expect(receipt.block).to.eq(3947)
-    expect(receipt.success).to.eq(true)
+    expect(receipt.block).toBe(3947)
+    expect(receipt.success).toBe(true)
   })
 
   it('Construction transaction', async () => {
@@ -20,7 +19,7 @@ describe('Transaction', () => {
       provider
     )
     const receipt = await transaction.awaitReceipt()
-    expect(receipt.block).to.eq(3947)
-    expect(receipt.success).to.eq(true)
+    expect(receipt.block).toBe(3947)
+    expect(receipt.success).toBe(true)
   })
 })

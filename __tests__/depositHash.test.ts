@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-import { arrayify, sha256, toUtf8Bytes } from 'ethers/lib/utils'
+import { arrayify, sha256 } from 'ethers/lib/utils'
 import { numberToBytesBE } from '../src/utils'
 
 describe('EthHash to SyncTxHash', () => {

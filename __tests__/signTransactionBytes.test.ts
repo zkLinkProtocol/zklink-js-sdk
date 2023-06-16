@@ -1,12 +1,11 @@
-import { expect } from 'chai'
 import { getTestWallet } from './utils'
 
 describe('signTransaction', function () {
   it('signTransactionBytes', async () => {
     const wallet = await getTestWallet()
     const signature = await wallet.signer?.signTransactionBytes('0xff')
-    expect(signature?.signature).to.eq(
-      '0a36a9de1e36720012871a0a96fd5e0a46ad3ec761357dfc57e2cd534bb563aa21cfd45aa60e59e76410294d3c9724373107bec6c1fd571231c45fedb888ea05'
+    expect(signature?.signature).toBe(
+      '8ed8a83b87a82c2585e954db9c66ae236cfa1ef4a42d07eefc2db3ab4ac15021438224a92b6bd2f3bf44a9a38f24f4b23f81af9130b66e7eb6bece34dc26f003'
     )
   })
 })

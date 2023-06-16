@@ -102,7 +102,7 @@ class Signer {
         return __awaiter(this, void 0, void 0, function* () {
             const msgBytes = utils.serializeForcedExit(tx);
             const signature = yield (0, crypto_1.signTransactionBytes)(__classPrivateFieldGet(this, _Signer_privateKey, "f"), msgBytes);
-            return Object.assign(Object.assign({}, tx), { fee: ethers_1.BigNumber.from(tx.fee).toString(), signature });
+            return Object.assign(Object.assign({}, tx), { exitAmount: ethers_1.BigNumber.from(tx.exitAmount).toString(), signature });
         });
     }
     signChangePubKey(changePubKey) {
