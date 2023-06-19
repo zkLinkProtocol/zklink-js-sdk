@@ -689,6 +689,7 @@ export class Wallet {
           const approveTx = await this.ethSigner.sendTransaction({
             to: deposit.token,
             data,
+            ...deposit.ethTxOptions,
           })
           nonce = approveTx.nonce + 1
         } catch (e) {

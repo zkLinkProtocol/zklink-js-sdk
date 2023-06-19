@@ -520,10 +520,7 @@ class Wallet {
                             contractAddress.mainContract,
                             utils_2.MAX_ERC20_APPROVE_AMOUNT,
                         ]);
-                        const approveTx = yield this.ethSigner.sendTransaction({
-                            to: deposit.token,
-                            data,
-                        });
+                        const approveTx = yield this.ethSigner.sendTransaction(Object.assign({ to: deposit.token, data }, deposit.ethTxOptions));
                         nonce = approveTx.nonce + 1;
                     }
                     catch (e) {
