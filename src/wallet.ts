@@ -16,6 +16,7 @@ import {
   EthSignerType,
   ForcedExitData,
   ForcedExitEntries,
+  Nonce,
   OrderData,
   OrderMatchingData,
   OrderMatchingEntries,
@@ -511,6 +512,7 @@ export class Wallet {
 
   async onchainAuthSigningKey(
     linkChainId: number,
+    nonce?: Nonce,
     ethTxOptions?: ethers.providers.TransactionRequest
   ): Promise<ContractTransaction> {
     if (!this.signer) {
@@ -525,7 +527,7 @@ export class Wallet {
     }
 
     const contractAddress = await this.provider.getContractInfoByChainId(linkChainId)
-    const numNonce = await this.getNonce()
+    const numNonce = nonce == undefined ? await this.getNonce() : nonce
     const data = MAIN_CONTRACT_INTERFACE.encodeFunctionData('setAuthPubkeyHash', [
       newPubKeyHash,
       numNonce,

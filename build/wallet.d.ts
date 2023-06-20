@@ -3,7 +3,7 @@ import { LinkContract } from './contract';
 import { EthMessageSigner } from './eth-message-signer';
 import { Provider } from './provider';
 import { Signer } from './signer';
-import { AccountBalances, AccountState, Address, ChainId, ChangePubKeyData, ChangePubKeyEntries, Create2Data, EthSignerType, ForcedExitData, ForcedExitEntries, OrderData, OrderMatchingData, OrderMatchingEntries, PriorityOperationReceipt, PubKeyHash, SignedTransaction, TokenAddress, TokenId, TokenLike, TransactionReceipt, TransferData, TransferEntries, TxEthSignature, WithdrawData, WithdrawEntries } from './types';
+import { AccountBalances, AccountState, Address, ChainId, ChangePubKeyData, ChangePubKeyEntries, Create2Data, EthSignerType, ForcedExitData, ForcedExitEntries, Nonce, OrderData, OrderMatchingData, OrderMatchingEntries, PriorityOperationReceipt, PubKeyHash, SignedTransaction, TokenAddress, TokenId, TokenLike, TransactionReceipt, TransferData, TransferEntries, TxEthSignature, WithdrawData, WithdrawEntries } from './types';
 export declare class ZKLinkTxError extends Error {
     value: PriorityOperationReceipt | TransactionReceipt;
     constructor(message: string, value: PriorityOperationReceipt | TransactionReceipt);
@@ -40,7 +40,7 @@ export declare class Wallet {
     getChangePubKeyData(entries: ChangePubKeyEntries): Promise<ChangePubKeyData>;
     signChangePubKey(entries: ChangePubKeyEntries): Promise<SignedTransaction>;
     isOnchainAuthSigningKeySet(linkChainId: number): Promise<boolean>;
-    onchainAuthSigningKey(linkChainId: number, ethTxOptions?: ethers.providers.TransactionRequest): Promise<ContractTransaction>;
+    onchainAuthSigningKey(linkChainId: number, nonce?: Nonce, ethTxOptions?: ethers.providers.TransactionRequest): Promise<ContractTransaction>;
     getCurrentPubKeyHash(): Promise<PubKeyHash>;
     getNonce(): Promise<number>;
     getSubNonce(subAccountId: number): Promise<number>;

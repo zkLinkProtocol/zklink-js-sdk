@@ -383,7 +383,7 @@ class Wallet {
             }
         });
     }
-    onchainAuthSigningKey(linkChainId, ethTxOptions) {
+    onchainAuthSigningKey(linkChainId, nonce, ethTxOptions) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
                 throw new Error('ZKLink signer is required for current pubkey calculation.');
@@ -394,7 +394,7 @@ class Wallet {
                 throw new Error('Current PubKeyHash is the same as new');
             }
             const contractAddress = yield this.provider.getContractInfoByChainId(linkChainId);
-            const numNonce = yield this.getNonce();
+            const numNonce = nonce == undefined ? yield this.getNonce() : nonce;
             const data = utils_2.MAIN_CONTRACT_INTERFACE.encodeFunctionData('setAuthPubkeyHash', [
                 newPubKeyHash,
                 numNonce,
