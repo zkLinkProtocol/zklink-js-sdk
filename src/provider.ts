@@ -108,18 +108,14 @@ export class Provider {
           nonce: 0,
           pubKeyHash: '0x0000000000000000000000000000000000000000',
           accountType: 'unknown',
+          subAccountNonces: {},
         }
       }
       throw e
     }
   }
 
-  async getBalance(
-    accountId: number,
-    subAccountId?: number
-  ): Promise<{
-    balances: AccountBalances
-  }> {
+  async getBalance(accountId: number, subAccountId?: number): Promise<AccountBalances> {
     const params = [accountId]
     if (typeof subAccountId === 'number') {
       params.push(subAccountId)

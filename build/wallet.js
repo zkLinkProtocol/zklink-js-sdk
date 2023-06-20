@@ -107,7 +107,7 @@ class Wallet {
                 throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
-            const transactionData = Object.assign(Object.assign({}, entries), { type: 'Transfer', accountId: this.accountId || (yield this.getAccountId()), from: this.address(), token: this.provider.tokenSet.resolveTokenId(entries.token), fee: entries.fee ? entries.fee : null, nonce: entries.nonce == null ? yield this.getNonce() : yield this.getNonce(entries.nonce), ts: entries.ts || (0, utils_2.getTimestamp)() });
+            const transactionData = Object.assign(Object.assign({}, entries), { type: 'Transfer', accountId: this.accountId || (yield this.getAccountId()), from: this.address(), token: this.provider.tokenSet.resolveTokenId(entries.token), fee: entries.fee ? entries.fee : null, nonce: entries.nonce == null ? yield this.getSubNonce(entries.fromSubAccountId) : entries.nonce, ts: entries.ts || (0, utils_2.getTimestamp)() });
             if (transactionData.fee == null) {
                 transactionData.fee = yield this.provider.getTransactionFee(Object.assign(Object.assign({}, transactionData), { fee: '0', amount: ethers_1.BigNumber.from(transactionData.amount).toString() }));
             }
@@ -152,8 +152,8 @@ class Wallet {
             }
             yield this.setRequiredAccountIdFromServer('perform a Forced Exit');
             const transactionData = Object.assign(Object.assign({}, entries), { type: 'ForcedExit', initiatorAccountId: entries.initiatorAccountId || this.accountId, l2SourceToken: this.provider.tokenSet.resolveTokenId(entries.l2SourceToken), l1TargetToken: this.provider.tokenSet.resolveTokenId(entries.l1TargetToken), initiatorNonce: entries.initiatorNonce == null
-                    ? yield this.getNonce()
-                    : yield this.getNonce(entries.initiatorNonce), ts: entries.ts || (0, utils_2.getTimestamp)() });
+                    ? yield this.getSubNonce(entries.initiatorSubAccountId)
+                    : entries.initiatorNonce, ts: entries.ts || (0, utils_2.getTimestamp)() });
             return transactionData;
         });
     }
@@ -223,7 +223,7 @@ class Wallet {
                 throw new Error('zkLink signer is required for sending zkLink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Withdraw funds');
-            const transactionData = Object.assign(Object.assign({}, entries), { type: 'Withdraw', accountId: entries.accountId || this.accountId, from: entries.from || this.address(), l2SourceToken: this.provider.tokenSet.resolveTokenId(entries.l2SourceToken), l1TargetToken: this.provider.tokenSet.resolveTokenId(entries.l1TargetToken), fee: entries.fee, nonce: entries.nonce == null ? yield this.getNonce() : yield this.getNonce(entries.nonce), ts: entries.ts || (0, utils_2.getTimestamp)() });
+            const transactionData = Object.assign(Object.assign({}, entries), { type: 'Withdraw', accountId: entries.accountId || this.accountId, from: entries.from || this.address(), l2SourceToken: this.provider.tokenSet.resolveTokenId(entries.l2SourceToken), l1TargetToken: this.provider.tokenSet.resolveTokenId(entries.l1TargetToken), fee: entries.fee, nonce: entries.nonce == null ? yield this.getSubNonce(entries.subAccountId) : entries.nonce, ts: entries.ts || (0, utils_2.getTimestamp)() });
             if (transactionData.fee == null) {
                 transactionData.fee = yield this.provider.getTransactionFee(Object.assign(Object.assign({}, transactionData), { fee: '0', amount: ethers_1.BigNumber.from(transactionData.amount).toString() }));
             }
@@ -297,7 +297,7 @@ class Wallet {
                 newPkHash: yield this.signer.pubKeyHash(),
                 fee: entries.fee,
                 feeToken: entries.feeToken,
-                nonce: entries.nonce == null ? yield this.getNonce() : yield this.getNonce(entries.nonce),
+                nonce: entries.nonce == null ? yield this.getNonce() : entries.nonce,
                 ts: entries.ts || (0, utils_2.getTimestamp)(),
             };
             if (entries.ethAuthType === 'Onchain') {
@@ -366,10 +366,10 @@ class Wallet {
             };
         });
     }
-    isOnchainAuthSigningKeySet(linkChainId, nonce = 'committed') {
+    isOnchainAuthSigningKeySet(linkChainId) {
         return __awaiter(this, void 0, void 0, function* () {
             const contractAddress = yield this.provider.getContractInfoByChainId(linkChainId);
-            const numNonce = yield this.getNonce(nonce);
+            const numNonce = yield this.getNonce();
             const data = utils_2.MAIN_CONTRACT_INTERFACE.encodeFunctionData('authFacts', [this.address(), numNonce]);
             try {
                 const onchainAuthFact = yield this.ethSigner.call({
@@ -383,7 +383,7 @@ class Wallet {
             }
         });
     }
-    onchainAuthSigningKey(linkChainId, nonce = 'committed', ethTxOptions) {
+    onchainAuthSigningKey(linkChainId, ethTxOptions) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.signer) {
                 throw new Error('ZKLink signer is required for current pubkey calculation.');
@@ -394,7 +394,7 @@ class Wallet {
                 throw new Error('Current PubKeyHash is the same as new');
             }
             const contractAddress = yield this.provider.getContractInfoByChainId(linkChainId);
-            const numNonce = yield this.getNonce(nonce);
+            const numNonce = yield this.getNonce();
             const data = utils_2.MAIN_CONTRACT_INTERFACE.encodeFunctionData('setAuthPubkeyHash', [
                 newPubKeyHash,
                 numNonce,
@@ -412,13 +412,16 @@ class Wallet {
             return (yield this.provider.getState(this.address())).pubKeyHash;
         });
     }
-    getNonce(nonce = 'committed') {
+    getNonce() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (nonce === 'committed') {
-                return (yield this.provider.getState(this.address())).nonce;
-            }
-            else if (typeof nonce === 'number') {
-                return nonce;
+            return (yield this.provider.getState(this.address())).nonce;
+        });
+    }
+    getSubNonce(subAccountId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const state = yield this.provider.getState(this.address());
+            if (state.subAccountNonces) {
+                return state.subAccountNonces[String(subAccountId)];
             }
         });
     }

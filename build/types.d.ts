@@ -9,7 +9,8 @@ export declare type ChainId = number;
 export declare type Ether = string;
 export declare type Wei = string;
 export declare type TotalFee = Map<TokenLike, BigNumber>;
-export declare type Nonce = number | 'committed';
+export declare type Nonce = number;
+export declare type SubAccountId = string;
 export declare type Network = 'localhost' | 'rinkeby' | 'ropsten' | 'mainnet' | 'rinkeby-beta' | 'ropsten-beta';
 export interface PairInfo {
     amplifier: number;
@@ -30,14 +31,13 @@ export interface Create2Data {
 export interface AccountState {
     id?: number;
     address: Address;
-    nonce: number;
+    nonce: Nonce;
     pubKeyHash: PubKeyHash;
     accountType: string;
+    subAccountNonces: Record<SubAccountId, Nonce>;
 }
 export interface AccountBalances {
-    [subAccountId: number]: {
-        [tokenId: number]: Wei;
-    };
+    [subAccountId: SubAccountId]: Record<string, Wei>;
 }
 export declare type EthProviderType = 'Metamask' | 'UniPass';
 export declare type EthSignerType = {

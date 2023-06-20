@@ -1,5 +1,5 @@
-import WebSocketAsPromised = require('websocket-as-promised');
 import { PubKeyHash } from './types';
+import WebSocketAsPromised = require('websocket-as-promised');
 export declare abstract class AbstractJSONRPCTransport {
     abstract request(method: string, params: any): Promise<any>;
     subscriptionsSupported(): boolean;

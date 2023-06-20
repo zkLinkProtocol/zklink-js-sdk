@@ -101,6 +101,7 @@ class Provider {
                         nonce: 0,
                         pubKeyHash: '0x0000000000000000000000000000000000000000',
                         accountType: 'unknown',
+                        subAccountNonces: {},
                     };
                 }
                 throw e;

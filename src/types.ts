@@ -18,7 +18,8 @@ export type Wei = string
 
 export type TotalFee = Map<TokenLike, BigNumber>
 
-export type Nonce = number | 'committed'
+export type Nonce = number
+export type SubAccountId = string
 
 export type Network =
   | 'localhost'
@@ -49,16 +50,14 @@ export interface Create2Data {
 export interface AccountState {
   id?: number
   address: Address
-  nonce: number
+  nonce: Nonce
   pubKeyHash: PubKeyHash
   accountType: string
+  subAccountNonces: Record<SubAccountId, Nonce>
 }
 
 export interface AccountBalances {
-  [subAccountId: number]: {
-    // Token are indexed by their id (e.g. "1")
-    [tokenId: number]: Wei
-  }
+  [subAccountId: SubAccountId]: Record<string, Wei>
 }
 
 export type EthProviderType = 'Metamask' | 'UniPass'

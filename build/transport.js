@@ -36,12 +36,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DummyTransport = exports.WSTransport = exports.HTTPTransport = exports.JRPCError = exports.AbstractJSONRPCTransport = void 0;
-const ethers_1 = require("ethers");
-const ethers = __importStar(require("ethers"));
 const axios_1 = __importDefault(require("axios"));
-const WebSocketAsPromised = require("websocket-as-promised");
+const ethers = __importStar(require("ethers"));
+const ethers_1 = require("ethers");
 const websocket = __importStar(require("websocket"));
 const signer_1 = require("./signer");
+const WebSocketAsPromised = require("websocket-as-promised");
 const W3CWebSocket = websocket.w3cwebsocket;
 class AbstractJSONRPCTransport {
     subscriptionsSupported() {
@@ -252,6 +252,10 @@ class DummyTransport extends AbstractJSONRPCTransport {
                     address: params[0],
                     nonce: 0,
                     pubKeyHash: yield this.getPubKeyHash(),
+                    subAccountNonces: {
+                        '0': 5,
+                        '1': 10,
+                    },
                 };
             }
             if (method == 'getAccountBalances') {

@@ -1,10 +1,10 @@
-import { BigNumber } from 'ethers'
-import * as ethers from 'ethers'
 import Axios from 'axios'
-import WebSocketAsPromised = require('websocket-as-promised')
+import * as ethers from 'ethers'
+import { BigNumber } from 'ethers'
 import * as websocket from 'websocket'
-import { PubKeyHash } from './types'
 import { Signer } from './signer'
+import { PubKeyHash } from './types'
+import WebSocketAsPromised = require('websocket-as-promised')
 
 const W3CWebSocket = websocket.w3cwebsocket
 
@@ -241,6 +241,10 @@ export class DummyTransport extends AbstractJSONRPCTransport {
         address: params[0],
         nonce: 0,
         pubKeyHash: await this.getPubKeyHash(),
+        subAccountNonces: {
+          '0': 5,
+          '1': 10,
+        },
       }
     }
     if (method == 'getAccountBalances') {

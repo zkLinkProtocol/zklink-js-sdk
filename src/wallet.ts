@@ -16,7 +16,6 @@ import {
   EthSignerType,
   ForcedExitData,
   ForcedExitEntries,
-  Nonce,
   OrderData,
   OrderMatchingData,
   OrderMatchingEntries,
@@ -183,7 +182,8 @@ export class Wallet {
       from: this.address(),
       token: this.provider.tokenSet.resolveTokenId(entries.token),
       fee: entries.fee ? entries.fee : null,
-      nonce: entries.nonce == null ? await this.getNonce() : await this.getNonce(entries.nonce),
+      nonce:
+        entries.nonce == null ? await this.getSubNonce(entries.fromSubAccountId) : entries.nonce,
       ts: entries.ts || getTimestamp(),
     }
 
@@ -242,8 +242,8 @@ export class Wallet {
       l1TargetToken: this.provider.tokenSet.resolveTokenId(entries.l1TargetToken),
       initiatorNonce:
         entries.initiatorNonce == null
-          ? await this.getNonce()
-          : await this.getNonce(entries.initiatorNonce),
+          ? await this.getSubNonce(entries.initiatorSubAccountId)
+          : entries.initiatorNonce,
       ts: entries.ts || getTimestamp(),
     }
 
@@ -334,7 +334,7 @@ export class Wallet {
       l2SourceToken: this.provider.tokenSet.resolveTokenId(entries.l2SourceToken),
       l1TargetToken: this.provider.tokenSet.resolveTokenId(entries.l1TargetToken),
       fee: entries.fee,
-      nonce: entries.nonce == null ? await this.getNonce() : await this.getNonce(entries.nonce),
+      nonce: entries.nonce == null ? await this.getSubNonce(entries.subAccountId) : entries.nonce,
       ts: entries.ts || getTimestamp(),
     }
 
@@ -417,7 +417,7 @@ export class Wallet {
       newPkHash: await this.signer.pubKeyHash(),
       fee: entries.fee,
       feeToken: entries.feeToken,
-      nonce: entries.nonce == null ? await this.getNonce() : await this.getNonce(entries.nonce),
+      nonce: entries.nonce == null ? await this.getNonce() : entries.nonce,
       ts: entries.ts || getTimestamp(),
     }
     if (entries.ethAuthType === 'Onchain') {
@@ -492,12 +492,9 @@ export class Wallet {
     }
   }
 
-  async isOnchainAuthSigningKeySet(
-    linkChainId: number,
-    nonce: Nonce = 'committed'
-  ): Promise<boolean> {
+  async isOnchainAuthSigningKeySet(linkChainId: number): Promise<boolean> {
     const contractAddress = await this.provider.getContractInfoByChainId(linkChainId)
-    const numNonce = await this.getNonce(nonce)
+    const numNonce = await this.getNonce()
     const data = MAIN_CONTRACT_INTERFACE.encodeFunctionData('authFacts', [this.address(), numNonce])
     try {
       const onchainAuthFact = await this.ethSigner.call({
@@ -514,7 +511,6 @@ export class Wallet {
 
   async onchainAuthSigningKey(
     linkChainId: number,
-    nonce: Nonce = 'committed',
     ethTxOptions?: ethers.providers.TransactionRequest
   ): Promise<ContractTransaction> {
     if (!this.signer) {
@@ -529,7 +525,7 @@ export class Wallet {
     }
 
     const contractAddress = await this.provider.getContractInfoByChainId(linkChainId)
-    const numNonce = await this.getNonce(nonce)
+    const numNonce = await this.getNonce()
     const data = MAIN_CONTRACT_INTERFACE.encodeFunctionData('setAuthPubkeyHash', [
       newPubKeyHash,
       numNonce,
@@ -550,11 +546,15 @@ export class Wallet {
     return (await this.provider.getState(this.address())).pubKeyHash
   }
 
-  async getNonce(nonce: Nonce = 'committed'): Promise<number> {
-    if (nonce === 'committed') {
-      return (await this.provider.getState(this.address())).nonce
-    } else if (typeof nonce === 'number') {
-      return nonce
+  async getNonce(): Promise<number> {
+    return (await this.provider.getState(this.address())).nonce
+  }
+
+  async getSubNonce(subAccountId: number): Promise<number> {
+    const state = await this.provider.getState(this.address())
+
+    if (state.subAccountNonces) {
+      return state.subAccountNonces[String(subAccountId)]
     }
   }
 
