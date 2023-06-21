@@ -418,10 +418,11 @@ class Wallet {
         });
     }
     getSubNonce(subAccountId) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const state = yield this.provider.getState(this.address());
             if (state.subAccountNonces) {
-                return state.subAccountNonces[String(subAccountId)];
+                return (_a = state.subAccountNonces[String(subAccountId)]) !== null && _a !== void 0 ? _a : 0;
             }
         });
     }

@@ -556,7 +556,7 @@ export class Wallet {
     const state = await this.provider.getState(this.address())
 
     if (state.subAccountNonces) {
-      return state.subAccountNonces[String(subAccountId)]
+      return state.subAccountNonces[String(subAccountId)] ?? 0
     }
   }
 
