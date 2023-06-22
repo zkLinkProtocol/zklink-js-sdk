@@ -58,7 +58,6 @@ export interface TransferEntries {
     to: Address;
     token: TokenId;
     amount: BigNumberish;
-    fee?: BigNumberish;
     nonce?: Nonce;
     ts?: number;
 }
@@ -87,7 +86,6 @@ export interface WithdrawEntries {
     fastWithdraw: number;
     accountId?: number;
     from?: string;
-    fee?: BigNumberish;
     nonce?: Nonce;
     ts?: number;
 }
@@ -152,11 +150,9 @@ export interface ChangePubKeyCREATE2 {
 export interface ChangePubKeyEntries {
     chainId: number;
     subAccountId: number;
-    feeToken: TokenId;
     ethAuthType: ChangePubkeyTypes;
     account?: Address;
     accountId?: number;
-    fee?: BigNumberish;
     ts?: number;
     nonce?: Nonce;
 }
@@ -277,8 +273,6 @@ export interface OrderMatchingEntries {
     maker: OrderData;
     expectBaseAmount: BigNumberish;
     expectQuoteAmount: BigNumberish;
-    feeToken: number;
-    fee?: BigNumberish;
     account?: Address;
     accountId?: number;
     signature?: Signature;

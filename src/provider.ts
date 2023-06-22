@@ -166,9 +166,9 @@ export class Provider {
     }
   }
 
+  // getTransactionFee is deprecated, will be removed in future.
   async getTransactionFee(tx: any): Promise<BigNumber> {
-    const transactionFee = await this.transport.request('estimateTransactionFee', [tx])
-    return transactionFee
+    return BigNumber.from('0')
   }
 
   async disconnect() {
