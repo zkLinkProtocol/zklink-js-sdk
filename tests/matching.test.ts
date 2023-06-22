@@ -67,7 +67,7 @@ describe('matching', () => {
       maker: maker.tx as OrderData,
       taker: taker.tx as OrderData,
       account: '0x3498F456645270eE003441df82C718b56c0e6666',
-      feeToken: 0,
+      feeToken: 1,
       accountId: 6,
       expectBaseAmount: '1000000000000000000',
       expectQuoteAmount: '1500000000000000000',
@@ -75,19 +75,19 @@ describe('matching', () => {
     const serialized = await serializeOrderMatching(matching)
 
     expect(Buffer.from(serialized).toString('hex')).toBe(
-      '08000000060183be69c82b2c56df952594436bd024ce85ed2eaee63dadb5b3a3e1aec623880000000000000000000000000de0b6b3a7640000000000000000000014d1120d7b160000'
+      '08000000060183be69c82b2c56df952594436bd024ce85ed2eaee63dadb5b3a3e1aec623880001000000000000000000000de0b6b3a7640000000000000000000014d1120d7b160000'
     )
 
     const signed = await wallet.signOrderMatching(matching)
 
     expect(sha256(serialized)).toBe(
-      '0x56fabbc07de5fc7ec7e766601543caafb8b7779478113fe9360396cb6b83e42f'
+      '0x2a85e0d5fc683da1f00019366444f9e9bf419b973cacb41e9fc4a3b44ed66421'
     )
     expect(signed.tx.signature?.pubKey).toBe(
       '77aa48808967258ac4c115ab14249a4d0b9888360bfb0079ab981822195b3d0c'
     )
     expect(signed.tx.signature?.signature).toBe(
-      '1ea1d57bb4555f777ade53c0533bb3c7c33c7038fe05c0b6e2e96e8a88f4ab2c2339552129b801956eef5450ab1fc5038b963424be242de90ab3c0d5e39e9501'
+      '7f8126c3e032cba9f0877f0ad7016b4c14e7171de50aa387f97f89611f2a11976a8ff34ed3bfa1678b52365416f62d9a4f94e29026cb1f23e0d81335c87f6601'
     )
   })
 
@@ -132,7 +132,7 @@ describe('matching', () => {
       },
     },
     fee: '0',
-    feeToken: 0,
+    feeToken: 1,
     expectBaseAmount: '43000000000000000',
     expectQuoteAmount: '1160484000000000000000',
     signature: {
@@ -164,7 +164,7 @@ describe('matching', () => {
     const sign = await wallet?.signer?.signTransactionBytes(txHash)
     expect(sign?.pubKey).toBe('643a80bc00a25c84ade07cb40db832e9144a7d5316589bb0e550f8cb442cfa15')
     expect(sign?.signature).toBe(
-      '5740bb39f4c617ad0bc2ef75afc5d3ac2d16a16e2a27670f6aff01da0e00f5a8ae283adb85cfa10283052520f0ed9264d6d2201a9d771b7a0260847f069be205'
+      '494cca2e000584aa3ca15a8afd0ac7c35ddf2e7a026b10b1ad1553c3c4f2819aa43eba2fe086a29d1e116e28d7a600032f4c2ef2b3705df12fc8669d70ebbc00'
     )
   })
 })

@@ -8,7 +8,7 @@ describe('ChangePubKey', () => {
       type: 'ChangePubKey',
       subAccountId: 1,
       chainId: 1,
-      feeToken: 0,
+      feeToken: 1,
       fee: '0',
       nonce: 0,
       accountId: 2,
@@ -16,7 +16,7 @@ describe('ChangePubKey', () => {
       newPkHash: '0x511494921e9aec60dfd65ce125dec96fe7c07133',
     } as ChangePubKeyData)
     expect(Buffer.from(bytes).toString('hex')).toBe(
-      '06010000000201511494921e9aec60dfd65ce125dec96fe7c07133000000000000000062a1e340'
+      '06010000000201511494921e9aec60dfd65ce125dec96fe7c07133000100000000000062a1e340'
     )
   })
   it('L2 signature', async function () {
@@ -33,7 +33,7 @@ describe('ChangePubKey', () => {
       '0x8a9351d39562b4123dccb0491b00575cf69327b18e41512e12802d74c842629867629484c13beee16175b417c71cd13863e2ce16470a1aeb0cb7d86ca05259fc1c'
     )
     expect(signedTransaction.tx.signature.signature).toBe(
-      '2e96c37afecb1bf5cd49903219e3a3f49e2729dc3cd22b4d9eab056e07d12583092759272d9726d80faeeb3c5b60cc9cf64fc2d7afa3c014d14eeff56769af04'
+      'c752b1a5c0059b35e192d8b051efe11beeb3e3cbdd1803c9ede0b1a1a62f4e1eaff3616c93aeaa837b9ac93db03aa43b65c36ac53464ffd827228e15c82f4c01'
     )
   })
 })
