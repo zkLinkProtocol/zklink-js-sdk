@@ -182,19 +182,12 @@ export class Wallet {
       accountId: this.accountId || (await this.getAccountId()),
       from: this.address(),
       token: this.provider.tokenSet.resolveTokenId(entries.token),
-      fee: entries.fee ? entries.fee : null,
+      fee: entries.fee ? entries.fee : '0',
       nonce:
         entries.nonce == null ? await this.getSubNonce(entries.fromSubAccountId) : entries.nonce,
       ts: entries.ts || getTimestamp(),
     }
 
-    if (transactionData.fee == null) {
-      transactionData.fee = await this.provider.getTransactionFee({
-        ...transactionData,
-        fee: '0',
-        amount: BigNumber.from(transactionData.amount).toString(),
-      })
-    }
     return transactionData
   }
 
@@ -283,16 +276,10 @@ export class Wallet {
       account: entries.account || this.address(),
       accountId: entries.accountId || this.accountId || (await this.getAccountId()),
       type: 'OrderMatching',
-      fee: entries.fee,
+      fee: entries.fee ? entries.fee : '0',
       feeToken: this.provider.tokenSet.resolveTokenId(entries.feeToken),
     }
 
-    if (transactionData.fee == null) {
-      transactionData.fee = await this.provider.getTransactionFee({
-        ...transactionData,
-        fee: '0',
-      })
-    }
     return transactionData
   }
 
@@ -334,18 +321,11 @@ export class Wallet {
       from: entries.from || this.address(),
       l2SourceToken: this.provider.tokenSet.resolveTokenId(entries.l2SourceToken),
       l1TargetToken: this.provider.tokenSet.resolveTokenId(entries.l1TargetToken),
-      fee: entries.fee,
+      fee: entries.fee ? entries.fee : '0',
       nonce: entries.nonce == null ? await this.getSubNonce(entries.subAccountId) : entries.nonce,
       ts: entries.ts || getTimestamp(),
     }
 
-    if (transactionData.fee == null) {
-      transactionData.fee = await this.provider.getTransactionFee({
-        ...transactionData,
-        fee: '0',
-        amount: BigNumber.from(transactionData.amount).toString(),
-      })
-    }
     return transactionData
   }
 
@@ -416,7 +396,7 @@ export class Wallet {
       accountId: entries.accountId || this.accountId || (await this.getAccountId()),
       subAccountId: entries.subAccountId,
       newPkHash: await this.signer.pubKeyHash(),
-      fee: entries.fee,
+      fee: entries.fee ? entries.fee : '0',
       feeToken: entries.feeToken,
       nonce: entries.nonce == null ? await this.getNonce() : entries.nonce,
       ts: entries.ts || getTimestamp(),
@@ -438,12 +418,6 @@ export class Wallet {
         saltArg: '0x0000000000000000000000000000000000000000000000000000000000000000',
         codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
       }
-    }
-    if (transactionData.fee == null) {
-      transactionData.fee = await this.provider.getTransactionFee({
-        ...transactionData,
-        fee: '0',
-      })
     }
 
     return transactionData

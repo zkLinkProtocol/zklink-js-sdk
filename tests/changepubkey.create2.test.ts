@@ -29,6 +29,7 @@ describe('Create2 ChangePubKey', () => {
       account: '0x62b23B5DfD7dDf643DBaB3Bc475398D5a7e3891f',
       accountId: 15,
       subAccountId: 0,
+      fee: '0',
       feeToken: 18,
       nonce: 0,
       ts: 1668054154,
@@ -38,7 +39,7 @@ describe('Create2 ChangePubKey', () => {
     expect(signed.tx.signature).toStrictEqual({
       pubKey: '0b3e7d5328193b9cda3d5372cece28be209b4c7c136e734c6261c4fda965e710',
       signature:
-        'd865bb6309ecc6a169ee4e42b13845f7f6b94cd6cb23fcaf793f330ee3fc6c89e63150db1b2d63c608dbbcbd870ecfa71f3556d121dba8d39980ba56cba4b903',
+        'e0c5a37155760d23e682df94e59f6be11decb38688a5f3b587308732e3d4e729ffc58b972e859687efa61f0045bc4362684107a89c58a162501d8d5e2b09a503',
     })
   })
 })
