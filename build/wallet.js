@@ -107,7 +107,10 @@ class Wallet {
                 throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
-            const transactionData = Object.assign(Object.assign({}, entries), { type: 'Transfer', accountId: this.accountId || (yield this.getAccountId()), from: this.address(), token: this.provider.tokenSet.resolveTokenId(entries.token), fee: '0', nonce: entries.nonce == null ? yield this.getSubNonce(entries.fromSubAccountId) : entries.nonce, ts: entries.ts || (0, utils_2.getTimestamp)() });
+            const transactionData = Object.assign(Object.assign({}, entries), { type: 'Transfer', accountId: this.accountId || (yield this.getAccountId()), from: this.address(), token: this.provider.tokenSet.resolveTokenId(entries.token), fee: entries.fee ? entries.fee : null, nonce: entries.nonce == null ? yield this.getSubNonce(entries.fromSubAccountId) : entries.nonce, ts: entries.ts || (0, utils_2.getTimestamp)() });
+            if (transactionData.fee == null) {
+                transactionData.fee = yield this.provider.getTransactionFee(Object.assign(Object.assign({}, transactionData), { fee: '0', amount: ethers_1.BigNumber.from(transactionData.amount).toString() }));
+            }
             return transactionData;
         });
     }
@@ -181,7 +184,10 @@ class Wallet {
                 throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
-            const transactionData = Object.assign(Object.assign({}, entries), { account: entries.account || this.address(), accountId: entries.accountId || this.accountId || (yield this.getAccountId()), type: 'OrderMatching', fee: '0', feeToken: 0 });
+            const transactionData = Object.assign(Object.assign({}, entries), { account: entries.account || this.address(), accountId: entries.accountId || this.accountId || (yield this.getAccountId()), type: 'OrderMatching', fee: entries.fee, feeToken: this.provider.tokenSet.resolveTokenId(entries.feeToken) });
+            if (transactionData.fee == null) {
+                transactionData.fee = yield this.provider.getTransactionFee(Object.assign(Object.assign({}, transactionData), { fee: '0' }));
+            }
             return transactionData;
         });
     }
@@ -192,7 +198,7 @@ class Wallet {
             const stringFee = ethers_1.BigNumber.from(transactionData.fee).isZero()
                 ? null
                 : ethers_1.utils.formatEther(transactionData.fee);
-            const stringFeeToken = '';
+            const stringFeeToken = this.provider.tokenSet.resolveTokenSymbol(transactionData.feeToken);
             const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
                 ? null
                 : yield this.ethMessageSigner.ethSignOrderMatching({
@@ -217,7 +223,10 @@ class Wallet {
                 throw new Error('zkLink signer is required for sending zkLink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Withdraw funds');
-            const transactionData = Object.assign(Object.assign({}, entries), { type: 'Withdraw', accountId: entries.accountId || this.accountId, from: entries.from || this.address(), l2SourceToken: this.provider.tokenSet.resolveTokenId(entries.l2SourceToken), l1TargetToken: this.provider.tokenSet.resolveTokenId(entries.l1TargetToken), fee: '0', nonce: entries.nonce == null ? yield this.getSubNonce(entries.subAccountId) : entries.nonce, ts: entries.ts || (0, utils_2.getTimestamp)() });
+            const transactionData = Object.assign(Object.assign({}, entries), { type: 'Withdraw', accountId: entries.accountId || this.accountId, from: entries.from || this.address(), l2SourceToken: this.provider.tokenSet.resolveTokenId(entries.l2SourceToken), l1TargetToken: this.provider.tokenSet.resolveTokenId(entries.l1TargetToken), fee: entries.fee, nonce: entries.nonce == null ? yield this.getSubNonce(entries.subAccountId) : entries.nonce, ts: entries.ts || (0, utils_2.getTimestamp)() });
+            if (transactionData.fee == null) {
+                transactionData.fee = yield this.provider.getTransactionFee(Object.assign(Object.assign({}, transactionData), { fee: '0', amount: ethers_1.BigNumber.from(transactionData.amount).toString() }));
+            }
             return transactionData;
         });
     }
@@ -286,8 +295,8 @@ class Wallet {
                 accountId: entries.accountId || this.accountId || (yield this.getAccountId()),
                 subAccountId: entries.subAccountId,
                 newPkHash: yield this.signer.pubKeyHash(),
-                fee: '0',
-                feeToken: 0,
+                fee: entries.fee,
+                feeToken: entries.feeToken,
                 nonce: entries.nonce == null ? yield this.getNonce() : entries.nonce,
                 ts: entries.ts || (0, utils_2.getTimestamp)(),
             };
@@ -309,6 +318,9 @@ class Wallet {
                     saltArg: '0x0000000000000000000000000000000000000000000000000000000000000000',
                     codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
                 };
+            }
+            if (transactionData.fee == null) {
+                transactionData.fee = yield this.provider.getTransactionFee(Object.assign(Object.assign({}, transactionData), { fee: '0' }));
             }
             return transactionData;
         });

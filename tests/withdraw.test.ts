@@ -32,10 +32,10 @@ describe('withdraw', () => {
       '0x1c353cb6d3bdc763b27125f0dc1ce7cb38bf76e24ef093a89abd9b0fe2bcb2ee'
     )
     expect(signed.ethereumSignature?.signature).toBe(
-      '0xbbd09c19da6b60169d36e8f25869e3fcc64b0f98fca5fed0bda9a6d7ee68b19f3bdfd9ed1915a450cd08ac3291d68f42cb024960abf0be9e8ac55fd3b907f7531b'
+      '0x2499120b362bd835b456f2a8e3e6c4ccef6d0ebbe76fd64d452d5bba600ad574713d6b6af043a8f070c532d1ba879c712235bf8e9af6291aa8bdfb1cbaaa4dc21b'
     )
     expect(signed.tx.signature?.signature).toBe(
-      'abafec01592cc846e394691456d15518dde2a0bb13db2709c066a4e4ffb1b0a503e539bee8abc57e861975a5f411f314bafa920d70f001605147bef0fb129d03'
+      '6d782453d4cda0eacda13b53fa5471942ad75ea5010e086df845886ba5407bac82f3c7c04ba58045f7115df52d091a232701c8613d5a8fe31fdbee1846d87f00'
     )
   })
 })

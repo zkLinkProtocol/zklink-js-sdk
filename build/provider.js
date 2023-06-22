@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Provider = void 0;
 const logger_1 = require("@ethersproject/logger");
-const ethers_1 = require("ethers");
 const transport_1 = require("./transport");
 const utils_1 = require("./utils");
 const EthersErrorCode = logger_1.ErrorCode;
@@ -156,10 +155,10 @@ class Provider {
             }
         });
     }
-    // getTransactionFee is deprecated, will be removed in future.
     getTransactionFee(tx) {
         return __awaiter(this, void 0, void 0, function* () {
-            return ethers_1.BigNumber.from('0');
+            const transactionFee = yield this.transport.request('estimateTransactionFee', [tx]);
+            return transactionFee;
         });
     }
     disconnect() {
