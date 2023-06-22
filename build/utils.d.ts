@@ -42,7 +42,7 @@ export declare function isTransactionFeePackable(amount: BigNumberish): boolean;
 export declare function buffer2bitsBE(buff: any): any[];
 export declare function sleep(ms: number): Promise<unknown>;
 export declare function isTokenETH(token: TokenAddress): boolean;
-declare type TokenOrId = TokenLike | number;
+type TokenOrId = TokenLike | number;
 export declare class TokenSet {
     private tokensById;
     constructor(tokensById: Tokens);

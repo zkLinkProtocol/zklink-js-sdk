@@ -1,17 +1,17 @@
 import { BigNumber, BigNumberish } from 'ethers';
-export declare type Address = string;
-export declare type PubKeyHash = string;
-export declare type TokenLike = TokenSymbol;
-export declare type TokenSymbol = string;
-export declare type TokenAddress = string;
-export declare type TokenId = number;
-export declare type ChainId = number;
-export declare type Ether = string;
-export declare type Wei = string;
-export declare type TotalFee = Map<TokenLike, BigNumber>;
-export declare type Nonce = number;
-export declare type SubAccountId = string;
-export declare type Network = 'localhost' | 'rinkeby' | 'ropsten' | 'mainnet' | 'rinkeby-beta' | 'ropsten-beta';
+export type Address = string;
+export type PubKeyHash = string;
+export type TokenLike = TokenSymbol;
+export type TokenSymbol = string;
+export type TokenAddress = string;
+export type TokenId = number;
+export type ChainId = number;
+export type Ether = string;
+export type Wei = string;
+export type TotalFee = Map<TokenLike, BigNumber>;
+export type Nonce = number;
+export type SubAccountId = string;
+export type Network = 'localhost' | 'rinkeby' | 'ropsten' | 'mainnet' | 'rinkeby-beta' | 'ropsten-beta';
 export interface PairInfo {
     amplifier: number;
     chains: ChainId[];
@@ -39,8 +39,8 @@ export interface AccountState {
 export interface AccountBalances {
     [subAccountId: SubAccountId]: Record<string, Wei>;
 }
-export declare type EthProviderType = 'Metamask' | 'UniPass';
-export declare type EthSignerType = {
+export type EthProviderType = 'Metamask' | 'UniPass';
+export type EthSignerType = {
     verificationMethod: 'ECDSA' | 'ERC-1271';
     isSignedMsgPrefixed: boolean;
 };
@@ -132,7 +132,7 @@ export interface ForcedExitData {
     signature?: Signature;
     ts: number;
 }
-export declare type ChangePubkeyTypes = 'Onchain' | 'EthECDSA' | 'EthCREATE2';
+export type ChangePubkeyTypes = 'Onchain' | 'EthECDSA' | 'EthCREATE2';
 export interface ChangePubKeyOnchain {
     type: 'Onchain';
 }
