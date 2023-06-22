@@ -277,7 +277,7 @@ export class Wallet {
       accountId: entries.accountId || this.accountId || (await this.getAccountId()),
       type: 'OrderMatching',
       fee: '0',
-      feeToken: 1,
+      feeToken: 0,
     }
 
     return transactionData
@@ -397,7 +397,7 @@ export class Wallet {
       subAccountId: entries.subAccountId,
       newPkHash: await this.signer.pubKeyHash(),
       fee: '0',
-      feeToken: 1,
+      feeToken: 0,
       nonce: entries.nonce == null ? await this.getNonce() : entries.nonce,
       ts: entries.ts || getTimestamp(),
     }

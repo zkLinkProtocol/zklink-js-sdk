@@ -181,7 +181,7 @@ class Wallet {
                 throw new Error('ZKLink signer is required for sending zklink transactions.');
             }
             yield this.setRequiredAccountIdFromServer('Transfer funds');
-            const transactionData = Object.assign(Object.assign({}, entries), { account: entries.account || this.address(), accountId: entries.accountId || this.accountId || (yield this.getAccountId()), type: 'OrderMatching', fee: '0', feeToken: 1 });
+            const transactionData = Object.assign(Object.assign({}, entries), { account: entries.account || this.address(), accountId: entries.accountId || this.accountId || (yield this.getAccountId()), type: 'OrderMatching', fee: '0', feeToken: 0 });
             return transactionData;
         });
     }
@@ -287,7 +287,7 @@ class Wallet {
                 subAccountId: entries.subAccountId,
                 newPkHash: yield this.signer.pubKeyHash(),
                 fee: '0',
-                feeToken: 1,
+                feeToken: 0,
                 nonce: entries.nonce == null ? yield this.getNonce() : entries.nonce,
                 ts: entries.ts || (0, utils_2.getTimestamp)(),
             };
