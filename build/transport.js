@@ -84,13 +84,12 @@ class HTTPTransport extends AbstractJSONRPCTransport {
                 method,
                 params,
             };
-            const CancelToken = axios_1.default.CancelToken;
-            const source = CancelToken.source();
+            const controller = new AbortController();
             const timeout = setTimeout(() => {
-                source.cancel('JRPC Timeout');
+                controller.abort('JRPC Timeout');
             }, this.rpcTimeout);
             const response = yield axios_1.default.post(this.address, request, {
-                cancelToken: source.token,
+                signal: controller.signal,
             }).then((resp) => {
                 return resp.data;
             });
