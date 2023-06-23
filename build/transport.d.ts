@@ -1,3 +1,4 @@
+import { AxiosInstance } from 'axios';
 import { PubKeyHash } from './types';
 import WebSocketAsPromised = require('websocket-as-promised');
 export declare abstract class AbstractJSONRPCTransport {
@@ -22,6 +23,7 @@ declare class Subscription {
 export declare class HTTPTransport extends AbstractJSONRPCTransport {
     address: string;
     rpcTimeout: number;
+    instance: AxiosInstance;
     constructor(address: string, rpcTimeout?: number);
     request(method: string, params?: any): Promise<any>;
     disconnect(): Promise<void>;

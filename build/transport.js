@@ -37,7 +37,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DummyTransport = exports.WSTransport = exports.HTTPTransport = exports.JRPCError = exports.AbstractJSONRPCTransport = void 0;
 const axios_1 = __importDefault(require("axios"));
-const ethers = __importStar(require("ethers"));
 const ethers_1 = require("ethers");
 const websocket = __importStar(require("websocket"));
 const signer_1 = require("./signer");
@@ -74,26 +73,23 @@ class HTTPTransport extends AbstractJSONRPCTransport {
         super();
         this.address = address;
         this.rpcTimeout = rpcTimeout;
+        this.instance = axios_1.default.create({
+            baseURL: address,
+            timeout: rpcTimeout,
+        });
     }
     // JSON RPC request
     request(method, params = null) {
         return __awaiter(this, void 0, void 0, function* () {
-            const request = {
+            const body = {
                 id: 1,
                 jsonrpc: '2.0',
                 method,
                 params,
             };
-            const controller = new AbortController();
-            const timeout = setTimeout(() => {
-                controller.abort('JRPC Timeout');
-            }, this.rpcTimeout);
-            const response = yield axios_1.default.post(this.address, request, {
-                signal: controller.signal,
-            }).then((resp) => {
+            const response = yield this.instance.post(this.address, body).then((resp) => {
                 return resp.data;
             });
-            clearTimeout(timeout);
             if ('result' in response) {
                 return response.result;
             }
@@ -207,7 +203,7 @@ class DummyTransport extends AbstractJSONRPCTransport {
     }
     getPubKeyHash() {
         return __awaiter(this, void 0, void 0, function* () {
-            const ethWallet = new ethers.Wallet(this.ethPrivateKey);
+            const ethWallet = new ethers_1.Wallet(this.ethPrivateKey);
             const { signer } = yield signer_1.Signer.fromETHSignature(ethWallet);
             return yield signer.pubKeyHash();
         });

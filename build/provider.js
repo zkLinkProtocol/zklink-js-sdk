@@ -16,10 +16,10 @@ const transport_1 = require("./transport");
 const utils_1 = require("./utils");
 const EthersErrorCode = logger_1.ErrorCode;
 class Provider {
-    constructor(transport) {
+    constructor(transport, rpcTimeout = 10000, pollIntervalMilliSecs = 2000) {
         this.transport = transport;
-        // For HTTP provider
-        this.pollIntervalMilliSecs = 2000;
+        this.rpcTimeout = rpcTimeout;
+        this.pollIntervalMilliSecs = pollIntervalMilliSecs;
     }
     /**
      * @deprecated Websocket support will be removed in future. Use HTTP transport instead.
@@ -35,10 +35,7 @@ class Provider {
     static newHttpProvider(address = 'http://127.0.0.1:3030', rpcTimeout, pollIntervalMilliSecs) {
         return __awaiter(this, void 0, void 0, function* () {
             const transport = new transport_1.HTTPTransport(address, rpcTimeout);
-            const provider = new Provider(transport);
-            if (pollIntervalMilliSecs) {
-                provider.pollIntervalMilliSecs = pollIntervalMilliSecs;
-            }
+            const provider = new Provider(transport, rpcTimeout, pollIntervalMilliSecs);
             provider.tokenSet = new utils_1.TokenSet(yield provider.getTokens());
             yield provider.getContractInfo();
             return provider;

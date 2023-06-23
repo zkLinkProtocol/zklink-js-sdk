@@ -18,11 +18,11 @@ export class Provider {
   contractInfo: ContractInfo[]
   public tokenSet: TokenSet
 
-  // For HTTP provider
-  public pollIntervalMilliSecs = 2000
-  public chainId: number
-
-  private constructor(public transport: AbstractJSONRPCTransport) {}
+  private constructor(
+    public transport: AbstractJSONRPCTransport,
+    public rpcTimeout = 10000,
+    public pollIntervalMilliSecs = 2000
+  ) {}
 
   /**
    * @deprecated Websocket support will be removed in future. Use HTTP transport instead.
@@ -40,10 +40,7 @@ export class Provider {
     pollIntervalMilliSecs?: number
   ): Promise<Provider> {
     const transport = new HTTPTransport(address, rpcTimeout)
-    const provider = new Provider(transport)
-    if (pollIntervalMilliSecs) {
-      provider.pollIntervalMilliSecs = pollIntervalMilliSecs
-    }
+    const provider = new Provider(transport, rpcTimeout, pollIntervalMilliSecs)
     provider.tokenSet = new TokenSet(await provider.getTokens())
     await provider.getContractInfo()
     return provider

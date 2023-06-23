@@ -4,10 +4,10 @@ import { AccountBalances, AccountState, Address, ContractInfo, Tokens, Transacti
 import { TokenSet } from './utils';
 export declare class Provider {
     transport: AbstractJSONRPCTransport;
+    rpcTimeout: number;
+    pollIntervalMilliSecs: number;
     contractInfo: ContractInfo[];
     tokenSet: TokenSet;
-    pollIntervalMilliSecs: number;
-    chainId: number;
     private constructor();
     /**
      * @deprecated Websocket support will be removed in future. Use HTTP transport instead.

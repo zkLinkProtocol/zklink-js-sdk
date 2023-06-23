@@ -1,6 +1,5 @@
-import Axios from 'axios'
-import * as ethers from 'ethers'
-import { BigNumber } from 'ethers'
+import axios, { AxiosInstance } from 'axios'
+import { BigNumber, Wallet } from 'ethers'
 import * as websocket from 'websocket'
 import { Signer } from './signer'
 import { PubKeyHash } from './types'
@@ -43,29 +42,29 @@ class Subscription {
 }
 
 export class HTTPTransport extends AbstractJSONRPCTransport {
+  public instance: AxiosInstance
+
   public constructor(public address: string, public rpcTimeout: number = 30000) {
     super()
+
+    this.instance = axios.create({
+      baseURL: address,
+      timeout: rpcTimeout,
+    })
   }
 
   // JSON RPC request
   async request(method: string, params = null): Promise<any> {
-    const request = {
+    const body = {
       id: 1,
       jsonrpc: '2.0',
       method,
       params,
     }
-    const controller = new AbortController()
-    const timeout = setTimeout(() => {
-      controller.abort('JRPC Timeout')
-    }, this.rpcTimeout)
 
-    const response = await Axios.post(this.address, request, {
-      signal: controller.signal,
-    }).then((resp) => {
+    const response = await this.instance.post(this.address, body).then((resp) => {
       return resp.data
     })
-    clearTimeout(timeout)
     if ('result' in response) {
       return response.result
     } else if ('error' in response) {
@@ -195,7 +194,7 @@ export class DummyTransport extends AbstractJSONRPCTransport {
   }
 
   async getPubKeyHash(): Promise<PubKeyHash> {
-    const ethWallet = new ethers.Wallet(this.ethPrivateKey)
+    const ethWallet = new Wallet(this.ethPrivateKey)
     const { signer } = await Signer.fromETHSignature(ethWallet)
     return await signer.pubKeyHash()
   }
