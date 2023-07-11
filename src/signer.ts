@@ -33,6 +33,10 @@ export class Signer {
     this.#privateKey = privKey
   }
 
+  public getPrivateKey() {
+    return this.#privateKey
+  }
+
   seed: Uint8Array
 
   async pubKeyHash(): Promise<PubKeyHash> {
@@ -185,7 +189,10 @@ export class Create2WalletSigner extends ethers.Signer {
       value: provider,
       writable: false,
     })
-    const create2Info = utils.getCREATE2AddressAndSalt(zkSyncPubkeyHash, create2WalletData)
+    const create2Info = utils.getCREATE2AddressAndSalt(
+      zkSyncPubkeyHash,
+      create2WalletData
+    )
     this.address = create2Info.address
     this.salt = create2Info.salt
   }
