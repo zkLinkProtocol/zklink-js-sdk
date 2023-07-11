@@ -1,20 +1,14 @@
 import { BigNumber, BigNumberish, ethers, utils } from 'ethers';
-import { Provider } from '.';
-import { Address, ChainId, ChangePubKeyData, CloseAccount, EthSignerType, ForcedExitData, OrderData, OrderMatchingData, PubKeyHash, TokenAddress, TokenLike, TokenSymbol, Tokens, TransferData, WithdrawData } from './types';
+import { Address, ChangePubKeyData, EthSignerType, ForcedExitData, OrderData, OrderMatchingData, PubKeyHash, TokenAddress, TransferData, WithdrawData } from './types';
 export declare const MIN_UNONCE = 1;
 export declare const MAX_UNONCE = 4294967295;
 export declare const IERC20_INTERFACE: ethers.utils.Interface;
 export declare const MAIN_CONTRACT_INTERFACE: ethers.utils.Interface;
-export declare const ZKL_CONTRACT_INTERFACE: ethers.utils.Interface;
 export declare const IEIP1271_INTERFACE: ethers.utils.Interface;
-export declare const ERC20_DEPOSIT_GAS_LIMIT: any;
 export declare const MAX_ERC20_APPROVE_AMOUNT: BigNumber;
 export declare const ERC20_APPROVE_TRESHOLD: BigNumber;
 export declare const ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT: BigNumber;
 export declare const ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT: BigNumber;
-export declare const ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT: BigNumber;
-export declare const ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT: BigNumber;
-export declare const TOTAL_CHAIN_NUM = 4;
 export declare const SIGN_MESSAGE = "Sign this message to create a key to interact with zkLink's layer2 services.\nNOTE: This application is powered by zkLink protocol.\n\nOnly sign this message for a trusted client!";
 export declare function floatToInteger(floatBytes: Uint8Array, expBits: number, mantissaBits: number, expBaseNumber: number): BigNumber;
 export declare function bitsIntoBytesInBEOrder(bits: number[]): Uint8Array;
@@ -41,21 +35,7 @@ export declare function closestGreaterOrEqPackableTransactionFee(fee: BigNumberi
 export declare function isTransactionFeePackable(amount: BigNumberish): boolean;
 export declare function buffer2bitsBE(buff: any): any[];
 export declare function sleep(ms: number): Promise<unknown>;
-export declare function isTokenETH(token: TokenAddress): boolean;
-type TokenOrId = TokenLike | number;
-export declare class TokenSet {
-    private tokensById;
-    constructor(tokensById: Tokens);
-    private resolveTokenObject;
-    isTokenTransferAmountPackable(tokenLike: TokenOrId, amount: string): boolean;
-    isTokenTransactionFeePackable(tokenLike: TokenOrId, amount: string): boolean;
-    formatToken(tokenLike: TokenOrId, amount: BigNumberish): string;
-    parseToken(tokenLike: TokenOrId, amount: string): BigNumber;
-    resolveTokenDecimals(tokenLike: TokenOrId): number;
-    resolveTokenId(tokenLike: TokenOrId): number;
-    resolveTokenAddress(tokenLike: TokenOrId, chainId: ChainId): TokenAddress;
-    resolveTokenSymbol(tokenLike: TokenOrId): TokenSymbol;
-}
+export declare function isGasToken(token: TokenAddress): boolean;
 export declare function getChangePubkeyMessage(pubKeyHash: PubKeyHash, nonce: number, accountId: number, verifyingContract: string, layerOneChainId: number, domainName?: string, version?: string): any;
 export declare function getSignedBytesFromMessage(message: utils.BytesLike | string, addPrefix: boolean): Uint8Array;
 export declare function signMessagePersonalAPI(signer: ethers.Signer | any, message: Uint8Array): Promise<string>;
@@ -85,10 +65,9 @@ export declare function serializeOrderMatching(matching: OrderMatchingData): Pro
  * Encodes the transaction data as the byte sequence according to the zkSync protocol.
  * @param tx A transaction to serialize.
  */
-export declare function serializeTx(tx: TransferData | WithdrawData | ChangePubKeyData | CloseAccount | ForcedExitData): Uint8Array;
+export declare function serializeTx(tx: TransferData | WithdrawData | ChangePubKeyData | ForcedExitData): Uint8Array;
 export declare function numberToBytesBE(number: number, bytes: number): Uint8Array;
 export declare function bigintToBytesBE(number1: bigint, bytes: number): Uint8Array;
-export declare function parseHexWithPrefix(str: string): Uint8Array;
 export declare function getCREATE2AddressAndSalt(syncPubkeyHash: string, create2Data: {
     creatorAddress: string;
     saltArg: string;
@@ -97,11 +76,6 @@ export declare function getCREATE2AddressAndSalt(syncPubkeyHash: string, create2
     salt: string;
     address: string;
 };
-export declare function getEthereumBalance(ethProvider: ethers.providers.Provider, syncProvider: Provider, address: Address, token: TokenAddress, chainId: ChainId): Promise<BigNumber>;
-export declare function getPendingBalance(ethProvider: ethers.providers.Provider, syncProvider: Provider, address: Address, token: TokenLike, chainId: ChainId): Promise<BigNumberish>;
-export declare function getTxHash(tx: TransferData | WithdrawData | ChangePubKeyData | ForcedExitData | CloseAccount): string;
-export declare function getRandom(min: number, max: number): number;
-export declare function getFastSwapUNonce(): number;
-export declare function chainsCompletion(chains: any[], chainNum: number, item: any): any[];
+export declare function getEthereumBalance(ethProvider: ethers.providers.Provider, address: Address, tokenAddress: TokenAddress): Promise<BigNumber>;
+export declare function getTxHash(tx: TransferData | WithdrawData | ChangePubKeyData | ForcedExitData): string;
 export declare function getTimestamp(): number;
-export {};

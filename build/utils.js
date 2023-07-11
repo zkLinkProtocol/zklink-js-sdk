@@ -20,8 +20,8 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.serializeFastWithdraw = exports.serializeFeeRatio = exports.serializeChainId = exports.serializeNonce = exports.serializeFeePacked = exports.serializeAmountFull = exports.serializeAmountPacked = exports.serializeTokenId = exports.serializeSubAccountId = exports.serializeAccountId = exports.serializeAddress = exports.serializePubKeyHash = exports.getEthSignatureType = exports.verifyERC1271Signature = exports.signMessageEIP712 = exports.signMessagePersonalAPI = exports.getSignedBytesFromMessage = exports.getChangePubkeyMessage = exports.TokenSet = exports.isTokenETH = exports.sleep = exports.buffer2bitsBE = exports.isTransactionFeePackable = exports.closestGreaterOrEqPackableTransactionFee = exports.closestPackableTransactionFee = exports.isTransactionAmountPackable = exports.closestGreaterOrEqPackableTransactionAmount = exports.closestPackableTransactionAmount = exports.packFeeChecked = exports.packAmountChecked = exports.reverseBits = exports.integerToFloatUp = exports.integerToFloat = exports.bitsIntoBytesInBEOrder = exports.floatToInteger = exports.SIGN_MESSAGE = exports.TOTAL_CHAIN_NUM = exports.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT = exports.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ERC20_APPROVE_TRESHOLD = exports.MAX_ERC20_APPROVE_AMOUNT = exports.ERC20_DEPOSIT_GAS_LIMIT = exports.IEIP1271_INTERFACE = exports.ZKL_CONTRACT_INTERFACE = exports.MAIN_CONTRACT_INTERFACE = exports.IERC20_INTERFACE = exports.MAX_UNONCE = exports.MIN_UNONCE = void 0;
-exports.getTimestamp = exports.chainsCompletion = exports.getFastSwapUNonce = exports.getRandom = exports.getTxHash = exports.getPendingBalance = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.parseHexWithPrefix = exports.bigintToBytesBE = exports.numberToBytesBE = exports.serializeTx = exports.serializeOrderMatching = exports.serializeOrder = exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeTransfer = exports.serializeWithdraw = exports.serializeTimestamp = void 0;
+exports.serializeOrder = exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeTransfer = exports.serializeWithdraw = exports.serializeTimestamp = exports.serializeFastWithdraw = exports.serializeFeeRatio = exports.serializeChainId = exports.serializeNonce = exports.serializeFeePacked = exports.serializeAmountFull = exports.serializeAmountPacked = exports.serializeTokenId = exports.serializeSubAccountId = exports.serializeAccountId = exports.serializeAddress = exports.serializePubKeyHash = exports.getEthSignatureType = exports.verifyERC1271Signature = exports.signMessageEIP712 = exports.signMessagePersonalAPI = exports.getSignedBytesFromMessage = exports.getChangePubkeyMessage = exports.isGasToken = exports.sleep = exports.buffer2bitsBE = exports.isTransactionFeePackable = exports.closestGreaterOrEqPackableTransactionFee = exports.closestPackableTransactionFee = exports.isTransactionAmountPackable = exports.closestGreaterOrEqPackableTransactionAmount = exports.closestPackableTransactionAmount = exports.packFeeChecked = exports.packAmountChecked = exports.reverseBits = exports.integerToFloatUp = exports.integerToFloat = exports.bitsIntoBytesInBEOrder = exports.floatToInteger = exports.SIGN_MESSAGE = exports.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ERC20_APPROVE_TRESHOLD = exports.MAX_ERC20_APPROVE_AMOUNT = exports.IEIP1271_INTERFACE = exports.MAIN_CONTRACT_INTERFACE = exports.IERC20_INTERFACE = exports.MAX_UNONCE = exports.MIN_UNONCE = void 0;
+exports.getTimestamp = exports.getTxHash = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.bigintToBytesBE = exports.numberToBytesBE = exports.serializeTx = exports.serializeOrderMatching = void 0;
 const ethers_1 = require("ethers");
 const zksync_crypto_1 = require("zksync-crypto");
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
@@ -32,9 +32,7 @@ exports.MIN_UNONCE = 1;
 exports.MAX_UNONCE = 4294967295;
 exports.IERC20_INTERFACE = new ethers_1.utils.Interface(require('../abi/IERC20.json').abi);
 exports.MAIN_CONTRACT_INTERFACE = new ethers_1.utils.Interface(require('../abi/ZkLink.json').abi);
-exports.ZKL_CONTRACT_INTERFACE = new ethers_1.utils.Interface(require('../abi/ZKL.json').abi);
 exports.IEIP1271_INTERFACE = new ethers_1.utils.Interface(require('../abi/IEIP1271.json').abi);
-exports.ERC20_DEPOSIT_GAS_LIMIT = require('../misc/DepositERC20GasLimit.json');
 exports.MAX_ERC20_APPROVE_AMOUNT = ethers_1.BigNumber.from('115792089237316195423570985008687907853269984665640564039457584007913129639935'); // 2^256 - 1
 exports.ERC20_APPROVE_TRESHOLD = ethers_1.BigNumber.from('57896044618658097711785492504343953926634992332820282019728792003956564819968'); // 2^255
 // Gas limit that is set for eth deposit by default. For default EOA accounts 60k should be enough, but we reserve
@@ -43,9 +41,6 @@ exports.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = ethers_1.BigNumber.from('140000'); /
 // For normal wallet/erc20 token 90k gas for deposit should be enough, but for some tokens this can go as high as ~200k
 // we try to be safe by default
 exports.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = ethers_1.BigNumber.from('300000'); // 300k
-exports.ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT = ethers_1.BigNumber.from('140000'); // 90k
-exports.ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT = ethers_1.BigNumber.from('300000'); // 300k
-exports.TOTAL_CHAIN_NUM = 4;
 const AMOUNT_EXPONENT_BIT_WIDTH = 5;
 const AMOUNT_MANTISSA_BIT_WIDTH = 35;
 const FEE_EXPONENT_BIT_WIDTH = 5;
@@ -212,14 +207,16 @@ function packFeeUp(amount) {
     return reverseBits(integerToFloatUp(amount, FEE_EXPONENT_BIT_WIDTH, FEE_MANTISSA_BIT_WIDTH, 10));
 }
 function packAmountChecked(amount) {
-    if (closestPackableTransactionAmount(amount.toString()).toString() !== amount.toString()) {
+    if (closestPackableTransactionAmount(amount.toString()).toString() !==
+        amount.toString()) {
         throw new Error('Transaction Amount is not packable');
     }
     return packAmount(amount);
 }
 exports.packAmountChecked = packAmountChecked;
 function packFeeChecked(amount) {
-    if (closestPackableTransactionFee(amount.toString()).toString() !== amount.toString()) {
+    if (closestPackableTransactionFee(amount.toString()).toString() !==
+        amount.toString()) {
         throw new Error('Fee Amount is not packable');
     }
     return packFee(amount);
@@ -283,62 +280,12 @@ function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 exports.sleep = sleep;
-function isTokenETH(token) {
+function isGasToken(token) {
     return (token === ethers_1.constants.AddressZero ||
-        '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase() === token.toLowerCase());
+        '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase() ===
+            token.toLowerCase());
 }
-exports.isTokenETH = isTokenETH;
-class TokenSet {
-    // TODO: handle stale entries, edge case when we rename token after adding it (ZKS-120).
-    constructor(tokensById) {
-        this.tokensById = tokensById;
-    }
-    resolveTokenObject(tokenLike) {
-        if (this.tokensById[tokenLike]) {
-            return this.tokensById[tokenLike];
-        }
-        for (const token of Object.values(this.tokensById)) {
-            if (typeof tokenLike === 'number') {
-                if (token.id === tokenLike) {
-                    return token;
-                }
-            }
-            else if (token.symbol.toLocaleLowerCase() === tokenLike.toLocaleLowerCase()) {
-                return token;
-            }
-        }
-        throw new Error(`Token ${tokenLike} is not supported`);
-    }
-    isTokenTransferAmountPackable(tokenLike, amount) {
-        const parsedAmount = this.parseToken(tokenLike, amount);
-        return isTransactionAmountPackable(parsedAmount);
-    }
-    isTokenTransactionFeePackable(tokenLike, amount) {
-        const parsedAmount = this.parseToken(tokenLike, amount);
-        return isTransactionFeePackable(parsedAmount);
-    }
-    formatToken(tokenLike, amount) {
-        const decimals = this.resolveTokenDecimals(tokenLike);
-        return ethers_1.utils.formatUnits(amount, decimals);
-    }
-    parseToken(tokenLike, amount) {
-        const decimals = this.resolveTokenDecimals(tokenLike);
-        return ethers_1.utils.parseUnits(amount, decimals);
-    }
-    resolveTokenDecimals(tokenLike) {
-        return this.resolveTokenObject(tokenLike).decimals;
-    }
-    resolveTokenId(tokenLike) {
-        return this.resolveTokenObject(tokenLike).id;
-    }
-    resolveTokenAddress(tokenLike, chainId) {
-        return this.resolveTokenObject(tokenLike).chains[chainId].address;
-    }
-    resolveTokenSymbol(tokenLike) {
-        return this.resolveTokenObject(tokenLike).symbol;
-    }
-}
-exports.TokenSet = TokenSet;
+exports.isGasToken = isGasToken;
 function getChangePubkeyMessage(pubKeyHash, nonce, accountId, verifyingContract, layerOneChainId, domainName = 'ZkLink', version = '1') {
     const domainType = [
         { name: 'name', type: 'string' },
@@ -379,7 +326,9 @@ function getChangePubkeyMessage(pubKeyHash, nonce, accountId, verifyingContract,
 }
 exports.getChangePubkeyMessage = getChangePubkeyMessage;
 function getSignedBytesFromMessage(message, addPrefix) {
-    let messageBytes = typeof message === 'string' ? ethers_1.utils.toUtf8Bytes(message) : ethers_1.utils.arrayify(message);
+    let messageBytes = typeof message === 'string'
+        ? ethers_1.utils.toUtf8Bytes(message)
+        : ethers_1.utils.arrayify(message);
     if (addPrefix) {
         messageBytes = ethers_1.utils.concat([
             ethers_1.utils.toUtf8Bytes(`\x19Ethereum Signed Message:\n${messageBytes.length}`),
@@ -393,7 +342,10 @@ function signMessagePersonalAPI(signer, message) {
     return __awaiter(this, void 0, void 0, function* () {
         if (signer instanceof ethers_1.ethers.providers.JsonRpcSigner) {
             return signer.provider
-                .send('personal_sign', [ethers_1.utils.hexlify(message), yield signer.getAddress()])
+                .send('personal_sign', [
+                ethers_1.utils.hexlify(message),
+                yield signer.getAddress(),
+            ])
                 .then((sign) => sign, (err) => {
                 // We check for method name in the error string because error messages about invalid method name
                 // often contain method name.
@@ -414,7 +366,10 @@ function signMessageEIP712(signer, data) {
     return __awaiter(this, void 0, void 0, function* () {
         if (signer instanceof ethers_1.ethers.providers.JsonRpcSigner) {
             return signer.provider
-                .send('eth_signTypedData_v4', [yield signer.getAddress(), JSON.stringify(data)])
+                .send('eth_signTypedData_v4', [
+                yield signer.getAddress(),
+                JSON.stringify(data),
+            ])
                 .then((sign) => sign, (err) => {
                 console.log('eth_signTypedData_v4', err);
                 throw err;
@@ -474,9 +429,7 @@ exports.getEthSignatureType = getEthSignatureType;
 function removeAddressPrefix(address) {
     if (address.startsWith('0x'))
         return address.substr(2);
-    if (address.startsWith('sync:'))
-        return address.substr(5);
-    throw new Error("ETH address must start with '0x' and PubKeyHash must start with 'sync:'");
+    throw new Error("ETH address must start with '0x'");
 }
 function serializePubKeyHash(address) {
     const prefixlessAddress = removeAddressPrefix(address);
@@ -760,10 +713,6 @@ function bigintToBytesBE(number1, bytes) {
     return result;
 }
 exports.bigintToBytesBE = bigintToBytesBE;
-function parseHexWithPrefix(str) {
-    return Uint8Array.from(Buffer.from(str.slice(2), 'hex'));
-}
-exports.parseHexWithPrefix = parseHexWithPrefix;
 function getCREATE2AddressAndSalt(syncPubkeyHash, create2Data) {
     const pubkeyHashHex = syncPubkeyHash;
     const additionalSaltArgument = ethers_1.ethers.utils.arrayify(create2Data.saltArg);
@@ -785,56 +734,25 @@ function getCREATE2AddressAndSalt(syncPubkeyHash, create2Data) {
     return { address: address, salt: ethers_1.ethers.utils.hexlify(salt) };
 }
 exports.getCREATE2AddressAndSalt = getCREATE2AddressAndSalt;
-function getEthereumBalance(ethProvider, syncProvider, address, token, chainId) {
+function getEthereumBalance(ethProvider, address, tokenAddress) {
     return __awaiter(this, void 0, void 0, function* () {
         let balance;
-        if (isTokenETH(token)) {
+        if (isGasToken(tokenAddress)) {
             balance = yield ethProvider.getBalance(address);
         }
         else {
-            const erc20contract = new ethers_1.Contract(token, exports.IERC20_INTERFACE, ethProvider);
+            const erc20contract = new ethers_1.Contract(tokenAddress, exports.IERC20_INTERFACE, ethProvider);
             balance = yield erc20contract.balanceOf(address);
         }
         return balance;
     });
 }
 exports.getEthereumBalance = getEthereumBalance;
-function getPendingBalance(ethProvider, syncProvider, address, token, chainId) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const contractAddress = yield syncProvider.getContractInfoByChainId(chainId);
-        const zksyncContract = new ethers_1.Contract(contractAddress.mainContract, exports.MAIN_CONTRACT_INTERFACE, ethProvider);
-        const tokenAddress = syncProvider.tokenSet.resolveTokenAddress(token, chainId);
-        return zksyncContract.getPendingBalance(address, tokenAddress);
-    });
-}
-exports.getPendingBalance = getPendingBalance;
 function getTxHash(tx) {
-    if (tx.type == 'Close') {
-        throw new Error('Close operation is disabled');
-    }
     let txBytes = serializeTx(tx);
     return ethers_1.ethers.utils.sha256(txBytes);
 }
 exports.getTxHash = getTxHash;
-function getRandom(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
-}
-exports.getRandom = getRandom;
-function getFastSwapUNonce() {
-    return getRandom(exports.MIN_UNONCE, exports.MAX_UNONCE);
-}
-exports.getFastSwapUNonce = getFastSwapUNonce;
-function chainsCompletion(chains, chainNum, item) {
-    if (chains.length === chainNum) {
-        return chains;
-    }
-    const newChains = Array.from(chains);
-    for (let i = 0; i < chainNum - chains.length; i++) {
-        newChains.push(item);
-    }
-    return newChains;
-}
-exports.chainsCompletion = chainsCompletion;
 function getTimestamp() {
     let ts = new Date().getTime();
     return parseInt(String(ts / 1000));

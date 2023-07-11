@@ -1,13 +1,8 @@
+import { TransactionResponse } from '@ethersproject/abstract-provider';
 import { BigNumber, BigNumberish, ContractTransaction, ethers } from 'ethers';
-import { LinkContract } from './contract';
 import { EthMessageSigner } from './eth-message-signer';
-import { Provider } from './provider';
 import { Signer } from './signer';
-import { AccountBalances, AccountState, Address, ChainId, ChangePubKeyData, ChangePubKeyEntries, Create2Data, EthSignerType, ForcedExitData, ForcedExitEntries, Nonce, OrderData, OrderMatchingData, OrderMatchingEntries, PriorityOperationReceipt, PubKeyHash, SignedTransaction, TokenAddress, TokenId, TokenLike, TransactionReceipt, TransferData, TransferEntries, TxEthSignature, WithdrawData, WithdrawEntries } from './types';
-export declare class ZKLinkTxError extends Error {
-    value: PriorityOperationReceipt | TransactionReceipt;
-    constructor(message: string, value: PriorityOperationReceipt | TransactionReceipt);
-}
+import { Address, ChangePubKeyData, ChangePubKeyEntries, Create2Data, EthSignerType, ForcedExitData, ForcedExitEntries, Nonce, OrderData, OrderMatchingData, OrderMatchingEntries, PubKeyHash, SignedTransaction, TokenAddress, TokenId, TransferData, TransferEntries, TxEthSignature, WithdrawData, WithdrawEntries } from './types';
 export declare class Wallet {
     ethSigner: ethers.Signer;
     ethMessageSigner: EthMessageSigner;
@@ -15,45 +10,32 @@ export declare class Wallet {
     signer?: Signer;
     accountId?: number;
     ethSignerType?: EthSignerType;
-    provider: Provider;
-    contract: LinkContract;
     private constructor();
-    connect(provider: Provider): this;
-    static fromEthSigner(ethWallet: ethers.Signer, provider: Provider, signer?: Signer, accountId?: number, ethSignerType?: EthSignerType): Promise<Wallet>;
-    static fromCreate2Data(syncSigner: Signer, createrSigner: ethers.Signer, provider: Provider, create2Data: Create2Data, accountId?: number): Promise<Wallet>;
-    static fromEthSignerNoKeys(ethWallet: ethers.Signer, provider: Provider, accountId?: number, ethSignerType?: EthSignerType): Promise<Wallet>;
+    static fromEthSigner(ethWallet: ethers.Signer, signer?: Signer, accountId?: number, ethSignerType?: EthSignerType): Promise<Wallet>;
+    static fromCreate2Data(syncSigner: Signer, createrSigner: ethers.Signer, create2Data: Create2Data, accountId?: number): Promise<Wallet>;
+    static fromEthSignerNoKeys(ethWallet: ethers.Signer, accountId?: number, ethSignerType?: EthSignerType): Promise<Wallet>;
     getEIP712Signature(data: any): Promise<TxEthSignature>;
-    sendTransfer(transfer: TransferEntries): Promise<Transaction>;
-    getTransferData(entries: TransferEntries): Promise<TransferData>;
+    getTransferData(entries: TransferEntries): TransferData;
     signTransfer(entries: TransferEntries): Promise<SignedTransaction>;
-    sendForcedExit(entries: ForcedExitEntries): Promise<Transaction>;
-    getForcedExitData(entries: ForcedExitEntries): Promise<ForcedExitData>;
+    getForcedExitData(entries: ForcedExitEntries): ForcedExitData;
     signForcedExit(entries: ForcedExitEntries): Promise<SignedTransaction>;
     signOrder(entries: OrderData): Promise<SignedTransaction>;
-    getOrderMatchingData(entries: OrderMatchingEntries): Promise<OrderMatchingData>;
+    getOrderMatchingData(entries: OrderMatchingEntries): OrderMatchingData;
     signOrderMatching(entries: OrderMatchingEntries): Promise<SignedTransaction>;
-    sendWithdrawToEthereum(entries: WithdrawEntries): Promise<Transaction>;
-    getWithdrawData(entries: WithdrawEntries): Promise<WithdrawData>;
+    getWithdrawData(entries: WithdrawEntries): WithdrawData;
     signWithdrawToEthereum(entries: WithdrawEntries): Promise<SignedTransaction>;
-    isSigningKeySet(): Promise<boolean>;
-    sendChangePubKey(entries: ChangePubKeyEntries): Promise<Transaction>;
+    isSigningKeySet(currentPubKeyHash: PubKeyHash): Promise<boolean>;
     getChangePubKeyData(entries: ChangePubKeyEntries): Promise<ChangePubKeyData>;
     signChangePubKey(entries: ChangePubKeyEntries): Promise<SignedTransaction>;
-    isOnchainAuthSigningKeySet(linkChainId: number): Promise<boolean>;
-    onchainAuthSigningKey(linkChainId: number, nonce?: Nonce, ethTxOptions?: ethers.providers.TransactionRequest): Promise<ContractTransaction>;
-    getCurrentPubKeyHash(): Promise<PubKeyHash>;
-    getNonce(): Promise<number>;
-    getSubNonce(subAccountId: number): Promise<number>;
-    getAccountId(): Promise<number | undefined>;
+    isOnchainAuthSigningKeySet(mainContract: Address, nonce: Nonce): Promise<boolean>;
+    onchainAuthSigningKey(mainContract: Address, nonce: Nonce, currentPubKeyHash: PubKeyHash, ethTxOptions?: ethers.providers.TransactionRequest): Promise<ContractTransaction>;
     address(): Address;
-    getAccountState(): Promise<AccountState>;
-    getBalances(subAccountId?: number): Promise<AccountBalances>;
-    getTokenBalance(tokenId: TokenId, subAccountId: number): Promise<string>;
-    getEthereumBalance(token: TokenLike, linkChainId: ChainId): Promise<BigNumber>;
+    getEthereumBalance(tokenAddress: TokenAddress): Promise<BigNumber>;
     estimateGasDeposit(tx: ethers.providers.TransactionRequest): Promise<BigNumber>;
-    isERC20DepositsApproved(tokenAddress: Address, accountAddress: Address, linkChainId: number, erc20ApproveThreshold?: BigNumber): Promise<boolean>;
-    approveERC20TokenDeposits(tokenAddress: Address, linkChainId: number, max_erc20_approve_amount?: BigNumber): Promise<ContractTransaction>;
+    isERC20DepositsApproved(mainContract: Address, tokenAddress: Address, accountAddress: Address, erc20ApproveThreshold?: BigNumber): Promise<boolean>;
+    approveERC20TokenDeposits(mainContract: Address, tokenAddress: Address, max_erc20_approve_amount?: BigNumber): Promise<TransactionResponse>;
     sendDepositFromEthereum(deposit: {
+        mainContract: Address;
         subAccountId: number;
         depositTo: Address;
         token: TokenAddress;
@@ -62,39 +44,16 @@ export declare class Wallet {
         mapping?: boolean;
         ethTxOptions?: ethers.providers.TransactionRequest;
         approveDepositAmountForERC20?: boolean;
-    }): Promise<ETHOperation>;
+    }): Promise<TransactionResponse>;
     emergencyWithdraw(withdraw: {
+        mainContract: Address;
         tokenId: TokenId;
         subAccountId: number;
         linkChainId: number;
-        accountId?: number;
+        accountId: number;
         ethTxOptions?: ethers.providers.TransactionRequest;
-    }): Promise<ETHOperation>;
-    getMainContract(linkChainId: number): Promise<ethers.Contract>;
+    }): Promise<TransactionResponse>;
     private modifyEthersError;
-    private setRequiredAccountIdFromServer;
+    requireAccountId(accountId: number, msg: string): void;
+    requireNonce(nonce: number, msg: string): void;
 }
-export declare class ETHOperation {
-    ethTx: ContractTransaction;
-    zkSyncProvider: Provider;
-    state: 'Sent' | 'Mined' | 'Committed' | 'Verified' | 'Failed';
-    error?: ZKLinkTxError;
-    priorityOpId?: BigNumber;
-    constructor(ethTx: ContractTransaction, zkSyncProvider: Provider);
-    awaitEthereumTxCommit(): Promise<ethers.ContractReceipt>;
-    awaitReceipt(): Promise<TransactionReceipt>;
-    private setErrorState;
-    private throwErrorIfFailedState;
-}
-export declare class Transaction {
-    txData: any;
-    txHash: string;
-    sidechainProvider: Provider;
-    state: 'Sent' | 'Committed' | 'Verified' | 'Failed';
-    error?: ZKLinkTxError;
-    constructor(txData: any, txHash: string, sidechainProvider: Provider);
-    awaitReceipt(): Promise<TransactionReceipt>;
-    private setErrorState;
-    private throwErrorIfFailedState;
-}
-export declare function submitSignedTransaction(signedTx: SignedTransaction, provider: Provider): Promise<Transaction>;

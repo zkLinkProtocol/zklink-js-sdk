@@ -3,6 +3,7 @@ import { Address, ChangePubKeyCREATE2, ChangePubKeyData, ChangePubKeyECDSA, Chan
 export declare class Signer {
     #private;
     private constructor();
+    getPrivateKey(): Uint8Array;
     seed: Uint8Array;
     pubKeyHash(): Promise<PubKeyHash>;
     signTransactionBytes(msg: string): Promise<Signature>;
