@@ -1,12 +1,10 @@
-import { BigNumber, BigNumberish } from 'ethers'
+import { BigNumberish } from 'ethers'
 
 // 0x-prefixed, hex encoded, ethereum account address
 export type Address = string
 // 0x-prefixed, hex encoded, hash of the account public key
 export type PubKeyHash = string
 
-// Symbol like "ETH" or "FAU" or token contract address(zero address is implied for "ETH").
-export type TokenLike = TokenSymbol
 // Token symbol (e.g. "ETH", "FAU", etc.)
 export type TokenSymbol = string
 // Token address (e.g. 0xde..ad for ERC20, or 0x00.00 for "ETH")
@@ -15,52 +13,15 @@ export type TokenId = number
 export type ChainId = number
 export type Ether = string
 export type Wei = string
-
-export type TotalFee = Map<TokenLike, BigNumber>
-
 export type Nonce = number
-export type SubAccountId = string
-
-export type Network =
-  | 'localhost'
-  | 'rinkeby'
-  | 'ropsten'
-  | 'mainnet'
-  | 'rinkeby-beta'
-  | 'ropsten-beta'
-
-export interface PairInfo {
-  amplifier: number
-  chains: ChainId[]
-  d: string
-  kind: number
-  lp_token: TokenId
-  reserves: string[]
-  token_in_pool: number
-  tokens: number[]
-  total_supply: string // wei
-}
+export type SubNonce = number
+export type SubAccountId = number
 
 export interface Create2Data {
   creatorAddress: string
   saltArg: string
   codeHash: string
 }
-
-export interface AccountState {
-  id?: number
-  address: Address
-  nonce: Nonce
-  pubKeyHash: PubKeyHash
-  accountType: string
-  subAccountNonces: Record<SubAccountId, Nonce>
-}
-
-export interface AccountBalances {
-  [subAccountId: SubAccountId]: Record<string, Wei>
-}
-
-export type EthProviderType = 'Metamask' | 'UniPass'
 
 export type EthSignerType = {
   verificationMethod: 'ECDSA' | 'ERC-1271'
@@ -80,73 +41,76 @@ export interface Signature {
 }
 
 export interface TransferEntries {
-  fromSubAccountId: number
-  toSubAccountId: number
+  accountId: number
+  fromSubAccountId: SubAccountId
+  toSubAccountId: SubAccountId
   to: Address
-  token: TokenId
+  tokenId: TokenId
+  tokenSymbol: TokenSymbol
   amount: BigNumberish
-  fee?: BigNumberish
-  nonce?: Nonce
+  fee: BigNumberish
+  nonce: SubNonce
   ts?: number
 }
 
 export interface TransferData {
   type: 'Transfer'
   accountId: number
-  fromSubAccountId: number
-  toSubAccountId: number
+  fromSubAccountId: SubAccountId
+  toSubAccountId: SubAccountId
   from: Address
   to: Address
   token: TokenId
   amount: BigNumberish
   fee: BigNumberish
   ts: number
-  nonce: number
+  nonce: SubNonce
   signature?: Signature
 }
 
 export interface WithdrawEntries {
   toChainId: ChainId
-  subAccountId: number
+  subAccountId: SubAccountId
   to: string
-  l2SourceToken: TokenId
-  l1TargetToken: TokenId
+  l2SourceTokenId: TokenId
+  l2SourceTokenSymbol: TokenSymbol
+  l1TargetTokenId: TokenId
   amount: BigNumberish
   withdrawFeeRatio: number
   fastWithdraw: number
-  accountId?: number
-  from?: string
-  fee?: BigNumberish
-  nonce?: Nonce
+  accountId: number
+  fee: BigNumberish
+  nonce: SubNonce
+  from?: Address
   ts?: number
 }
 export interface WithdrawData {
   type: 'Withdraw'
-  toChainId: number
-  subAccountId: number
+  toChainId: ChainId
+  subAccountId: SubAccountId
   accountId: number
   from: Address
   to: Address
-  l2SourceToken: number
-  l1TargetToken: number
+  l2SourceToken: TokenId
+  l1TargetToken: TokenId
   amount: BigNumberish
   fee: BigNumberish
   withdrawFeeRatio: number
   fastWithdraw: number
   ts: number
-  nonce: number
+  nonce: SubNonce
   signature?: Signature
 }
 
 export interface ForcedExitEntries {
   toChainId: ChainId
-  initiatorAccountId?: number
-  initiatorSubAccountId: number
+  initiatorAccountId: number
+  initiatorSubAccountId: SubAccountId
   target: Address
-  targetSubAccountId: number
-  l2SourceToken: TokenId
-  l1TargetToken: TokenId
-  initiatorNonce?: Nonce
+  targetSubAccountId: SubAccountId
+  l2SourceTokenId: TokenId
+  l1TargetTokenId: TokenId
+  initiatorNonce: SubNonce
   exitAmount: BigNumberish
   ts?: number
 }
@@ -154,12 +118,12 @@ export interface ForcedExitData {
   type: 'ForcedExit'
   toChainId: ChainId
   initiatorAccountId: number
-  initiatorSubAccountId: number
+  initiatorSubAccountId: SubAccountId
   target: Address
-  targetSubAccountId: number
-  l2SourceToken: number
-  l1TargetToken: number
-  initiatorNonce: number
+  targetSubAccountId: SubAccountId
+  l2SourceToken: TokenId
+  l1TargetToken: TokenId
+  initiatorNonce: SubNonce
   exitAmount: BigNumberish
   signature?: Signature
   ts: number
@@ -185,38 +149,34 @@ export interface ChangePubKeyCREATE2 {
 }
 
 export interface ChangePubKeyEntries {
-  chainId: number
-  subAccountId: number
-  feeToken: TokenId
+  chainId: ChainId
+  accountId: number
+  subAccountId: SubAccountId
+  feeTokenId: TokenId
   ethAuthType: ChangePubkeyTypes
+  fee: BigNumberish
+  nonce: Nonce
+  mainContract: Address
+  layerOneChainId: number
+  newPkHash?: PubKeyHash
   account?: Address
-  accountId?: number
-  fee?: BigNumberish
   ts?: number
-  nonce?: Nonce
 }
 
 export interface ChangePubKeyData {
   type: 'ChangePubKey'
-  chainId: number
-  subAccountId: number
+  chainId: ChainId
+  subAccountId: SubAccountId
   account: Address
   accountId: number
   newPkHash: PubKeyHash
-  feeToken: number
+  feeToken: TokenId
   fee: BigNumberish
   ts: number
-  nonce: number
+  nonce: Nonce
   signature?: Signature
   ethAuthData?: ChangePubKeyOnchain | ChangePubKeyECDSA | ChangePubKeyCREATE2
-  ethSignature?: string
-}
-
-export interface CloseAccount {
-  type: 'Close'
-  account: Address
-  nonce: number
-  signature: Signature
+  ethSignature?: TxEthSignature
 }
 
 export interface SignedTransaction {
@@ -224,109 +184,10 @@ export interface SignedTransaction {
     | TransferData
     | WithdrawData
     | ChangePubKeyData
-    | CloseAccount
     | ForcedExitData
     | OrderData
     | OrderMatchingData
   ethereumSignature?: TxEthSignature
-}
-
-export interface BlockInfo {
-  blockNumber: number
-  committed: boolean
-  verified: boolean
-}
-
-export interface TransactionReceipt {
-  executed: boolean
-  success?: boolean
-  failReason?: string
-  block?: number
-}
-
-export interface TransactionResult {
-  txHash?: string
-  tx?: any
-  receipt?: TransactionReceipt
-  updates?: {
-    type: string
-    updateId: number
-    accountId: number
-    subAccountId: number
-    coinId: number
-    oldBalance: string
-    newBalance: string
-    oldNonce: number
-    newNonce: number
-  }[]
-}
-
-export interface PriorityOperationReceipt {
-  executed: boolean
-  block?: BlockInfo
-}
-
-export interface ContractInfo {
-  chainId: number
-  layerOneChainId: number
-  mainContract: string
-}
-
-export interface Token {
-  id: TokenId
-  symbol: TokenSymbol
-  decimals: number
-  chains: {
-    [x: ChainId]: {
-      chainId: ChainId
-      address: Address
-      decimals: number
-      fastWithdraw: boolean
-    }
-  }
-}
-export interface Tokens {
-  // Tokens are indexed by their symbol (e.g. "ETH")
-  [token: TokenId]: Token
-}
-
-// we have to ignore this because of a bug in prettier causes this exact block
-// to have double semicolons inside
-// prettier-ignore
-export interface ChangePubKeyFee {
-    // Note: Ignore, since it just looks more intuitive if `"ChangePubKey"` is kept as a string literal)
-    // prettier-ignore
-    // Denotes how authorization of operation is performed:
-    // 'Onchain' if it's done by sending an Ethereum transaction,
-    // 'ECDSA' if it's done by providing an Ethereum signature in zkSync transaction.
-    // 'CREATE2' if it's done by providing arguments to restore account ethereum address according to CREATE2 specification.
-    "ChangePubKey": ChangePubkeyTypes;
-}
-
-export interface LegacyChangePubKeyFee {
-  ChangePubKey: {
-    onchainPubkeyAuth: boolean
-  }
-}
-
-export interface Fee {
-  // Operation type (amount of chunks in operation differs and impacts the total fee).
-  feeType: 'Withdraw' | 'Transfer' | 'TransferToNew' | 'FastWithdraw' | ChangePubKeyFee
-  // Amount of gas used by transaction
-  gasTxAmounts: BigNumber[]
-  // Gas price (in wei)
-  gasPriceWei: BigNumber
-  // Ethereum gas part of fee (in wei)
-  gasFee: BigNumber
-  // Zero-knowledge proof part of fee (in wei)
-  zkpFee: BigNumber
-  // Total fee amount (in wei)
-  totalFee: BigNumber
-}
-
-export interface BatchFee {
-  // Total fee amount (in wei)
-  totalFee: BigNumber
 }
 
 export interface OrderData {
@@ -346,15 +207,16 @@ export interface OrderData {
 }
 
 export interface OrderMatchingEntries {
+  accountId: number
   subAccountId: number
   taker: OrderData
   maker: OrderData
   expectBaseAmount: BigNumberish
   expectQuoteAmount: BigNumberish
-  feeToken: number
-  fee?: BigNumberish
+  feeTokenId: TokenId
+  feeTokenSymbol: TokenSymbol
+  fee: BigNumberish
   account?: Address
-  accountId?: number
   signature?: Signature
 }
 export interface OrderMatchingData {
@@ -367,6 +229,6 @@ export interface OrderMatchingData {
   expectBaseAmount: BigNumberish
   expectQuoteAmount: BigNumberish
   fee: BigNumberish
-  feeToken: number
+  feeToken: TokenId
   signature?: Signature
 }

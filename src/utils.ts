@@ -1,20 +1,21 @@
-import { BigNumber, BigNumberish, Contract, constants, ethers, utils } from 'ethers'
+import {
+  BigNumber,
+  BigNumberish,
+  Contract,
+  constants,
+  ethers,
+  utils,
+} from 'ethers'
 import { rescueHashOrders } from 'zksync-crypto'
-import { Provider } from '.'
 import {
   Address,
-  ChainId,
   ChangePubKeyData,
-  CloseAccount,
   EthSignerType,
   ForcedExitData,
   OrderData,
   OrderMatchingData,
   PubKeyHash,
   TokenAddress,
-  TokenLike,
-  TokenSymbol,
-  Tokens,
   TransferData,
   WithdrawData,
 } from './types'
@@ -27,13 +28,15 @@ const MAX_NUMBER_OF_ACCOUNTS = Math.pow(2, 24)
 export const MIN_UNONCE = 1
 export const MAX_UNONCE = 4294967295
 
-export const IERC20_INTERFACE = new utils.Interface(require('../abi/IERC20.json').abi)
-export const MAIN_CONTRACT_INTERFACE = new utils.Interface(require('../abi/ZkLink.json').abi)
-export const ZKL_CONTRACT_INTERFACE = new utils.Interface(require('../abi/ZKL.json').abi)
-
-export const IEIP1271_INTERFACE = new utils.Interface(require('../abi/IEIP1271.json').abi)
-
-export const ERC20_DEPOSIT_GAS_LIMIT = require('../misc/DepositERC20GasLimit.json')
+export const IERC20_INTERFACE = new utils.Interface(
+  require('../abi/IERC20.json').abi
+)
+export const MAIN_CONTRACT_INTERFACE = new utils.Interface(
+  require('../abi/ZkLink.json').abi
+)
+export const IEIP1271_INTERFACE = new utils.Interface(
+  require('../abi/IEIP1271.json').abi
+)
 
 export const MAX_ERC20_APPROVE_AMOUNT = BigNumber.from(
   '115792089237316195423570985008687907853269984665640564039457584007913129639935'
@@ -49,10 +52,6 @@ export const ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = BigNumber.from('140000') // 90k
 // For normal wallet/erc20 token 90k gas for deposit should be enough, but for some tokens this can go as high as ~200k
 // we try to be safe by default
 export const ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = BigNumber.from('300000') // 300k
-export const ETH_RECOMMENDED_FASTSWAP_GAS_LIMIT = BigNumber.from('140000') // 90k
-export const ERC20_RECOMMENDED_FASTSWAP_GAS_LIMIT = BigNumber.from('300000') // 300k
-
-export const TOTAL_CHAIN_NUM = 4
 
 const AMOUNT_EXPONENT_BIT_WIDTH = 5
 const AMOUNT_MANTISSA_BIT_WIDTH = 35
@@ -243,33 +242,53 @@ export function reverseBits(buffer: Uint8Array): Uint8Array {
 
 function packAmount(amount: BigNumber): Uint8Array {
   return reverseBits(
-    integerToFloat(amount, AMOUNT_EXPONENT_BIT_WIDTH, AMOUNT_MANTISSA_BIT_WIDTH, 10)
+    integerToFloat(
+      amount,
+      AMOUNT_EXPONENT_BIT_WIDTH,
+      AMOUNT_MANTISSA_BIT_WIDTH,
+      10
+    )
   )
 }
 
 function packAmountUp(amount: BigNumber): Uint8Array {
   return reverseBits(
-    integerToFloatUp(amount, AMOUNT_EXPONENT_BIT_WIDTH, AMOUNT_MANTISSA_BIT_WIDTH, 10)
+    integerToFloatUp(
+      amount,
+      AMOUNT_EXPONENT_BIT_WIDTH,
+      AMOUNT_MANTISSA_BIT_WIDTH,
+      10
+    )
   )
 }
 
 function packFee(amount: BigNumber): Uint8Array {
-  return reverseBits(integerToFloat(amount, FEE_EXPONENT_BIT_WIDTH, FEE_MANTISSA_BIT_WIDTH, 10))
+  return reverseBits(
+    integerToFloat(amount, FEE_EXPONENT_BIT_WIDTH, FEE_MANTISSA_BIT_WIDTH, 10)
+  )
 }
 
 function packFeeUp(amount: BigNumber): Uint8Array {
-  return reverseBits(integerToFloatUp(amount, FEE_EXPONENT_BIT_WIDTH, FEE_MANTISSA_BIT_WIDTH, 10))
+  return reverseBits(
+    integerToFloatUp(amount, FEE_EXPONENT_BIT_WIDTH, FEE_MANTISSA_BIT_WIDTH, 10)
+  )
 }
 
 export function packAmountChecked(amount: BigNumber): Uint8Array {
-  if (closestPackableTransactionAmount(amount.toString()).toString() !== amount.toString()) {
+  if (
+    closestPackableTransactionAmount(amount.toString()).toString() !==
+    amount.toString()
+  ) {
     throw new Error('Transaction Amount is not packable')
   }
   return packAmount(amount)
 }
 
 export function packFeeChecked(amount: BigNumber): Uint8Array {
-  if (closestPackableTransactionFee(amount.toString()).toString() !== amount.toString()) {
+  if (
+    closestPackableTransactionFee(amount.toString()).toString() !==
+    amount.toString()
+  ) {
     throw new Error('Fee Amount is not packable')
   }
   return packFee(amount)
@@ -280,14 +299,28 @@ export function packFeeChecked(amount: BigNumber): Uint8Array {
  * e.g 1000000003 => 1000000000
  * @param amount
  */
-export function closestPackableTransactionAmount(amount: BigNumberish): BigNumber {
+export function closestPackableTransactionAmount(
+  amount: BigNumberish
+): BigNumber {
   const packedAmount = packAmount(BigNumber.from(amount))
-  return floatToInteger(packedAmount, AMOUNT_EXPONENT_BIT_WIDTH, AMOUNT_MANTISSA_BIT_WIDTH, 10)
+  return floatToInteger(
+    packedAmount,
+    AMOUNT_EXPONENT_BIT_WIDTH,
+    AMOUNT_MANTISSA_BIT_WIDTH,
+    10
+  )
 }
 
-export function closestGreaterOrEqPackableTransactionAmount(amount: BigNumberish): BigNumber {
+export function closestGreaterOrEqPackableTransactionAmount(
+  amount: BigNumberish
+): BigNumber {
   const packedAmount = packAmountUp(BigNumber.from(amount))
-  return floatToInteger(packedAmount, AMOUNT_EXPONENT_BIT_WIDTH, AMOUNT_MANTISSA_BIT_WIDTH, 10)
+  return floatToInteger(
+    packedAmount,
+    AMOUNT_EXPONENT_BIT_WIDTH,
+    AMOUNT_MANTISSA_BIT_WIDTH,
+    10
+  )
 }
 
 export function isTransactionAmountPackable(amount: BigNumberish): boolean {
@@ -301,12 +334,24 @@ export function isTransactionAmountPackable(amount: BigNumberish): boolean {
  */
 export function closestPackableTransactionFee(fee: BigNumberish): BigNumber {
   const packedFee = packFee(BigNumber.from(fee))
-  return floatToInteger(packedFee, FEE_EXPONENT_BIT_WIDTH, FEE_MANTISSA_BIT_WIDTH, 10)
+  return floatToInteger(
+    packedFee,
+    FEE_EXPONENT_BIT_WIDTH,
+    FEE_MANTISSA_BIT_WIDTH,
+    10
+  )
 }
 
-export function closestGreaterOrEqPackableTransactionFee(fee: BigNumberish): BigNumber {
+export function closestGreaterOrEqPackableTransactionFee(
+  fee: BigNumberish
+): BigNumber {
   const packedFee = packFeeUp(BigNumber.from(fee))
-  return floatToInteger(packedFee, FEE_EXPONENT_BIT_WIDTH, FEE_MANTISSA_BIT_WIDTH, 10)
+  return floatToInteger(
+    packedFee,
+    FEE_EXPONENT_BIT_WIDTH,
+    FEE_MANTISSA_BIT_WIDTH,
+    10
+  )
 }
 
 export function isTransactionFeePackable(amount: BigNumberish): boolean {
@@ -333,72 +378,12 @@ export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-export function isTokenETH(token: TokenAddress): boolean {
+export function isGasToken(token: TokenAddress): boolean {
   return (
     token === constants.AddressZero ||
-    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase() === token.toLowerCase()
+    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase() ===
+      token.toLowerCase()
   )
-}
-
-type TokenOrId = TokenLike | number
-
-export class TokenSet {
-  // TODO: handle stale entries, edge case when we rename token after adding it (ZKS-120).
-  constructor(private tokensById: Tokens) {}
-
-  private resolveTokenObject(tokenLike: TokenOrId) {
-    if (this.tokensById[tokenLike]) {
-      return this.tokensById[tokenLike]
-    }
-
-    for (const token of Object.values(this.tokensById)) {
-      if (typeof tokenLike === 'number') {
-        if (token.id === tokenLike) {
-          return token
-        }
-      } else if (token.symbol.toLocaleLowerCase() === tokenLike.toLocaleLowerCase()) {
-        return token
-      }
-    }
-
-    throw new Error(`Token ${tokenLike} is not supported`)
-  }
-
-  public isTokenTransferAmountPackable(tokenLike: TokenOrId, amount: string): boolean {
-    const parsedAmount = this.parseToken(tokenLike, amount)
-    return isTransactionAmountPackable(parsedAmount)
-  }
-
-  public isTokenTransactionFeePackable(tokenLike: TokenOrId, amount: string): boolean {
-    const parsedAmount = this.parseToken(tokenLike, amount)
-    return isTransactionFeePackable(parsedAmount)
-  }
-
-  public formatToken(tokenLike: TokenOrId, amount: BigNumberish): string {
-    const decimals = this.resolveTokenDecimals(tokenLike)
-    return utils.formatUnits(amount, decimals)
-  }
-
-  public parseToken(tokenLike: TokenOrId, amount: string): BigNumber {
-    const decimals = this.resolveTokenDecimals(tokenLike)
-    return utils.parseUnits(amount, decimals)
-  }
-
-  public resolveTokenDecimals(tokenLike: TokenOrId): number {
-    return this.resolveTokenObject(tokenLike).decimals
-  }
-
-  public resolveTokenId(tokenLike: TokenOrId): number {
-    return this.resolveTokenObject(tokenLike).id
-  }
-
-  public resolveTokenAddress(tokenLike: TokenOrId, chainId: ChainId): TokenAddress {
-    return this.resolveTokenObject(tokenLike).chains[chainId].address
-  }
-
-  public resolveTokenSymbol(tokenLike: TokenOrId): TokenSymbol {
-    return this.resolveTokenObject(tokenLike).symbol
-  }
 }
 
 export function getChangePubkeyMessage(
@@ -453,7 +438,9 @@ export function getSignedBytesFromMessage(
   addPrefix: boolean
 ): Uint8Array {
   let messageBytes =
-    typeof message === 'string' ? utils.toUtf8Bytes(message) : utils.arrayify(message)
+    typeof message === 'string'
+      ? utils.toUtf8Bytes(message)
+      : utils.arrayify(message)
   if (addPrefix) {
     messageBytes = utils.concat([
       utils.toUtf8Bytes(`\x19Ethereum Signed Message:\n${messageBytes.length}`),
@@ -469,7 +456,10 @@ export async function signMessagePersonalAPI(
 ): Promise<string> {
   if (signer instanceof ethers.providers.JsonRpcSigner) {
     return signer.provider
-      .send('personal_sign', [utils.hexlify(message), await signer.getAddress()])
+      .send('personal_sign', [
+        utils.hexlify(message),
+        await signer.getAddress(),
+      ])
       .then(
         (sign) => sign,
         (err) => {
@@ -487,10 +477,16 @@ export async function signMessagePersonalAPI(
   }
 }
 
-export async function signMessageEIP712(signer: any, data: any): Promise<string> {
+export async function signMessageEIP712(
+  signer: any,
+  data: any
+): Promise<string> {
   if (signer instanceof ethers.providers.JsonRpcSigner) {
     return signer.provider
-      .send('eth_signTypedData_v4', [await signer.getAddress(), JSON.stringify(data)])
+      .send('eth_signTypedData_v4', [
+        await signer.getAddress(),
+        JSON.stringify(data),
+      ])
       .then(
         (sign) => sign,
         (err) => {
@@ -515,7 +511,11 @@ export async function verifyERC1271Signature(
   const signMessage = getSignedBytesFromMessage(message, true)
   const signMessageHash = utils.keccak256(signMessage)
 
-  const eip1271 = new ethers.Contract(address, IEIP1271_INTERFACE, signerOrProvider)
+  const eip1271 = new ethers.Contract(
+    address,
+    IEIP1271_INTERFACE,
+    signerOrProvider
+  )
   const eipRetVal = await eip1271.isValidSignature(signMessageHash, signature)
   return eipRetVal === EIP1271_SUCCESS_VALUE
 }
@@ -529,7 +529,10 @@ export async function getEthSignatureType(
   const messageNoPrefix = getSignedBytesFromMessage(message, false)
   const messageWithPrefix = getSignedBytesFromMessage(message, true)
 
-  const prefixedECDSASigner = utils.recoverAddress(utils.keccak256(messageWithPrefix), signature)
+  const prefixedECDSASigner = utils.recoverAddress(
+    utils.keccak256(messageWithPrefix),
+    signature
+  )
   if (prefixedECDSASigner.toLowerCase() === address.toLowerCase()) {
     return {
       verificationMethod: 'ECDSA',
@@ -569,12 +572,8 @@ export async function getEthSignatureType(
 
 function removeAddressPrefix(address: Address | PubKeyHash): string {
   if (address.startsWith('0x')) return address.substr(2)
-
-  if (address.startsWith('sync:')) return address.substr(5)
-
-  throw new Error("ETH address must start with '0x' and PubKeyHash must start with 'sync:'")
+  throw new Error("ETH address must start with '0x'")
 }
-
 export function serializePubKeyHash(address: PubKeyHash): Uint8Array {
   const prefixlessAddress = removeAddressPrefix(address)
 
@@ -585,7 +584,6 @@ export function serializePubKeyHash(address: PubKeyHash): Uint8Array {
 
   return addressBytes
 }
-
 export function serializeAddress(address: Address | PubKeyHash): Uint8Array {
   const prefixlessAddress = removeAddressPrefix(address)
   const address32 = utils.zeroPad(`0x${prefixlessAddress}`, 32)
@@ -596,7 +594,6 @@ export function serializeAddress(address: Address | PubKeyHash): Uint8Array {
 
   return addressBytes
 }
-
 export function serializeAccountId(accountId: number): Uint8Array {
   if (accountId < 0) {
     throw new Error('Negative account id')
@@ -606,11 +603,9 @@ export function serializeAccountId(accountId: number): Uint8Array {
   }
   return numberToBytesBE(accountId, 4)
 }
-
 export function serializeSubAccountId(subAccountId: number): Uint8Array {
   return numberToBytesBE(subAccountId, 1)
 }
-
 export function serializeTokenId(tokenId: number): Uint8Array {
   if (tokenId < 0) {
     throw new Error('Negative tokenId')
@@ -620,20 +615,16 @@ export function serializeTokenId(tokenId: number): Uint8Array {
   }
   return numberToBytesBE(tokenId, 2)
 }
-
 export function serializeAmountPacked(amount: BigNumberish): Uint8Array {
   return packAmountChecked(BigNumber.from(amount))
 }
-
 export function serializeAmountFull(amount: BigNumberish): Uint8Array {
   const bnAmount = BigNumber.from(amount)
   return utils.zeroPad(utils.arrayify(bnAmount), 16)
 }
-
 export function serializeFeePacked(fee: BigNumberish): Uint8Array {
   return packFeeChecked(BigNumber.from(fee))
 }
-
 export function serializeNonce(nonce: number): Uint8Array {
   if (nonce < 0) {
     throw new Error('Negative nonce')
@@ -649,7 +640,6 @@ export function serializeFeeRatio(withdrawFeeRatio: number): Uint8Array {
 export function serializeFastWithdraw(fastWithdraw: number): Uint8Array {
   return new Uint8Array([fastWithdraw])
 }
-
 export function serializeTimestamp(time: number): Uint8Array {
   if (time < 0) {
     throw new Error('Negative timestamp')
@@ -713,7 +703,9 @@ export function serializeTransfer(transfer: TransferData): Uint8Array {
   ])
 }
 
-export function serializeChangePubKey(changePubKey: ChangePubKeyData): Uint8Array {
+export function serializeChangePubKey(
+  changePubKey: ChangePubKeyData
+): Uint8Array {
   const type = new Uint8Array([6])
   const chainIdBytes = serializeChainId(changePubKey.chainId)
   const subAccountIdBytes = serializeSubAccountId(changePubKey.subAccountId)
@@ -739,10 +731,16 @@ export function serializeChangePubKey(changePubKey: ChangePubKeyData): Uint8Arra
 export function serializeForcedExit(forcedExit: ForcedExitData): Uint8Array {
   const type = new Uint8Array([7])
   const toChainIdBytes = serializeChainId(forcedExit.toChainId)
-  const initiatorAccountIdBytes = serializeAccountId(forcedExit.initiatorAccountId)
-  const initiatorSubAccountIdBytes = serializeSubAccountId(forcedExit.initiatorSubAccountId)
+  const initiatorAccountIdBytes = serializeAccountId(
+    forcedExit.initiatorAccountId
+  )
+  const initiatorSubAccountIdBytes = serializeSubAccountId(
+    forcedExit.initiatorSubAccountId
+  )
   const targetBytes = serializeAddress(forcedExit.target)
-  const targetSubAccountIdBytes = serializeSubAccountId(forcedExit.targetSubAccountId)
+  const targetSubAccountIdBytes = serializeSubAccountId(
+    forcedExit.targetSubAccountId
+  )
   const l2SourceTokenIdBytes = serializeTokenId(forcedExit.l2SourceToken)
   const l1TargetTokenIdBytes = serializeTokenId(forcedExit.l1TargetToken)
   const initiatorNonceBytes = serializeNonce(forcedExit.initiatorNonce)
@@ -792,7 +790,9 @@ export function serializeOrder(order: OrderData): Uint8Array {
   ])
 }
 
-export async function serializeOrderMatching(matching: OrderMatchingData): Promise<Uint8Array> {
+export async function serializeOrderMatching(
+  matching: OrderMatchingData
+): Promise<Uint8Array> {
   const makerBytes = serializeOrder(matching.maker)
   const takerBytes = serializeOrder(matching.taker)
   const ordersBytes = new Uint8Array(178)
@@ -825,7 +825,7 @@ export async function serializeOrderMatching(matching: OrderMatchingData): Promi
  * @param tx A transaction to serialize.
  */
 export function serializeTx(
-  tx: TransferData | WithdrawData | ChangePubKeyData | CloseAccount | ForcedExitData
+  tx: TransferData | WithdrawData | ChangePubKeyData | ForcedExitData
 ): Uint8Array {
   switch (tx.type) {
     case 'Transfer':
@@ -859,10 +859,6 @@ export function bigintToBytesBE(number1: bigint, bytes: number): Uint8Array {
   return result
 }
 
-export function parseHexWithPrefix(str: string) {
-  return Uint8Array.from(Buffer.from(str.slice(2), 'hex'))
-}
-
 export function getCREATE2AddressAndSalt(
   syncPubkeyHash: string,
   create2Data: {
@@ -879,7 +875,9 @@ export function getCREATE2AddressAndSalt(
   }
 
   // CREATE2 salt
-  const salt = ethers.utils.keccak256(ethers.utils.concat([additionalSaltArgument, pubkeyHashHex]))
+  const salt = ethers.utils.keccak256(
+    ethers.utils.concat([additionalSaltArgument, pubkeyHashHex])
+  )
 
   // Address according to CREATE2 specification
   const address =
@@ -900,68 +898,29 @@ export function getCREATE2AddressAndSalt(
 
 export async function getEthereumBalance(
   ethProvider: ethers.providers.Provider,
-  syncProvider: Provider,
   address: Address,
-  token: TokenAddress,
-  chainId: ChainId
+  tokenAddress: TokenAddress
 ): Promise<BigNumber> {
   let balance: BigNumber
-  if (isTokenETH(token)) {
+  if (isGasToken(tokenAddress)) {
     balance = await ethProvider.getBalance(address)
   } else {
-    const erc20contract = new Contract(token, IERC20_INTERFACE, ethProvider)
+    const erc20contract = new Contract(
+      tokenAddress,
+      IERC20_INTERFACE,
+      ethProvider
+    )
 
     balance = await erc20contract.balanceOf(address)
   }
   return balance
 }
 
-export async function getPendingBalance(
-  ethProvider: ethers.providers.Provider,
-  syncProvider: Provider,
-  address: Address,
-  token: TokenLike,
-  chainId: ChainId
-): Promise<BigNumberish> {
-  const contractAddress = await syncProvider.getContractInfoByChainId(chainId)
-  const zksyncContract = new Contract(
-    contractAddress.mainContract,
-    MAIN_CONTRACT_INTERFACE,
-    ethProvider
-  )
-
-  const tokenAddress = syncProvider.tokenSet.resolveTokenAddress(token, chainId)
-
-  return zksyncContract.getPendingBalance(address, tokenAddress)
-}
-
 export function getTxHash(
-  tx: TransferData | WithdrawData | ChangePubKeyData | ForcedExitData | CloseAccount
+  tx: TransferData | WithdrawData | ChangePubKeyData | ForcedExitData
 ): string {
-  if (tx.type == 'Close') {
-    throw new Error('Close operation is disabled')
-  }
   let txBytes = serializeTx(tx)
   return ethers.utils.sha256(txBytes)
-}
-
-export function getRandom(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1) + min)
-}
-
-export function getFastSwapUNonce() {
-  return getRandom(MIN_UNONCE, MAX_UNONCE)
-}
-
-export function chainsCompletion(chains: any[], chainNum: number, item: any) {
-  if (chains.length === chainNum) {
-    return chains
-  }
-  const newChains = Array.from(chains)
-  for (let i = 0; i < chainNum - chains.length; i++) {
-    newChains.push(item)
-  }
-  return newChains
 }
 
 export function getTimestamp(): number {

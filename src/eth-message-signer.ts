@@ -6,14 +6,22 @@ import { getSignedBytesFromMessage, signMessagePersonalAPI } from './utils'
  * Wrapper around `ethers.Signer` which provides convenient methods to get and sign messages required for zkSync.
  */
 export class EthMessageSigner {
-  constructor(private ethSigner: ethers.Signer, private ethSignerType?: EthSignerType) {}
+  constructor(
+    private ethSigner: ethers.Signer,
+    private ethSignerType?: EthSignerType
+  ) {}
 
-  async getEthMessageSignature(message: ethers.utils.BytesLike): Promise<TxEthSignature> {
+  async getEthMessageSignature(
+    message: ethers.utils.BytesLike
+  ): Promise<TxEthSignature> {
     if (this.ethSignerType == null) {
       throw new Error('ethSignerType is unknown')
     }
 
-    const signedBytes = getSignedBytesFromMessage(message, !this.ethSignerType.isSignedMsgPrefixed)
+    const signedBytes = getSignedBytesFromMessage(
+      message,
+      !this.ethSignerType.isSignedMsgPrefixed
+    )
     const signature = await signMessagePersonalAPI(this.ethSigner, signedBytes)
 
     return {
@@ -33,7 +41,10 @@ export class EthMessageSigner {
     nonce: number
     accountId: number
   }): string {
-    let humanReadableTxInfo = this.getTransferEthMessagePart(transfer, 'transfer')
+    let humanReadableTxInfo = this.getTransferEthMessagePart(
+      transfer,
+      'transfer'
+    )
     if (humanReadableTxInfo.length != 0) {
       humanReadableTxInfo += '\n'
     }
@@ -54,7 +65,10 @@ export class EthMessageSigner {
     return await this.getEthMessageSignature(message)
   }
 
-  getOrderMatchingEthSignMessage(matching: { stringFeeToken: string; stringFee: string }): string {
+  getOrderMatchingEthSignMessage(matching: {
+    stringFeeToken: string
+    stringFee: string
+  }): string {
     let humanReadableTxInfo = this.getOrderMatchingEthMessagePart(matching)
     if (humanReadableTxInfo.length != 0) {
       humanReadableTxInfo += '\n'
@@ -71,7 +85,10 @@ export class EthMessageSigner {
     return await this.getEthMessageSignature(message)
   }
 
-  getOrderMatchingEthMessagePart(tx: { stringFeeToken: string; stringFee: string }): string {
+  getOrderMatchingEthMessagePart(tx: {
+    stringFeeToken: string
+    stringFee: string
+  }): string {
     let message = `OrderMatching fee: ${tx.stringFee} ${tx.stringFeeToken}`
     return message
   }
@@ -220,7 +237,9 @@ export class EthMessageSigner {
 
     let message = ''
     if (tx.stringAmount != null) {
-      message += `${txType} ${tx.stringAmount} ${tx.stringToken} to: ${tx.to.toLowerCase()}`
+      message += `${txType} ${tx.stringAmount} ${
+        tx.stringToken
+      } to: ${tx.to.toLowerCase()}`
     }
     if (tx.stringFee != null) {
       if (message.length != 0) {
@@ -259,7 +278,9 @@ export class EthMessageSigner {
     stringFee: string
     target: string
   }): string {
-    let message = `ForcedExit ${forcedExit.stringToken} to: ${forcedExit.target.toLowerCase()}`
+    let message = `ForcedExit ${
+      forcedExit.stringToken
+    } to: ${forcedExit.target.toLowerCase()}`
     if (forcedExit.stringFee != null) {
       message += `\nFee: ${forcedExit.stringFee} ${forcedExit.stringFeeToken}`
     }
@@ -277,25 +298,4 @@ export class EthMessageSigner {
     const message = this.getWithdrawEthSignMessage(withdraw)
     return await this.getEthMessageSignature(message)
   }
-
-  // getChangePubKeyEthSignMessage(changePubKey: {
-  //   pubKeyHash: PubKeyHash
-  //   nonce: number
-  //   accountId: number
-  // }): Uint8Array {
-  //   return getChangePubkeyMessage(
-  //     changePubKey.pubKeyHash,
-  //     changePubKey.nonce,
-  //     changePubKey.accountId
-  //   )
-  // }
-
-  // async ethSignChangePubKey(changePubKey: {
-  //   pubKeyHash: PubKeyHash
-  //   nonce: number
-  //   accountId: number
-  // }): Promise<TxEthSignature> {
-  //   const message = this.getChangePubKeyEthSignMessage(changePubKey)
-  //   return await this.getEthMessageSignature(message)
-  // }
 }
