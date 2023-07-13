@@ -55,6 +55,9 @@ class Signer {
         _Signer_privateKey.set(this, void 0);
         __classPrivateFieldSet(this, _Signer_privateKey, privKey, "f");
     }
+    getPrivateKey() {
+        return __classPrivateFieldGet(this, _Signer_privateKey, "f");
+    }
     pubKeyHash() {
         return __awaiter(this, void 0, void 0, function* () {
             return yield (0, crypto_1.privateKeyToPubKeyHash)(__classPrivateFieldGet(this, _Signer_privateKey, "f"));
