@@ -535,7 +535,6 @@ export class Wallet {
     depositTo: Address
     token: TokenAddress
     amount: BigNumberish
-    linkChainId: number
     mapping?: boolean
     ethTxOptions?: ethers.providers.TransactionRequest
     approveDepositAmountForERC20?: boolean
@@ -623,7 +622,6 @@ export class Wallet {
     mainContract: Address
     tokenId: TokenId
     subAccountId: number
-    linkChainId: number
     accountId: number
     ethTxOptions?: ethers.providers.TransactionRequest
   }): Promise<TransactionResponse> {
