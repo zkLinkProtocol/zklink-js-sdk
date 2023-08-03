@@ -21,8 +21,9 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.serializeOrder = exports.serializeForcedExit = exports.serializeChangePubKey = exports.serializeTransfer = exports.serializeWithdraw = exports.serializeTimestamp = exports.serializeFastWithdraw = exports.serializeFeeRatio = exports.serializeChainId = exports.serializeNonce = exports.serializeFeePacked = exports.serializeAmountFull = exports.serializeAmountPacked = exports.serializeTokenId = exports.serializeSubAccountId = exports.serializeAccountId = exports.serializeAddress = exports.serializePubKeyHash = exports.getEthSignatureType = exports.verifyERC1271Signature = exports.signMessageEIP712 = exports.signMessagePersonalAPI = exports.getSignedBytesFromMessage = exports.getChangePubkeyMessage = exports.isGasToken = exports.sleep = exports.buffer2bitsBE = exports.isTransactionFeePackable = exports.closestGreaterOrEqPackableTransactionFee = exports.closestPackableTransactionFee = exports.isTransactionAmountPackable = exports.closestGreaterOrEqPackableTransactionAmount = exports.closestPackableTransactionAmount = exports.packFeeChecked = exports.packAmountChecked = exports.reverseBits = exports.integerToFloatUp = exports.integerToFloat = exports.bitsIntoBytesInBEOrder = exports.floatToInteger = exports.SIGN_MESSAGE = exports.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT = exports.ERC20_APPROVE_TRESHOLD = exports.MAX_ERC20_APPROVE_AMOUNT = exports.IEIP1271_INTERFACE = exports.MAIN_CONTRACT_INTERFACE = exports.IERC20_INTERFACE = exports.MAX_UNONCE = exports.MIN_UNONCE = void 0;
-exports.getTimestamp = exports.getTxHash = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.bigintToBytesBE = exports.numberToBytesBE = exports.serializeTx = exports.serializeOrderMatching = void 0;
+exports.getL2TxHashFromEthHash = exports.getTimestamp = exports.getTxHash = exports.getEthereumBalance = exports.getCREATE2AddressAndSalt = exports.bigintToBytesBE = exports.numberToBytesBE = exports.serializeTx = exports.serializeOrderMatching = void 0;
 const ethers_1 = require("ethers");
+const utils_1 = require("ethers/lib/utils");
 const zksync_crypto_1 = require("zksync-crypto");
 // Max number of tokens for the current version, it is determined by the zkSync circuit implementation.
 const MAX_NUMBER_OF_TOKENS = 65535;
@@ -758,3 +759,13 @@ function getTimestamp() {
     return parseInt(String(ts / 1000));
 }
 exports.getTimestamp = getTimestamp;
+function getL2TxHashFromEthHash(ethHash, serialId) {
+    if (!ethHash || !Number.isInteger(Number(serialId)))
+        return '';
+    const bytes = ethers_1.ethers.utils.concat([
+        numberToBytesBE(Number(serialId), 8),
+        (0, utils_1.arrayify)(ethHash),
+    ]);
+    return ethers_1.ethers.utils.sha256(bytes);
+}
+exports.getL2TxHashFromEthHash = getL2TxHashFromEthHash;

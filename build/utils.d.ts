@@ -79,3 +79,4 @@ export declare function getCREATE2AddressAndSalt(syncPubkeyHash: string, create2
 export declare function getEthereumBalance(ethProvider: ethers.providers.Provider, address: Address, tokenAddress: TokenAddress): Promise<BigNumber>;
 export declare function getTxHash(tx: TransferData | WithdrawData | ChangePubKeyData | ForcedExitData): string;
 export declare function getTimestamp(): number;
+export declare function getL2TxHashFromEthHash(ethHash: string, serialId: number): string;

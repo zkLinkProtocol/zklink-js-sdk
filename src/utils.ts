@@ -6,6 +6,7 @@ import {
   ethers,
   utils,
 } from 'ethers'
+import { arrayify } from 'ethers/lib/utils'
 import { rescueHashOrders } from 'zksync-crypto'
 import {
   Address,
@@ -926,4 +927,14 @@ export function getTxHash(
 export function getTimestamp(): number {
   let ts = new Date().getTime()
   return parseInt(String(ts / 1000))
+}
+
+export function getL2TxHashFromEthHash(ethHash: string, serialId: number) {
+  if (!ethHash || !Number.isInteger(Number(serialId))) return ''
+
+  const bytes = ethers.utils.concat([
+    numberToBytesBE(Number(serialId), 8),
+    arrayify(ethHash),
+  ])
+  return ethers.utils.sha256(bytes)
 }
