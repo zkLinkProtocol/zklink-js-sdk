@@ -391,7 +391,7 @@ class Wallet {
                         deposit.depositTo,
                         deposit.subAccountId,
                     ]);
-                    ethTransaction = yield this.ethSigner.sendTransaction(Object.assign({ to: deposit.mainContract, data, value: ethers_1.BigNumber.from(deposit.amount), gasLimit: ethers_1.BigNumber.from(utils_2.ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT) }, deposit.ethTxOptions));
+                    ethTransaction = yield this.ethSigner.sendTransaction(Object.assign({ to: deposit.mainContract, data, value: ethers_1.BigNumber.from(deposit.amount) }, deposit.ethTxOptions));
                 }
                 catch (e) {
                     this.modifyEthersError(e);
@@ -422,20 +422,6 @@ class Wallet {
                 ]);
                 const tx = Object.assign({ to: deposit.mainContract, data,
                     nonce }, deposit.ethTxOptions);
-                // We set gas limit only if user does not set it using ethTxOptions.
-                if (tx.gasLimit == null) {
-                    if (deposit.approveDepositAmountForERC20) {
-                        tx.gasLimit = utils_2.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT;
-                    }
-                    else {
-                        try {
-                            tx.gasLimit = yield this.estimateGasDeposit(tx);
-                        }
-                        catch (e) {
-                            this.modifyEthersError(e);
-                        }
-                    }
-                }
                 try {
                     ethTransaction = yield this.ethSigner.sendTransaction(tx);
                 }

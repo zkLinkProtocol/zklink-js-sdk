@@ -557,7 +557,6 @@ export class Wallet {
           to: deposit.mainContract,
           data,
           value: BigNumber.from(deposit.amount),
-          gasLimit: BigNumber.from(ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT),
           ...deposit.ethTxOptions,
         })
       } catch (e) {
@@ -595,18 +594,6 @@ export class Wallet {
         data,
         nonce,
         ...deposit.ethTxOptions,
-      }
-      // We set gas limit only if user does not set it using ethTxOptions.
-      if (tx.gasLimit == null) {
-        if (deposit.approveDepositAmountForERC20) {
-          tx.gasLimit = ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT
-        } else {
-          try {
-            tx.gasLimit = await this.estimateGasDeposit(tx)
-          } catch (e) {
-            this.modifyEthersError(e)
-          }
-        }
       }
       try {
         ethTransaction = await this.ethSigner.sendTransaction(tx)
