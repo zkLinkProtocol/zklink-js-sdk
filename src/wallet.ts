@@ -480,6 +480,30 @@ export class Wallet {
     }
   }
 
+  async getERC20DepositsAllowance(
+    mainContract: Address,
+    tokenAddress: Address,
+    accountAddress: Address
+  ) {
+    if (isGasToken(tokenAddress)) {
+      return ERC20_APPROVE_TRESHOLD
+    }
+    try {
+      const data = IERC20_INTERFACE.encodeFunctionData('allowance', [
+        accountAddress,
+        mainContract,
+      ])
+
+      const currentAllowance = await this.ethSigner.call({
+        to: tokenAddress,
+        data,
+      })
+      return BigNumber.from(currentAllowance)
+    } catch (e) {
+      this.modifyEthersError(e)
+    }
+  }
+
   async isERC20DepositsApproved(
     mainContract: Address,
     tokenAddress: Address,

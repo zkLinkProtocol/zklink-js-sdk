@@ -32,6 +32,7 @@ export declare class Wallet {
     address(): Address;
     getEthereumBalance(tokenAddress: TokenAddress): Promise<BigNumber>;
     estimateGasDeposit(tx: ethers.providers.TransactionRequest): Promise<BigNumber>;
+    getERC20DepositsAllowance(mainContract: Address, tokenAddress: Address, accountAddress: Address): Promise<BigNumber>;
     isERC20DepositsApproved(mainContract: Address, tokenAddress: Address, accountAddress: Address, erc20ApproveThreshold?: BigNumber): Promise<boolean>;
     approveERC20TokenDeposits(mainContract: Address, tokenAddress: Address, max_erc20_approve_amount?: BigNumber): Promise<TransactionResponse>;
     sendDepositFromEthereum(deposit: {

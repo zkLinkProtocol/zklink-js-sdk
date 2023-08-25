@@ -337,6 +337,27 @@ class Wallet {
             }
         });
     }
+    getERC20DepositsAllowance(mainContract, tokenAddress, accountAddress) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if ((0, utils_2.isGasToken)(tokenAddress)) {
+                return utils_2.ERC20_APPROVE_TRESHOLD;
+            }
+            try {
+                const data = utils_2.IERC20_INTERFACE.encodeFunctionData('allowance', [
+                    accountAddress,
+                    mainContract,
+                ]);
+                const currentAllowance = yield this.ethSigner.call({
+                    to: tokenAddress,
+                    data,
+                });
+                return ethers_1.BigNumber.from(currentAllowance);
+            }
+            catch (e) {
+                this.modifyEthersError(e);
+            }
+        });
+    }
     isERC20DepositsApproved(mainContract, tokenAddress, accountAddress, erc20ApproveThreshold = utils_2.ERC20_APPROVE_TRESHOLD) {
         return __awaiter(this, void 0, void 0, function* () {
             if ((0, utils_2.isGasToken)(tokenAddress)) {
