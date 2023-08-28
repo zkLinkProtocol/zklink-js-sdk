@@ -12,12 +12,14 @@ import { EthMessageSigner } from './eth-message-signer'
 import { Create2WalletSigner, Signer } from './signer'
 import {
   Address,
+  ChainId,
   ChangePubKeyData,
   ChangePubKeyEntries,
   Create2Data,
   EthSignerType,
   ForcedExitData,
   ForcedExitEntries,
+  L1ChainId,
   Nonce,
   OrderData,
   OrderMatchingData,
@@ -34,6 +36,7 @@ import {
 } from './types'
 import {
   ERC20_APPROVE_TRESHOLD,
+  ERC20_DEPOSIT_GAS_LIMIT,
   ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT,
   ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT,
   IERC20_INTERFACE,
@@ -554,6 +557,7 @@ export class Wallet {
   }
 
   async sendDepositFromEthereum(deposit: {
+    chainId: L1ChainId
     mainContract: Address
     subAccountId: number
     depositTo: Address
@@ -618,6 +622,14 @@ export class Wallet {
         data,
         nonce,
         ...deposit.ethTxOptions,
+      }
+
+      if (tx.gasLimit == null) {
+        if (deposit.approveDepositAmountForERC20) {
+          tx.gasLimit =
+            ERC20_DEPOSIT_GAS_LIMIT[deposit.chainId] ??
+            ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT
+        }
       }
       try {
         ethTransaction = await this.ethSigner.sendTransaction(tx)

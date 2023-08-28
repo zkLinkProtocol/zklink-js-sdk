@@ -2,7 +2,7 @@ import { TransactionResponse } from '@ethersproject/abstract-provider';
 import { BigNumber, BigNumberish, ContractTransaction, ethers } from 'ethers';
 import { EthMessageSigner } from './eth-message-signer';
 import { Signer } from './signer';
-import { Address, ChangePubKeyData, ChangePubKeyEntries, Create2Data, EthSignerType, ForcedExitData, ForcedExitEntries, Nonce, OrderData, OrderMatchingData, OrderMatchingEntries, PubKeyHash, SignedTransaction, TokenAddress, TokenId, TransferData, TransferEntries, TxEthSignature, WithdrawData, WithdrawEntries } from './types';
+import { Address, ChangePubKeyData, ChangePubKeyEntries, Create2Data, EthSignerType, ForcedExitData, ForcedExitEntries, L1ChainId, Nonce, OrderData, OrderMatchingData, OrderMatchingEntries, PubKeyHash, SignedTransaction, TokenAddress, TokenId, TransferData, TransferEntries, TxEthSignature, WithdrawData, WithdrawEntries } from './types';
 export declare class Wallet {
     ethSigner: ethers.Signer;
     ethMessageSigner: EthMessageSigner;
@@ -36,6 +36,7 @@ export declare class Wallet {
     isERC20DepositsApproved(mainContract: Address, tokenAddress: Address, accountAddress: Address, erc20ApproveThreshold?: BigNumber): Promise<boolean>;
     approveERC20TokenDeposits(mainContract: Address, tokenAddress: Address, max_erc20_approve_amount?: BigNumber): Promise<TransactionResponse>;
     sendDepositFromEthereum(deposit: {
+        chainId: L1ChainId;
         mainContract: Address;
         subAccountId: number;
         depositTo: Address;

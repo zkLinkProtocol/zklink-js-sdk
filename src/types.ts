@@ -10,6 +10,7 @@ export type TokenSymbol = string
 // Token address (e.g. 0xde..ad for ERC20, or 0x00.00 for "ETH")
 export type TokenAddress = string
 export type TokenId = number
+export type L1ChainId = number
 export type ChainId = number
 export type Ether = string
 export type Wei = string

@@ -4,6 +4,7 @@ export type PubKeyHash = string;
 export type TokenSymbol = string;
 export type TokenAddress = string;
 export type TokenId = number;
+export type L1ChainId = number;
 export type ChainId = number;
 export type Ether = string;
 export type Wei = string;

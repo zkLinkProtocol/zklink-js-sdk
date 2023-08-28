@@ -400,6 +400,7 @@ class Wallet {
         });
     }
     sendDepositFromEthereum(deposit) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             let ethTransaction;
             if (!(0, utils_1.isAddress)(deposit.token)) {
@@ -443,6 +444,12 @@ class Wallet {
                 ]);
                 const tx = Object.assign({ to: deposit.mainContract, data,
                     nonce }, deposit.ethTxOptions);
+                if (tx.gasLimit == null) {
+                    if (deposit.approveDepositAmountForERC20) {
+                        tx.gasLimit =
+                            (_a = utils_2.ERC20_DEPOSIT_GAS_LIMIT[deposit.chainId]) !== null && _a !== void 0 ? _a : utils_2.ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT;
+                    }
+                }
                 try {
                     ethTransaction = yield this.ethSigner.sendTransaction(tx);
                 }
