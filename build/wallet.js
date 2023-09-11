@@ -493,7 +493,7 @@ class Wallet {
         if (accountId === undefined || accountId === null) {
             throw new Error(`Missing accountId in ${msg}, accountId: ${accountId}`);
         }
-        if (typeof accountId !== 'number' || accountId <= 0) {
+        if (typeof accountId !== 'number' || accountId < 0) {
             throw new Error(`Invalid accountId in ${msg}, accountId: ${accountId}`);
         }
     }
