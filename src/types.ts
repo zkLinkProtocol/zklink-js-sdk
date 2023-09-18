@@ -202,8 +202,7 @@ export interface OrderData {
   amount: BigNumberish
   price: BigNumberish
   isSell: number
-  feeRatio1: number // be used for make
-  feeRatio2: number // be used for taker
+  feeRates: [number, number] // [maker, taker], e.g. [100, 255] 100 means 1%, max is 2.56% |
   signature?: Signature
 }
 

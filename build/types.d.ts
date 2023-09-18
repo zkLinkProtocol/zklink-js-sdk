@@ -172,8 +172,7 @@ export interface OrderData {
     amount: BigNumberish;
     price: BigNumberish;
     isSell: number;
-    feeRatio1: number;
-    feeRatio2: number;
+    feeRates: [number, number];
     signature?: Signature;
 }
 export interface OrderMatchingEntries {

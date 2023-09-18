@@ -774,8 +774,6 @@ export function serializeOrder(order: OrderData): Uint8Array {
   const quoteTokenIdBytes = serializeTokenId(order.quoteTokenId)
   const priceBytes = bigintToBytesBE(BigNumber.from(order.price).toBigInt(), 15)
   const isSellBytes = numberToBytesBE(order.isSell, 1)
-  const feeRatio1Bytes = numberToBytesBE(order.feeRatio1, 1)
-  const feeRatio2Bytes = numberToBytesBE(order.feeRatio2, 1)
   const amountBytes = serializeAmountPacked(order.amount)
   return ethers.utils.concat([
     type,
@@ -787,8 +785,8 @@ export function serializeOrder(order: OrderData): Uint8Array {
     quoteTokenIdBytes,
     priceBytes,
     isSellBytes,
-    feeRatio1Bytes,
-    feeRatio2Bytes,
+    numberToBytesBE(order.feeRates[0], 1),
+    numberToBytesBE(order.feeRates[1], 1),
     amountBytes,
   ])
 }

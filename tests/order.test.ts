@@ -13,8 +13,7 @@ const orderMaker = {
   price: BigNumber.from('10000000000000000000'),
   amount: BigNumber.from('5000000000000000000'),
   isSell: 0,
-  feeRatio1: 5,
-  feeRatio2: 10,
+  feeRates: [5, 10],
 }
 const orderTaker = {
   type: 'Order',
@@ -27,8 +26,7 @@ const orderTaker = {
   price: BigNumber.from('5000000000000000000'),
   amount: BigNumber.from('10000000000000000000'),
   isSell: 1,
-  feeRatio1: 5,
-  feeRatio2: 10,
+  feeRates: [5, 10],
 }
 
 describe('Order', () => {
@@ -69,8 +67,7 @@ describe('Order', () => {
       price: BigNumber.from('900000000000000000'),
       amount: BigNumber.from('10000000000000000000'),
       isSell: 0,
-      feeRatio1: 5,
-      feeRatio2: 10,
+      feeRates: [5, 10],
     } as any)
     expect(signedTransaction?.tx?.signature?.signature).toBe(
       '43a2b06e196f85d93ed5ed759b767238e0dde7949859ca80153add1b57af9b95969d9a60d5c64fef712e021460103e369d40ea83d98e782b9aecd7e230841402'
