@@ -12,6 +12,8 @@ import {
   ChangePubKeyData,
   ChangePubKeyECDSA,
   ChangePubKeyOnchain,
+  ContractData,
+  ContractMatchingData,
   Create2Data,
   EthSignerType,
   ForcedExitData,
@@ -63,6 +65,18 @@ export class Signer {
     }
   }
 
+  async signOrder(tx: OrderData): Promise<OrderData> {
+    const msgBytes = utils.serializeOrder(tx)
+    const signature = await signTransactionBytes(this.#privateKey, msgBytes)
+
+    return {
+      ...tx,
+      price: BigNumber.from(tx.price).toString(),
+      amount: BigNumber.from(tx.amount).toString(),
+      signature,
+    }
+  }
+
   async signOrderMatching(tx: OrderMatchingData): Promise<OrderMatchingData> {
     const msgBytes = await utils.serializeOrderMatching(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
@@ -86,16 +100,41 @@ export class Signer {
     } as any
   }
 
-  async signOrder(tx: OrderData): Promise<OrderData> {
-    const msgBytes = utils.serializeOrder(tx)
+  async signContract(tx: ContractData): Promise<ContractData> {
+    const msgBytes = utils.serializeContract(tx)
     const signature = await signTransactionBytes(this.#privateKey, msgBytes)
 
     return {
       ...tx,
       price: BigNumber.from(tx.price).toString(),
-      amount: BigNumber.from(tx.amount).toString(),
       signature,
     }
+  }
+
+  async signContractMatching(
+    tx: ContractMatchingData
+  ): Promise<ContractMatchingData> {
+    const msgBytes = await utils.serializeContractMatching(tx)
+    const signature = await signTransactionBytes(this.#privateKey, msgBytes)
+
+    return {
+      ...tx,
+      type: utils.TxType.ContractMatching,
+      maker: tx.maker.map((v) => {
+        return {
+          ...v,
+          size: BigNumber.from(v.size).toString(),
+          price: BigNumber.from(v.price).toString(),
+        }
+      }),
+      taker: {
+        ...tx.taker,
+        size: BigNumber.from(tx.taker.size).toString(),
+        price: BigNumber.from(tx.taker.price).toString(),
+      },
+      fee: BigNumber.from(tx.fee).toString(),
+      signature,
+    } as any
   }
 
   async signWithdraw(tx: WithdrawData): Promise<WithdrawData> {

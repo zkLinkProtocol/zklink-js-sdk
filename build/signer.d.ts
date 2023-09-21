@@ -1,5 +1,5 @@
 import { BigNumberish, ethers } from 'ethers';
-import { Address, ChangePubKeyCREATE2, ChangePubKeyData, ChangePubKeyECDSA, ChangePubKeyOnchain, Create2Data, EthSignerType, ForcedExitData, OrderData, OrderMatchingData, PubKeyHash, Signature, TokenId, TransferData, WithdrawData } from './types';
+import { Address, ChangePubKeyCREATE2, ChangePubKeyData, ChangePubKeyECDSA, ChangePubKeyOnchain, ContractData, ContractMatchingData, Create2Data, EthSignerType, ForcedExitData, OrderData, OrderMatchingData, PubKeyHash, Signature, TokenId, TransferData, WithdrawData } from './types';
 export declare class Signer {
     #private;
     private constructor();
@@ -9,8 +9,10 @@ export declare class Signer {
     signTransactionBytes(msg: string): Promise<Signature>;
     pubKey(): Promise<string>;
     signTransfer(tx: TransferData): Promise<TransferData>;
-    signOrderMatching(tx: OrderMatchingData): Promise<OrderMatchingData>;
     signOrder(tx: OrderData): Promise<OrderData>;
+    signOrderMatching(tx: OrderMatchingData): Promise<OrderMatchingData>;
+    signContract(tx: ContractData): Promise<ContractData>;
+    signContractMatching(tx: ContractMatchingData): Promise<ContractMatchingData>;
     signWithdraw(tx: WithdrawData): Promise<WithdrawData>;
     signForcedExit(tx: ForcedExitData): Promise<ForcedExitData>;
     signChangePubKey(changePubKey: {

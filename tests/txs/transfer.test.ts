@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers'
-import { TransferEntries, serializeTransfer } from '../src'
-import { getTestWallet } from './utils'
+import { TransferEntries, serializeTransfer } from '../../src'
+import { getTestWallet } from '../wallet.test'
 
 describe('Transfer', () => {
   const entries: TransferEntries = {

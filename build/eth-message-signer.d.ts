@@ -57,6 +57,18 @@ export declare class EthMessageSigner {
         baseTokenSymbol: string;
         quoteTokenSymbol: string;
     }): string;
+    getContractMatchingEthMessagePart(tx: {
+        stringFeeToken: string;
+        stringFee: string;
+    }): string;
+    getContractMatchingEthSignMessage(matching: {
+        stringFeeToken: string;
+        stringFee: string;
+    }): string;
+    ethSignContractMatching(matching: {
+        stringFeeToken: string;
+        stringFee: string;
+    }): Promise<TxEthSignature>;
     getCreatePoolEthMessagePart(tx: {
         token0: string;
         token1: string;

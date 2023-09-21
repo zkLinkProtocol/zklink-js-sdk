@@ -1,6 +1,6 @@
-import { OrderData, OrderMatchingEntries } from '../src/types'
-import { serializeOrder, serializeOrderMatching } from '../src/utils'
-import { getTestWallet } from './utils'
+import { OrderData, OrderMatchingEntries } from '../../src/types'
+import { serializeOrder, serializeOrderMatching } from '../../src/utils'
+import { getTestWallet } from '../wallet.test'
 
 describe('matching', () => {
   const makerData: OrderData = {

@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers'
-import { WithdrawEntries } from '../src/types'
-import { serializeWithdraw } from '../src/utils'
-import { getTestWallet } from './utils'
+import { WithdrawEntries } from '../../src/types'
+import { serializeWithdraw } from '../../src/utils'
+import { getTestWallet } from '../wallet.test'
 
 describe('withdraw', () => {
   const entries: WithdrawEntries = {

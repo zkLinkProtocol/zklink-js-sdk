@@ -163,6 +163,40 @@ class Wallet {
             };
         });
     }
+    signContract(entries) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const signedTransferTransaction = yield this.signer.signContract(entries);
+            return {
+                tx: signedTransferTransaction,
+                ethereumSignature: null,
+            };
+        });
+    }
+    getContractMatchingData(entries) {
+        const { feeTokenId, feeTokenSymbol } = entries, data = __rest(entries, ["feeTokenId", "feeTokenSymbol"]);
+        const transactionData = Object.assign(Object.assign({}, data), { type: 'ContractMatching', feeToken: feeTokenId });
+        return transactionData;
+    }
+    signContractMatching(entries) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const transactionData = this.getContractMatchingData(entries);
+            const signedTransferTransaction = yield this.signer.signContractMatching(transactionData);
+            const stringFee = ethers_1.BigNumber.from(transactionData.fee).isZero()
+                ? null
+                : ethers_1.utils.formatEther(transactionData.fee);
+            const stringFeeToken = entries.feeTokenSymbol;
+            const ethereumSignature = this.ethSigner instanceof signer_1.Create2WalletSigner
+                ? null
+                : yield this.ethMessageSigner.ethSignContractMatching({
+                    stringFee,
+                    stringFeeToken,
+                });
+            return {
+                tx: signedTransferTransaction,
+                ethereumSignature,
+            };
+        });
+    }
     getWithdrawData(entries) {
         this.requireAccountId(entries === null || entries === void 0 ? void 0 : entries.accountId, 'Withdraw');
         this.requireNonce(entries === null || entries === void 0 ? void 0 : entries.nonce, 'Withdraw');

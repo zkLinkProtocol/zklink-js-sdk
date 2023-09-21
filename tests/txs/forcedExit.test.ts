@@ -1,6 +1,6 @@
-import { ForcedExitEntries } from '../src/types'
-import { serializeForcedExit } from '../src/utils'
-import { getTestWallet } from './utils'
+import { ForcedExitEntries } from '../../src/types'
+import { serializeForcedExit } from '../../src/utils'
+import { getTestWallet } from '../wallet.test'
 
 describe('forcedExit', () => {
   const entries: ForcedExitEntries = {

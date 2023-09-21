@@ -146,6 +146,34 @@ export class EthMessageSigner {
     return message
   }
 
+  getContractMatchingEthMessagePart(tx: {
+    stringFeeToken: string
+    stringFee: string
+  }): string {
+    let message = `ContractMatching fee: ${tx.stringFee} ${tx.stringFeeToken}`
+    return message
+  }
+
+  getContractMatchingEthSignMessage(matching: {
+    stringFeeToken: string
+    stringFee: string
+  }): string {
+    let humanReadableTxInfo = this.getContractMatchingEthMessagePart(matching)
+    if (humanReadableTxInfo.length != 0) {
+      humanReadableTxInfo += '\n'
+    }
+
+    return humanReadableTxInfo
+  }
+
+  async ethSignContractMatching(matching: {
+    stringFeeToken: string
+    stringFee: string
+  }): Promise<TxEthSignature> {
+    const message = this.getContractMatchingEthSignMessage(matching)
+    return await this.getEthMessageSignature(message)
+  }
+
   getCreatePoolEthMessagePart(tx: { token0: string; token1: string }): string {
     let message = ''
     message += `Token: ${tx.token0} - ${tx.token1}`

@@ -2,7 +2,7 @@ import { TransactionResponse } from '@ethersproject/abstract-provider';
 import { BigNumber, BigNumberish, ContractTransaction, ethers } from 'ethers';
 import { EthMessageSigner } from './eth-message-signer';
 import { Signer } from './signer';
-import { Address, ChangePubKeyData, ChangePubKeyEntries, Create2Data, EthSignerType, ForcedExitData, ForcedExitEntries, L1ChainId, Nonce, OrderData, OrderMatchingData, OrderMatchingEntries, PubKeyHash, SignedTransaction, TokenAddress, TokenId, TransferData, TransferEntries, TxEthSignature, WithdrawData, WithdrawEntries } from './types';
+import { Address, ChangePubKeyData, ChangePubKeyEntries, ContractData, ContractMatchingData, ContractMatchingEntries, Create2Data, EthSignerType, ForcedExitData, ForcedExitEntries, L1ChainId, Nonce, OrderData, OrderMatchingData, OrderMatchingEntries, PubKeyHash, SignedTransaction, TokenAddress, TokenId, TransferData, TransferEntries, TxEthSignature, WithdrawData, WithdrawEntries } from './types';
 export declare class Wallet {
     ethSigner: ethers.Signer;
     ethMessageSigner: EthMessageSigner;
@@ -22,6 +22,9 @@ export declare class Wallet {
     signOrder(entries: OrderData): Promise<SignedTransaction>;
     getOrderMatchingData(entries: OrderMatchingEntries): OrderMatchingData;
     signOrderMatching(entries: OrderMatchingEntries): Promise<SignedTransaction>;
+    signContract(entries: ContractData): Promise<SignedTransaction>;
+    getContractMatchingData(entries: ContractMatchingEntries): ContractMatchingData;
+    signContractMatching(entries: ContractMatchingEntries): Promise<SignedTransaction>;
     getWithdrawData(entries: WithdrawEntries): WithdrawData;
     signWithdrawToEthereum(entries: WithdrawEntries): Promise<SignedTransaction>;
     isSigningKeySet(currentPubKeyHash: PubKeyHash): Promise<boolean>;

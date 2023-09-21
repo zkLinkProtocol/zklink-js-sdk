@@ -1,6 +1,6 @@
-import { ChangePubKeyEntries } from '../src/types'
-import { serializeChangePubKey } from '../src/utils'
-import { getTestWallet } from './utils'
+import { ChangePubKeyEntries } from '../../src/types'
+import { serializeChangePubKey } from '../../src/utils'
+import { getTestWallet } from '../wallet.test'
 
 describe('ChangePubKey', () => {
   const entries: ChangePubKeyEntries = {

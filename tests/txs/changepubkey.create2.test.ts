@@ -1,6 +1,6 @@
-import { ChangePubKeyEntries } from '../src/types'
-import { Wallet as LinkWallet } from '../src/wallet'
-import { getTestWallet } from './utils'
+import { ChangePubKeyEntries } from '../../src/types'
+import { Wallet as LinkWallet } from '../../src/wallet'
+import { getTestWallet } from '../wallet.test'
 
 describe('Create2 ChangePubKey', () => {
   it('signature', async () => {

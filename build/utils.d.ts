@@ -1,5 +1,5 @@
 import { BigNumber, BigNumberish, ethers, utils } from 'ethers';
-import { Address, ChangePubKeyData, EthSignerType, ForcedExitData, OrderData, OrderMatchingData, PubKeyHash, TokenAddress, TransferData, WithdrawData } from './types';
+import { Address, ChangePubKeyData, ContractData, ContractMatchingData, EthSignerType, ForcedExitData, OrderData, OrderMatchingData, PubKeyHash, TokenAddress, TransferData, WithdrawData } from './types';
 export declare const MIN_UNONCE = 1;
 export declare const MAX_UNONCE = 4294967295;
 export declare const IERC20_INTERFACE: ethers.utils.Interface;
@@ -11,6 +11,21 @@ export declare const ERC20_APPROVE_TRESHOLD: BigNumber;
 export declare const ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT: BigNumber;
 export declare const ERC20_RECOMMENDED_DEPOSIT_GAS_LIMIT: BigNumber;
 export declare const SIGN_MESSAGE = "Sign this message to create a key to interact with zkLink's layer2 services.\nNOTE: This application is powered by zkLink protocol.\n\nOnly sign this message for a trusted client!";
+export declare enum TxType {
+    Deposit = 1,
+    TransferToNew = 2,
+    Withdraw = 3,
+    Transfer = 4,
+    FullExit = 5,
+    ChangePubKey = 6,
+    ForcedExit = 7,
+    OrderMatching = 8,
+    ContractMatching = 9,
+    Contract = 254,
+    Order = 255
+}
+export declare const ORDER_TYPES: number;
+export declare const CONTRACT_TYPES = 35;
 export declare function floatToInteger(floatBytes: Uint8Array, expBits: number, mantissaBits: number, expBaseNumber: number): BigNumber;
 export declare function bitsIntoBytesInBEOrder(bits: number[]): Uint8Array;
 export declare function integerToFloat(integer: BigNumber, expBits: number, mantissaBits: number, expBase: number): Uint8Array;
@@ -50,6 +65,7 @@ export declare function serializeSubAccountId(subAccountId: number): Uint8Array;
 export declare function serializeTokenId(tokenId: number): Uint8Array;
 export declare function serializeAmountPacked(amount: BigNumberish): Uint8Array;
 export declare function serializeAmountFull(amount: BigNumberish): Uint8Array;
+export declare function serializePrice(price: BigNumberish): Uint8Array;
 export declare function serializeFeePacked(fee: BigNumberish): Uint8Array;
 export declare function serializeNonce(nonce: number): Uint8Array;
 export declare function serializeChainId(chainId: number): Uint8Array;
@@ -62,13 +78,14 @@ export declare function serializeChangePubKey(changePubKey: ChangePubKeyData): U
 export declare function serializeForcedExit(forcedExit: ForcedExitData): Uint8Array;
 export declare function serializeOrder(order: OrderData): Uint8Array;
 export declare function serializeOrderMatching(matching: OrderMatchingData): Promise<Uint8Array>;
+export declare function serializeContract(contract: ContractData): Uint8Array;
+export declare function serializeContractMatching(matching: ContractMatchingData): Promise<Uint8Array>;
 /**
  * Encodes the transaction data as the byte sequence according to the zkSync protocol.
  * @param tx A transaction to serialize.
  */
 export declare function serializeTx(tx: TransferData | WithdrawData | ChangePubKeyData | ForcedExitData): Uint8Array;
 export declare function numberToBytesBE(number: number, bytes: number): Uint8Array;
-export declare function bigintToBytesBE(number1: bigint, bytes: number): Uint8Array;
 export declare function getCREATE2AddressAndSalt(syncPubkeyHash: string, create2Data: {
     creatorAddress: string;
     saltArg: string;

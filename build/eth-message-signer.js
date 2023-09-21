@@ -94,6 +94,23 @@ class EthMessageSigner {
         message += '\n';
         return message;
     }
+    getContractMatchingEthMessagePart(tx) {
+        let message = `ContractMatching fee: ${tx.stringFee} ${tx.stringFeeToken}`;
+        return message;
+    }
+    getContractMatchingEthSignMessage(matching) {
+        let humanReadableTxInfo = this.getContractMatchingEthMessagePart(matching);
+        if (humanReadableTxInfo.length != 0) {
+            humanReadableTxInfo += '\n';
+        }
+        return humanReadableTxInfo;
+    }
+    ethSignContractMatching(matching) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const message = this.getContractMatchingEthSignMessage(matching);
+            return yield this.getEthMessageSignature(message);
+        });
+    }
     getCreatePoolEthMessagePart(tx) {
         let message = '';
         message += `Token: ${tx.token0} - ${tx.token1}`;

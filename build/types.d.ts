@@ -4,6 +4,7 @@ export type PubKeyHash = string;
 export type TokenSymbol = string;
 export type TokenAddress = string;
 export type TokenId = number;
+export type PairId = number;
 export type L1ChainId = number;
 export type ChainId = number;
 export type Ether = string;
@@ -158,7 +159,7 @@ export interface ChangePubKeyData {
     ethSignature?: TxEthSignature;
 }
 export interface SignedTransaction {
-    tx: TransferData | WithdrawData | ChangePubKeyData | ForcedExitData | OrderData | OrderMatchingData;
+    tx: TransferData | WithdrawData | ChangePubKeyData | ForcedExitData | OrderData | OrderMatchingData | ContractData | ContractMatchingData;
     ethereumSignature?: TxEthSignature;
 }
 export interface OrderData {
@@ -197,6 +198,39 @@ export interface OrderMatchingData {
     maker: OrderData;
     expectBaseAmount: BigNumberish;
     expectQuoteAmount: BigNumberish;
+    fee: BigNumberish;
+    feeToken: TokenId;
+    signature?: Signature;
+}
+export interface ContractData {
+    type: 'Contract';
+    accountId: number;
+    subAccountId: number;
+    slotId: number;
+    nonce: number;
+    pairId: PairId;
+    size: BigNumberish;
+    price: BigNumberish;
+    direction: number;
+    feeRates: [number, number];
+    signature?: Signature;
+}
+export interface ContractMatchingEntries {
+    accountId: number;
+    subAccountId: number;
+    maker: ContractData[];
+    taker: ContractData;
+    feeTokenId: TokenId;
+    feeTokenSymbol: TokenSymbol;
+    fee: BigNumberish;
+    signature?: Signature;
+}
+export interface ContractMatchingData {
+    type: 'ContractMatching';
+    accountId: number;
+    subAccountId: number;
+    maker: ContractData[];
+    taker: ContractData;
     fee: BigNumberish;
     feeToken: TokenId;
     signature?: Signature;

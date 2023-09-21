@@ -1,4 +1,4 @@
-import { getTestWallet } from './utils'
+import { getTestWallet } from './wallet.test'
 
 describe('signTransaction', function () {
   it('signTransactionBytes', async () => {

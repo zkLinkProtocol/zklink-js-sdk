@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers'
-import { serializeOrder } from '../src/utils'
-import { getTestWallet } from './utils'
+import { serializeOrder } from '../../src/utils'
+import { getTestWallet } from '../wallet.test'
 
 const orderMaker = {
   type: 'Order',

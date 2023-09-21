@@ -10,6 +10,7 @@ export type TokenSymbol = string
 // Token address (e.g. 0xde..ad for ERC20, or 0x00.00 for "ETH")
 export type TokenAddress = string
 export type TokenId = number
+export type PairId = number
 export type L1ChainId = number
 export type ChainId = number
 export type Ether = string
@@ -188,6 +189,8 @@ export interface SignedTransaction {
     | ForcedExitData
     | OrderData
     | OrderMatchingData
+    | ContractData
+    | ContractMatchingData
   ethereumSignature?: TxEthSignature
 }
 
@@ -228,6 +231,40 @@ export interface OrderMatchingData {
   maker: OrderData
   expectBaseAmount: BigNumberish
   expectQuoteAmount: BigNumberish
+  fee: BigNumberish
+  feeToken: TokenId
+  signature?: Signature
+}
+
+export interface ContractData {
+  type: 'Contract'
+  accountId: number
+  subAccountId: number
+  slotId: number
+  nonce: number
+  pairId: PairId
+  size: BigNumberish
+  price: BigNumberish
+  direction: number // 0 -> short, 1 -> long
+  feeRates: [number, number] // [maker, taker], e.g. [100, 255] 100 means 1%, max is 2.56% |
+  signature?: Signature
+}
+export interface ContractMatchingEntries {
+  accountId: number
+  subAccountId: number
+  maker: ContractData[]
+  taker: ContractData
+  feeTokenId: TokenId
+  feeTokenSymbol: TokenSymbol
+  fee: BigNumberish
+  signature?: Signature
+}
+export interface ContractMatchingData {
+  type: 'ContractMatching'
+  accountId: number
+  subAccountId: number
+  maker: ContractData[]
+  taker: ContractData
   fee: BigNumberish
   feeToken: TokenId
   signature?: Signature

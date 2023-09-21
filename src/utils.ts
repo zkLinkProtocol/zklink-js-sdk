@@ -11,6 +11,8 @@ import { rescueHashOrders } from 'zksync-crypto'
 import {
   Address,
   ChangePubKeyData,
+  ContractData,
+  ContractMatchingData,
   EthSignerType,
   ForcedExitData,
   OrderData,
@@ -63,6 +65,23 @@ const FEE_MANTISSA_BIT_WIDTH = 11
 
 export const SIGN_MESSAGE =
   "Sign this message to create a key to interact with zkLink's layer2 services.\nNOTE: This application is powered by zkLink protocol.\n\nOnly sign this message for a trusted client!"
+
+export enum TxType {
+  Deposit = 1,
+  TransferToNew = 2,
+  Withdraw = 3,
+  Transfer = 4,
+  FullExit = 5,
+  ChangePubKey = 6,
+  ForcedExit = 7,
+  OrderMatching = 8,
+  ContractMatching = 9,
+  Contract = 254,
+  Order = 255,
+}
+
+export const ORDER_TYPES = 1424 / 8 // 178
+export const CONTRACT_TYPES = 35
 
 export function floatToInteger(
   floatBytes: Uint8Array,
@@ -625,6 +644,10 @@ export function serializeAmountFull(amount: BigNumberish): Uint8Array {
   const bnAmount = BigNumber.from(amount)
   return utils.zeroPad(utils.arrayify(bnAmount), 16)
 }
+export function serializePrice(price: BigNumberish): Uint8Array {
+  const bnPrice = BigNumber.from(price)
+  return utils.zeroPad(utils.arrayify(bnPrice), 15)
+}
 export function serializeFeePacked(fee: BigNumberish): Uint8Array {
   return packFeeChecked(BigNumber.from(fee))
 }
@@ -651,7 +674,7 @@ export function serializeTimestamp(time: number): Uint8Array {
 }
 
 export function serializeWithdraw(withdraw: WithdrawData): Uint8Array {
-  const type = new Uint8Array([3])
+  const type = new Uint8Array([TxType.Withdraw])
   const toChainId = serializeChainId(withdraw.toChainId)
   const accountId = serializeAccountId(withdraw.accountId)
   const subAccountId = serializeSubAccountId(withdraw.subAccountId)
@@ -682,7 +705,7 @@ export function serializeWithdraw(withdraw: WithdrawData): Uint8Array {
 }
 
 export function serializeTransfer(transfer: TransferData): Uint8Array {
-  const type = new Uint8Array([4]) // tx type
+  const type = new Uint8Array([TxType.Transfer]) // tx type
   const accountId = serializeAccountId(transfer.accountId)
   const fromSubAccountId = serializeSubAccountId(transfer.fromSubAccountId)
   const to = serializeAddress(transfer.to)
@@ -709,7 +732,7 @@ export function serializeTransfer(transfer: TransferData): Uint8Array {
 export function serializeChangePubKey(
   changePubKey: ChangePubKeyData
 ): Uint8Array {
-  const type = new Uint8Array([6])
+  const type = new Uint8Array([TxType.ChangePubKey])
   const chainIdBytes = serializeChainId(changePubKey.chainId)
   const subAccountIdBytes = serializeSubAccountId(changePubKey.subAccountId)
   const accountIdBytes = serializeAccountId(changePubKey.accountId)
@@ -732,7 +755,7 @@ export function serializeChangePubKey(
 }
 
 export function serializeForcedExit(forcedExit: ForcedExitData): Uint8Array {
-  const type = new Uint8Array([7])
+  const type = new Uint8Array([TxType.ForcedExit])
   const toChainIdBytes = serializeChainId(forcedExit.toChainId)
   const initiatorAccountIdBytes = serializeAccountId(
     forcedExit.initiatorAccountId
@@ -765,15 +788,17 @@ export function serializeForcedExit(forcedExit: ForcedExitData): Uint8Array {
 }
 
 export function serializeOrder(order: OrderData): Uint8Array {
-  const type = new Uint8Array([255])
+  const type = new Uint8Array([TxType.Order])
   const accountIdBytes = serializeAccountId(order.accountId)
   const subAccountIdBytes = serializeSubAccountId(order.subAccountId)
   const slotBytes = numberToBytesBE(order.slotId, 2)
   const nonceBytes = numberToBytesBE(order.nonce, 3)
   const baseTokenIdBytes = serializeTokenId(order.baseTokenId)
   const quoteTokenIdBytes = serializeTokenId(order.quoteTokenId)
-  const priceBytes = bigintToBytesBE(BigNumber.from(order.price).toBigInt(), 15)
+  const priceBytes = serializePrice(order.price)
   const isSellBytes = numberToBytesBE(order.isSell, 1)
+  const makerFeeRateBytes = numberToBytesBE(order.feeRates[0], 1)
+  const takerFeeRateBytes = numberToBytesBE(order.feeRates[1], 1)
   const amountBytes = serializeAmountPacked(order.amount)
   return ethers.utils.concat([
     type,
@@ -785,8 +810,8 @@ export function serializeOrder(order: OrderData): Uint8Array {
     quoteTokenIdBytes,
     priceBytes,
     isSellBytes,
-    numberToBytesBE(order.feeRates[0], 1),
-    numberToBytesBE(order.feeRates[1], 1),
+    makerFeeRateBytes,
+    takerFeeRateBytes,
     amountBytes,
   ])
 }
@@ -796,7 +821,7 @@ export async function serializeOrderMatching(
 ): Promise<Uint8Array> {
   const makerBytes = serializeOrder(matching.maker)
   const takerBytes = serializeOrder(matching.taker)
-  const ordersBytes = new Uint8Array(178)
+  const ordersBytes = new Uint8Array(ORDER_TYPES)
   ordersBytes.fill(0)
   ordersBytes.set([...makerBytes, ...takerBytes], 0)
 
@@ -818,6 +843,63 @@ export async function serializeOrderMatching(
     feeBytes,
     expectBaseAmountBytes,
     expectQuoteAmountBytes,
+  ])
+}
+
+export function serializeContract(contract: ContractData): Uint8Array {
+  const type = new Uint8Array([TxType.Contract])
+  const accountIdBytes = serializeAccountId(contract.accountId)
+  const subAccountIdBytes = serializeSubAccountId(contract.subAccountId)
+  const slotBytes = numberToBytesBE(contract.slotId, 2)
+  const nonceBytes = numberToBytesBE(contract.nonce, 3)
+  const pairIdBytes = numberToBytesBE(contract.pairId, 1)
+  const sizeBytes = serializeAmountPacked(contract.size)
+  const priceBytes = serializePrice(contract.price)
+  const directionBytes = numberToBytesBE(contract.direction, 1)
+  const makerFeeRateBytes = numberToBytesBE(contract.feeRates[0], 1)
+  const takerFeeRateBytes = numberToBytesBE(contract.feeRates[1], 1)
+  return ethers.utils.concat([
+    type,
+    accountIdBytes,
+    subAccountIdBytes,
+    slotBytes,
+    nonceBytes,
+    pairIdBytes,
+    directionBytes,
+    sizeBytes,
+    priceBytes,
+    makerFeeRateBytes,
+    takerFeeRateBytes,
+  ])
+}
+
+export async function serializeContractMatching(
+  matching: ContractMatchingData
+): Promise<Uint8Array> {
+  const makerArrayBytes = new Uint8Array(CONTRACT_TYPES * matching.maker.length)
+  matching.maker.forEach((v, i) => {
+    const makerBytes = serializeContract(v)
+    makerArrayBytes.set(makerBytes, i * makerBytes.length)
+  })
+  const takerBytes = serializeContract(matching.taker)
+  const ordersBytes = new Uint8Array(ORDER_TYPES)
+  ordersBytes.fill(0)
+  ordersBytes.set([...makerArrayBytes, ...takerBytes], 0)
+
+  const ordersHash = await rescueHashOrders(ordersBytes)
+
+  const type = new Uint8Array([TxType.ContractMatching])
+  const accountIdBytes = serializeAccountId(matching.accountId)
+  const subAccountIdBytes = serializeSubAccountId(matching.subAccountId)
+  const feeTokenBytes = serializeTokenId(matching.feeToken)
+  const feeBytes = serializeFeePacked(matching.fee)
+  return ethers.utils.concat([
+    type,
+    accountIdBytes,
+    subAccountIdBytes,
+    ordersHash,
+    feeTokenBytes,
+    feeBytes,
   ])
 }
 
@@ -847,15 +929,6 @@ export function numberToBytesBE(number: number, bytes: number): Uint8Array {
   for (let i = bytes - 1; i >= 0; i--) {
     result[i] = number & 0xff
     number >>= 8
-  }
-  return result
-}
-
-export function bigintToBytesBE(number1: bigint, bytes: number): Uint8Array {
-  const result = new Uint8Array(bytes)
-  for (let i = bytes - 1; i >= 0; i--) {
-    result[i] = Number(number1 & BigInt('0xff'))
-    number1 >>= BigInt(8)
   }
   return result
 }

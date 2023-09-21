@@ -14,6 +14,9 @@ import {
   Address,
   ChangePubKeyData,
   ChangePubKeyEntries,
+  ContractData,
+  ContractMatchingData,
+  ContractMatchingEntries,
   Create2Data,
   EthSignerType,
   ForcedExitData,
@@ -242,6 +245,54 @@ export class Wallet {
       this.ethSigner instanceof Create2WalletSigner
         ? null
         : await this.ethMessageSigner.ethSignOrderMatching({
+            stringFee,
+            stringFeeToken,
+          })
+    return {
+      tx: signedTransferTransaction,
+      ethereumSignature,
+    }
+  }
+
+  async signContract(entries: ContractData): Promise<SignedTransaction> {
+    const signedTransferTransaction = await this.signer.signContract(entries)
+
+    return {
+      tx: signedTransferTransaction,
+      ethereumSignature: null,
+    }
+  }
+
+  getContractMatchingData(
+    entries: ContractMatchingEntries
+  ): ContractMatchingData {
+    const { feeTokenId, feeTokenSymbol, ...data } = entries
+    const transactionData: ContractMatchingData = {
+      ...data,
+      type: 'ContractMatching',
+      feeToken: feeTokenId,
+    }
+
+    return transactionData
+  }
+
+  async signContractMatching(
+    entries: ContractMatchingEntries
+  ): Promise<SignedTransaction> {
+    const transactionData = this.getContractMatchingData(entries)
+    const signedTransferTransaction = await this.signer.signContractMatching(
+      transactionData
+    )
+
+    const stringFee = BigNumber.from(transactionData.fee).isZero()
+      ? null
+      : utils.formatEther(transactionData.fee)
+    const stringFeeToken = entries.feeTokenSymbol
+
+    const ethereumSignature =
+      this.ethSigner instanceof Create2WalletSigner
+        ? null
+        : await this.ethMessageSigner.ethSignContractMatching({
             stringFee,
             stringFeeToken,
           })
