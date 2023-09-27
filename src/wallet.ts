@@ -43,7 +43,6 @@ import {
   IERC20_INTERFACE,
   MAIN_CONTRACT_INTERFACE,
   MAX_ERC20_APPROVE_AMOUNT,
-  getChangePubkeyMessage,
   getEthereumBalance,
   getTimestamp,
   isGasToken,
@@ -367,7 +366,7 @@ export class Wallet {
     this.requireAccountId(entries?.accountId, 'ChangePubKey')
     this.requireNonce(entries?.nonce, 'ChangePubKey')
 
-    const { feeTokenId, layerOneChainId, ...data } = entries
+    const { feeTokenId, ...data } = entries
     const transactionData: ChangePubKeyData = {
       ...data,
       type: 'ChangePubKey',
@@ -409,15 +408,13 @@ export class Wallet {
         type: 'Onchain',
       }
     } else if (entries.ethAuthType === 'EthECDSA') {
-      const changePubKeySignData = getChangePubkeyMessage(
-        transactionData.newPkHash,
-        transactionData.nonce,
-        transactionData.accountId,
-        entries.mainContract,
-        entries.layerOneChainId
-      )
-      const ethSignature = (await this.getEIP712Signature(changePubKeySignData))
-        .signature
+      const ethSignature = (
+        await this.ethMessageSigner.ethSignChangePubKey({
+          pubKeyHash: transactionData.newPkHash,
+          nonce: String(transactionData.nonce),
+          accountId: String(transactionData.accountId),
+        })
+      ).signature
       transactionData.ethAuthData = {
         type: 'EthECDSA',
         ethSignature,
