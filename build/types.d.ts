@@ -174,7 +174,7 @@ export interface OrderData {
     price: BigNumberish;
     isSell: number;
     feeRates: [number, number];
-    hasSubsidy: 0 | 1;
+    hasSubsidy?: 0 | 1;
     signature?: Signature;
 }
 export interface OrderMatchingEntries {
@@ -214,7 +214,7 @@ export interface ContractData {
     price: BigNumberish;
     direction: 0 | 1;
     feeRates: [number, number];
-    hasSubsidy: 0 | 1;
+    hasSubsidy?: 0 | 1;
     signature?: Signature;
 }
 export interface ContractMatchingEntries {
