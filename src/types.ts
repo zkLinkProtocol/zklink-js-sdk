@@ -206,6 +206,7 @@ export interface OrderData {
   price: BigNumberish
   isSell: number
   feeRates: [number, number] // [maker, taker], e.g. [100, 255] 100 means 1%, max is 2.56% |
+  hasSubsidy: 0 | 1 // 0 -> pay fee, 1 -> subsidy
   signature?: Signature
 }
 
@@ -245,8 +246,9 @@ export interface ContractData {
   pairId: PairId
   size: BigNumberish
   price: BigNumberish
-  direction: number // 0 -> short, 1 -> long
+  direction: 0 | 1 // 0 -> short, 1 -> long
   feeRates: [number, number] // [maker, taker], e.g. [100, 255] 100 means 1%, max is 2.56% |
+  hasSubsidy: 0 | 1 // 0 -> pay fee, 1 -> subsidy
   signature?: Signature
 }
 export interface ContractMatchingEntries {

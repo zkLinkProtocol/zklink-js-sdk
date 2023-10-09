@@ -25,7 +25,7 @@ export declare enum TxType {
     Order = 255
 }
 export declare const ORDER_TYPES: number;
-export declare const CONTRACT_TYPES = 35;
+export declare const CONTRACT_TYPES = 36;
 export declare function floatToInteger(floatBytes: Uint8Array, expBits: number, mantissaBits: number, expBaseNumber: number): BigNumber;
 export declare function bitsIntoBytesInBEOrder(bits: number[]): Uint8Array;
 export declare function integerToFloat(integer: BigNumber, expBits: number, mantissaBits: number, expBase: number): Uint8Array;

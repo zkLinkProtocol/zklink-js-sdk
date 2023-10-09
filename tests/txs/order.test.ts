@@ -33,14 +33,14 @@ describe('Order', () => {
   it('serialize order maker', () => {
     const serialized = serializeOrder(orderMaker as any)
     expect(Buffer.from(serialized).toString('hex')).toBe(
-      'ff0000000201000000000000010002000000000000008ac7230489e8000000050a2540be4009'
+      'ff0000000201000000000000010002000000000000008ac7230489e8000000050a002540be4009'
     )
   })
 
   it('serialize order taker', () => {
     const serialized = serializeOrder(orderTaker as any)
     expect(Buffer.from(serialized).toString('hex')).toBe(
-      'ff0000000201000100000000010002000000000000004563918244f4000001050a4a817c8009'
+      'ff0000000201000100000000010002000000000000004563918244f4000001050a004a817c8009'
     )
   })
 
@@ -51,7 +51,7 @@ describe('Order', () => {
       '77aa48808967258ac4c115ab14249a4d0b9888360bfb0079ab981822195b3d0c'
     )
     expect(signedTransaction?.tx?.signature?.signature).toBe(
-      '381a682a9d8732c66971fa5703a1accf3de9371abf6779cf441cc584ea1df692b170b3c918104e992c9920ba79793ed0138f2423e953a5facef2be96a608f305'
+      '8ee9dc660b6709b2d74340e0800f3f78e6f7b64b40151421127347cb243f4a13c068fd610a57976c028565381ad312b737e25cef232d2475f5732cfbdc1e1e05'
     )
   })
 
@@ -70,7 +70,7 @@ describe('Order', () => {
       feeRates: [5, 10],
     } as any)
     expect(signedTransaction?.tx?.signature?.signature).toBe(
-      '43a2b06e196f85d93ed5ed759b767238e0dde7949859ca80153add1b57af9b95969d9a60d5c64fef712e021460103e369d40ea83d98e782b9aecd7e230841402'
+      '8aeb3f5df5929a42fa056dc8fdb7f9c670c02bb929241280a1c8a174d5847828ffc2d5ddacac5652621ebf26b037fa4e431dbe0649d78246497c50f9f55f2d05'
     )
   })
 })

@@ -63,7 +63,7 @@ var TxType;
     TxType[TxType["Order"] = 255] = "Order";
 })(TxType || (exports.TxType = TxType = {}));
 exports.ORDER_TYPES = 1424 / 8; // 178
-exports.CONTRACT_TYPES = 35;
+exports.CONTRACT_TYPES = 36;
 function floatToInteger(floatBytes, expBits, mantissaBits, expBaseNumber) {
     if (floatBytes.length * 8 !== mantissaBits + expBits) {
         throw new Error('Float unpacking, incorrect input length');
@@ -655,6 +655,7 @@ function serializeOrder(order) {
     const makerFeeRateBytes = numberToBytesBE(order.feeRates[0], 1);
     const takerFeeRateBytes = numberToBytesBE(order.feeRates[1], 1);
     const amountBytes = serializeAmountPacked(order.amount);
+    const hasSubsidyBytes = numberToBytesBE(order.hasSubsidy, 1);
     return ethers_1.ethers.utils.concat([
         type,
         accountIdBytes,
@@ -667,6 +668,7 @@ function serializeOrder(order) {
         isSellBytes,
         makerFeeRateBytes,
         takerFeeRateBytes,
+        hasSubsidyBytes,
         amountBytes,
     ]);
 }
@@ -711,6 +713,7 @@ function serializeContract(contract) {
     const directionBytes = numberToBytesBE(contract.direction, 1);
     const makerFeeRateBytes = numberToBytesBE(contract.feeRates[0], 1);
     const takerFeeRateBytes = numberToBytesBE(contract.feeRates[1], 1);
+    const hasSubsidyBytes = numberToBytesBE(contract.hasSubsidy, 1);
     return ethers_1.ethers.utils.concat([
         type,
         accountIdBytes,
@@ -723,6 +726,7 @@ function serializeContract(contract) {
         priceBytes,
         makerFeeRateBytes,
         takerFeeRateBytes,
+        hasSubsidyBytes,
     ]);
 }
 exports.serializeContract = serializeContract;

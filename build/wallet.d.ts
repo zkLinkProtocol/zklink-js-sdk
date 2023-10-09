@@ -57,6 +57,8 @@ export declare class Wallet {
         ethTxOptions?: ethers.providers.TransactionRequest;
     }): Promise<TransactionResponse>;
     private modifyEthersError;
+    assert(condition: boolean, message: string): void;
+    requireTypeNumber(value: any, message: string): void;
     requireAccountId(accountId: number, msg: string): void;
     requireNonce(nonce: number, msg: string): void;
 }

@@ -59,9 +59,8 @@ const data = {
 describe('Contract Transaction', () => {
   it('serialize maker', () => {
     const bytes = serializeContract(data.maker[0] as ContractData)
-    // bytes: [254, 0, 0, 0, 101, 1, 0, 1, 0, 0, 2, 3, 0, 223, 132, 117, 128, 7, 0, 0, 0, 0, 0, 8, 174, 157, 76, 212, 176, 167, 160, 0, 0, 20, 10]
     expect(hexlify(bytes)).toBe(
-      '0xfe000000650100010000020300df84758007000000000008ae9d4cd4b0a7a00000140a'
+      '0xfe000000650100010000020300df84758007000000000008ae9d4cd4b0a7a00000140a00'
     )
   })
 
@@ -78,9 +77,8 @@ describe('Contract Transaction', () => {
 
   it('serialize taker', () => {
     const bytes = serializeContract(data.taker as ContractData)
-    // bytes: [254, 0, 0, 0, 100, 1, 0, 1, 0, 0, 9, 3, 1, 149, 2, 249, 0, 7, 0, 0, 0, 0, 0, 8, 228, 211, 22, 130, 118, 134, 64, 0, 0, 20, 10]
     expect(hexlify(bytes)).toBe(
-      '0xfe0000006401000100000903019502f90007000000000008e4d316827686400000140a'
+      '0xfe0000006401000100000903019502f90007000000000008e4d316827686400000140a00'
     )
   })
 
@@ -97,9 +95,8 @@ describe('Contract Transaction', () => {
 
   it('serialize ContractMatching', async () => {
     const bytes = await serializeContractMatching(data as any)
-    // bytes: [9, 0, 0, 0, 0, 1, 68, 185, 138, 42, 155, 175, 87, 117, 255, 137, 104, 36, 73, 89, 134, 163, 253, 66, 129, 169, 143, 32, 150, 252, 10, 78, 166, 53, 10, 133, 128, 0, 1, 0, 32]
     expect(hexlify(bytes)).toBe(
-      '0x09000000000144b98a2a9baf5775ff896824495986a3fd4281a98f2096fc0a4ea6350a858000010020'
+      '0x090000000001f438775bc5dbe4a9767e5de23009fcb5606473662140a830b0fa3ca937bae900010020'
     )
   })
 
@@ -113,7 +110,7 @@ describe('Contract Transaction', () => {
     expect(typeof tx.taker.size).toBe('string')
     expect(typeof tx.taker.price).toBe('string')
     expect(tx.signature?.signature).toBe(
-      '1aaa8bf030524f6ea62d7ad009b4507e2a477f090d63b0bcc8da0f6330d5bdab50d9de89e9c631e0c74549ce4d6d140c72d78218984ad63ac46c88d80cf50601'
+      '9f84317b25e083f9b1236e3ff91bdb39618c0f1ee99c364ac2330a90d29d1e2faf3860ea28c35ff7e9cfad89b2f7315086025c718429b1e8fae4263aa920a402'
     )
     expect(ethereumSignature?.signature).toBe(
       '0x27ab5fd0b367e440fb7c9ad48bb675a365504b1fd857f16638d0d9782040ad5f2233da9177f01177d2d1bd8b28d47b4cefa05961a9adceb656e1ba548374807c1c'

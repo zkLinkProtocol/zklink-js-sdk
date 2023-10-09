@@ -174,6 +174,7 @@ export interface OrderData {
     price: BigNumberish;
     isSell: number;
     feeRates: [number, number];
+    hasSubsidy: 0 | 1;
     signature?: Signature;
 }
 export interface OrderMatchingEntries {
@@ -211,8 +212,9 @@ export interface ContractData {
     pairId: PairId;
     size: BigNumberish;
     price: BigNumberish;
-    direction: number;
+    direction: 0 | 1;
     feeRates: [number, number];
+    hasSubsidy: 0 | 1;
     signature?: Signature;
 }
 export interface ContractMatchingEntries {

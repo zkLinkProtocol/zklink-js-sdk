@@ -81,7 +81,7 @@ export enum TxType {
 }
 
 export const ORDER_TYPES = 1424 / 8 // 178
-export const CONTRACT_TYPES = 35
+export const CONTRACT_TYPES = 36
 
 export function floatToInteger(
   floatBytes: Uint8Array,
@@ -800,6 +800,7 @@ export function serializeOrder(order: OrderData): Uint8Array {
   const makerFeeRateBytes = numberToBytesBE(order.feeRates[0], 1)
   const takerFeeRateBytes = numberToBytesBE(order.feeRates[1], 1)
   const amountBytes = serializeAmountPacked(order.amount)
+  const hasSubsidyBytes = numberToBytesBE(order.hasSubsidy, 1)
   return ethers.utils.concat([
     type,
     accountIdBytes,
@@ -812,6 +813,7 @@ export function serializeOrder(order: OrderData): Uint8Array {
     isSellBytes,
     makerFeeRateBytes,
     takerFeeRateBytes,
+    hasSubsidyBytes,
     amountBytes,
   ])
 }
@@ -858,6 +860,7 @@ export function serializeContract(contract: ContractData): Uint8Array {
   const directionBytes = numberToBytesBE(contract.direction, 1)
   const makerFeeRateBytes = numberToBytesBE(contract.feeRates[0], 1)
   const takerFeeRateBytes = numberToBytesBE(contract.feeRates[1], 1)
+  const hasSubsidyBytes = numberToBytesBE(contract.hasSubsidy, 1)
   return ethers.utils.concat([
     type,
     accountIdBytes,
@@ -870,6 +873,7 @@ export function serializeContract(contract: ContractData): Uint8Array {
     priceBytes,
     makerFeeRateBytes,
     takerFeeRateBytes,
+    hasSubsidyBytes,
   ])
 }
 

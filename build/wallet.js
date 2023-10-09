@@ -130,7 +130,23 @@ class Wallet {
         });
     }
     signOrder(entries) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            this.requireAccountId(entries === null || entries === void 0 ? void 0 : entries.accountId, 'Order');
+            this.requireTypeNumber(entries === null || entries === void 0 ? void 0 : entries.subAccountId, 'Missing or invalid "subAccountId"');
+            this.requireTypeNumber(entries === null || entries === void 0 ? void 0 : entries.slotId, 'Missing or invalid "slotId"');
+            this.requireNonce(entries === null || entries === void 0 ? void 0 : entries.nonce, 'Order');
+            this.requireTypeNumber(entries.baseTokenId, 'Missing or invalid "baseTokenId"');
+            this.requireTypeNumber(entries.quoteTokenId, 'Missing or invalid "quoteTokenId"');
+            this.assert(typeof entries.amount === 'string' ||
+                ethers_1.BigNumber.isBigNumber(entries.amount), 'Missing or invalid "amount"');
+            this.assert(typeof entries.price === 'string' || ethers_1.BigNumber.isBigNumber(entries.price), 'Missing or invalid "price"');
+            this.assert(entries.isSell === 0 || entries.isSell === 1, '"isSell" must be either 0 or 1');
+            this.assert(entries.feeRates instanceof Array, '"feeRates" must be an array');
+            this.assert(((_a = entries.feeRates) === null || _a === void 0 ? void 0 : _a.length) === 2, '"feeRates" length must be 2');
+            if (entries.hasSubsidy === undefined) {
+                entries.hasSubsidy = entries.feeRates[0] < 0 ? 1 : 0;
+            }
             const signedTransferTransaction = yield this.signer.signOrder(entries);
             return {
                 tx: signedTransferTransaction,
@@ -164,7 +180,21 @@ class Wallet {
         });
     }
     signContract(entries) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            this.requireAccountId(entries === null || entries === void 0 ? void 0 : entries.accountId, 'Contract');
+            this.requireTypeNumber(entries === null || entries === void 0 ? void 0 : entries.subAccountId, 'Missing or invalid "subAccountId"');
+            this.requireTypeNumber(entries === null || entries === void 0 ? void 0 : entries.slotId, 'Missing or invalid "slotId"');
+            this.requireNonce(entries === null || entries === void 0 ? void 0 : entries.nonce, 'Contract');
+            this.requireTypeNumber(entries.pairId, 'Missing or invalid "pairId"');
+            this.assert(typeof entries.size === 'string' || ethers_1.BigNumber.isBigNumber(entries.size), 'Missing or invalid "size"');
+            this.assert(typeof entries.price === 'string' || ethers_1.BigNumber.isBigNumber(entries.price), 'Missing or invalid "price"');
+            this.assert(entries.direction === 0 || entries.direction === 1, '"direction" must be either 0 or 1');
+            this.assert(entries.feeRates instanceof Array, '"feeRates" must be an array');
+            this.assert(((_a = entries.feeRates) === null || _a === void 0 ? void 0 : _a.length) === 2, '"feeRates" length must be 2');
+            if (entries.hasSubsidy === undefined) {
+                entries.hasSubsidy = entries.feeRates[0] < 0 ? 1 : 0;
+            }
             const signedTransferTransaction = yield this.signer.signContract(entries);
             return {
                 tx: signedTransferTransaction,
@@ -522,6 +552,14 @@ class Wallet {
             }
         }
         throw error;
+    }
+    assert(condition, message) {
+        if (condition === false) {
+            throw new Error(message);
+        }
+    }
+    requireTypeNumber(value, message) {
+        this.assert(typeof value === 'number', message);
     }
     requireAccountId(accountId, msg) {
         if (accountId === undefined || accountId === null) {

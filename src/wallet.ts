@@ -208,6 +208,44 @@ export class Wallet {
   }
 
   async signOrder(entries: OrderData): Promise<SignedTransaction> {
+    this.requireAccountId(entries?.accountId, 'Order')
+    this.requireTypeNumber(
+      entries?.subAccountId,
+      'Missing or invalid "subAccountId"'
+    )
+    this.requireTypeNumber(entries?.slotId, 'Missing or invalid "slotId"')
+    this.requireNonce(entries?.nonce, 'Order')
+    this.requireTypeNumber(
+      entries.baseTokenId,
+      'Missing or invalid "baseTokenId"'
+    )
+    this.requireTypeNumber(
+      entries.quoteTokenId,
+      'Missing or invalid "quoteTokenId"'
+    )
+    this.assert(
+      typeof entries.amount === 'string' ||
+        BigNumber.isBigNumber(entries.amount),
+      'Missing or invalid "amount"'
+    )
+    this.assert(
+      typeof entries.price === 'string' || BigNumber.isBigNumber(entries.price),
+      'Missing or invalid "price"'
+    )
+    this.assert(
+      entries.isSell === 0 || entries.isSell === 1,
+      '"isSell" must be either 0 or 1'
+    )
+    this.assert(
+      entries.feeRates instanceof Array,
+      '"feeRates" must be an array'
+    )
+    this.assert(entries.feeRates?.length === 2, '"feeRates" length must be 2')
+
+    if (entries.hasSubsidy === undefined) {
+      entries.hasSubsidy = entries.feeRates[0] < 0 ? 1 : 0
+    }
+
     const signedTransferTransaction = await this.signer.signOrder(entries)
 
     return {
@@ -255,6 +293,36 @@ export class Wallet {
   }
 
   async signContract(entries: ContractData): Promise<SignedTransaction> {
+    this.requireAccountId(entries?.accountId, 'Contract')
+    this.requireTypeNumber(
+      entries?.subAccountId,
+      'Missing or invalid "subAccountId"'
+    )
+    this.requireTypeNumber(entries?.slotId, 'Missing or invalid "slotId"')
+    this.requireNonce(entries?.nonce, 'Contract')
+    this.requireTypeNumber(entries.pairId, 'Missing or invalid "pairId"')
+    this.assert(
+      typeof entries.size === 'string' || BigNumber.isBigNumber(entries.size),
+      'Missing or invalid "size"'
+    )
+    this.assert(
+      typeof entries.price === 'string' || BigNumber.isBigNumber(entries.price),
+      'Missing or invalid "price"'
+    )
+    this.assert(
+      entries.direction === 0 || entries.direction === 1,
+      '"direction" must be either 0 or 1'
+    )
+    this.assert(
+      entries.feeRates instanceof Array,
+      '"feeRates" must be an array'
+    )
+    this.assert(entries.feeRates?.length === 2, '"feeRates" length must be 2')
+
+    if (entries.hasSubsidy === undefined) {
+      entries.hasSubsidy = entries.feeRates[0] < 0 ? 1 : 0
+    }
+
     const signedTransferTransaction = await this.signer.signContract(entries)
 
     return {
@@ -736,6 +804,15 @@ export class Wallet {
     throw error
   }
 
+  assert(condition: boolean, message: string) {
+    if (condition === false) {
+      throw new Error(message)
+    }
+  }
+
+  requireTypeNumber(value: any, message: string) {
+    this.assert(typeof value === 'number', message)
+  }
   requireAccountId(accountId: number, msg: string) {
     if (accountId === undefined || accountId === null) {
       throw new Error(`Missing accountId in ${msg}, accountId: ${accountId}`)
