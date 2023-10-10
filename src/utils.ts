@@ -797,8 +797,8 @@ export function serializeOrder(order: OrderData): Uint8Array {
   const quoteTokenIdBytes = serializeTokenId(order.quoteTokenId)
   const priceBytes = serializePrice(order.price)
   const isSellBytes = numberToBytesBE(order.isSell, 1)
-  const makerFeeRateBytes = numberToBytesBE(order.feeRates[0], 1)
-  const takerFeeRateBytes = numberToBytesBE(order.feeRates[1], 1)
+  const makerFeeRateBytes = numberToBytesBE(Math.abs(order.feeRates[0]), 1)
+  const takerFeeRateBytes = numberToBytesBE(Math.abs(order.feeRates[1]), 1)
   const amountBytes = serializeAmountPacked(order.amount)
   const hasSubsidyBytes = numberToBytesBE(order.hasSubsidy, 1)
   return ethers.utils.concat([
@@ -858,8 +858,8 @@ export function serializeContract(contract: ContractData): Uint8Array {
   const sizeBytes = serializeAmountPacked(contract.size)
   const priceBytes = serializePrice(contract.price)
   const directionBytes = numberToBytesBE(contract.direction, 1)
-  const makerFeeRateBytes = numberToBytesBE(contract.feeRates[0], 1)
-  const takerFeeRateBytes = numberToBytesBE(contract.feeRates[1], 1)
+  const makerFeeRateBytes = numberToBytesBE(Math.abs(contract.feeRates[0]), 1)
+  const takerFeeRateBytes = numberToBytesBE(Math.abs(contract.feeRates[1]), 1)
   const hasSubsidyBytes = numberToBytesBE(contract.hasSubsidy, 1)
   return ethers.utils.concat([
     type,
