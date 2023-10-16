@@ -145,7 +145,7 @@ class Wallet {
             this.assert(entries.feeRates instanceof Array, '"feeRates" must be an array');
             this.assert(((_a = entries.feeRates) === null || _a === void 0 ? void 0 : _a.length) === 2, '"feeRates" length must be 2');
             if (entries.hasSubsidy === undefined) {
-                entries.hasSubsidy = entries.feeRates[0] < 0 ? 1 : 0;
+                entries.hasSubsidy = entries.feeRates[0] <= 0 ? 1 : 0;
             }
             const signedTransferTransaction = yield this.signer.signOrder(entries);
             return {
@@ -193,7 +193,7 @@ class Wallet {
             this.assert(entries.feeRates instanceof Array, '"feeRates" must be an array');
             this.assert(((_a = entries.feeRates) === null || _a === void 0 ? void 0 : _a.length) === 2, '"feeRates" length must be 2');
             if (entries.hasSubsidy === undefined) {
-                entries.hasSubsidy = entries.feeRates[0] < 0 ? 1 : 0;
+                entries.hasSubsidy = entries.feeRates[0] <= 0 ? 1 : 0;
             }
             const signedTransferTransaction = yield this.signer.signContract(entries);
             return {

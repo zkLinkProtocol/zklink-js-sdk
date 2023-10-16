@@ -243,7 +243,7 @@ export class Wallet {
     this.assert(entries.feeRates?.length === 2, '"feeRates" length must be 2')
 
     if (entries.hasSubsidy === undefined) {
-      entries.hasSubsidy = entries.feeRates[0] < 0 ? 1 : 0
+      entries.hasSubsidy = entries.feeRates[0] <= 0 ? 1 : 0
     }
 
     const signedTransferTransaction = await this.signer.signOrder(entries)
@@ -320,7 +320,7 @@ export class Wallet {
     this.assert(entries.feeRates?.length === 2, '"feeRates" length must be 2')
 
     if (entries.hasSubsidy === undefined) {
-      entries.hasSubsidy = entries.feeRates[0] < 0 ? 1 : 0
+      entries.hasSubsidy = entries.feeRates[0] <= 0 ? 1 : 0
     }
 
     const signedTransferTransaction = await this.signer.signContract(entries)
