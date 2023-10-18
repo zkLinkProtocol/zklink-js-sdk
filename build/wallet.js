@@ -244,7 +244,7 @@ class Wallet {
         return __awaiter(this, void 0, void 0, function* () {
             this.requireAccountId(entries === null || entries === void 0 ? void 0 : entries.accountId, 'ChangePubKey');
             this.requireNonce(entries === null || entries === void 0 ? void 0 : entries.nonce, 'ChangePubKey');
-            const { feeTokenId, layerOneChainId } = entries, data = __rest(entries, ["feeTokenId", "layerOneChainId"]);
+            const { feeTokenId } = entries, data = __rest(entries, ["feeTokenId"]);
             const transactionData = Object.assign(Object.assign({}, data), { type: 'ChangePubKey', account: entries.account || this.address(), newPkHash: entries.newPkHash || (yield this.signer.pubKeyHash()), feeToken: feeTokenId, ts: entries.ts || (0, utils_2.getTimestamp)() });
             if (entries.ethAuthType === 'Onchain') {
                 transactionData.ethAuthData = {
@@ -277,9 +277,11 @@ class Wallet {
                 };
             }
             else if (entries.ethAuthType === 'EthECDSA') {
-                const changePubKeySignData = (0, utils_2.getChangePubkeyMessage)(transactionData.newPkHash, transactionData.nonce, transactionData.accountId, entries.mainContract, entries.layerOneChainId);
-                const ethSignature = (yield this.getEIP712Signature(changePubKeySignData))
-                    .signature;
+                const ethSignature = (yield this.ethMessageSigner.ethSignChangePubKey({
+                    pubKeyHash: transactionData.newPkHash,
+                    nonce: String(transactionData.nonce),
+                    accountId: String(transactionData.accountId),
+                })).signature;
                 transactionData.ethAuthData = {
                     type: 'EthECDSA',
                     ethSignature,

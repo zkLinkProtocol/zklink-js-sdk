@@ -137,8 +137,6 @@ export interface ChangePubKeyEntries {
     ethAuthType: ChangePubkeyTypes;
     fee: BigNumberish;
     nonce: Nonce;
-    mainContract: Address;
-    layerOneChainId: number;
     newPkHash?: PubKeyHash;
     account?: Address;
     ts?: number;

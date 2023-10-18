@@ -175,13 +175,18 @@ class EthMessageSigner {
     getWithdrawEthMessagePart(tx) {
         return this.getTransferEthMessagePart(tx, 'withdraw');
     }
-    getChangePubKeyEthMessagePart(changePubKey) {
-        let message = '';
-        message += `Set signing key: ${changePubKey.pubKeyHash.toLowerCase()}`;
-        if (changePubKey.stringFee != null) {
-            message += `\nFee: ${changePubKey.stringFee} ${changePubKey.stringToken}`;
-        }
+    getChangePubKeyEthSignMessage(changePubKey) {
+        let message = 'ChangePubKey';
+        message += `\nPubKeyHash: ${changePubKey.pubKeyHash.toLowerCase()}`;
+        message += `\nNonce: ${changePubKey.nonce}`;
+        message += `\nAccountId: ${changePubKey.accountId}`;
         return message;
+    }
+    ethSignChangePubKey(changePubKey) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const message = this.getChangePubKeyEthSignMessage(changePubKey);
+            return yield this.getEthMessageSignature(message);
+        });
     }
     getForcedExitEthMessagePart(forcedExit) {
         let message = `ForcedExit ${forcedExit.stringToken} to: ${forcedExit.target.toLowerCase()}`;
