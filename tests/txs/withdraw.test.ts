@@ -27,7 +27,7 @@ describe('withdraw', () => {
     const data = wallet.getWithdrawData(entries)
     const serialized = serializeWithdraw(data)
     expect(Buffer.from(serialized).toString('hex')).toBe(
-      '030300000001010000000000000000000000003d809e414ba4893709c85f242ba3617481bc4126000100110100000000000000056bb8cd3fbf7bc000334d0000005501003262552fdb'
+      '030300000001010000000000000000000000003d809e414ba4893709c85f242ba3617481bc41260001001100000000000000056bb8cd3fbf7bc000334d000000550101003262552fdb'
     )
   })
 
@@ -35,7 +35,7 @@ describe('withdraw', () => {
     const wallet = await getTestWallet()
     const signed = await wallet.signWithdrawToEthereum(entries)
     expect(signed.tx.signature?.signature).toBe(
-      '9c8810bf73a21f67530d4699cd3890af1217a3d6617da6ec0fcb6bdb7c1f0198024efa73008aecda3968b9deb403306dc7d9eb0e63cc3a169c0cefe8a3cfb801'
+      'e2eea70a5dbec859d09cf43090c6112513d2a754700861226285150313131b0065310117331d2f57de490371a157a27a5667a190cc90b59fee92140d9dbbc002'
     )
   })
 
