@@ -117,6 +117,9 @@ class Wallet {
     }
     getForcedExitData(entries) {
         const { l2SourceTokenId, l1TargetTokenId } = entries, data = __rest(entries, ["l2SourceTokenId", "l1TargetTokenId"]);
+        if (entries.withdrawToL1 !== 0 && entries.withdrawToL1 !== 1) {
+            throw new Error('withdrawToL1 must be 0 or 1');
+        }
         const transactionData = Object.assign(Object.assign({}, data), { type: 'ForcedExit', l2SourceToken: l2SourceTokenId, l1TargetToken: l1TargetTokenId, ts: entries.ts || (0, utils_2.getTimestamp)() });
         return transactionData;
     }

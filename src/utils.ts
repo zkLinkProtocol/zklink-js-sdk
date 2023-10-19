@@ -771,6 +771,7 @@ export function serializeForcedExit(forcedExit: ForcedExitData): Uint8Array {
   )
   const l2SourceTokenIdBytes = serializeTokenId(forcedExit.l2SourceToken)
   const l1TargetTokenIdBytes = serializeTokenId(forcedExit.l1TargetToken)
+  const withdrawToL1Bytes = numberToBytesBE(forcedExit.withdrawToL1, 1)
   const initiatorNonceBytes = serializeNonce(forcedExit.initiatorNonce)
   const exitAmountBytes = serializeAmountFull(forcedExit.exitAmount)
   const tsBytes = numberToBytesBE(forcedExit.ts, 4)
@@ -783,6 +784,7 @@ export function serializeForcedExit(forcedExit: ForcedExitData): Uint8Array {
     targetSubAccountIdBytes,
     l2SourceTokenIdBytes,
     l1TargetTokenIdBytes,
+    withdrawToL1Bytes,
     initiatorNonceBytes,
     exitAmountBytes,
     tsBytes,

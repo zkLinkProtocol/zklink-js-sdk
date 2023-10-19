@@ -184,6 +184,11 @@ export class Wallet {
 
   getForcedExitData(entries: ForcedExitEntries): ForcedExitData {
     const { l2SourceTokenId, l1TargetTokenId, ...data } = entries
+
+    if (entries.withdrawToL1 !== 0 && entries.withdrawToL1 !== 1) {
+      throw new Error('withdrawToL1 must be 0 or 1')
+    }
+
     const transactionData: ForcedExitData = {
       ...data,
       type: 'ForcedExit',

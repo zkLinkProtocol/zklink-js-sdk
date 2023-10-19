@@ -92,6 +92,7 @@ export interface WithdrawData {
 }
 export interface ForcedExitEntries {
     toChainId: ChainId;
+    withdrawToL1: 0 | 1;
     initiatorAccountId: number;
     initiatorSubAccountId: SubAccountId;
     target: Address;
@@ -105,6 +106,7 @@ export interface ForcedExitEntries {
 export interface ForcedExitData {
     type: 'ForcedExit';
     toChainId: ChainId;
+    withdrawToL1: 0 | 1;
     initiatorAccountId: number;
     initiatorSubAccountId: SubAccountId;
     target: Address;
