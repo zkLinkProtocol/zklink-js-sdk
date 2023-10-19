@@ -200,6 +200,9 @@ class Wallet {
     getWithdrawData(entries) {
         this.requireAccountId(entries === null || entries === void 0 ? void 0 : entries.accountId, 'Withdraw');
         this.requireNonce(entries === null || entries === void 0 ? void 0 : entries.nonce, 'Withdraw');
+        if (entries.withdrawToL1 !== 0 && entries.withdrawToL1 !== 1) {
+            throw new Error('withdrawToL1 must be 0 or 1');
+        }
         const { l2SourceTokenId, l2SourceTokenSymbol, l1TargetTokenId } = entries, data = __rest(entries, ["l2SourceTokenId", "l2SourceTokenSymbol", "l1TargetTokenId"]);
         const transactionData = Object.assign(Object.assign({}, data), { type: 'Withdraw', from: entries.from || this.address(), l2SourceToken: l2SourceTokenId, l1TargetToken: l1TargetTokenId, ts: entries.ts || (0, utils_2.getTimestamp)() });
         return transactionData;

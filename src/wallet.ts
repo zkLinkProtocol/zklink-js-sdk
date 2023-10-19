@@ -304,6 +304,11 @@ export class Wallet {
   getWithdrawData(entries: WithdrawEntries): WithdrawData {
     this.requireAccountId(entries?.accountId, 'Withdraw')
     this.requireNonce(entries?.nonce, 'Withdraw')
+
+    if (entries.withdrawToL1 !== 0 && entries.withdrawToL1 !== 1) {
+      throw new Error('withdrawToL1 must be 0 or 1')
+    }
+
     const { l2SourceTokenId, l2SourceTokenSymbol, l1TargetTokenId, ...data } =
       entries
     const transactionData: WithdrawData = {

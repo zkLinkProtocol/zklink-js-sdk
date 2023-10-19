@@ -544,6 +544,7 @@ function serializeWithdraw(withdraw) {
     const toBytes = serializeAddress(withdraw.to);
     const l2SourceTokenIdBytes = serializeTokenId(withdraw.l2SourceToken);
     const l1TargetTokenIdBytes = serializeTokenId(withdraw.l1TargetToken);
+    const withdrawToL1Bytes = numberToBytesBE(withdraw.withdrawToL1, 1);
     const amountBytes = serializeAmountFull(withdraw.amount);
     const feeBytes = serializeFeePacked(withdraw.fee);
     const nonceBytes = serializeNonce(withdraw.nonce);
@@ -558,6 +559,7 @@ function serializeWithdraw(withdraw) {
         toBytes,
         l2SourceTokenIdBytes,
         l1TargetTokenIdBytes,
+        withdrawToL1Bytes,
         amountBytes,
         feeBytes,
         nonceBytes,

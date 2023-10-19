@@ -57,6 +57,7 @@ export interface TransferData {
 }
 export interface WithdrawEntries {
     toChainId: ChainId;
+    withdrawToL1: 0 | 1;
     subAccountId: SubAccountId;
     to: string;
     l2SourceTokenId: TokenId;
@@ -74,6 +75,7 @@ export interface WithdrawEntries {
 export interface WithdrawData {
     type: 'Withdraw';
     toChainId: ChainId;
+    withdrawToL1: 0 | 1;
     subAccountId: SubAccountId;
     accountId: number;
     from: Address;
