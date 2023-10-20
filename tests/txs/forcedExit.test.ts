@@ -22,7 +22,7 @@ describe('forcedExit', () => {
     const data = wallet.getForcedExitData(entries)
     const serialized = serializeForcedExit(data)
     expect(Buffer.from(serialized).toString('hex')).toBe(
-      '070100000001000000000000000000000000003498f456645270ee003441df82c718b56c0e6666000001001101000000550000000000000000000e90eda394400062552fdb'
+      '070100000001000000000000000000000000003498f456645270ee003441df82c718b56c0e66660000010011000000550000000000000000000e90eda39440000162552fdb'
     )
   })
 
@@ -31,7 +31,7 @@ describe('forcedExit', () => {
     const signed = await wallet.signForcedExit(entries)
     expect(signed.ethereumSignature).toBeUndefined()
     expect(signed.tx.signature?.signature).toBe(
-      '1b9759525d01c781bcf20154de8c7a4eb21a8fe98fc8c39093f0519f83071717dcac6209eabe45f28b56fab7a1899a1202b97c1e440870165d536e164f0df701'
+      '5adbdc54f70c7ced9a0012117fa62c05ee37b972f2f569b8e6cc217ab598da15a4cb63dae1127be654eba3611b92fdeea5b923c809ea2824f608ec50e3757101'
     )
   })
 })
