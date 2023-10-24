@@ -28,7 +28,7 @@ describe('Create2 ChangePubKey', () => {
       '0x02632c1812cbbcb827ab923a8402fbf3df9df037'
     )
     const entries: ChangePubKeyEntries = {
-      ethAuthType: 'EthCREATE2',
+      ethAuthType: 'EthCreate2',
       chainId: 2,
       account: '0x62b23B5DfD7dDf643DBaB3Bc475398D5a7e3891f',
       accountId: 15,

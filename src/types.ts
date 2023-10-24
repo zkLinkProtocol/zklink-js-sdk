@@ -135,7 +135,7 @@ export interface ForcedExitData {
   ts: number
 }
 
-export type ChangePubkeyTypes = 'Onchain' | 'EthECDSA' | 'EthCREATE2'
+export type ChangePubkeyTypes = 'Onchain' | 'EthECDSA' | 'EthCreate2'
 
 export interface ChangePubKeyOnchain {
   type: 'Onchain'
@@ -148,7 +148,7 @@ export interface ChangePubKeyECDSA {
 }
 
 export interface ChangePubKeyCREATE2 {
-  type: 'EthCREATE2'
+  type: 'EthCreate2'
   creatorAddress: string
   saltArg: string
   codeHash: string

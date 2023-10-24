@@ -263,9 +263,9 @@ class Wallet {
                     ethSignature: '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
                 };
             }
-            else if (entries.ethAuthType === 'EthCREATE2') {
+            else if (entries.ethAuthType === 'EthCreate2') {
                 transactionData.ethAuthData = {
-                    type: 'EthCREATE2',
+                    type: 'EthCreate2',
                     creatorAddress: '0x0000000000000000000000000000000000000000',
                     saltArg: '0x0000000000000000000000000000000000000000000000000000000000000000',
                     codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -293,11 +293,11 @@ class Wallet {
                     ethSignature,
                 };
             }
-            else if (entries.ethAuthType === 'EthCREATE2') {
+            else if (entries.ethAuthType === 'EthCreate2') {
                 if (this.ethSigner instanceof signer_1.Create2WalletSigner) {
                     const create2data = this.ethSigner.create2WalletData;
                     transactionData.ethAuthData = {
-                        type: 'EthCREATE2',
+                        type: 'EthCreate2',
                         creatorAddress: create2data.creatorAddress,
                         saltArg: create2data.saltArg,
                         codeHash: create2data.codeHash,
