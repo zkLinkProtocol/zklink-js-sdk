@@ -37,8 +37,6 @@ describe('Create2 ChangePubKey', () => {
       feeTokenId: 18,
       nonce: 0,
       ts: 1668054154,
-      mainContract: '0x0000000000000000000000000000000000000000',
-      layerOneChainId: 1,
     }
 
     const signed = await create2Wallet.signChangePubKey(entries)
