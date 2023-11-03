@@ -119,11 +119,16 @@ export declare class EthMessageSigner {
         stringFee: string;
         to?: string;
     }): string;
-    getChangePubKeyEthMessagePart(changePubKey: {
+    getChangePubKeyEthSignMessage(changePubKey: {
         pubKeyHash: PubKeyHash;
-        stringToken: string;
-        stringFee: string;
+        nonce: string;
+        accountId: string;
     }): string;
+    ethSignChangePubKey(changePubKey: {
+        pubKeyHash: PubKeyHash;
+        nonce: string;
+        accountId: string;
+    }): Promise<TxEthSignature>;
     getForcedExitEthMessagePart(forcedExit: {
         stringToken: string;
         stringFeeToken: string;

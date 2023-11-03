@@ -548,6 +548,7 @@ function serializeWithdraw(withdraw) {
     const feeBytes = serializeFeePacked(withdraw.fee);
     const nonceBytes = serializeNonce(withdraw.nonce);
     const fastWithdrawBytes = serializeFastWithdraw(withdraw.fastWithdraw);
+    const withdrawToL1Bytes = numberToBytesBE(withdraw.withdrawToL1, 1);
     const withdrawFeeRatioBytes = serializeFeeRatio(withdraw.withdrawFeeRatio);
     const tsBytes = numberToBytesBE(withdraw.ts, 4);
     return ethers_1.ethers.utils.concat([
@@ -562,6 +563,7 @@ function serializeWithdraw(withdraw) {
         feeBytes,
         nonceBytes,
         fastWithdrawBytes,
+        withdrawToL1Bytes,
         withdrawFeeRatioBytes,
         tsBytes,
     ]);
@@ -626,6 +628,7 @@ function serializeForcedExit(forcedExit) {
     const l1TargetTokenIdBytes = serializeTokenId(forcedExit.l1TargetToken);
     const initiatorNonceBytes = serializeNonce(forcedExit.initiatorNonce);
     const exitAmountBytes = serializeAmountFull(forcedExit.exitAmount);
+    const withdrawToL1Bytes = numberToBytesBE(forcedExit.withdrawToL1, 1);
     const tsBytes = numberToBytesBE(forcedExit.ts, 4);
     return ethers_1.ethers.utils.concat([
         type,
@@ -638,6 +641,7 @@ function serializeForcedExit(forcedExit) {
         l1TargetTokenIdBytes,
         initiatorNonceBytes,
         exitAmountBytes,
+        withdrawToL1Bytes,
         tsBytes,
     ]);
 }

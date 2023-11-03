@@ -6,6 +6,7 @@ import { getTestWallet } from '../wallet.test'
 describe('withdraw', () => {
   const entries: WithdrawEntries = {
     toChainId: 3,
+    withdrawToL1: 1,
     subAccountId: 1,
     accountId: 1,
     from: '0x3498F456645270eE003441df82C718b56c0e6666',
@@ -26,7 +27,7 @@ describe('withdraw', () => {
     const data = wallet.getWithdrawData(entries)
     const serialized = serializeWithdraw(data)
     expect(Buffer.from(serialized).toString('hex')).toBe(
-      '030300000001010000000000000000000000003d809e414ba4893709c85f242ba3617481bc41260001001100000000000000056bb8cd3fbf7bc000334d0000005501003262552fdb'
+      '030300000001010000000000000000000000003d809e414ba4893709c85f242ba3617481bc41260001001100000000000000056bb8cd3fbf7bc000334d000000550101003262552fdb'
     )
   })
 
@@ -34,7 +35,7 @@ describe('withdraw', () => {
     const wallet = await getTestWallet()
     const signed = await wallet.signWithdrawToEthereum(entries)
     expect(signed.tx.signature?.signature).toBe(
-      '6d782453d4cda0eacda13b53fa5471942ad75ea5010e086df845886ba5407bac82f3c7c04ba58045f7115df52d091a232701c8613d5a8fe31fdbee1846d87f00'
+      'e2eea70a5dbec859d09cf43090c6112513d2a754700861226285150313131b0065310117331d2f57de490371a157a27a5667a190cc90b59fee92140d9dbbc002'
     )
   })
 

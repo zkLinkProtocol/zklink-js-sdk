@@ -287,17 +287,25 @@ export class EthMessageSigner {
     return this.getTransferEthMessagePart(tx, 'withdraw')
   }
 
-  getChangePubKeyEthMessagePart(changePubKey: {
+  getChangePubKeyEthSignMessage(changePubKey: {
     pubKeyHash: PubKeyHash
-    stringToken: string
-    stringFee: string
+    nonce: string
+    accountId: string
   }): string {
-    let message = ''
-    message += `Set signing key: ${changePubKey.pubKeyHash.toLowerCase()}`
-    if (changePubKey.stringFee != null) {
-      message += `\nFee: ${changePubKey.stringFee} ${changePubKey.stringToken}`
-    }
+    let message = 'ChangePubKey'
+    message += `\nPubKeyHash: ${changePubKey.pubKeyHash.toLowerCase()}`
+    message += `\nNonce: ${changePubKey.nonce}`
+    message += `\nAccountId: ${changePubKey.accountId}`
     return message
+  }
+
+  async ethSignChangePubKey(changePubKey: {
+    pubKeyHash: PubKeyHash
+    nonce: string
+    accountId: string
+  }): Promise<TxEthSignature> {
+    const message = this.getChangePubKeyEthSignMessage(changePubKey)
+    return await this.getEthMessageSignature(message)
   }
 
   getForcedExitEthMessagePart(forcedExit: {

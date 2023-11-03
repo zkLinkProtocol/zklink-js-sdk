@@ -43,7 +43,6 @@ import {
   IERC20_INTERFACE,
   MAIN_CONTRACT_INTERFACE,
   MAX_ERC20_APPROVE_AMOUNT,
-  getChangePubkeyMessage,
   getEthereumBalance,
   getTimestamp,
   isGasToken,
@@ -185,6 +184,11 @@ export class Wallet {
 
   getForcedExitData(entries: ForcedExitEntries): ForcedExitData {
     const { l2SourceTokenId, l1TargetTokenId, ...data } = entries
+
+    if (entries.withdrawToL1 !== 0 && entries.withdrawToL1 !== 1) {
+      throw new Error('withdrawToL1 must be 0 or 1')
+    }
+
     const transactionData: ForcedExitData = {
       ...data,
       type: 'ForcedExit',
@@ -373,6 +377,11 @@ export class Wallet {
   getWithdrawData(entries: WithdrawEntries): WithdrawData {
     this.requireAccountId(entries?.accountId, 'Withdraw')
     this.requireNonce(entries?.nonce, 'Withdraw')
+
+    if (entries.withdrawToL1 !== 0 && entries.withdrawToL1 !== 1) {
+      throw new Error('withdrawToL1 must be 0 or 1')
+    }
+
     const { l2SourceTokenId, l2SourceTokenSymbol, l1TargetTokenId, ...data } =
       entries
     const transactionData: WithdrawData = {
@@ -435,7 +444,7 @@ export class Wallet {
     this.requireAccountId(entries?.accountId, 'ChangePubKey')
     this.requireNonce(entries?.nonce, 'ChangePubKey')
 
-    const { feeTokenId, layerOneChainId, ...data } = entries
+    const { feeTokenId, ...data } = entries
     const transactionData: ChangePubKeyData = {
       ...data,
       type: 'ChangePubKey',
@@ -454,9 +463,9 @@ export class Wallet {
         ethSignature:
           '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
       }
-    } else if (entries.ethAuthType === 'EthCREATE2') {
+    } else if (entries.ethAuthType === 'EthCreate2') {
       transactionData.ethAuthData = {
-        type: 'EthCREATE2',
+        type: 'EthCreate2',
         creatorAddress: '0x0000000000000000000000000000000000000000',
         saltArg:
           '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -477,24 +486,22 @@ export class Wallet {
         type: 'Onchain',
       }
     } else if (entries.ethAuthType === 'EthECDSA') {
-      const changePubKeySignData = getChangePubkeyMessage(
-        transactionData.newPkHash,
-        transactionData.nonce,
-        transactionData.accountId,
-        entries.mainContract,
-        entries.layerOneChainId
-      )
-      const ethSignature = (await this.getEIP712Signature(changePubKeySignData))
-        .signature
+      const ethSignature = (
+        await this.ethMessageSigner.ethSignChangePubKey({
+          pubKeyHash: transactionData.newPkHash,
+          nonce: String(transactionData.nonce),
+          accountId: String(transactionData.accountId),
+        })
+      ).signature
       transactionData.ethAuthData = {
         type: 'EthECDSA',
         ethSignature,
       }
-    } else if (entries.ethAuthType === 'EthCREATE2') {
+    } else if (entries.ethAuthType === 'EthCreate2') {
       if (this.ethSigner instanceof Create2WalletSigner) {
         const create2data = this.ethSigner.create2WalletData
         transactionData.ethAuthData = {
-          type: 'EthCREATE2',
+          type: 'EthCreate2',
           creatorAddress: create2data.creatorAddress,
           saltArg: create2data.saltArg,
           codeHash: create2data.codeHash,

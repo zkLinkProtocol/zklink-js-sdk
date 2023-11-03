@@ -57,6 +57,7 @@ export interface TransferData {
 }
 export interface WithdrawEntries {
     toChainId: ChainId;
+    withdrawToL1: 0 | 1;
     subAccountId: SubAccountId;
     to: string;
     l2SourceTokenId: TokenId;
@@ -74,6 +75,7 @@ export interface WithdrawEntries {
 export interface WithdrawData {
     type: 'Withdraw';
     toChainId: ChainId;
+    withdrawToL1: 0 | 1;
     subAccountId: SubAccountId;
     accountId: number;
     from: Address;
@@ -90,6 +92,7 @@ export interface WithdrawData {
 }
 export interface ForcedExitEntries {
     toChainId: ChainId;
+    withdrawToL1: 0 | 1;
     initiatorAccountId: number;
     initiatorSubAccountId: SubAccountId;
     target: Address;
@@ -103,6 +106,7 @@ export interface ForcedExitEntries {
 export interface ForcedExitData {
     type: 'ForcedExit';
     toChainId: ChainId;
+    withdrawToL1: 0 | 1;
     initiatorAccountId: number;
     initiatorSubAccountId: SubAccountId;
     target: Address;
@@ -114,7 +118,7 @@ export interface ForcedExitData {
     signature?: Signature;
     ts: number;
 }
-export type ChangePubkeyTypes = 'Onchain' | 'EthECDSA' | 'EthCREATE2';
+export type ChangePubkeyTypes = 'Onchain' | 'EthECDSA' | 'EthCreate2';
 export interface ChangePubKeyOnchain {
     type: 'Onchain';
 }
@@ -124,7 +128,7 @@ export interface ChangePubKeyECDSA {
     batchHash?: string;
 }
 export interface ChangePubKeyCREATE2 {
-    type: 'EthCREATE2';
+    type: 'EthCreate2';
     creatorAddress: string;
     saltArg: string;
     codeHash: string;
@@ -137,8 +141,6 @@ export interface ChangePubKeyEntries {
     ethAuthType: ChangePubkeyTypes;
     fee: BigNumberish;
     nonce: Nonce;
-    mainContract: Address;
-    layerOneChainId: number;
     newPkHash?: PubKeyHash;
     account?: Address;
     ts?: number;
