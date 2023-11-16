@@ -80,7 +80,6 @@ export interface WithdrawEntries {
   l1TargetTokenId: TokenId
   amount: BigNumberish
   withdrawFeeRatio: number
-  fastWithdraw: number
   accountId: number
   fee: BigNumberish
   nonce: SubNonce
@@ -100,7 +99,6 @@ export interface WithdrawData {
   amount: BigNumberish
   fee: BigNumberish
   withdrawFeeRatio: number
-  fastWithdraw: number
   ts: number
   nonce: SubNonce
   signature?: Signature

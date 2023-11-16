@@ -547,7 +547,6 @@ function serializeWithdraw(withdraw) {
     const amountBytes = serializeAmountFull(withdraw.amount);
     const feeBytes = serializeFeePacked(withdraw.fee);
     const nonceBytes = serializeNonce(withdraw.nonce);
-    const fastWithdrawBytes = serializeFastWithdraw(withdraw.fastWithdraw);
     const withdrawToL1Bytes = numberToBytesBE(withdraw.withdrawToL1, 1);
     const withdrawFeeRatioBytes = serializeFeeRatio(withdraw.withdrawFeeRatio);
     const tsBytes = numberToBytesBE(withdraw.ts, 4);
@@ -562,7 +561,6 @@ function serializeWithdraw(withdraw) {
         amountBytes,
         feeBytes,
         nonceBytes,
-        fastWithdrawBytes,
         withdrawToL1Bytes,
         withdrawFeeRatioBytes,
         tsBytes,
